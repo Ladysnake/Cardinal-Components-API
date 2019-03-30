@@ -1,0 +1,12 @@
+{
+    "required": true,
+    "minVersion": "0.7.11",
+    "compatibilityLevel": "JAVA_8",
+    "package": "nerdhub.cardinal.components.mixin",
+    "mixins": [
+        "MixinBlock"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

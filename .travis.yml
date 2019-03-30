@@ -1,0 +1,49 @@
+git:
+    quiet: true
+    submodules: true
+    depth: 50
+language: java
+# uncomment to always install latest oracle java8 jdk:
+#addons:
+#    apt:
+#        packages:
+#         - oracle-java8-installer
+jdk:
+    - oraclejdk8
+before_install:
+    - "chmod +x gradlew"
+
+install:
+    - "./gradlew cleanLoomBinaries cleanLoomMappings clean"
+
+script:
+    - "./gradlew build"
+
+before_cache:
+    - find $HOME/.gradle/ -name '*.lock' -print -exec rm -f {} \;
+
+cache:
+    directories:
+        - "$HOME/.gradle/caches/"
+        - "$HOME/.gradle/wrapper/"
+
+before_deploy:
+    - echo "deploying to NerdHub Maven"
+
+deploy:
+    -   provider: script
+        script: "./gradlew publish"
+        skip_cleanup: true
+        on:
+            repo: NerdHubMC/Cardinal-Components-API
+            branch: master
+
+    # if commit tag is created, deploy to curseforge
+    -   provider: script
+        script: "./gradlew curseforge"
+        target_commitsh: $TRAVIS_TAG
+        skip_cleanup: true
+        on:
+            repo: NerdHubMC/Cardinal-Components-API
+            tags: true
+            branch: master

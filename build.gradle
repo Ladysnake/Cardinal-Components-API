@@ -1,0 +1,45 @@
+plugins {
+    id "fabric-loom" version "0.2.0-SNAPSHOT"
+    id "com.matthewprenger.cursegradle" version "1.1.2"
+    id "maven-publish"
+}
+
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+
+group = "com.github.NerdHubMC"
+archivesBaseName = "Cardinal-Components-API"
+version = System.getenv("TRAVIS_TAG") ?: project.mod_version
+println("Setting version: " + version)
+
+apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/basic_project.gradle"
+
+processResources {
+    // this will ensure that this task is redone when there"s a change
+    inputs.property "version", project.version
+
+    // replace stuff in fabric.mod.json, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include "fabric.mod.json"
+
+        // add mod metadata
+        expand "version": project.version
+    }
+
+    // copy everything else, that"s not the fabric.mod.json
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "fabric.mod.json"
+    }
+}
+
+repositories {
+    maven {
+        name = "FabricMC"
+        url = "https://maven.fabricmc.net"
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings "net.fabricmc:yarn:${minecraft_version}.${yarn_mappings}"
+    modCompile "net.fabricmc:fabric-loader:${loader_version}"
+}
