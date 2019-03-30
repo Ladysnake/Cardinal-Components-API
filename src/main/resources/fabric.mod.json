@@ -1,0 +1,9 @@
+{
+    "id": "cardinal_components",
+    "name": "Cardinal Components API",
+    "version": "${version}",
+    "side": "universal",
+    "mixins": {
+        "common": "mixins.cardinal_components.json"
+    }
+}
