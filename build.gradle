@@ -11,6 +11,24 @@ archivesBaseName = "Cardinal-Components-API"
 version = System.getenv("TRAVIS_TAG") ?: project.mod_version
 println("Setting version: " + version)
 
+task apiJar(type: Jar, dependsOn: classes) {
+    onlyIf {
+        project.hasProperty("api_package")
+    }
+    from(sourceSets.main.allJava) {
+        include String.valueOf(findProperty("api_package")).replace('.', '/') + "/**"
+    }
+    from "LICENSE.md"
+    manifest.mainAttributes(
+            "Implementation-Title": project.archivesBaseName + "-api",
+            "Implementation-Version": project.version,
+            "Maven-Artifact": "${project.group}:${project.name}:${project.version}:api".toLowerCase(Locale.ROOT),
+            "Built-On-Minecraft": project.minecraft_version,
+            "Built-On-Java": "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})"
+    )
+    classifier = "api"
+}
+
 apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/basic_project.gradle"
 
 processResources {
