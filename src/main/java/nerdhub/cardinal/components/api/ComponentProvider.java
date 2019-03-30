@@ -5,7 +5,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
+import java.util.Set;
 
 public interface ComponentProvider {
 
@@ -23,7 +23,7 @@ public interface ComponentProvider {
     <T> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side);
 
     /**
-     * @return an <strong>immutable</strong> view of the components exposed by this {@link ComponentProvider}
+     * @return an <strong>immutable</strong> view of the component types exposed by this {@link ComponentProvider}
      */
-    Collection<ComponentType<?>> getComponentTypes();
+    Set<ComponentType<?>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side);
 }
