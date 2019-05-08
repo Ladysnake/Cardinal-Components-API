@@ -4,6 +4,7 @@ public class ComponentType<T> {
 
     /**
      * package-private;
+     *
      * @see ComponentRegistry#get(Class)!
      */
     ComponentType() {
