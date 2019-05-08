@@ -2,12 +2,15 @@ package nerdhub.cardinal.components.api;
 
 public class ComponentType<T> {
 
+    private final String id;
+
     /**
      * package-private;
      *
-     * @see ComponentRegistry#get(Class)!
+     * @see ComponentRegistry#getOrCreate(Class)!
      */
-    ComponentType() {
+    ComponentType(Class clazz) {
+        this.id = clazz.getCanonicalName();
     }
 
     /**
@@ -16,5 +19,9 @@ public class ComponentType<T> {
     @SuppressWarnings("unchecked")
     public <V> V cast(Object instance) {
         return (V) instance;
+    }
+
+    public String getID() {
+        return this.id;
     }
 }

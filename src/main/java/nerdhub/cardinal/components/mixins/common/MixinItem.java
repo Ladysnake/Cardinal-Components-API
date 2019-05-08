@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(Item.class)
-public class MixinItem implements ItemComponentProvider {
+public abstract class MixinItem implements ItemComponentProvider {
 
     @Override
     public void initComponents(ItemStack stack) {
@@ -19,6 +19,6 @@ public class MixinItem implements ItemComponentProvider {
     @SuppressWarnings("ConstantConditions")
     @Override
     public <T extends ItemComponent> void addComponent(ItemStack stack, ComponentType<T> type, T component) {
-        ((ItemstackComponents) (Object) stack).addComponent(type, component);
+        ((ItemstackComponents) (Object) stack).setComponentValue(type, component);
     }
 }

@@ -5,5 +5,6 @@ import nerdhub.cardinal.components.api.component.ItemComponent;
 
 public interface ItemstackComponents {
 
-    <T extends ItemComponent> void addComponent(ComponentType<T> type, T obj);
+    <T extends ItemComponent> void setComponentValue(ComponentType<T> type, ItemComponent obj);
+
 }
