@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    modCompile "com.github.NerdHubMC:Cardinal-Component-API:<VERSION>"
+    modCompile "com.github.NerdHubMC:Cardinal-Components-API:<VERSION>"
 }
 ```
 
