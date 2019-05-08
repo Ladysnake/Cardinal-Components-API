@@ -1,6 +1,8 @@
+import net.fabricmc.loom.task.RemapJar
+
 plugins {
-    id "fabric-loom" version "0.2.0-SNAPSHOT"
-    id "com.matthewprenger.cursegradle" version "1.1.2"
+    id "fabric-loom" version "0.2.2-SNAPSHOT"
+    id "com.matthewprenger.cursegradle" version "1.2.0"
     id "maven-publish"
 }
 
@@ -9,7 +11,19 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 group = "com.github.NerdHubMC"
 archivesBaseName = "Cardinal-Components-API"
 version = System.getenv("TRAVIS_TAG") ?: project.mod_version
-println("Setting version: " + version)
+
+repositories {
+    maven {
+        name = "FabricMC"
+        url = "https://maven.fabricmc.net"
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings "net.fabricmc:yarn:${minecraft_version}+build.${yarn_mappings}"
+    modCompile "net.fabricmc:fabric-loader:${loader_version}"
+}
 
 task apiJar(type: Jar, dependsOn: classes) {
     onlyIf {
@@ -27,6 +41,17 @@ task apiJar(type: Jar, dependsOn: classes) {
             "Built-On-Java": "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})"
     )
     classifier = "api"
+}
+
+task remapApiJar(type: RemapJar, dependsOn: apiJar) {
+    onlyIf {
+        project.hasProperty("api_package")
+    }
+    jar = apiJar.archiveFile.get().asFile
+}
+
+if (project.hasProperty("api_package")) {
+    tasks.jar.dependsOn project.tasks.getByName("apiJar")
 }
 
 apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/basic_project.gradle"
@@ -47,17 +72,4 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude "fabric.mod.json"
     }
-}
-
-repositories {
-    maven {
-        name = "FabricMC"
-        url = "https://maven.fabricmc.net"
-    }
-}
-
-dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings "net.fabricmc:yarn:${minecraft_version}.${yarn_mappings}"
-    modCompile "net.fabricmc:fabric-loader:${loader_version}"
 }

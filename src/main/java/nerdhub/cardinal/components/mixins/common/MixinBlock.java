@@ -1,7 +1,7 @@
-package nerdhub.cardinal.components.mixin;
+package nerdhub.cardinal.components.mixins.common;
 
 import com.google.common.collect.ImmutableSet;
-import nerdhub.cardinal.components.api.ComponentProvider;
+import nerdhub.cardinal.components.api.BlockComponentProvider;
 import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
@@ -14,24 +14,24 @@ import javax.annotation.Nullable;
 import java.util.Set;
 
 @Mixin(Block.class)
-public class MixinBlock implements ComponentProvider {
+public class MixinBlock implements BlockComponentProvider {
 
     @Override
     public <T> boolean hasComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
         BlockEntity be = blockView.getBlockEntity(pos);
-        return be instanceof ComponentProvider && ((ComponentProvider) be).hasComponent(blockView, pos, type, side);
+        return be instanceof BlockComponentProvider && ((BlockComponentProvider) be).hasComponent(blockView, pos, type, side);
     }
 
     @Nullable
     @Override
     public <T> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
         BlockEntity be = blockView.getBlockEntity(pos);
-        return be instanceof ComponentProvider ? ((ComponentProvider) be).getComponent(blockView, pos, type, side) : null;
+        return be instanceof BlockComponentProvider ? ((BlockComponentProvider) be).getComponent(blockView, pos, type, side) : null;
     }
 
     @Override
     public Set<ComponentType<?>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side) {
         BlockEntity be = blockView.getBlockEntity(pos);
-        return be instanceof ComponentProvider ? ((ComponentProvider) be).getComponentTypes(blockView, pos, side) : ImmutableSet.of();
+        return be instanceof BlockComponentProvider ? ((BlockComponentProvider) be).getComponentTypes(blockView, pos, side) : ImmutableSet.of();
     }
 }
