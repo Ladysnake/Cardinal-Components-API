@@ -1,27 +1,30 @@
 package nerdhub.cardinal.components.api;
 
-public class ComponentType<T> {
+import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.util.Identifier;
 
-    private final String id;
+public class ComponentType<T extends Component> {
+
+    private final Identifier id;
 
     /**
      * package-private;
      *
      * @see ComponentRegistry#getOrCreate(Class)!
      */
-    ComponentType(Class clazz) {
-        this.id = clazz.getCanonicalName();
+    ComponentType(Class clazz, Identifier id) {
+        this.id = id;
     }
 
     /**
      * convenience method to easily cast a component instance to it's type
      */
     @SuppressWarnings("unchecked")
-    public <V> V cast(Object instance) {
-        return (V) instance;
+    public T cast(Object instance) {
+        return (T) instance;
     }
 
-    public String getID() {
+    public Identifier getID() {
         return this.id;
     }
 }

@@ -4,13 +4,14 @@ import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.ItemComponentProvider;
 import nerdhub.cardinal.components.api.accessor.StackComponentAccessor;
-import nerdhub.cardinal.components.api.component.ItemComponent;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.mixins.accessor.ItemstackComponents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,7 +28,7 @@ import java.util.Set;
 @Mixin(ItemStack.class)
 public abstract class MixinItemStack implements StackComponentAccessor, ItemstackComponents {
 
-    private final Map<ComponentType<? extends ItemComponent>, ItemComponent> components = new IdentityHashMap<>();
+    private final Map<ComponentType<? extends Component>, Component> components = new IdentityHashMap<>();
 
     @Inject(method = "areTagsEqual", at = @At("RETURN"))
     private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
@@ -52,10 +53,10 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
         }
         StackComponentAccessor accessor = (StackComponentAccessor) (Object) stack1;
         StackComponentAccessor other = (StackComponentAccessor) (Object) stack2;
-        Set<ComponentType<? extends ItemComponent>> types = accessor.getComponentTypes();
+        Set<ComponentType<? extends Component>> types = accessor.getComponentTypes();
         if(types.size() == other.getComponentTypes().size()) {
-            for(ComponentType<? extends ItemComponent> type : types) {
-                if(!other.hasComponent(type) || !accessor.getComponent(type).isEqual(other.getComponent(type))) {
+            for(ComponentType<? extends Component> type : types) {
+                if(!other.hasComponent(type) || !accessor.getComponent(type).isComponentEqual(other.getComponent(type))) {
                     return false;
                 }
             }
@@ -68,8 +69,8 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
     private void copy(CallbackInfoReturnable<ItemStack> cir) {
         ItemstackComponents other = (ItemstackComponents) (Object) cir.getReturnValue();
         components.forEach((type, component) -> {
-            ItemComponent copy = copyOf(component);
-            copy.fromTag(component.toTag(new CompoundTag()));
+            Component copy = copyOf(component);
+            copy.fromItemTag(component.toItemTag(new CompoundTag()));
             other.setComponentValue(type, copy);
         });
     }
@@ -77,9 +78,9 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
     /**
      * private helper method
      */
-    private static ItemComponent copyOf(ItemComponent toCopy) {
-        ItemComponent ret = toCopy.newInstance();
-        ret.fromTag(toCopy.toTag(new CompoundTag()));
+    private static Component copyOf(Component toCopy) {
+        Component ret = toCopy.newInstanceForItemStack();
+        ret.fromItemTag(toCopy.toItemTag(new CompoundTag()));
         return ret;
     }
 
@@ -90,7 +91,7 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
             components.forEach((type, component) -> {
                 CompoundTag componentTag = new CompoundTag();
                 componentTag.putString("id", type.getID());
-                componentTag.put("component", component.toTag(new CompoundTag()));
+                componentTag.put("component", component.toItemTag(new CompoundTag()));
                 componentList.add(componentTag);
             });
             tag.put("cardinal_components", componentList);
@@ -99,7 +100,7 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
 
     @Inject(method = "<init>(Lnet/minecraft/item/ItemProvider;I)V", at = @At("RETURN"))
     private void initComponents(ItemProvider item, int amount, CallbackInfo ci) {
-        ((ItemComponentProvider) this.getItem()).initComponents((ItemStack) (Object) this);
+        ((ItemComponentProvider) this.getItem()).createComponents((ItemStack) (Object) this);
     }
 
     @Shadow
@@ -110,13 +111,13 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
-        ((ItemComponentProvider) this.getItem()).initComponents((ItemStack) (Object) this);
+        ((ItemComponentProvider) this.getItem()).createComponents((ItemStack) (Object) this);
         if(tag.containsKey("cardinal_components", 9)) {
             ListTag componentList = tag.getList("cardinal_components", 9);
             componentList.stream().map(CompoundTag.class::cast).forEach(data -> {
-                ComponentType type = ComponentRegistry.get(data.getString("id"));
+                ComponentType type = ComponentRegistry.get(new Identifier(data.getString("id")));
                 if(this.hasComponent(type)) {
-                    this.getComponent(type).fromTag(data.getCompound("component"));
+                    this.getComponent(type).fromItemTag(data.getCompound("component"));
                 }
             });
         }
@@ -124,24 +125,24 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
     }
 
     @Override
-    public <T extends ItemComponent> void setComponentValue(ComponentType<T> type, ItemComponent obj) {
+    public <T extends Component> void setComponentValue(ComponentType<T> type, Component obj) {
         components.put(type, obj);
     }
 
     @Override
-    public <T extends ItemComponent> boolean hasComponent(ComponentType<T> type) {
+    public <T extends Component> boolean hasComponent(ComponentType<T> type) {
         return components.containsKey(type);
     }
 
     @Nullable
     @Override
-    public <T extends ItemComponent> T getComponent(ComponentType<T> type) {
+    public <T extends Component> T getComponent(ComponentType<T> type) {
         return components.containsKey(type) ? type.cast(components.get(type)) : null;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Set<ComponentType<? extends ItemComponent>> getComponentTypes() {
+    public Set<ComponentType<? extends Component>> getComponentTypes() {
         return Collections.unmodifiableSet(components.keySet());
     }
 }
