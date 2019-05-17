@@ -3,22 +3,21 @@ package nerdhub.cardinal.components.api.component;
 import net.minecraft.nbt.CompoundTag;
 
 /**
- * base class for item components.<br/>
- * provides basic serialization capability
+ * Convenience interface for item-only components.<br/>
+ * Item components are <strong>NOT</strong> required to explicitly implement this interface!<br/>
+ * fall back to {@link Component} for handling item components!
  */
-public interface ItemComponent {
+public interface ItemComponent extends Component {
 
-    void fromTag(CompoundTag tag);
+    @Override
+    void fromItemTag(CompoundTag tag);
 
-    CompoundTag toTag(CompoundTag tag);
+    @Override
+    CompoundTag toItemTag(CompoundTag tag);
 
-    /**
-     * used for copying item components to another stack
-     */
-    ItemComponent newInstance();
+    @Override
+    Component newInstanceForItemStack();
 
-    /**
-     * used for comparing two instances of item components
-     */
-    boolean isEqual(ItemComponent other);
+    @Override
+    boolean isComponentEqual(Component other);
 }
