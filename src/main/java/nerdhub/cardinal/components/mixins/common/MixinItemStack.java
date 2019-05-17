@@ -7,7 +7,7 @@ import nerdhub.cardinal.components.api.accessor.StackComponentAccessor;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.mixins.accessor.ItemstackComponents;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemProvider;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -37,13 +37,6 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
         }
     }
 
-    @Inject(method = "isEqual", at = @At("RETURN"))
-    private void isEqual(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if(cir.getReturnValueZ() && !compare((ItemStack) (Object) this, stack)) {
-            cir.setReturnValue(false);
-        }
-    }
-
     /**
      * private helper method
      */
@@ -63,6 +56,13 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
             return true;
         }
         return false;
+    }
+
+    @Inject(method = "isEqual", at = @At("RETURN"))
+    private void isEqual(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+        if(cir.getReturnValueZ() && !compare((ItemStack) (Object) this, stack)) {
+            cir.setReturnValue(false);
+        }
     }
 
     @Inject(method = "copy", at = @At("RETURN"))
@@ -90,7 +90,7 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
             ListTag componentList = new ListTag();
             components.forEach((type, component) -> {
                 CompoundTag componentTag = new CompoundTag();
-                componentTag.putString("id", type.getID());
+                componentTag.putString("id", type.getID().toString());
                 componentTag.put("component", component.toItemTag(new CompoundTag()));
                 componentList.add(componentTag);
             });
@@ -98,8 +98,8 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
         }
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/item/ItemProvider;I)V", at = @At("RETURN"))
-    private void initComponents(ItemProvider item, int amount, CallbackInfo ci) {
+    @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("RETURN"))
+    private void initComponents(ItemConvertible item, int amount, CallbackInfo ci) {
         ((ItemComponentProvider) this.getItem()).createComponents((ItemStack) (Object) this);
     }
 
@@ -121,12 +121,6 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
                 }
             });
         }
-
-    }
-
-    @Override
-    public <T extends Component> void setComponentValue(ComponentType<T> type, Component obj) {
-        components.put(type, obj);
     }
 
     @Override
@@ -144,5 +138,10 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
     @Override
     public Set<ComponentType<? extends Component>> getComponentTypes() {
         return Collections.unmodifiableSet(components.keySet());
+    }
+
+    @Override
+    public <T extends Component> void setComponentValue(ComponentType<T> type, Component obj) {
+        components.put(type, obj);
     }
 }
