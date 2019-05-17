@@ -1,5 +1,3 @@
-import net.fabricmc.loom.task.RemapJar
-
 plugins {
     id "fabric-loom" version "0.2.2-SNAPSHOT"
     id "com.matthewprenger.cursegradle" version "1.2.0"
@@ -25,34 +23,34 @@ dependencies {
     modCompile "net.fabricmc:fabric-loader:${loader_version}"
 }
 
-task apiJar(type: Jar, dependsOn: classes) {
-    onlyIf {
-        project.hasProperty("api_package")
-    }
-    from(sourceSets.main.allJava) {
-        include String.valueOf(findProperty("api_package")).replace('.', '/') + "/**"
-    }
-    from "LICENSE.md"
-    manifest.mainAttributes(
-            "Implementation-Title": project.archivesBaseName + "-api",
-            "Implementation-Version": project.version,
-            "Maven-Artifact": "${project.group}:${project.name}:${project.version}:api".toLowerCase(Locale.ROOT),
-            "Built-On-Minecraft": project.minecraft_version,
-            "Built-On-Java": "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})"
-    )
-    classifier = "api"
-}
+//task apiJar(type: Jar, dependsOn: classes) {
+//    onlyIf {
+//        project.hasProperty("api_package")
+//    }
+//    from(sourceSets.main.allJava) {
+//        include String.valueOf(findProperty("api_package")).replace('.', '/') + "/**"
+//    }
+//    from "LICENSE.md"
+//    manifest.mainAttributes(
+//            "Implementation-Title": project.archivesBaseName + "-api",
+//            "Implementation-Version": project.version,
+//            "Maven-Artifact": "${project.group}:${project.name}:${project.version}:api".toLowerCase(Locale.ROOT),
+//            "Built-On-Minecraft": project.minecraft_version,
+//            "Built-On-Java": "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})"
+//    )
+//    classifier = "api"
+//}
 
-task remapApiJar(type: RemapJar, dependsOn: apiJar) {
-    onlyIf {
-        project.hasProperty("api_package")
-    }
-    jar = apiJar.archiveFile.get().asFile
-}
-
-if (project.hasProperty("api_package")) {
-    tasks.jar.dependsOn project.tasks.getByName("apiJar")
-}
+//task remapApiJar(type: RemapJar, dependsOn: apiJar) {
+//    onlyIf {
+//        project.hasProperty("api_package")
+//    }
+//    jar = apiJar.archiveFile.get().asFile
+//}
+//
+//if (project.hasProperty("api_package")) {
+//    tasks.jar.dependsOn project.tasks.getByName("apiJar")
+//}
 
 apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/basic_project.gradle"
 
