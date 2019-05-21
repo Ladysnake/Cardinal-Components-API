@@ -25,12 +25,12 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
-@Mixin(ItemStack.class)
+@Mixin(value = ItemStack.class, priority = 900)
 public abstract class MixinItemStack implements StackComponentAccessor, ItemstackComponents {
 
     private final Map<ComponentType<? extends Component>, Component> components = new IdentityHashMap<>();
 
-    @Inject(method = "areTagsEqual", at = @At("RETURN"))
+    @Inject(method = "areTagsEqual", at = @At("RETURN"), cancellable = true)
     private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
         if(cir.getReturnValueZ() && !compare(stack1, stack2)) {
             cir.setReturnValue(false);
@@ -40,6 +40,7 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
     /**
      * private helper method
      */
+    @SuppressWarnings("ConstantConditions")
     private static boolean compare(ItemStack stack1, ItemStack stack2) {
         if(stack1.isEmpty()) {
             return true;
@@ -58,13 +59,14 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
         return false;
     }
 
-    @Inject(method = "isEqual", at = @At("RETURN"))
+    @Inject(method = "isEqual", at = @At("RETURN"), cancellable = true)
     private void isEqual(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if(cir.getReturnValueZ() && !compare((ItemStack) (Object) this, stack)) {
             cir.setReturnValue(false);
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Inject(method = "copy", at = @At("RETURN"))
     private void copy(CallbackInfoReturnable<ItemStack> cir) {
         ItemstackComponents other = (ItemstackComponents) (Object) cir.getReturnValue();
@@ -106,9 +108,7 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
     @Shadow
     public abstract Item getItem();
 
-    @Shadow
-    public abstract void removeDisplayName();
-
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
         ((ItemComponentProvider) this.getItem()).createComponents((ItemStack) (Object) this);
@@ -134,7 +134,6 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
         return components.containsKey(type) ? type.cast(components.get(type)) : null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Set<ComponentType<? extends Component>> getComponentTypes() {
         return Collections.unmodifiableSet(components.keySet());
