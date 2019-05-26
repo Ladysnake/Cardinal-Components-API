@@ -42,7 +42,7 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
      */
     @SuppressWarnings("ConstantConditions")
     private static boolean compare(ItemStack stack1, ItemStack stack2) {
-        if(stack1.isEmpty()) {
+        if(stack1.isEmpty() && stack2.isEmpty()) {
             return true;
         }
         StackComponentAccessor accessor = (StackComponentAccessor) (Object) stack1;
@@ -70,7 +70,7 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
     @Inject(method = "copy", at = @At("RETURN"))
     private void copy(CallbackInfoReturnable<ItemStack> cir) {
         ItemstackComponents other = (ItemstackComponents) (Object) cir.getReturnValue();
-        components.forEach((type, component) -> {
+        this.components.forEach((type, component) -> {
             Component copy = copyOf(component);
             copy.fromItemTag(component.toItemTag(new CompoundTag()));
             other.setComponentValue(type, copy);
@@ -96,7 +96,7 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
                 componentTag.put("component", component.toItemTag(new CompoundTag()));
                 componentList.add(componentTag);
             });
-            tag.put("cardinal_components", componentList);
+            cir.getReturnValue().put("cardinal_components", componentList);
         }
     }
 
@@ -113,7 +113,7 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
         ((ItemComponentProvider) this.getItem()).createComponents((ItemStack) (Object) this);
         if(tag.containsKey("cardinal_components", 9)) {
-            ListTag componentList = tag.getList("cardinal_components", 9);
+            ListTag componentList = tag.getList("cardinal_components", 10);
             componentList.stream().map(CompoundTag.class::cast).forEach(data -> {
                 ComponentType type = ComponentRegistry.get(new Identifier(data.getString("id")));
                 if(this.hasComponent(type)) {
