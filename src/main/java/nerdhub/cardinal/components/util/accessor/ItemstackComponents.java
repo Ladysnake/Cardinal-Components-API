@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.mixins.accessor;
+package nerdhub.cardinal.components.util.accessor;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
