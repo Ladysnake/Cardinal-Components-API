@@ -5,7 +5,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.ItemComponentProvider;
 import nerdhub.cardinal.components.api.accessor.StackComponentAccessor;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.mixins.accessor.ItemstackComponents;
+import nerdhub.cardinal.components.util.accessor.ItemstackComponents;
 import nerdhub.cardinal.components.util.ComponentStackHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
