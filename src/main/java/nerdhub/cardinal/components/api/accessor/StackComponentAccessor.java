@@ -14,9 +14,7 @@ import java.util.Set;
 public interface StackComponentAccessor {
 
     /**
-     * convenience method to retrieve
-     * @param stack
-     * @return
+     * convenience method to retrieve StackComponentAccessor from a given {@link ItemStack}
      */
     @SuppressWarnings("ConstantConditions")
     static StackComponentAccessor get(ItemStack stack) {

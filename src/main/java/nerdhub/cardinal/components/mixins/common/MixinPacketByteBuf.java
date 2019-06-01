@@ -31,6 +31,7 @@ public abstract class MixinPacketByteBuf {
         ((PacketByteBuf) (Object) this).writeCompoundTag(containerTag);
     }
 
+    @SuppressWarnings({"ConstantConditions", "unchecked"})
     @Inject(method = "readItemStack", at = @At(value = "RETURN"))
     private void readStack(CallbackInfoReturnable<ItemStack> cir) {
         ItemStack itemStack_1 = cir.getReturnValue();
