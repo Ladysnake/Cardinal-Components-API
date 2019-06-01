@@ -26,7 +26,7 @@
     "mixins": [
         {
             "environment": "*",
-            "config": "mixins.cardinal_components.common.json"
+            "config": "mixins.cardinal_components.json"
         }
     ]
 }

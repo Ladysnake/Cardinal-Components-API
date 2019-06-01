@@ -6,6 +6,7 @@ import nerdhub.cardinal.components.api.ItemComponentProvider;
 import nerdhub.cardinal.components.api.accessor.StackComponentAccessor;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.mixins.accessor.ItemstackComponents;
+import nerdhub.cardinal.components.util.ComponentStackHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -32,36 +33,14 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
 
     @Inject(method = "areTagsEqual", at = @At("RETURN"), cancellable = true)
     private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
-        if(cir.getReturnValueZ() && !compare(stack1, stack2)) {
+        if(cir.getReturnValueZ() && !ComponentStackHelper.areComponentsEqual(stack1, stack2)) {
             cir.setReturnValue(false);
         }
     }
 
-    /**
-     * private helper method
-     */
-    @SuppressWarnings("ConstantConditions")
-    private static boolean compare(ItemStack stack1, ItemStack stack2) {
-        if(stack1.isEmpty() && stack2.isEmpty()) {
-            return true;
-        }
-        StackComponentAccessor accessor = (StackComponentAccessor) (Object) stack1;
-        StackComponentAccessor other = (StackComponentAccessor) (Object) stack2;
-        Set<ComponentType<? extends Component>> types = accessor.getComponentTypes();
-        if(types.size() == other.getComponentTypes().size()) {
-            for(ComponentType<? extends Component> type : types) {
-                if(!other.hasComponent(type) || !accessor.getComponent(type).isComponentEqual(other.getComponent(type))) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
     @Inject(method = "isEqual", at = @At("RETURN"), cancellable = true)
     private void isEqual(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if(cir.getReturnValueZ() && !compare((ItemStack) (Object) this, stack)) {
+        if(cir.getReturnValueZ() && !ComponentStackHelper.areComponentsEqual((ItemStack) (Object) this, stack)) {
             cir.setReturnValue(false);
         }
     }
@@ -71,19 +50,9 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
     private void copy(CallbackInfoReturnable<ItemStack> cir) {
         ItemstackComponents other = (ItemstackComponents) (Object) cir.getReturnValue();
         this.components.forEach((type, component) -> {
-            Component copy = copyOf(component);
-            copy.fromItemTag(component.toItemTag(new CompoundTag()));
+            Component copy = ComponentStackHelper.copyOf(component);
             other.setComponentValue(type, copy);
         });
-    }
-
-    /**
-     * private helper method
-     */
-    private static Component copyOf(Component toCopy) {
-        Component ret = toCopy.newInstanceForItemStack();
-        ret.fromItemTag(toCopy.toItemTag(new CompoundTag()));
-        return ret;
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))
