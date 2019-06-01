@@ -14,6 +14,16 @@ import java.util.Set;
 public interface StackComponentAccessor {
 
     /**
+     * convenience method to retrieve
+     * @param stack
+     * @return
+     */
+    @SuppressWarnings("ConstantConditions")
+    static StackComponentAccessor get(ItemStack stack) {
+        return (StackComponentAccessor) (Object) stack;
+    }
+
+    /**
      * if this method returns {@code true}, then {@link #getComponent(ComponentType)} <strong>must not</strong> return {@code null} for the same {@link ComponentType}
      */
     <T extends Component> boolean hasComponent(ComponentType<T> type);
