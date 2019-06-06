@@ -40,7 +40,7 @@ deploy:
 
     # if commit tag is created, deploy to curseforge
     -   provider: script
-        script: "./gradlew curseforge"
+        script: "./gradlew clean curseforge"
         target_commitsh: $TRAVIS_TAG
         skip_cleanup: true
         on:
