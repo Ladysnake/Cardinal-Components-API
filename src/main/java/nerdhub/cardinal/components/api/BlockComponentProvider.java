@@ -8,6 +8,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.Set;
 
 public interface BlockComponentProvider {
@@ -31,6 +32,10 @@ public interface BlockComponentProvider {
      * @return an instance of the requested component, or {@code null}
      */
     <T extends Component> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side);
+
+    default <T extends Component> Optional<T> optionally(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
+        return Optional.ofNullable(getComponent(blockView, pos, type, side));
+    }
 
     /**
      * @return an <strong>immutable</strong> view of the component types exposed by this {@link BlockComponentProvider}
