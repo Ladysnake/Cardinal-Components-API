@@ -5,6 +5,7 @@
     "package": "nerdhub.cardinal.components.mixins",
     "mixins": [
         "common.MixinBlock",
+        "common.MixinEntity",
         "common.MixinItem",
         "common.MixinItemStack",
         "common.MixinPacketByteBuf"
