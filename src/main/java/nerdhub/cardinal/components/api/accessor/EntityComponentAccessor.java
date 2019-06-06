@@ -5,6 +5,7 @@ import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.entity.Entity;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.Set;
 
 public interface EntityComponentAccessor {
@@ -17,6 +18,10 @@ public interface EntityComponentAccessor {
 
     @Nullable
     <T extends Component> T getComponent(ComponentType<T> type);
+
+    default <T extends Component> Optional<T> optionally(ComponentType<T> type) {
+        return Optional.ofNullable(getComponent(type));
+    }
 
     Set<ComponentType<? extends Component>> getComponentTypes();
 
