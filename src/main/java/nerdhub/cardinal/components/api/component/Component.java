@@ -1,5 +1,7 @@
 package nerdhub.cardinal.components.api.component;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 
 /**
@@ -9,18 +11,18 @@ import net.minecraft.nbt.CompoundTag;
  */
 public interface Component {
 
-    default void fromItemTag(CompoundTag tag) {
-        throw new IllegalStateException("Tried to deserialize on Block, or not implemented on Item!");
+    default void deserialize(CompoundTag tag) {
+        throw new IllegalStateException("Tried to deserialize on Block, or method not implemented!");
     }
 
-    default CompoundTag toItemTag(CompoundTag tag) {
-        throw new IllegalStateException("Tried to serialize on Block, or not implemented on Item!");
+    default CompoundTag serialize(CompoundTag tag) {
+        throw new IllegalStateException("Tried to serialize on Block, or not method not implemented!");
     }
 
     /**
-     * used for copying item components to another stack
+     * used for copying components to another {@link ItemStack} or {@link Entity}
      */
-    default Component newInstanceForItemStack() {
+    default Component newInstance() {
         throw new IllegalStateException("Tried to serialize on Block, or not implemented on Item!");
     }
 

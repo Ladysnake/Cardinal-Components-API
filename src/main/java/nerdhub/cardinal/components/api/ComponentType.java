@@ -10,7 +10,7 @@ public class ComponentType<T extends Component> {
     /**
      * package-private;
      *
-     * @see ComponentRegistry#getOrCreate(Class)!
+     * @see ComponentRegistry#getOrCreate(Class, Identifier)!
      */
     ComponentType(Class clazz, Identifier id) {
         this.id = id;

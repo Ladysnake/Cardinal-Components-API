@@ -1,4 +1,10 @@
 ------------------------------------------------------
+Version 1.2.0
+------------------------------------------------------
+- add utility methods for getting block/item components
+- refactor component interfaces
+
+------------------------------------------------------
 Version 1.1.3
 ------------------------------------------------------
 - fix itemstack component client desync
