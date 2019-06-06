@@ -35,7 +35,7 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
         }
     }
 
-    @Inject(method = "isEqual", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "isEqualIgnoreDamage", at = @At("RETURN"), cancellable = true)
     private void isEqual(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if(cir.getReturnValueZ() && !ComponentHelper.areComponentsEqual((ItemStack) (Object) this, stack)) {
             cir.setReturnValue(false);
