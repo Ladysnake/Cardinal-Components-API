@@ -24,7 +24,7 @@ public abstract class MixinPacketByteBuf {
         stack.getComponentTypes().forEach(type -> {
             CompoundTag nbt = new CompoundTag();
             nbt.putString("id", type.getID().toString());
-            nbt.put("data", stack.getComponent(type).toItemTag(new CompoundTag()));
+            nbt.put("data", stack.getComponent(type).serialize(new CompoundTag()));
             tag.add(nbt);
         });
         containerTag.put("cardinal_components", tag);
@@ -42,7 +42,7 @@ public abstract class MixinPacketByteBuf {
             for(int i = 0; i < componentList.size(); i++) {
                 CompoundTag tag = componentList.getCompoundTag(i);
                 ComponentType type = ComponentRegistry.get(new Identifier(tag.getString("id")));
-                stack.getComponent(type).fromItemTag(tag.getCompound("data"));
+                stack.getComponent(type).deserialize(tag.getCompound("data"));
             }
         }
     }
