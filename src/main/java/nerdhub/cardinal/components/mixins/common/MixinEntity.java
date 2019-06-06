@@ -25,10 +25,15 @@ public abstract class MixinEntity implements EntityComponentProvider, EntityComp
 
     private Map<ComponentType<? extends Component>, Component> components = new IdentityHashMap<>();
 
-    @Inject(method = "initDataTracker", at = @At("RETURN"))
+    @Inject(method = "<init>", at = @At("RETURN"))
     private void initDataTracker(CallbackInfo ci) {
         this.createComponents(this.components);
         EntityComponentCallback.EVENT.invoker().attachComponents((Entity) (Object) this, this.components);
+    }
+
+    @Override
+    public void createComponents(Map<ComponentType<? extends Component>, Component> components) {
+        //NO-OP, but needs to be implemented
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))
