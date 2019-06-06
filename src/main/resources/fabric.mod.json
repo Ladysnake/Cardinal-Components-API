@@ -9,6 +9,9 @@
     "custom": {
         "modmenu:api": true
     },
+    "depends": {
+        "fabric-api-base": "*"
+    },
     "authors": [
         {
             "name": "UpcraftLP",
