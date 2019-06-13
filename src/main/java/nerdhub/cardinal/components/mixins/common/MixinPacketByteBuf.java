@@ -23,7 +23,7 @@ public abstract class MixinPacketByteBuf {
         ListTag tag = new ListTag();
         stack.getComponentTypes().forEach(type -> {
             CompoundTag nbt = new CompoundTag();
-            nbt.putString("id", type.getID().toString());
+            nbt.putString("id", type.getId().toString());
             nbt.put("data", stack.getComponent(type).serialize(new CompoundTag()));
             tag.add(nbt);
         });
@@ -31,7 +31,7 @@ public abstract class MixinPacketByteBuf {
         ((PacketByteBuf) (Object) this).writeCompoundTag(containerTag);
     }
 
-    @SuppressWarnings({"ConstantConditions", "unchecked"})
+    @SuppressWarnings({"ConstantConditions"})
     @Inject(method = "readItemStack", at = @At(value = "RETURN"))
     private void readStack(CallbackInfoReturnable<ItemStack> cir) {
         ItemStack itemStack_1 = cir.getReturnValue();
@@ -41,7 +41,7 @@ public abstract class MixinPacketByteBuf {
             ListTag componentList = containerTag.getList("cardinal_components", 10);
             for(int i = 0; i < componentList.size(); i++) {
                 CompoundTag tag = componentList.getCompoundTag(i);
-                ComponentType type = ComponentRegistry.get(new Identifier(tag.getString("id")));
+                ComponentType<?> type = ComponentRegistry.get(new Identifier(tag.getString("id")));
                 stack.getComponent(type).deserialize(tag.getCompound("data"));
             }
         }

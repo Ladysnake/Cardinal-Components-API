@@ -65,7 +65,7 @@ public abstract class MixinItemStack implements StackComponentAccessor, Itemstac
     @Shadow
     public abstract Item getItem();
 
-    @SuppressWarnings({"unchecked", "ConstantConditions", "DuplicatedCode"})
+    @SuppressWarnings({"ConstantConditions", "DuplicatedCode"})
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
         ((ItemComponentProvider) this.getItem()).createComponents((ItemStack) (Object) this);
