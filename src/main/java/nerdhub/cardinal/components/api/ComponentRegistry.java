@@ -5,6 +5,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public final class ComponentRegistry {
 
@@ -21,8 +22,8 @@ public final class ComponentRegistry {
         ComponentType<T> registered = (ComponentType<T>) REGISTRY.get(componentId);
         if(!componentClass.isInterface()) {
             throw new IllegalArgumentException("Base component class must be an interface: " + componentClass.getCanonicalName());
-        } else if(registered != null && registered.componentClass != componentClass) {
-            throw new IllegalStateException("Registered component " + componentId + " twice with 2 different classes: " + registered.componentClass + ", " + componentClass);
+        } else if(registered != null && registered.getComponentClass() != componentClass) {
+            throw new IllegalStateException("Registered component " + componentId + " twice with 2 different classes: " + registered.getComponentClass() + ", " + componentClass);
         } else if(registered == null) {
             // Not using computeIfAbsent since we need to check the possibly registered class first
             registered = new ComponentType<>(componentId, componentClass, nextRawId++);
@@ -36,6 +37,10 @@ public final class ComponentRegistry {
      */
     public static ComponentType<?> get(Identifier id) {
         return REGISTRY.get(id);
+    }
+
+    public static Stream<ComponentType<?>> stream() {
+        return REGISTRY.values().stream();
     }
 
     private ComponentRegistry() { throw new AssertionError(); }

@@ -5,7 +5,7 @@ import net.minecraft.util.Identifier;
 
 public final class ComponentType<T extends Component> {
 
-    final Class<T> componentClass;
+    private final Class<T> componentClass;
     private final Identifier id;
     private final int rawId;
 
@@ -22,7 +22,7 @@ public final class ComponentType<T extends Component> {
     }
 
     /**
-     * convenience method to easily cast a component instance to it's type
+     * convenience method to easily cast a component instance to its type
      */
     public T cast(Object instance) {
         return componentClass.cast(instance);
@@ -34,5 +34,9 @@ public final class ComponentType<T extends Component> {
 
     public int getRawId() {
         return this.rawId;
+    }
+
+    public Class<T> getComponentClass() {
+        return componentClass;
     }
 }
