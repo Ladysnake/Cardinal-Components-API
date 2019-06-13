@@ -3,28 +3,36 @@ package nerdhub.cardinal.components.api;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.util.Identifier;
 
-public class ComponentType<T extends Component> {
+public final class ComponentType<T extends Component> {
 
+    final Class<T> componentClass;
     private final Identifier id;
+    private final int rawId;
 
     /**
-     * package-private;
+     * Constructs a new immutable ComponentType
      *
-     * @see ComponentRegistry#getOrCreate(Class, Identifier)!
+     * @see ComponentRegistry#registerIfAbsent(Identifier, Class)!
      */
-    ComponentType(Class clazz, Identifier id) {
+
+    /* package-private */ ComponentType(Identifier id, Class<T> componentClass, int rawId) {
+        this.componentClass = componentClass;
         this.id = id;
+        this.rawId = rawId;
     }
 
     /**
      * convenience method to easily cast a component instance to it's type
      */
-    @SuppressWarnings("unchecked")
     public T cast(Object instance) {
-        return (T) instance;
+        return componentClass.cast(instance);
     }
 
-    public Identifier getID() {
+    public Identifier getId() {
         return this.id;
+    }
+
+    public int getRawId() {
+        return this.rawId;
     }
 }

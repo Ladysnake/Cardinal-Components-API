@@ -4,36 +4,39 @@ import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Map;
 
-public class ComponentRegistry {
+public final class ComponentRegistry {
 
-    private static final Map<Class<?>, ComponentType<?>> REGISTRY = new IdentityHashMap<>();
-    private static final Map<Identifier, ComponentType<?>> NAME_LOOKUP = new HashMap<>();
+    private static final Map<Identifier, ComponentType<?>> REGISTRY = new HashMap<>();
+    private static int nextRawId = 0;
 
     /**
-     * used to obtain a shared instance of {@link nerdhub.cardinal.components.api.ComponentType}
+     * used to obtain a shared instance of {@link ComponentType}
      *
-     * @param clazz the interface of which to obtain a {@link ComponentType}
+     * @param componentClass the interface of which to obtain a {@link ComponentType}
      */
-    @SuppressWarnings("unchecked")
-    public static <T extends Component> ComponentType<T> getOrCreate(Class<T> clazz, Identifier id) {
-        if(!clazz.isInterface()) {
-            throw new IllegalArgumentException("class must be an interface: " + clazz.getCanonicalName());
+    public static <T extends Component> ComponentType<T> registerIfAbsent(Identifier componentId, Class<T> componentClass) {
+        @SuppressWarnings("unchecked")
+        ComponentType<T> registered = (ComponentType<T>) REGISTRY.get(componentId);
+        if(!componentClass.isInterface()) {
+            throw new IllegalArgumentException("Base component class must be an interface: " + componentClass.getCanonicalName());
+        } else if(registered != null && registered.componentClass != componentClass) {
+            throw new IllegalStateException("Registered component " + componentId + " twice with 2 different classes: " + registered.componentClass + ", " + componentClass);
+        } else if(registered == null) {
+            // Not using computeIfAbsent since we need to check the possibly registered class first
+            registered = new ComponentType<>(componentId, componentClass, nextRawId++);
+            REGISTRY.put(componentId, registered);
         }
-        return (ComponentType<T>) REGISTRY.computeIfAbsent(clazz, aClass -> {
-            ComponentType<T> type = new ComponentType<>(aClass, id);
-            NAME_LOOKUP.put(type.getID(), type);
-            return type;
-        });
+        return registered;
+    }
+    
+    /**
+     * Directly retrieves a ComponentType from its id.
+     */
+    public static ComponentType<?> get(Identifier id) {
+        return REGISTRY.get(id);
     }
 
-    /**
-     * internal use ONLY
-     */
-    @SuppressWarnings("unchecked")
-    public static <T extends Component> ComponentType<T> get(Identifier id) {
-        return (ComponentType<T>) NAME_LOOKUP.get(id);
-    }
+    private ComponentRegistry() { throw new AssertionError(); }
 }

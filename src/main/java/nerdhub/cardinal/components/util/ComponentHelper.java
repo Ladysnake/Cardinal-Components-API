@@ -19,7 +19,7 @@ public class ComponentHelper {
             ListTag componentList = new ListTag();
             components.forEach((type, component) -> {
                 CompoundTag componentTag = new CompoundTag();
-                componentTag.putString("id", type.getID().toString());
+                componentTag.putString("id", type.getId().toString());
                 componentTag.put("component", component.serialize(new CompoundTag()));
                 componentList.add(componentTag);
             });
@@ -56,7 +56,7 @@ public class ComponentHelper {
         if(tag.containsKey("cardinal_components", 9)) {
             ListTag componentList = tag.getList("cardinal_components", 10);
             componentList.stream().map(CompoundTag.class::cast).forEach(nbt -> {
-                ComponentType<? extends Component> type = ComponentRegistry.get(new Identifier(nbt.getString("id")));
+                ComponentType<?> type = ComponentRegistry.get(new Identifier(nbt.getString("id")));
                 components.get(type).deserialize(nbt.getCompound("component"));
             });
         }
