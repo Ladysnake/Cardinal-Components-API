@@ -4,6 +4,7 @@ import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.accessor.StackComponentAccessor;
 import nerdhub.cardinal.components.api.component.Component;
+import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -53,8 +54,8 @@ public class ComponentHelper {
     }
 
     public static void readFromTag(Map<ComponentType<? extends Component>, Component> components, CompoundTag tag) {
-        if(tag.containsKey("cardinal_components", 9)) {
-            ListTag componentList = tag.getList("cardinal_components", 10);
+        if(tag.containsKey("cardinal_components", NbtType.LIST)) {
+            ListTag componentList = tag.getList("cardinal_components", NbtType.COMPOUND);
             componentList.stream().map(CompoundTag.class::cast).forEach(nbt -> {
                 ComponentType<?> type = ComponentRegistry.get(new Identifier(nbt.getString("id")));
                 components.get(type).deserialize(nbt.getCompound("component"));
