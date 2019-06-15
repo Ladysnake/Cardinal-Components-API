@@ -73,14 +73,14 @@ public abstract class MixinItemStack implements ComponentAccessor, ItemstackComp
     }
 
     @Override
-    public <T extends Component> boolean hasComponent(ComponentType<T> type) {
+    public boolean hasComponent(ComponentType<?> type) {
         return components.containsKey(type);
     }
 
     @Nullable
     @Override
-    public <T extends Component> T getComponent(ComponentType<T> type) {
-        return components.containsKey(type) ? type.cast(components.get(type)) : null;
+    public Component getComponent(ComponentType<?> type) {
+        return components.getOrDefault(type, null);
     }
 
     @Override

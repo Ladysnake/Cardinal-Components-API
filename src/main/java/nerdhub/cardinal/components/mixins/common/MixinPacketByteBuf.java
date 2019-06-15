@@ -18,7 +18,7 @@ public abstract class MixinPacketByteBuf {
 
     @Inject(method = "writeItemStack", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/PacketByteBuf;writeCompoundTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/util/PacketByteBuf;", shift = At.Shift.AFTER), cancellable = true)
     private void writeItemStack(ItemStack itemStack_1, CallbackInfoReturnable<PacketByteBuf> cir) {
-        ComponentAccessor stack = ComponentAccessor.get(itemStack_1);
+        ComponentAccessor stack = ComponentAccessor.fromItemStack(itemStack_1);
         CompoundTag containerTag = new CompoundTag();
         ListTag tag = new ListTag();
         stack.getComponentTypes().forEach(type -> {
@@ -36,7 +36,7 @@ public abstract class MixinPacketByteBuf {
     private void readStack(CallbackInfoReturnable<ItemStack> cir) {
         ItemStack itemStack_1 = cir.getReturnValue();
         if(!itemStack_1.isEmpty()) {
-            ComponentAccessor stack = ComponentAccessor.get(itemStack_1);
+            ComponentAccessor stack = ComponentAccessor.fromItemStack(itemStack_1);
             CompoundTag containerTag = ((PacketByteBuf) (Object) this).readCompoundTag();
             ListTag componentList = containerTag.getList("cardinal_components", 10);
             for(int i = 0; i < componentList.size(); i++) {

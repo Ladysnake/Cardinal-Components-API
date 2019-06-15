@@ -47,14 +47,14 @@ public abstract class MixinEntity implements EntityComponentProvider, ComponentA
     }
 
     @Override
-    public <T extends Component> boolean hasComponent(ComponentType<T> type) {
+    public boolean hasComponent(ComponentType<?> type) {
         return this.components.containsKey(type);
     }
 
     @Nullable
     @Override
-    public <T extends Component> T getComponent(ComponentType<T> type) {
-        return this.components.containsKey(type) ? type.cast(this.components.get(type)) : null;
+    public Component getComponent(ComponentType<?> type) {
+        return this.components.getOrDefault(type, null);
     }
 
     @Override
