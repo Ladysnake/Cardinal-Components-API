@@ -1,25 +1,32 @@
-package nerdhub.cardinal.components.api.accessor;
+package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.ItemComponentProvider;
-import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 
 import java.util.Optional;
 import java.util.Set;
 
 /**
- * used to access an {@link ItemStack}'s components.
+ * used to access an object's components.
  * if you want to expose components see {@link ItemComponentProvider}
  */
-public interface StackComponentAccessor {
+public interface ComponentAccessor {
 
     /**
-     * convenience method to retrieve StackComponentAccessor from a given {@link ItemStack}
+     * convenience method to retrieve ComponentAccessor from a given {@link ItemStack}
      */
     @SuppressWarnings("ConstantConditions")
-    static StackComponentAccessor get(ItemStack stack) {
-        return (StackComponentAccessor) (Object) stack;
+    static ComponentAccessor get(ItemStack stack) {
+        return (ComponentAccessor) (Object) stack;
+    }
+
+    /**
+     * convenience method to retrieve a ComponentAccessor from a given {@link Entity}
+     */
+    static ComponentAccessor get(Entity entity) {
+        return (ComponentAccessor) entity;
     }
 
     /**

@@ -82,13 +82,12 @@ interface ObjectPath<T, R> extends Function<T, R> {
      * If evaluation of either function throws an exception, it is relayed to
      * the caller of the composed function.
      *
-     * @param <V> the type of output of the {@code after} function, and of the
-     *           composed function
+     * @param <V>   the type of output of the {@code after} function, and of the
+     *              composed function
      * @param after the function to apply after this function is applied
      * @return a composed function that first applies this function and then
      * applies the {@code after} function
      * @throws NullPointerException if after is null
-     *
      * @see #compose(Function)
      */
     @Override
@@ -135,8 +134,9 @@ interface ObjectPath<T, R> extends Function<T, R> {
      * return <code>null</code> instead.
      * If evaluation of this function throws an exception, it is relayed to
      * the caller of the composed function.
+     *
      * @param clazz the class of the type to cast this function's results to
-     * @param <V> the type to cast this function's results to
+     * @param <V>   the type to cast this function's results to
      * @return a composed function that first applies this function and then
      * returns the result after casting, or null if the result cannot be casted.
      */
