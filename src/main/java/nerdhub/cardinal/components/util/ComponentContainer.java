@@ -75,7 +75,7 @@ public class ComponentContainer {
         Preconditions.checkNotNull(value);
         Preconditions.checkArgument(key.getComponentClass().isInstance(value));
         int index = key.getRawId();
-        V oldValue = key.cast(vals[index]);
+        V oldValue = key.getComponentClass().cast(vals[index]);
         vals[index] = value;
         if (oldValue == null) {
             size++;
