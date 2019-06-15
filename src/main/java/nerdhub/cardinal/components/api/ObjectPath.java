@@ -4,7 +4,9 @@ import javax.annotation.Nullable;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Represents a function that extracts a property from a given object.
@@ -51,6 +53,7 @@ interface ObjectPath<T, R> extends Function<T, R> {
      *
      * @param t a source object
      * @return the non-null value obtained by {@link #apply(Object) applying} this function to the source
+     * @throws NoSuchElementException if the object cannot be mapped to a value using this function
      */
     default R get(T t) {
         R r = this.apply(t);
@@ -61,16 +64,43 @@ interface ObjectPath<T, R> extends Function<T, R> {
     }
 
     /**
-     * Returns an {@code Optional} describing the result of {@link #apply(Object)}
-     * on the given argument, if both argument and result are non-null,
-     * otherwise returns an empty {@code Optional}.
+     * Convert this {@code ObjectPath} to an {@code Optional} describing the result
+     * of {@link #apply(Object)} on the given argument. If this function does not
+     * produce a value from the given argument, the returned {@code Optional} will
+     * be empty.
      *
-     * @param t the possibly-null value to extract a property from
+     * @param value the possibly-null value to extract a property from
      * @return an {@code Optional} with a present value if the specified value
      * and the result of this function is non-null, otherwise an empty {@code Optional}
      */
-    default Optional<R> optionally(@Nullable T t) {
-        return Optional.ofNullable(t).map(this);
+    default Optional<R> toOptional(@Nullable T value) {
+        return Optional.ofNullable(value).map(this);
+    }
+
+    /**
+     * Returns a composed function that first applies the {@code before}
+     * function to its input, and then applies this function to the result.
+     * If <code>before</code> returns <code>null</code>, this function will
+     * not be applied and the resulting function will return null instead.
+     * If evaluation of either function throws an exception, it is relayed to
+     * the caller of the composed function.
+     *
+     * @param <V> the type of input to the {@code before} function, and to the
+     *           composed function
+     * @param before the function to apply before this function is applied
+     * @return a composed function that first applies the {@code before}
+     * function and then applies this function if the result is not null
+     * @throws NullPointerException if before is null
+     *
+     * @see #andThen(Function)
+     */
+    @Override
+    default <V> ObjectPath<V, R> compose(Function<? super V, ? extends T> before) {
+        Objects.requireNonNull(before);
+        return (obj) -> {
+            T t = before.apply(obj);
+            return t != null ? this.apply(t) : null;
+        };
     }
 
     /**
@@ -100,28 +130,50 @@ interface ObjectPath<T, R> extends Function<T, R> {
     }
 
     /**
-     * Returns a composed function that first applies the {@code before}
-     * function to its input, and then applies this function to the result.
-     * If <code>before</code> returns <code>null</code>, this function will
-     * not be applied and the resulting function will return null instead.
-     * If evaluation of either function throws an exception, it is relayed to
-     * the caller of the composed function.
+     * Returns a composed {@code Consumer} that first applies this function to
+     * its input, and then performs the {@code after} operation.
+     * If the application of <code>this</code> returns <code>null</code>,
+     * <code>after</code> will not be applied and the resulting function will
+     * return <code>null</code> instead.
+     * If performing either operation throws an exception, it is relayed to the caller of the
+     * composed operation.  If applying this function throws an exception,
+     * the {@code after} operation will not be performed.
      *
-     * @param <V> the type of input to the {@code before} function, and to the
-     *           composed function
-     * @param before the function to apply before this function is applied
-     * @return a composed function that first applies the {@code before}
-     * function and then applies this function if the result is not null
-     * @throws NullPointerException if before is null
-     *
-     * @see #andThen(Function)
+     * @param after the operation to perform on the result of
+     * @return a composed {@code Consumer} that first applies this function
+     * and then performs the {@code after} operation
+     * @throws NullPointerException if {@code after} is null
      */
-    @Override
-    default <V> Function<V, R> compose(Function<? super V, ? extends T> before) {
-        Objects.requireNonNull(before);
-        return (obj) -> {
-            T t = before.apply(obj);
-            return t != null ? this.apply(t) : null;
+    default Consumer<T> andThen(Consumer<? super R> after) {
+        Objects.requireNonNull(after);
+        return (T t) -> {
+            R r = this.apply(t);
+            if (t != null) {
+                after.accept(r);
+            }
+        };
+    }
+
+    /**
+     * Returns a composed {@code Predicate} that first applies this function to
+     * its input, and then evaluates the {@code after} predicate.
+     * If the application of <code>this</code> returns <code>null</code>,
+     * <code>after</code> will not be evaluated and the resulting predicate will
+     * return <code>false</code> instead.
+     * If performing either operation throws an exception, it is relayed to the caller of the
+     * composed predicate.  If applying this function throws an exception,
+     * the {@code after} predicate will not be evaluated.
+     *
+     * @param after the operation to perform on the result of
+     * @return a composed {@code Predicate} that first applies this
+     * function and then evaluates the {@code after} predicate
+     * @throws NullPointerException if {@code after} is null
+     */
+    default Predicate<T> andThen(Predicate<? super R> after) {
+        Objects.requireNonNull(after);
+        return (T t) -> {
+            R r = this.apply(t);
+            return t != null && after.test(r);
         };
     }
 
