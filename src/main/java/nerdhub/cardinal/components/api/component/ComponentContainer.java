@@ -2,8 +2,9 @@ package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
 
-public interface ComponentContainer {
-    boolean containsKey(ComponentType<?> type);
+import java.util.Map;
+
+public interface ComponentContainer extends Map<ComponentType<?>, Component> {
 
     /**
      * Returns the value to which the specified component type is mapped,
@@ -35,4 +36,10 @@ public interface ComponentContainer {
      * @throws NullPointerException if the specified key or value is null
      */
     <V extends Component> V put(ComponentType<V> key, V value);
+
+    @Override
+    default Component remove(Object key) {
+        throw new UnsupportedOperationException();
+    }
+
 }

@@ -29,7 +29,9 @@ public final class ComponentType<T extends Component> {
     @SuppressWarnings("unchecked")
     @Nullable
     private T apply(ComponentAccessor componentAccessor) {
-        return (T) componentAccessor.getComponent(this);
+        Component ret = componentAccessor.getComponent(this);
+        assert ret == null || this.getComponentClass().isInstance(ret);
+        return (T) ret;
     }
 
     public Identifier getId() {
