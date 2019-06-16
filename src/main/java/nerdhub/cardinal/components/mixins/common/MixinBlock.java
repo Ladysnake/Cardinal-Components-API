@@ -1,9 +1,9 @@
 package nerdhub.cardinal.components.mixins.common;
 
 import com.google.common.collect.ImmutableSet;
-import nerdhub.cardinal.components.api.BlockComponentProvider;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.provider.BlockComponentProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
