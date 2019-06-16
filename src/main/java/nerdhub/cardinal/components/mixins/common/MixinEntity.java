@@ -1,10 +1,10 @@
 package nerdhub.cardinal.components.mixins.common;
 
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.EntityComponentProvider;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentAccessor;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.api.provider.EntityComponentProvider;
 import nerdhub.cardinal.components.util.ComponentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
