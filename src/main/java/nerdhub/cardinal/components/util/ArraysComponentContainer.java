@@ -44,6 +44,10 @@ public final class ArraysComponentContainer extends AbstractMap<ComponentType<?>
         this.vals = new Component[size];
     }
 
+    public ArraysComponentContainer(ComponentContainer original) {
+        this.putAll(original);
+    }
+
     /**
      * Returns the number of components held by this container.
      *
