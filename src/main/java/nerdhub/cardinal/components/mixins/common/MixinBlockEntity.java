@@ -24,7 +24,7 @@ import java.util.Set;
 public abstract class MixinBlockEntity implements SidedComponentProvider {
 
     @Unique
-    private SidedComponentContainer components = new EnumMapSidedComponentContainer<>();
+    private EnumMapSidedComponentContainer components = new EnumMapSidedComponentContainer<>();
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void fireComponentCallback(CallbackInfo ci) {
@@ -43,7 +43,7 @@ public abstract class MixinBlockEntity implements SidedComponentProvider {
 
     @Override
     public ComponentAccessor getComponents(@Nullable Direction side) {
-        return this.components.get(side);
+        return this.components.getComponentProvider(side);
     }
 
 }
