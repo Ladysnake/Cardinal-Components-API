@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.api;
+package nerdhub.cardinal.components.api.util;
 
 import javax.annotation.Nullable;
 import java.util.NoSuchElementException;
@@ -34,7 +34,7 @@ import java.util.function.Predicate;
  * @author Pyrofab
  */
 @FunctionalInterface
-interface ObjectPath<T, R> extends Function<T, R> {
+public interface ObjectPath<T, R> extends Function<T, R> {
 
     /**
      * Applies this path function to the given argument.

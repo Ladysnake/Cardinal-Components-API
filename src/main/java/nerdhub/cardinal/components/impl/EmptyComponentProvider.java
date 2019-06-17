@@ -1,8 +1,8 @@
-package nerdhub.cardinal.components.util;
+package nerdhub.cardinal.components.impl;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentAccessor;
+import nerdhub.cardinal.components.api.provider.ComponentProvider;
 import nerdhub.cardinal.components.api.provider.ItemComponentProvider;
 
 import java.util.Collections;
@@ -11,9 +11,8 @@ import java.util.Set;
 /**
  * used to access an object's components.
  * if you want to expose components see {@link ItemComponentProvider}
- * TODO rename to ComponentProvider, in line with others
  */
-public class EmptyComponentAccessor implements ComponentAccessor {
+public class EmptyComponentProvider implements ComponentProvider {
 
     /**
      * if this method returns {@code true}, then {@link #getComponent(ComponentType)} <strong>must not</strong> return {@code null} for the same {@link ComponentType}

@@ -1,9 +1,9 @@
-package nerdhub.cardinal.components.util;
+package nerdhub.cardinal.components.impl;
 
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentAccessor;
+import nerdhub.cardinal.components.api.provider.ComponentProvider;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
@@ -33,8 +33,8 @@ public class ComponentHelper {
         if(stack1.isEmpty() && stack2.isEmpty()) {
             return true;
         }
-        ComponentAccessor accessor = (ComponentAccessor) (Object) stack1;
-        ComponentAccessor other = (ComponentAccessor) (Object) stack2;
+        ComponentProvider accessor = (ComponentProvider) (Object) stack1;
+        ComponentProvider other = (ComponentProvider) (Object) stack2;
         Set<ComponentType<? extends Component>> types = accessor.getComponentTypes();
         if(types.size() == other.getComponentTypes().size()) {
             for(ComponentType<? extends Component> type : types) {

@@ -2,10 +2,9 @@ package nerdhub.cardinal.components.mixins.common;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentAccessor;
+import nerdhub.cardinal.components.api.provider.ComponentProvider;
 import nerdhub.cardinal.components.api.provider.ItemComponentProvider;
-import nerdhub.cardinal.components.util.ComponentHelper;
-import nerdhub.cardinal.components.util.accessor.ItemstackComponents;
+import nerdhub.cardinal.components.impl.ComponentHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -24,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Mixin(value = ItemStack.class, priority = 900)
-public abstract class MixinItemStack implements ComponentAccessor, ItemstackComponents {
+public abstract class MixinItemStack implements ComponentProvider {
 
     private final Map<ComponentType<? extends Component>, Component> components = new IdentityHashMap<>();
 
@@ -45,7 +44,7 @@ public abstract class MixinItemStack implements ComponentAccessor, ItemstackComp
     @SuppressWarnings("ConstantConditions")
     @Inject(method = "copy", at = @At("RETURN"))
     private void copy(CallbackInfoReturnable<ItemStack> cir) {
-        ItemstackComponents other = (ItemstackComponents) (Object) cir.getReturnValue();
+        MixinItemStack other = (MixinItemStack) (Object) cir.getReturnValue();
         this.components.forEach((type, component) -> {
             Component copy = ComponentHelper.copyOf(component);
             other.setComponentValue(type, copy);
@@ -57,18 +56,17 @@ public abstract class MixinItemStack implements ComponentAccessor, ItemstackComp
         ComponentHelper.writeToTag(components, cir.getReturnValue());
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("RETURN"))
+    @Shadow
+    public abstract Item getItem();
+
+    @SuppressWarnings("InvalidMemberReference") // Minecraft dev plugin does not support array values
+    @Inject(method = {"<init>(Lnet/minecraft/item/ItemConvertible;I)V", "<init>(Lnet/minecraft/nbt/CompoundTag;)V"}, at = @At("RETURN"))
     private void initComponents(ItemConvertible item, int amount, CallbackInfo ci) {
         ((ItemComponentProvider) this.getItem()).createComponents((ItemStack) (Object) this);
     }
 
-    @Shadow
-    public abstract Item getItem();
-
-    @SuppressWarnings({"ConstantConditions", "DuplicatedCode"})
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
-        ((ItemComponentProvider) this.getItem()).createComponents((ItemStack) (Object) this);
         ComponentHelper.readFromTag(this.components, tag);
     }
 
@@ -88,8 +86,7 @@ public abstract class MixinItemStack implements ComponentAccessor, ItemstackComp
         return Collections.unmodifiableSet(components.keySet());
     }
 
-    @Override
-    public <T extends Component> void setComponentValue(ComponentType<T> type, Component obj) {
+    <T extends Component> void setComponentValue(ComponentType<T> type, Component obj) {
         components.put(type, obj);
     }
 }

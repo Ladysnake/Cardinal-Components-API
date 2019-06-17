@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.util;
+package nerdhub.cardinal.components.impl;
 
 import com.google.common.base.Preconditions;
 import nerdhub.cardinal.components.api.ComponentRegistry;
@@ -14,9 +14,8 @@ import java.util.*;
  *
  * @implNote The implementation is based on {@link java.util.EnumMap} and offers constant time
  * execution for all operations.
- * TODO rename to IndexedComponentContainer
  */
-public final class ArraysComponentContainer extends AbstractMap<ComponentType<?>, Component> implements ComponentContainer {
+public final class IndexedComponentContainer extends AbstractMap<ComponentType<?>, Component> implements ComponentContainer {
     /**
      * All of the component types that can be stored in this container.
      * (Cached for performance.)
@@ -37,14 +36,14 @@ public final class ArraysComponentContainer extends AbstractMap<ComponentType<?>
      */
     private int size;
 
-    public ArraysComponentContainer() {
+    public IndexedComponentContainer() {
         this.universeSize = 0;
         this.keyUniverse = new ComponentType[universeSize];
         this.size = 0;
         this.vals = new Component[size];
     }
 
-    public ArraysComponentContainer(ComponentContainer original) {
+    public IndexedComponentContainer(ComponentContainer original) {
         this.putAll(original);
     }
 
@@ -289,7 +288,7 @@ public final class ArraysComponentContainer extends AbstractMap<ComponentType<?>
             }
 
             public Component setValue(Component value) {
-                return ArraysComponentContainer.this.put(getKey(), value);
+                return IndexedComponentContainer.this.put(getKey(), value);
             }
 
             public boolean equals(Object o) {

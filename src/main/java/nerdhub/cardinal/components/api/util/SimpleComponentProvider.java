@@ -1,9 +1,9 @@
-package nerdhub.cardinal.components.util;
+package nerdhub.cardinal.components.api.util;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentAccessor;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.provider.ComponentProvider;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * used to access an object's components.
  */
-public class SimpleComponentProvider implements ComponentAccessor {
+public class SimpleComponentProvider implements ComponentProvider {
     protected ComponentContainer backing;
 
     public SimpleComponentProvider(ComponentContainer backing) {

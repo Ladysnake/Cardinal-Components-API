@@ -2,11 +2,10 @@ package nerdhub.cardinal.components.mixins.common;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentAccessor;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.provider.EntityComponentProvider;
-import nerdhub.cardinal.components.util.ArraysComponentContainer;
-import nerdhub.cardinal.components.util.ComponentHelper;
+import nerdhub.cardinal.components.api.provider.ComponentProvider;
+import nerdhub.cardinal.components.impl.ComponentHelper;
+import nerdhub.cardinal.components.impl.IndexedComponentContainer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundTag;
@@ -19,13 +18,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 @Mixin(Entity.class)
-public abstract class MixinEntity implements EntityComponentProvider, ComponentAccessor {
+public abstract class MixinEntity implements ComponentProvider {
 
-    private ComponentContainer components = new ArraysComponentContainer();
+    private ComponentContainer components = new IndexedComponentContainer();
 
     @Shadow
     public abstract EntityType<?> getType();
@@ -33,15 +31,9 @@ public abstract class MixinEntity implements EntityComponentProvider, ComponentA
     @SuppressWarnings("unchecked")
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initDataTracker(CallbackInfo ci) {
-        this.createComponents(this.components);
         // Mixin classes can be referenced from other mixin classes
         //noinspection ReferenceToMixin,ConstantConditions
         ((MixinEntityType)(Object)this.getType()).cardinal_fireComponentEvents((Entity) (Object) this, this.components);
-    }
-
-    @Override
-    public void createComponents(Map<ComponentType<? extends Component>, Component> components) {
-        //NO-OP, but needs to be implemented
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))
