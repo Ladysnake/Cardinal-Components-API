@@ -25,10 +25,12 @@ public abstract class MixinEntity implements EntityComponentProvider, ComponentA
 
     private Map<ComponentType<? extends Component>, Component> components = new IdentityHashMap<>();
 
+    @Shadow public abstract EntityType<?> getType();
+
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initDataTracker(CallbackInfo ci) {
         this.createComponents(this.components);
-        EntityComponentCallback.EVENT.invoker().attachComponents((Entity) (Object) this, this.components);
+        ((MixinEntityType)this.getType()).cardinal_fireComponentEvents((Entity) (Object) this, this.components);
     }
 
     @Override

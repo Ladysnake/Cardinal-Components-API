@@ -6,6 +6,7 @@
     "mixins": [
         "common.MixinBlock",
         "common.MixinEntity",
+        "common.MixinEntityType",
         "common.MixinItem",
         "common.MixinItemStack",
         "common.MixinPacketByteBuf"
