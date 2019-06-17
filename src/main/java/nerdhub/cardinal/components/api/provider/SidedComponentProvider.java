@@ -12,22 +12,29 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * A side-aware component provider.
+ */
 public interface SidedComponentProvider {
+    SidedComponentProvider EMPTY = new EmptySidedComponentProvider();
 
-    ComponentAccessor get(@Nullable Direction side);
+    ComponentAccessor getComponents(@Nullable Direction side);
 
     /**
      * if this method returns {@code true}, then {@link #getComponent(BlockView, BlockPos, ComponentType, Direction)} <strong>must not</strong> return {@code null} for the same {@link ComponentType}
      *
      * @return whether or not this {@link SidedComponentProvider} can provide the desired component
      */
+    @Deprecated
     <T extends Component> boolean hasComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side);
 
     /**
      * @return an instance of the requested component, or {@code null}
      */
+    @Deprecated
     <T extends Component> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side);
 
+    @Deprecated
     default <T extends Component> Optional<T> optionally(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
         return Optional.ofNullable(getComponent(blockView, pos, type, side));
     }
@@ -35,5 +42,6 @@ public interface SidedComponentProvider {
     /**
      * @return an <strong>immutable</strong> view of the component types exposed by this {@link SidedComponentProvider}
      */
+    @Deprecated
     Set<ComponentType<? extends Component>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side);
 }

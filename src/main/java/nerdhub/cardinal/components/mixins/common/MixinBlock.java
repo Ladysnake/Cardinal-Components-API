@@ -18,6 +18,12 @@ import java.util.Set;
 public class MixinBlock implements BlockComponentProvider {
 
     @Override
+    public SidedComponentProvider getComponents(BlockView view, BlockPos pos) {
+        // The following optimization assumes that regular blocks never have block entities
+        return this.getClass() == Block.class ? SidedComponentProvider.EMPTY : BlockComponentProvider.super.getComponents(view, pos);
+    }
+
+    @Override
     public <T extends Component> boolean hasComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
         BlockEntity be = blockView.getBlockEntity(pos);
         return be instanceof BlockComponentProvider && ((BlockComponentProvider) be).hasComponent(blockView, pos, type, side);
