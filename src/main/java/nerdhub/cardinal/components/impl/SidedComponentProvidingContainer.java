@@ -1,11 +1,12 @@
-package nerdhub.cardinal.components.util;
+package nerdhub.cardinal.components.impl;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentAccessor;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.SidedComponentContainer;
+import nerdhub.cardinal.components.api.provider.ComponentProvider;
 import nerdhub.cardinal.components.api.provider.SidedComponentProvider;
+import nerdhub.cardinal.components.api.util.SimpleComponentProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.Direction;
 
@@ -23,15 +24,15 @@ public final class SidedComponentProvidingContainer implements SidedComponentCon
      * from the core container and replaces the latter in the corresponding provider.
      */
     private final Map<Direction, ComponentContainer> delegates = new EnumMap<>(Direction.class);
-    private final ComponentContainer core = new ArraysComponentContainer();
+    private final ComponentContainer core = new IndexedComponentContainer();
 
-    private final ComponentAccessor coreProvider = new SimpleComponentProvider(core);
-    private final ComponentAccessor northProvider  = new MutableComponentProvider(core);
-    private final ComponentAccessor southProvider  = new MutableComponentProvider(core);
-    private final ComponentAccessor eastProvider   = new MutableComponentProvider(core);
-    private final ComponentAccessor westProvider   = new MutableComponentProvider(core);
-    private final ComponentAccessor topProvider    = new MutableComponentProvider(core);
-    private final ComponentAccessor bottomProvider = new MutableComponentProvider(core);
+    private final ComponentProvider coreProvider = new SimpleComponentProvider(core);
+    private final ComponentProvider northProvider  = new MutableComponentProvider(core);
+    private final ComponentProvider southProvider  = new MutableComponentProvider(core);
+    private final ComponentProvider eastProvider   = new MutableComponentProvider(core);
+    private final ComponentProvider westProvider   = new MutableComponentProvider(core);
+    private final ComponentProvider topProvider    = new MutableComponentProvider(core);
+    private final ComponentProvider bottomProvider = new MutableComponentProvider(core);
 
     public ComponentContainer get(@Nullable Direction side) {
         if (side == null) {
@@ -40,14 +41,14 @@ public final class SidedComponentProvidingContainer implements SidedComponentCon
         // If someone wants to interact directly with the side container and there is not one yet, create it
         // and link it to the provider
         return delegates.computeIfAbsent(side, s -> {
-            ComponentContainer cc = new ArraysComponentContainer(core);
+            ComponentContainer cc = new IndexedComponentContainer(core);
             ((MutableComponentProvider)getComponents(s)).setBackingContainer(cc);
             return cc;
         });
     }
 
     @Override
-    public ComponentAccessor getComponents(@Nullable Direction side) {
+    public ComponentProvider getComponents(@Nullable Direction side) {
         if (side == null) {
             return coreProvider;
         }
@@ -85,5 +86,19 @@ public final class SidedComponentProvidingContainer implements SidedComponentCon
     public CompoundTag toTag(CompoundTag tag) {
         // TODO
         return tag;
+    }
+
+    /**
+     * used to access an object's components.
+     */
+    private static class MutableComponentProvider extends SimpleComponentProvider {
+        MutableComponentProvider(ComponentContainer backing) {
+            super(backing);
+        }
+
+        void setBackingContainer(ComponentContainer backing) {
+            this.backing = backing;
+        }
+
     }
 }

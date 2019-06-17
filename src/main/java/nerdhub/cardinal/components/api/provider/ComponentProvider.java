@@ -1,8 +1,7 @@
-package nerdhub.cardinal.components.api.component;
+package nerdhub.cardinal.components.api.provider;
 
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.provider.ItemComponentProvider;
-import nerdhub.cardinal.components.util.EmptyComponentAccessor;
+import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 
@@ -11,24 +10,22 @@ import java.util.Set;
 /**
  * used to access an object's components.
  * if you want to expose components see {@link ItemComponentProvider}
- * TODO rename to ComponentProvider, in line with others
  */
-public interface ComponentAccessor {
-    ComponentAccessor EMPTY = new EmptyComponentAccessor();
+public interface ComponentProvider {
 
     /**
-     * convenience method to retrieve ComponentAccessor from a given {@link ItemStack}
+     * convenience method to retrieve ComponentProvider from a given {@link ItemStack}
      */
     @SuppressWarnings("ConstantConditions")
-    static ComponentAccessor fromItemStack(ItemStack stack) {
-        return (ComponentAccessor) (Object) stack;
+    static ComponentProvider fromItemStack(ItemStack stack) {
+        return (ComponentProvider) (Object) stack;
     }
 
     /**
-     * convenience method to retrieve a ComponentAccessor from a given {@link Entity}
+     * convenience method to retrieve a ComponentProvider from a given {@link Entity}
      */
-    static ComponentAccessor fromEntity(Entity entity) {
-        return (ComponentAccessor) entity;
+    static ComponentProvider fromEntity(Entity entity) {
+        return (ComponentProvider) entity;
     }
 
     /**

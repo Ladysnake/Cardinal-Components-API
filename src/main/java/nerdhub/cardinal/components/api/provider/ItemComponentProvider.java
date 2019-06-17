@@ -8,6 +8,7 @@ public interface ItemComponentProvider {
 
     /**
      * called when creating the components for an ItemStack
+     * TODO replace this with an Item-specific event
      */
     void createComponents(ItemStack stack);
 

@@ -1,7 +1,8 @@
-package nerdhub.cardinal.components.util;
+package nerdhub.cardinal.components.impl;
 
-import nerdhub.cardinal.components.api.component.ComponentAccessor;
+import nerdhub.cardinal.components.api.provider.ComponentProvider;
 import nerdhub.cardinal.components.api.provider.SidedComponentProvider;
+import nerdhub.cardinal.components.api.util.Components;
 import net.minecraft.util.math.Direction;
 
 import javax.annotation.Nullable;
@@ -11,8 +12,8 @@ import javax.annotation.Nullable;
  */
 public final class EmptySidedComponentProvider implements SidedComponentProvider {
     @Override
-    public ComponentAccessor getComponents(@Nullable Direction side) {
-        return ComponentAccessor.EMPTY;
+    public ComponentProvider getComponents(@Nullable Direction side) {
+        return Components.EMPTY_PROVIDER;
     }
 }
 

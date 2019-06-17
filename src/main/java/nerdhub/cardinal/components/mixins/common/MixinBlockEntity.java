@@ -1,8 +1,8 @@
 package nerdhub.cardinal.components.mixins.common;
 
-import nerdhub.cardinal.components.api.component.ComponentAccessor;
+import nerdhub.cardinal.components.api.provider.ComponentProvider;
 import nerdhub.cardinal.components.api.provider.SidedComponentProvider;
-import nerdhub.cardinal.components.util.SidedComponentProvidingContainer;
+import nerdhub.cardinal.components.impl.SidedComponentProvidingContainer;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.CompoundTag;
@@ -44,7 +44,7 @@ public abstract class MixinBlockEntity implements SidedComponentProvider {
     }
 
     @Override
-    public ComponentAccessor getComponents(@Nullable Direction side) {
+    public ComponentProvider getComponents(@Nullable Direction side) {
         return this.components.getComponents(side);
     }
 
