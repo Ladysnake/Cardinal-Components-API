@@ -35,12 +35,12 @@ public abstract class MixinBlockEntity implements SidedComponentProvider {
 
     @Inject(method = "toTag", at = @At("RETURN"))
     private void toTag(CompoundTag inputTag, CallbackInfoReturnable<CompoundTag> cir) {
-        this.components.toTag(cir.getReturnValue());
+        cir.getReturnValue().put("cardinal:components", this.components.toTag(new CompoundTag()));
     }
 
     @Inject(method = "fromTag", at = @At("RETURN"))
     private void fromTag(CompoundTag tag, CallbackInfo ci) {
-        this.components.fromTag(tag);
+        this.components.fromTag(tag.getCompound("cardinal:components"));
     }
 
     @Override
