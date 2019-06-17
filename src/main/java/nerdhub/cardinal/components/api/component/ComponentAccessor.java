@@ -10,6 +10,7 @@ import java.util.Set;
 /**
  * used to access an object's components.
  * if you want to expose components see {@link ItemComponentProvider}
+ * TODO rename to ComponentProvider, in line with others
  */
 public interface ComponentAccessor {
 
