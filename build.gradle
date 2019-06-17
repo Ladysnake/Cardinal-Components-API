@@ -26,6 +26,10 @@ dependencies {
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
 }
 
+jar {
+    exclude "nerdhub/cardinal/components/testmod/**"
+}
+
 //task apiJar(type: Jar, dependsOn: classes) {
 //    onlyIf {
 //        project.hasProperty("api_package")
