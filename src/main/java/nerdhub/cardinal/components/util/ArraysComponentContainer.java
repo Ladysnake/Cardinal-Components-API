@@ -104,10 +104,12 @@ public final class ArraysComponentContainer extends AbstractMap<ComponentType<?>
         return oldValue;
     }
 
+    @Override
     public void fromTag(CompoundTag serialized) {
         // TODO
     }
 
+    @Override
     public CompoundTag toTag(CompoundTag tag) {
         // TODO
         return tag;

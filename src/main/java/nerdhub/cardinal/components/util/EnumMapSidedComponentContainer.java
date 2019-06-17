@@ -18,4 +18,15 @@ public final class EnumMapSidedComponentContainer implements SidedComponentConta
         }
         return delegates.get(side);
     }
+
+    @Override
+    public void fromTag(CompoundTag serialized) {
+        // TODO
+    }
+
+    @Override
+    public CompoundTag toTag(CompoundTag tag) {
+        // TODO
+        return tag;
+    }
 }

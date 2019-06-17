@@ -30,4 +30,8 @@ public interface SidedComponentContainer {
         }
         get(side).put(type, component);
     }
+
+    public void fromTag(CompoundTag serialized);
+
+    public CompoundTag toTag(CompoundTag tag);
 }

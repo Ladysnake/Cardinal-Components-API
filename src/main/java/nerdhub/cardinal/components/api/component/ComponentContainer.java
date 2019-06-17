@@ -42,4 +42,7 @@ public interface ComponentContainer extends Map<ComponentType<?>, Component> {
         throw new UnsupportedOperationException();
     }
 
+    public void fromTag(CompoundTag serialized);
+
+    public CompoundTag toTag(CompoundTag tag);
 }
