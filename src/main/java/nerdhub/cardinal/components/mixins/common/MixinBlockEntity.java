@@ -43,7 +43,7 @@ public abstract class MixinBlockEntity implements SidedComponentProvider {
 
     @Override
     public ComponentAccessor getComponents(@Nullable Direction side) {
-        return this.components.getComponentProvider(side);
+        return this.components.getComponents(side);
     }
 
 }
