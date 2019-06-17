@@ -24,6 +24,8 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
+
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
 }
 
 jar {
