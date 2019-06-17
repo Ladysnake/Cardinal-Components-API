@@ -12,24 +12,24 @@ import net.minecraft.nbt.CompoundTag;
 public interface Component {
 
     default void deserialize(CompoundTag tag) {
-        throw new IllegalStateException("Tried to deserialize on Block, or method not implemented!");
+        throw new UnsupportedOperationException("Tried to deserialize on Block, or method not implemented!");
     }
 
     default CompoundTag serialize(CompoundTag tag) {
-        throw new IllegalStateException("Tried to serialize on Block, or not method not implemented!");
+        throw new UnsupportedOperationException("Tried to serialize on Block, or not method not implemented!");
     }
 
     /**
      * used for copying components to another {@link ItemStack} or {@link Entity}
      */
     default Component newInstance() {
-        throw new IllegalStateException("Tried to serialize on Block, or not implemented on Item!");
+        throw new UnsupportedOperationException("Tried to serialize on Block, or not implemented on Item!");
     }
 
     /**
      * used for comparing two instances of item components
      */
     default boolean isComponentEqual(Component other) {
-        throw new IllegalStateException("Tried to compare block component, or not implemented on Item!");
+        throw new UnsupportedOperationException("Tried to compare block component, or not implemented on Item!");
     }
 }
