@@ -3,12 +3,15 @@ package nerdhub.cardinal.components.mixins.common;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentAccessor;
-import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.provider.EntityComponentProvider;
+import nerdhub.cardinal.components.util.ArraysComponentContainer;
 import nerdhub.cardinal.components.util.ComponentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundTag;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -16,21 +19,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity implements EntityComponentProvider, ComponentAccessor {
 
-    private Map<ComponentType<? extends Component>, Component> components = new IdentityHashMap<>();
+    private ComponentContainer components = new ArraysComponentContainer();
 
-    @Shadow public abstract EntityType<?> getType();
+    @Shadow
+    public abstract EntityType<?> getType();
 
+    @SuppressWarnings("unchecked")
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initDataTracker(CallbackInfo ci) {
         this.createComponents(this.components);
-        ((MixinEntityType)this.getType()).cardinal_fireComponentEvents((Entity) (Object) this, this.components);
+        // Mixin classes can be referenced from other mixin classes
+        //noinspection ReferenceToMixin,ConstantConditions
+        ((MixinEntityType)(Object)this.getType()).cardinal_fireComponentEvents((Entity) (Object) this, this.components);
     }
 
     @Override

@@ -1,19 +1,19 @@
 package nerdhub.cardinal.components.util;
 
 import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.ComponentAccessor;
 import nerdhub.cardinal.components.api.provider.ItemComponentProvider;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
 
-import java.util.Set;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * used to access an object's components.
  * if you want to expose components see {@link ItemComponentProvider}
  * TODO rename to ComponentProvider, in line with others
  */
-public class EmptyComponentAccessor {
+public class EmptyComponentAccessor implements ComponentAccessor {
 
     /**
      * if this method returns {@code true}, then {@link #getComponent(ComponentType)} <strong>must not</strong> return {@code null} for the same {@link ComponentType}

@@ -2,6 +2,7 @@ package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.provider.ItemComponentProvider;
+import nerdhub.cardinal.components.util.EmptyComponentAccessor;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 

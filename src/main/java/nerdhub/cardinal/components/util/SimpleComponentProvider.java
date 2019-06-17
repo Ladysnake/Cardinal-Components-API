@@ -1,16 +1,18 @@
 package nerdhub.cardinal.components.util;
 
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.provider.ItemComponentProvider;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
+import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.ComponentAccessor;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 
+import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Set;
 
 /**
  * used to access an object's components.
  */
-public class SimpleComponentProvider {
+public class SimpleComponentProvider implements ComponentAccessor {
     protected ComponentContainer backing;
 
     public SimpleComponentProvider(ComponentContainer backing) {

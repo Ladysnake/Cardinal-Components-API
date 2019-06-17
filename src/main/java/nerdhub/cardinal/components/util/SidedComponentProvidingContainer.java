@@ -1,8 +1,19 @@
 package nerdhub.cardinal.components.util;
 
-import java.util.*;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.ComponentAccessor;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.SidedComponentContainer;
+import nerdhub.cardinal.components.api.provider.SidedComponentProvider;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.math.Direction;
 
-public final class EnumMapSidedComponentContainer implements SidedComponentContainer, SidedComponentProvider {
+import javax.annotation.Nullable;
+import java.util.EnumMap;
+import java.util.Map;
+
+public final class SidedComponentProvidingContainer implements SidedComponentContainer, SidedComponentProvider {
     /* 
      * To limit RAM consumption, delegates are only created when queried for the first time.
      * Because a lot of block entities will only attach components to the core container,
@@ -11,7 +22,7 @@ public final class EnumMapSidedComponentContainer implements SidedComponentConta
      * actual instance or because a component is to be attached to it), it takes all mappings
      * from the core container and replaces the latter in the corresponding provider.
      */
-    private final EnumMap<Direction, ComponentContainer> delegates = new EnumMap<>();
+    private final Map<Direction, ComponentContainer> delegates = new EnumMap<>(Direction.class);
     private final ComponentContainer core = new ArraysComponentContainer();
 
     private final ComponentAccessor coreProvider = new SimpleComponentProvider(core);
@@ -35,9 +46,6 @@ public final class EnumMapSidedComponentContainer implements SidedComponentConta
         });
     }
 
-    /**
-     * Gets a component provider for the given side.
-     */
     @Override
     public ComponentAccessor getComponents(@Nullable Direction side) {
         if (side == null) {
@@ -48,15 +56,17 @@ public final class EnumMapSidedComponentContainer implements SidedComponentConta
             case SOUTH: return southProvider;
             case EAST: return eastProvider;
             case WEST: return westProvider;
-            case TOP: return topProvider;
-            case BOTTOM: return bottomProvider;
+            case UP: return topProvider;
+            case DOWN: return bottomProvider;
+            default: throw new IllegalStateException();
         }
     }
 
-    default <T> void put(@Nullable Direction side, ComponentType<T> type, T component) {
+    @Override
+    public <T extends Component> void put(@Nullable Direction side, ComponentType<T> type, T component) {
         if (side == null) {
             // For each side, check that the container has already been created and does not contain the component type
-            for (Direction dir : Direction.VALUES) {
+            for (Direction dir : Direction.values()) {
                 ComponentContainer cc = delegates.get(dir);
                 if (cc != null && !cc.containsKey(type)) {
                     cc.put(type, component);

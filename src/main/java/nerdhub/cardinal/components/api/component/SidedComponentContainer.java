@@ -1,6 +1,10 @@
 package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.math.Direction;
+
+import javax.annotation.Nullable;
 
 /**
  * A side-aware compound component container.
@@ -19,9 +23,9 @@ public interface SidedComponentContainer {
      * If {@code side} is {@code null}, the component will also be attached
      * to every side that does not already have a component of this type.
      */
-    default <T> void put(@Nullable Direction side, ComponentType<T> type, T component) {
+    default <T extends Component> void put(@Nullable Direction side, ComponentType<T> type, T component) {
         if (side == null) {
-            for (Direction dir : Direction.VALUES) {
+            for (Direction dir : Direction.values()) {
                 ComponentContainer cc = get(dir);
                 if (!cc.containsKey(type)) {
                     cc.put(type, component);
@@ -31,7 +35,7 @@ public interface SidedComponentContainer {
         get(side).put(type, component);
     }
 
-    public void fromTag(CompoundTag serialized);
+    void fromTag(CompoundTag serialized);
 
-    public CompoundTag toTag(CompoundTag tag);
+    CompoundTag toTag(CompoundTag tag);
 }
