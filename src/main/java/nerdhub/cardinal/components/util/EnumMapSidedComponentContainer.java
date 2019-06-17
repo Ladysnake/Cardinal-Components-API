@@ -2,7 +2,7 @@ package nerdhub.cardinal.components.util;
 
 import java.util.*;
 
-public final class EnumMapSidedComponentContainer implements SidedComponentContainer {
+public final class EnumMapSidedComponentContainer implements SidedComponentContainer, SidedComponentProvider {
     /* 
      * To limit RAM consumption, delegates are only created when queried for the first time.
      * Because a lot of block entities will only attach components to the core container,
@@ -30,7 +30,7 @@ public final class EnumMapSidedComponentContainer implements SidedComponentConta
         // and link it to the provider
         return delegates.computeIfAbsent(side, s -> {
             ComponentContainer cc = new ArraysComponentContainer(core);
-            ((MutableComponentProvider)getComponentProvider(s)).setBackingContainer(cc);
+            ((MutableComponentProvider)getComponents(s)).setBackingContainer(cc);
             return cc;
         });
     }
@@ -38,7 +38,8 @@ public final class EnumMapSidedComponentContainer implements SidedComponentConta
     /**
      * Gets a component provider for the given side.
      */
-    public ComponentAccessor getComponentProvider(@Nullable Direction side) {
+    @Override
+    public ComponentAccessor getComponents(@Nullable Direction side) {
         if (side == null) {
             return coreProvider;
         }
