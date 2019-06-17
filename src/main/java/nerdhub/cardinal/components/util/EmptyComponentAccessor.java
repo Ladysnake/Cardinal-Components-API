@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.api.component;
+package nerdhub.cardinal.components.util;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.provider.ItemComponentProvider;
@@ -6,34 +6,22 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 
 import java.util.Set;
+import java.util.Collections;
 
 /**
  * used to access an object's components.
  * if you want to expose components see {@link ItemComponentProvider}
  * TODO rename to ComponentProvider, in line with others
  */
-public interface ComponentAccessor {
-    ComponentAccessor EMPTY = new EmptyComponentAccessor();
-
-    /**
-     * convenience method to retrieve ComponentAccessor from a given {@link ItemStack}
-     */
-    @SuppressWarnings("ConstantConditions")
-    static ComponentAccessor fromItemStack(ItemStack stack) {
-        return (ComponentAccessor) (Object) stack;
-    }
-
-    /**
-     * convenience method to retrieve a ComponentAccessor from a given {@link Entity}
-     */
-    static ComponentAccessor fromEntity(Entity entity) {
-        return (ComponentAccessor) entity;
-    }
+public class EmptyComponentAccessor {
 
     /**
      * if this method returns {@code true}, then {@link #getComponent(ComponentType)} <strong>must not</strong> return {@code null} for the same {@link ComponentType}
      */
-    boolean hasComponent(ComponentType<?> type);
+    @Override
+    public boolean hasComponent(ComponentType<?> type) {
+        return false;
+    }
 
     /**
      * A component requester should generally call one of the {@link ComponentType} methods
@@ -43,10 +31,16 @@ public interface ComponentAccessor {
      * @see ComponentType#get(Object)
      * @see ComponentType#maybeGet(Object)
      */
-    Component getComponent(ComponentType<?> type);
+    @Override
+    public Component getComponent(ComponentType<?> type) {
+        return null;
+    }
 
     /**
      * @return an unmodifiable view of the component types
      */
-    Set<ComponentType<? extends Component>> getComponentTypes();
+    public Set<ComponentType<? extends Component>> getComponentTypes() {
+        return Collections.emptySet();
+    }
+
 }

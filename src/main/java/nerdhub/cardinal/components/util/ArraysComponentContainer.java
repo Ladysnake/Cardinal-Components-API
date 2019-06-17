@@ -14,6 +14,7 @@ import java.util.*;
  *
  * @implNote The implementation is based on {@link java.util.EnumMap} and offers constant time
  * execution for all operations.
+ * TODO rename to IndexedComponentContainer
  */
 public final class ArraysComponentContainer extends AbstractMap<ComponentType<?>, Component> implements ComponentContainer {
     /**

@@ -23,6 +23,16 @@ public interface BlockComponentProvider {
     }
 
     /**
+     * Returns the sided component provider for the block at the specified location.
+     * Subclasses with block entities must fall back to {@code BlockComponentProvider.super.getComponents(view, pos)}.
+     * Failures to obtain a meaningful component provider should result in an empty provider being returned.
+     */
+    default SidedComponentProvider getComponents(BlockView view, BlockPos pos) {
+        BlockEntity be = view.getBlockEntity(pos);
+        return be != null ? ((SidedComponentProvider) be).get(blockView, pos, type, side) : SidedComponentProvider.EMPTY;
+    }
+
+    /**
      * if this method returns {@code true}, then {@link #getComponent(BlockView, BlockPos, ComponentType, Direction)} <strong>must not</strong> return {@code null} for the same {@link ComponentType}
      *
      * @return whether or not this {@link BlockComponentProvider} can provide the desired component
