@@ -2,8 +2,8 @@ package nerdhub.cardinal.components.api.provider;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import nerdhub.cardinal.components.api.component.ComponentAccessor;
+import nerdhub.cardinal.components.util.EmptySidedComponentProvider;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
@@ -26,13 +26,13 @@ public interface SidedComponentProvider {
      * @return whether or not this {@link SidedComponentProvider} can provide the desired component
      */
     @Deprecated
-    <T extends Component> boolean hasComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side);
+    default <T extends Component> boolean hasComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {return false;}
 
     /**
      * @return an instance of the requested component, or {@code null}
      */
     @Deprecated
-    <T extends Component> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side);
+    default <T extends Component> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {return null;}
 
     @Deprecated
     default <T extends Component> Optional<T> optionally(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
@@ -43,5 +43,5 @@ public interface SidedComponentProvider {
      * @return an <strong>immutable</strong> view of the component types exposed by this {@link SidedComponentProvider}
      */
     @Deprecated
-    Set<ComponentType<? extends Component>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side);
+    default Set<ComponentType<? extends Component>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side) {return null;}
 }

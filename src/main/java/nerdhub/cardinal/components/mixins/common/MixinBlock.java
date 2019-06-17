@@ -4,23 +4,26 @@ import com.google.common.collect.ImmutableSet;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.provider.BlockComponentProvider;
+import nerdhub.cardinal.components.api.provider.SidedComponentProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 
 import javax.annotation.Nullable;
 import java.util.Set;
 
 @Mixin(Block.class)
-public class MixinBlock implements BlockComponentProvider {
+public abstract class MixinBlock implements BlockComponentProvider {
+
+    @Shadow public abstract boolean hasBlockEntity();
 
     @Override
     public SidedComponentProvider getComponents(BlockView view, BlockPos pos) {
-        // The following optimization assumes that regular blocks never have block entities
-        return this.getClass() == Block.class ? SidedComponentProvider.EMPTY : BlockComponentProvider.super.getComponents(view, pos);
+        return this.hasBlockEntity() ? BlockComponentProvider.super.getComponents(view, pos) : SidedComponentProvider.EMPTY;
     }
 
     @Override

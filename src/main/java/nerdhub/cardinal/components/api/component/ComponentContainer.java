@@ -1,6 +1,7 @@
 package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public interface ComponentContainer extends Map<ComponentType<?>, Component> {
         throw new UnsupportedOperationException();
     }
 
-    public void fromTag(CompoundTag serialized);
+    void fromTag(CompoundTag serialized);
 
-    public CompoundTag toTag(CompoundTag tag);
+    CompoundTag toTag(CompoundTag tag);
 }

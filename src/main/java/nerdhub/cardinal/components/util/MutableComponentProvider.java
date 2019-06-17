@@ -1,11 +1,6 @@
 package nerdhub.cardinal.components.util;
 
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.provider.ItemComponentProvider;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-
-import java.util.Set;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 
 /**
  * used to access an object's components.
