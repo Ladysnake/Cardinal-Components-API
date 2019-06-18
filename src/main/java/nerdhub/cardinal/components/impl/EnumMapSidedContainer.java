@@ -20,14 +20,19 @@ import java.util.Map;
  */
 public final class EnumMapSidedContainer implements SidedComponentContainer {
     private final Map<Direction, ComponentContainer> sides = new EnumMap<>(Direction.class);
+    private final Supplier<ComponentContainer> factory;
     private ComponentContainer core;
+
+    public LazySidedContainer(Supplier<ComponentContainer> factory) {
+        this.factory = factory;
+    }
 
     @Override
     public ComponentContainer get(@Nullable Direction side) {
         if (side == null) {
             return core == null ? (core = factory.get()) : core;
         }
-        return sides.computeIfAbsent(side, d -> new IndexedComponentContainer());
+        return sides.computeIfAbsent(side, d -> factory.get());
     }
 
     @Override
