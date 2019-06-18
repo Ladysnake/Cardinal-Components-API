@@ -15,25 +15,9 @@ import javax.annotation.Nullable;
  * a {@code null} side should only be made when the caller does not have specific
  * side information, and will return only elements attached to the {@code null} side.
  */
+ // TODO rename to SidedCompoundContainer
 public interface SidedComponentContainer {
     ComponentContainer get(@Nullable Direction side);
-
-    /**
-     * Convenience method to attach a component to a sided container.
-     * If {@code side} is {@code null}, the component will also be attached
-     * to every side that does not already have a component of this type.
-     */
-    default <T extends Component> void put(@Nullable Direction side, ComponentType<T> type, T component) {
-        if (side == null) {
-            for (Direction dir : Direction.values()) {
-                ComponentContainer cc = get(dir);
-                if (!cc.containsKey(type)) {
-                    cc.put(type, component);
-                }
-            }
-        }
-        get(side).put(type, component);
-    }
 
     void fromTag(CompoundTag serialized);
 
