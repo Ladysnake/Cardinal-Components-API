@@ -12,7 +12,7 @@ import java.util.Set;
  * used to access an object's components.
  * if you want to expose components see {@link ItemComponentProvider}
  */
-public class EmptyComponentProvider implements ComponentProvider {
+public final class EmptyComponentProvider implements ComponentProvider {
 
     /**
      * if this method returns {@code true}, then {@link #getComponent(ComponentType)} <strong>must not</strong> return {@code null} for the same {@link ComponentType}

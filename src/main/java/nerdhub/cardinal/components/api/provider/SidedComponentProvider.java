@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 /**
  * A side-aware component provider.
+ * TODO rename to SidedCompoundProvider
  */
 public interface SidedComponentProvider {
 

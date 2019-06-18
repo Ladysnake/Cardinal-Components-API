@@ -10,7 +10,8 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * used to access an object's components.
+ * A component provider backed by a container.
+ * TODO move to impl
  */
 public class SimpleComponentProvider implements ComponentProvider {
     protected ComponentContainer backing;

@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 public final class EmptySidedComponentProvider implements SidedComponentProvider {
     @Override
     public ComponentProvider getComponents(@Nullable Direction side) {
-        return Components.EMPTY_PROVIDER;
+        return Components.emptyProvider();
     }
 }
 
