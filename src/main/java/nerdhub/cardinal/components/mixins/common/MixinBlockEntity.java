@@ -3,8 +3,9 @@ package nerdhub.cardinal.components.mixins.common;
 import nerdhub.cardinal.components.api.component.SidedContainerCompound;
 import nerdhub.cardinal.components.api.provider.ComponentProvider;
 import nerdhub.cardinal.components.api.provider.SidedProviderCompound;
-import nerdhub.cardinal.components.api.util.Components;
-import nerdhub.cardinal.components.impl.DirectSidedProviderCompound;
+import nerdhub.cardinal.components.api.util.impl.DirectSidedProviderCompound;
+import nerdhub.cardinal.components.api.util.impl.IndexedComponentContainer;
+import nerdhub.cardinal.components.api.util.impl.SuppliedSidedContainerCompound;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.CompoundTag;
@@ -25,7 +26,7 @@ public abstract class MixinBlockEntity implements SidedProviderCompound {
     @Shadow public abstract BlockEntityType<?> getType();
 
     @Unique
-    private final SidedContainerCompound componentContainer = Components.suppliedSidedContainer(Components::indexedContainer);
+    private final SidedContainerCompound componentContainer = new SuppliedSidedContainerCompound(IndexedComponentContainer::new);
     @Unique
     private DirectSidedProviderCompound components = new DirectSidedProviderCompound(componentContainer);
 

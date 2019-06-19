@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.impl;
+package nerdhub.cardinal.components.api.util.impl;
 
 import com.google.common.base.Preconditions;
 import nerdhub.cardinal.components.api.ComponentRegistry;

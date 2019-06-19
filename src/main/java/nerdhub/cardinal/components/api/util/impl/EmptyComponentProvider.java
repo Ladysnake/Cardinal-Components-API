@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.impl;
+package nerdhub.cardinal.components.api.util.impl;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
@@ -13,6 +13,7 @@ import java.util.Set;
  * if you want to expose components see {@link ItemComponentProvider}
  */
 public final class EmptyComponentProvider implements ComponentProvider {
+    private EmptyComponentProvider() {}
 
     /**
      * if this method returns {@code true}, then {@link #getComponent(ComponentType)} <strong>must not</strong> return {@code null} for the same {@link ComponentType}
@@ -40,6 +41,11 @@ public final class EmptyComponentProvider implements ComponentProvider {
      */
     public Set<ComponentType<? extends Component>> getComponentTypes() {
         return Collections.emptySet();
+    }
+
+    private static final ComponentProvider EMPTY_PROVIDER = new EmptyComponentProvider();
+    public static ComponentProvider instance() {
+        return EMPTY_PROVIDER;
     }
 
 }

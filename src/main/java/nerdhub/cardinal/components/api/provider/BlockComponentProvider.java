@@ -1,6 +1,6 @@
 package nerdhub.cardinal.components.api.provider;
 
-import nerdhub.cardinal.components.api.util.Components;
+import nerdhub.cardinal.components.api.util.impl.EmptySidedProviderCompound;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -24,7 +24,7 @@ public interface BlockComponentProvider {
      */
     default SidedProviderCompound getComponents(BlockView view, BlockPos pos) {
         BlockEntity be = view.getBlockEntity(pos);
-        return be != null ? (SidedProviderCompound) be : Components.emptySidedProvider();
+        return be != null ? (SidedProviderCompound) be : EmptySidedProviderCompound.instance();
     }
 
 }
