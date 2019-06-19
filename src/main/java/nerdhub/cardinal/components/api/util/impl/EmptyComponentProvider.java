@@ -4,6 +4,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.provider.ComponentProvider;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
 
@@ -30,6 +31,7 @@ public final class EmptyComponentProvider implements ComponentProvider {
      * {@inheritDoc}
      * @return {@code null}
      */
+    @Nullable
     @Override
     public Component getComponent(ComponentType<?> type) {
         return null;

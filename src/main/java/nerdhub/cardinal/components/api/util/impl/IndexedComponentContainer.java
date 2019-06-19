@@ -6,6 +6,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -66,6 +67,7 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
         return rawId < vals.length && vals[rawId] != null;
     }
 
+    @Nullable
     @Override
     public Component get(Object key) {
         return get((ComponentType<?>) key);
@@ -74,6 +76,7 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
     /**
      * {@inheritDoc}
      */
+    @Nullable
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Component> T get(ComponentType<T> key) {
@@ -85,6 +88,7 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
     /**
      * {@inheritDoc}
      */
+    @Nullable
     @Override
     public <V extends Component> V put(ComponentType<V> key, V value) {
         Preconditions.checkNotNull(key);
@@ -286,6 +290,7 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
                 return vals[index];
             }
 
+            @Nullable
             public Component setValue(Component value) {
                 return IndexedComponentContainer.this.put(getKey(), value);
             }
