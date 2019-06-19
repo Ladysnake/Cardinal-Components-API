@@ -2,6 +2,7 @@ plugins {
     id "fabric-loom" version "0.2.4-SNAPSHOT"
     id "com.matthewprenger.cursegradle" version "1.2.0"
     id "maven-publish"
+    // TODO add code quality plugin
 }
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8

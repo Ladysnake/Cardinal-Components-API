@@ -3,7 +3,6 @@ package nerdhub.cardinal.components.api.util.impl;
 import nerdhub.cardinal.components.api.component.SidedContainerCompound;
 import nerdhub.cardinal.components.api.provider.ComponentProvider;
 import nerdhub.cardinal.components.api.provider.SidedProviderCompound;
-import nerdhub.cardinal.components.api.util.SimpleComponentProvider;
 import net.minecraft.util.math.Direction;
 
 import javax.annotation.Nullable;

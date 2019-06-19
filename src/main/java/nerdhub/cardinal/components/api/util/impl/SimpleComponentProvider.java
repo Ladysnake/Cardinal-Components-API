@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.api.util;
+package nerdhub.cardinal.components.api.util.impl;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
@@ -11,7 +11,6 @@ import java.util.Set;
 
 /**
  * A component provider backed by a container.
- * TODO move to impl
  */
 public class SimpleComponentProvider implements ComponentProvider {
     protected ComponentContainer backing;
