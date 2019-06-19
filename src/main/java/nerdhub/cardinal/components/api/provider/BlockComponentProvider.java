@@ -22,9 +22,9 @@ public interface BlockComponentProvider {
      * Subclasses with block entities must fall back to {@code BlockComponentProvider.super.getComponents(view, pos)}.
      * Failures to obtain a meaningful component provider should result in an empty provider being returned.
      */
-    default SidedComponentProvider getComponents(BlockView view, BlockPos pos) {
+    default SidedProviderCompound getComponents(BlockView view, BlockPos pos) {
         BlockEntity be = view.getBlockEntity(pos);
-        return be != null ? (SidedComponentProvider) be : Components.EMPTY_SIDED_PROVIDER;
+        return be != null ? (SidedProviderCompound) be : Components.emptySidedProvider();
     }
 
 }

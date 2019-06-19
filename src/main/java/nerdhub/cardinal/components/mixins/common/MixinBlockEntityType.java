@@ -1,6 +1,6 @@
 package nerdhub.cardinal.components.mixins.common;
 
-import nerdhub.cardinal.components.api.component.SidedComponentContainer;
+import nerdhub.cardinal.components.api.component.SidedContainerCompound;
 import nerdhub.cardinal.components.api.event.BlockEntityComponentCallback;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import net.fabricmc.fabric.api.event.Event;
@@ -24,7 +24,7 @@ public abstract class MixinBlockEntityType<B extends BlockEntity> {
      * This method has undefined behaviour if several entity classes share the same entity type.
      */
     @SuppressWarnings("unchecked")
-    void cardinal_fireComponentEvents(B b, SidedComponentContainer cc) {
+    void cardinal_fireComponentEvents(B b, SidedContainerCompound cc) {
         // assert b.getType() == this;
         if (cardinal_componentEvents == null) {
             List<Event<BlockEntityComponentCallback<? super B>>> events = new ArrayList<>();

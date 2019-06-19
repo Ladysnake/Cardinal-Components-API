@@ -1,7 +1,7 @@
 
 package nerdhub.cardinal.components.api.event;
 
-import nerdhub.cardinal.components.api.component.SidedComponentContainer;
+import nerdhub.cardinal.components.api.component.SidedContainerCompound;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.block.entity.BlockEntity;
@@ -24,5 +24,5 @@ public interface BlockEntityComponentCallback<T extends BlockEntity> {
         );
     }
 
-    void attachComponents(T blockEntity, SidedComponentContainer components);
+    void attachComponents(T blockEntity, SidedContainerCompound components);
 }
