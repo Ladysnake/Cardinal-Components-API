@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.impl;
+package nerdhub.cardinal.components.api.util.impl;
 
 import com.google.common.collect.Sets;
 import nerdhub.cardinal.components.api.ComponentType;

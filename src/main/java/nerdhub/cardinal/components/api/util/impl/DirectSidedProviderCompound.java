@@ -1,9 +1,8 @@
-package nerdhub.cardinal.components.impl;
+package nerdhub.cardinal.components.api.util.impl;
 
 import nerdhub.cardinal.components.api.component.SidedContainerCompound;
 import nerdhub.cardinal.components.api.provider.ComponentProvider;
 import nerdhub.cardinal.components.api.provider.SidedProviderCompound;
-import nerdhub.cardinal.components.api.util.Components;
 import nerdhub.cardinal.components.api.util.SimpleComponentProvider;
 import net.minecraft.util.math.Direction;
 
@@ -35,7 +34,7 @@ public final class DirectSidedProviderCompound implements SidedProviderCompound 
     }
 
     private ComponentProvider createSideProvider(Direction side) {
-        return Components.fallBackProvider(Components.wrappingProvider(backing.get(side)), coreProvider);
+        return new FallBackComponentProvider(new SimpleComponentProvider(backing.get(side)), coreProvider);
     }
 
     @Override

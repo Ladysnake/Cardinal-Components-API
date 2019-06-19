@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.impl;
+package nerdhub.cardinal.components.api.util;
 
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;

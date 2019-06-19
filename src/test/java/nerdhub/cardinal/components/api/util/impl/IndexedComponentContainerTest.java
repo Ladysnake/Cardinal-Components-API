@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.impl;
+package nerdhub.cardinal.components.api.util.impl;
 
 import org.junit.jupiter.api.Test;
 
