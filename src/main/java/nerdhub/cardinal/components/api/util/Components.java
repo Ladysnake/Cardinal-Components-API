@@ -1,16 +1,18 @@
 package nerdhub.cardinal.components.api.util;
 
+import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.SidedContainerCompound;
 import nerdhub.cardinal.components.api.provider.ComponentProvider;
-import nerdhub.cardinal.components.api.provider.SidedComponentProvider;
-import nerdhub.cardinal.components.impl.EmptyComponentProvider;
-import nerdhub.cardinal.components.impl.EmptySidedComponentProvider;
-import nerdhub.cardinal.components.impl.FallBackComponentProvider;
+import nerdhub.cardinal.components.api.provider.SidedProviderCompound;
+import nerdhub.cardinal.components.impl.*;
+
+import java.util.function.Supplier;
 
 public final class Components {
     private Components() { throw new AssertionError(); }
 
-    public static final ComponentProvider EMPTY_PROVIDER = new EmptyComponentProvider();
-    public static final SidedComponentProvider EMPTY_SIDED_PROVIDER = new EmptySidedComponentProvider();
+    private static final ComponentProvider EMPTY_PROVIDER = new EmptyComponentProvider();
+    private static final SidedProviderCompound EMPTY_SIDED_PROVIDER = new EmptySidedProviderCompound();
 
     /* ComponentProvider factory methods */
 
@@ -34,17 +36,17 @@ public final class Components {
 
     /* SidedCompoundProvider factory methods */
 
-    public static SidedCompoundProvider emptySidedCompound() {
+    public static SidedProviderCompound emptySidedProvider() {
         return EMPTY_SIDED_PROVIDER;
     }
 
-    public static SidedCompoundProvider wrappingSidedCompound(SidedComponentContainer backing) {
-        return new DirectSidedCompoundProvider(backing);
+    public static SidedProviderCompound wrappingSidedProvider(SidedContainerCompound backing) {
+        return new DirectSidedProviderCompound(backing);
     }
 
     /* SidedCompoundContainer factory methods */
 
-    public static SidedCompoundContainer lazySidedContainer(Supplier<ComponentContainer> factory) {
-        return new LazySidedContainer(factory);
+    public static SidedContainerCompound suppliedSidedContainer(Supplier<ComponentContainer> factory) {
+        return new SuppliedSidedContainerCompound(factory);
     }
 }

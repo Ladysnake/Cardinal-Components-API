@@ -1,7 +1,7 @@
 package nerdhub.cardinal.components.mixins.common;
 
 import nerdhub.cardinal.components.api.provider.BlockComponentProvider;
-import nerdhub.cardinal.components.api.provider.SidedComponentProvider;
+import nerdhub.cardinal.components.api.provider.SidedProviderCompound;
 import nerdhub.cardinal.components.api.util.Components;
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
@@ -15,8 +15,8 @@ public abstract class MixinBlock implements BlockComponentProvider {
     @Shadow public abstract boolean hasBlockEntity();
 
     @Override
-    public SidedComponentProvider getComponents(BlockView view, BlockPos pos) {
-        return this.hasBlockEntity() ? BlockComponentProvider.super.getComponents(view, pos) : Components.EMPTY_SIDED_PROVIDER;
+    public SidedProviderCompound getComponents(BlockView view, BlockPos pos) {
+        return this.hasBlockEntity() ? BlockComponentProvider.super.getComponents(view, pos) : Components.emptySidedProvider();
     }
 
 }

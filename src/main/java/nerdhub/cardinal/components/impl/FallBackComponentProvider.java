@@ -1,13 +1,11 @@
 package nerdhub.cardinal.components.impl;
 
+import com.google.common.collect.Sets;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.provider.ComponentProvider;
-import com.google.collect.Sets;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -17,7 +15,7 @@ public class FallBackComponentProvider implements ComponentProvider {
     protected ComponentProvider main;
     protected ComponentProvider fallback;
 
-    public FallBackComponentProvider(ComponentContainer main, ComponentProvider fallback) {
+    public FallBackComponentProvider(ComponentProvider main, ComponentProvider fallback) {
         this.main = main;
         this.fallback = fallback;
     }
@@ -41,8 +39,8 @@ public class FallBackComponentProvider implements ComponentProvider {
     @Nullable
     @Override
     public Component getComponent(ComponentType<?> type) {
-        Component c = main.get(type);
-        return c != null ? c : fallback.get(type);
+        Component c = main.getComponent(type);
+        return c != null ? c : fallback.getComponent(type);
     }
 
     /**

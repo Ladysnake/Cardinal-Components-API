@@ -1,8 +1,10 @@
 package nerdhub.cardinal.components.mixins.common;
 
+import nerdhub.cardinal.components.api.component.SidedContainerCompound;
 import nerdhub.cardinal.components.api.provider.ComponentProvider;
-import nerdhub.cardinal.components.api.provider.SidedComponentProvider;
-import nerdhub.cardinal.components.impl.SidedComponentProvidingContainer;
+import nerdhub.cardinal.components.api.provider.SidedProviderCompound;
+import nerdhub.cardinal.components.api.util.Components;
+import nerdhub.cardinal.components.impl.DirectSidedProviderCompound;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.CompoundTag;
@@ -18,29 +20,31 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import javax.annotation.Nullable;
 
 @Mixin(BlockEntity.class)
-public abstract class MixinBlockEntity implements SidedComponentProvider {
+public abstract class MixinBlockEntity implements SidedProviderCompound {
 
     @Shadow public abstract BlockEntityType<?> getType();
 
     @Unique
-    private SidedComponentProvidingContainer components = new SidedComponentProvidingContainer();
+    private final SidedContainerCompound componentContainer = Components.suppliedSidedContainer(Components::indexedContainer);
+    @Unique
+    private DirectSidedProviderCompound components = new DirectSidedProviderCompound(componentContainer);
 
     @SuppressWarnings("unchecked")
     @Inject(method = "<init>", at = @At("RETURN"))
     private void fireComponentCallback(CallbackInfo ci) {
         // Mixin classes can be referenced from other mixin classes
         //noinspection ReferenceToMixin,ConstantConditions
-        ((MixinBlockEntityType)(Object)this.getType()).cardinal_fireComponentEvents((BlockEntity) (Object) this, this.components);
+        ((MixinBlockEntityType)(Object)this.getType()).cardinal_fireComponentEvents((BlockEntity) (Object) this, this.componentContainer);
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))
     private void toTag(CompoundTag inputTag, CallbackInfoReturnable<CompoundTag> cir) {
-        cir.getReturnValue().put("cardinal:components", this.components.toTag(new CompoundTag()));
+        cir.getReturnValue().put("cardinal:components", this.componentContainer.toTag(new CompoundTag()));
     }
 
     @Inject(method = "fromTag", at = @At("RETURN"))
     private void fromTag(CompoundTag tag, CallbackInfo ci) {
-        this.components.fromTag(tag.getCompound("cardinal:components"));
+        this.componentContainer.fromTag(tag.getCompound("cardinal:components"));
     }
 
     @Override

@@ -1,29 +1,25 @@
 package nerdhub.cardinal.components.impl;
 
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.SidedComponentContainer;
-import nerdhub.cardinal.components.api.provider.ComponentProvider;
-import nerdhub.cardinal.components.api.provider.SidedComponentProvider;
-import nerdhub.cardinal.components.api.util.Components;
-import nerdhub.cardinal.components.api.util.SimpleComponentProvider;
+import nerdhub.cardinal.components.api.component.SidedContainerCompound;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.Direction;
 
 import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
- * A sided compound component container that creates container instances as they are needed
+ * A sided compound component container that uses a supplier to obtain
+ * its side components
  */
-public final class EnumMapSidedContainer implements SidedComponentContainer {
+public final class SuppliedSidedContainerCompound implements SidedContainerCompound {
     private final Map<Direction, ComponentContainer> sides = new EnumMap<>(Direction.class);
     private final Supplier<ComponentContainer> factory;
     private ComponentContainer core;
 
-    public LazySidedContainer(Supplier<ComponentContainer> factory) {
+    public SuppliedSidedContainerCompound(Supplier<ComponentContainer> factory) {
         this.factory = factory;
     }
 
