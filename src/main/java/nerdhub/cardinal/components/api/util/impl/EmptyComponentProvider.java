@@ -3,20 +3,23 @@ package nerdhub.cardinal.components.api.util.impl;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.provider.ComponentProvider;
-import nerdhub.cardinal.components.api.provider.ItemComponentProvider;
 
 import java.util.Collections;
 import java.util.Set;
 
 /**
- * used to access an object's components.
- * if you want to expose components see {@link ItemComponentProvider}
+ * A provider that never exposes any component
  */
 public final class EmptyComponentProvider implements ComponentProvider {
-    private EmptyComponentProvider() {}
+    private static final ComponentProvider EMPTY_PROVIDER = new EmptyComponentProvider();
+
+    public static ComponentProvider instance() {
+        return EMPTY_PROVIDER;
+    }
 
     /**
-     * if this method returns {@code true}, then {@link #getComponent(ComponentType)} <strong>must not</strong> return {@code null} for the same {@link ComponentType}
+     * {@inheritDoc}
+     * @return {@code false}
      */
     @Override
     public boolean hasComponent(ComponentType<?> type) {
@@ -24,12 +27,8 @@ public final class EmptyComponentProvider implements ComponentProvider {
     }
 
     /**
-     * A component requester should generally call one of the {@link ComponentType} methods
-     * instead of calling this directly.
-     *
-     * @return an instance of the requested component, or {@code null}
-     * @see ComponentType#get(Object)
-     * @see ComponentType#maybeGet(Object)
+     * {@inheritDoc}
+     * @return {@code null}
      */
     @Override
     public Component getComponent(ComponentType<?> type) {
@@ -37,15 +36,12 @@ public final class EmptyComponentProvider implements ComponentProvider {
     }
 
     /**
-     * @return an unmodifiable view of the component types
+     * {@inheritDoc}
+     * @return an empty set representing this provider's supported component types
      */
     public Set<ComponentType<? extends Component>> getComponentTypes() {
         return Collections.emptySet();
     }
 
-    private static final ComponentProvider EMPTY_PROVIDER = new EmptyComponentProvider();
-    public static ComponentProvider instance() {
-        return EMPTY_PROVIDER;
-    }
-
+    private EmptyComponentProvider() {}
 }
