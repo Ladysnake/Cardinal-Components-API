@@ -4,7 +4,6 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.provider.ComponentProvider;
-import nerdhub.cardinal.components.api.util.ComponentHelper;
 import nerdhub.cardinal.components.api.util.impl.IndexedComponentContainer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -38,12 +37,12 @@ public abstract class MixinEntity implements ComponentProvider {
 
     @Inject(method = "toTag", at = @At("RETURN"))
     private void toTag(CompoundTag inputTag, CallbackInfoReturnable<CompoundTag> cir) {
-        ComponentHelper.writeToTag(this.components, cir.getReturnValue());
+        this.components.toTag(cir.getReturnValue());
     }
 
     @Inject(method = "fromTag", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V", shift = At.Shift.AFTER))
     private void fromTag(CompoundTag tag, CallbackInfo ci) {
-        ComponentHelper.readFromTag(this.components, tag);
+        this.components.fromTag(tag);
     }
 
     @Override

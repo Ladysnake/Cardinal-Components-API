@@ -5,7 +5,6 @@ import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import net.minecraft.nbt.CompoundTag;
 
 import java.util.*;
 
@@ -15,7 +14,7 @@ import java.util.*;
  * @implNote The implementation is based on {@link java.util.EnumMap} and offers constant time
  * execution for all operations.
  */
-public final class IndexedComponentContainer extends AbstractMap<ComponentType<?>, Component> implements ComponentContainer {
+public final class IndexedComponentContainer extends AbstractComponentContainer {
     /**
      * All of the component types that can be stored in this container.
      * (Cached for performance.)
@@ -106,17 +105,6 @@ public final class IndexedComponentContainer extends AbstractMap<ComponentType<?
             size++;
         }
         return oldValue;
-    }
-
-    @Override
-    public void fromTag(CompoundTag serialized) {
-        // TODO
-    }
-
-    @Override
-    public CompoundTag toTag(CompoundTag tag) {
-        // TODO
-        return tag;
     }
 
     // Views
