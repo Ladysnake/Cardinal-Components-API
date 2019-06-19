@@ -7,6 +7,7 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 
 /**
  * An efficient container for attached {@link Component}.
@@ -105,6 +106,16 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
             size++;
         }
         return oldValue;
+    }
+
+    @Override
+    public void forEach(BiConsumer<? super ComponentType<?>, ? super Component> action) {
+        for (int i = 0; i < universeSize; i++) {
+            Component val = vals[i];
+            if (val != null) {
+                action.accept(keyUniverse[i], val);
+            }
+        }
     }
 
     // Views
