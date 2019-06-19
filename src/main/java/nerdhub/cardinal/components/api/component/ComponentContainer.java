@@ -5,6 +5,12 @@ import net.minecraft.nbt.CompoundTag;
 
 import java.util.Map;
 
+/**
+ * A container for components.
+ * <p> A {@code ComponentContainer} cannot have its components removed.
+ * Components can be added or replaced, but removal of existing component types
+ * is unsupported. This guarantees consistent behaviour for consumers.
+ */
 public interface ComponentContainer extends Map<ComponentType<?>, Component> {
 
     /**
@@ -35,10 +41,16 @@ public interface ComponentContainer extends Map<ComponentType<?>, Component> {
      *     return can also indicate that the map previously associated
      *     <tt>null</tt> with the specified key.)
      * @throws NullPointerException if the specified key or value is null
+     * @throws UnsupportedOperationException if the <tt>put</tt> operation
+     *         is not supported by this container
+     *
+     * @implSpec Implementations that do not support modification should
+     *           document their immutability properties
      */
     <V extends Component> V put(ComponentType<V> key, V value);
 
     @Override
+    @Deprecated
     default Component remove(Object key) {
         throw new UnsupportedOperationException();
     }

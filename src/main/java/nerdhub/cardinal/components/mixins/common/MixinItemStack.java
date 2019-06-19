@@ -2,9 +2,11 @@ package nerdhub.cardinal.components.mixins.common;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.provider.ComponentProvider;
 import nerdhub.cardinal.components.api.provider.ItemComponentProvider;
-import nerdhub.cardinal.components.api.util.ComponentHelper;
+import nerdhub.cardinal.components.api.util.Components;
+import nerdhub.cardinal.components.api.util.impl.IndexedComponentContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -18,25 +20,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.Map;
 import java.util.Set;
 
 @Mixin(value = ItemStack.class, priority = 900)
 public abstract class MixinItemStack implements ComponentProvider {
 
-    private final Map<ComponentType<? extends Component>, Component> components = new IdentityHashMap<>();
+    private final ComponentContainer components = new IndexedComponentContainer();
 
     @Inject(method = "areTagsEqual", at = @At("RETURN"), cancellable = true)
     private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
-        if(cir.getReturnValueZ() && !ComponentHelper.areComponentsEqual(stack1, stack2)) {
+        if(cir.getReturnValueZ() && !Components.areComponentsEqual(stack1, stack2)) {
             cir.setReturnValue(false);
         }
     }
 
     @Inject(method = "isEqualIgnoreDamage", at = @At("RETURN"), cancellable = true)
     private void isEqual(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if(cir.getReturnValueZ() && !ComponentHelper.areComponentsEqual((ItemStack) (Object) this, stack)) {
+        if(cir.getReturnValueZ() && !Components.areComponentsEqual((ItemStack) (Object) this, stack)) {
             cir.setReturnValue(false);
         }
     }
@@ -46,28 +46,29 @@ public abstract class MixinItemStack implements ComponentProvider {
     private void copy(CallbackInfoReturnable<ItemStack> cir) {
         MixinItemStack other = (MixinItemStack) (Object) cir.getReturnValue();
         this.components.forEach((type, component) -> {
-            Component copy = ComponentHelper.copyOf(component);
+            Component copy = Components.copyOf(component);
             other.setComponentValue(type, copy);
         });
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))
     private void serialize(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
-        ComponentHelper.writeToTag(components, cir.getReturnValue());
+        this.components.toTag(cir.getReturnValue());
     }
 
     @Shadow
     public abstract Item getItem();
 
-    @SuppressWarnings("InvalidMemberReference") // Minecraft dev plugin does not support array values
-    @Inject(method = {"<init>(Lnet/minecraft/item/ItemConvertible;I)V", "<init>(Lnet/minecraft/nbt/CompoundTag;)V"}, at = @At("RETURN"))
+    @SuppressWarnings("DuplicatedCode")
+    @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("RETURN"))
     private void initComponents(ItemConvertible item, int amount, CallbackInfo ci) {
         ((ItemComponentProvider) this.getItem()).createComponents((ItemStack) (Object) this);
     }
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
-        ComponentHelper.readFromTag(this.components, tag);
+        ((ItemComponentProvider) this.getItem()).createComponents((ItemStack) (Object) this);
+        this.components.fromTag(tag);
     }
 
     @Override
