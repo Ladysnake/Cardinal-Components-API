@@ -152,6 +152,15 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
         }
     }
 
+    // IndexedComponentContainer specific methods
+
+    /**
+     * The size of the current range of values that this container uses.
+     */
+    public int getUniverseSize() {
+        return this.universeSize;
+    }
+
     // Views
 
     /**

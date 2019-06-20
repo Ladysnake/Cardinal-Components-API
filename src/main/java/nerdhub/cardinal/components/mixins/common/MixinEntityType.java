@@ -15,6 +15,8 @@ import java.util.List;
 public abstract class MixinEntityType<E extends Entity> {
     @Nullable
 	private Event<EntityComponentCallback<? super E>>[] cardinal_componentEvents;
+    @Unique
+    private FeedbackContainerFactory componentContainerFactory = new FeedbackContainerFactory();
 
     /**
      * Fires {@link EntityComponentCallback} for every superclass of the given entity.
@@ -22,8 +24,9 @@ public abstract class MixinEntityType<E extends Entity> {
      * This method has undefined behaviour if several entity classes share the same entity type.
      */
     @SuppressWarnings("unchecked")
-    void cardinal_fireComponentEvents(E e, ComponentContainer cc) {
+    void cardinal_fireComponentEvents(E e) {
         // assert e.getType() == this;
+        IndexedComponentContainer cc = this.componentContainerFactory.create();
         if (cardinal_componentEvents == null) {
             List<Event<EntityComponentCallback<? super E>>> events = new ArrayList<>();
             Class c = e.getClass();
@@ -36,5 +39,6 @@ public abstract class MixinEntityType<E extends Entity> {
         for (Event<EntityComponentCallback<? super E>> event : cardinal_componentEvents) {
             event.invoker().attachComponents(e, cc);
         }
+        this.componentContainerFactory.adjustFrom(cc);
     }
 }
