@@ -2,10 +2,13 @@ package nerdhub.cardinal.components.mixins.common;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.api.util.impl.IndexedComponentContainer;
+import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -24,7 +27,7 @@ public abstract class MixinEntityType<E extends Entity> {
      * This method has undefined behaviour if several entity classes share the same entity type.
      */
     @SuppressWarnings("unchecked")
-    void cardinal_fireComponentEvents(E e) {
+    ComponentContainer cardinal_fireComponentEvents(E e) {
         // assert e.getType() == this;
         IndexedComponentContainer cc = this.componentContainerFactory.create();
         if (cardinal_componentEvents == null) {
@@ -40,5 +43,6 @@ public abstract class MixinEntityType<E extends Entity> {
             event.invoker().attachComponents(e, cc);
         }
         this.componentContainerFactory.adjustFrom(cc);
+        return cc;
     }
 }

@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -75,13 +74,13 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
     @Override
     public boolean containsKey(Object key) {
         if (key != null && key.getClass() == ComponentType.class) {
-            return this.containsKey(key);
+            return this.containsKey((ComponentType<?>) key);
         }
         return false;
     }
 
     public boolean containsKey(ComponentType<?> key) {
-        final int index = ((ComponentType)key).getRawId() - this.minIndex;
+        final int index = key.getRawId() - this.minIndex;
         return index >= 0 && index < this.universeSize && this.vals[index] != null;
     }
 
@@ -102,7 +101,8 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
     @SuppressWarnings("unchecked")
     public <T extends Component> T get(ComponentType<T> key) {
         final int index = key.getRawId() - this.minIndex;
-        return index >= 0 && index < this.universeSize ? (T) this.vals[index] : null;
+        Component[] vals = this.vals;
+        return index >= 0 && index < vals.length ? (T) vals[index] : null;
     }
 
     /**
