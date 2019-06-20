@@ -22,7 +22,7 @@ import java.util.Set;
 @Mixin(Entity.class)
 public abstract class MixinEntity implements ComponentProvider {
 
-    private ComponentContainer components = new IndexedComponentContainer();
+    private ComponentContainer components;
 
     @Shadow
     public abstract EntityType<?> getType();
@@ -32,7 +32,7 @@ public abstract class MixinEntity implements ComponentProvider {
     private void initDataTracker(CallbackInfo ci) {
         // Mixin classes can be referenced from other mixin classes
         //noinspection ReferenceToMixin,ConstantConditions
-        ((MixinEntityType)(Object)this.getType()).cardinal_fireComponentEvents((Entity) (Object) this, this.components);
+        this.components = ((MixinEntityType)(Object)this.getType()).cardinal_createContainer((Entity) (Object) this);
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))
@@ -53,7 +53,8 @@ public abstract class MixinEntity implements ComponentProvider {
     @Nullable
     @Override
     public Component getComponent(ComponentType<?> type) {
-        return this.components.getOrDefault(type, null);
+        // TODO use generics again
+        return this.components.get(type);
     }
 
     @Override
