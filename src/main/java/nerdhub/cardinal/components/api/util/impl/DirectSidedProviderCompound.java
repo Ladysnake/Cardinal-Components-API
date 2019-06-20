@@ -28,8 +28,8 @@ public final class DirectSidedProviderCompound implements SidedProviderCompound 
         this.southProvider  = createSideProvider(Direction.SOUTH);
         this.eastProvider   = createSideProvider(Direction.EAST);
         this.westProvider   = createSideProvider(Direction.WEST);
-        this.upProvider = createSideProvider(Direction.UP);
-        this.downProvider = createSideProvider(Direction.DOWN);
+        this.upProvider     = createSideProvider(Direction.UP);
+        this.downProvider   = createSideProvider(Direction.DOWN);
     }
 
     private ComponentProvider createSideProvider(Direction side) {
