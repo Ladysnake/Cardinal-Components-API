@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
  * An efficient container for attached {@link Component}.
  *
  * @implNote The implementation is based on {@link java.util.EnumMap} and offers constant time
- * execution for all operations.
+ * execution for all read operations.
  */
 public final class IndexedComponentContainer extends AbstractComponentContainer {
     /**
@@ -24,6 +24,7 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
     private ComponentType<?>[] keyUniverse;
 
     private int universeSize;
+    private int minIndex;
 
     /**
      * Array representation of this map.  The ith element is the value
@@ -34,18 +35,29 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
 
     /**
      * The number of mappings in this container.
+     * This number should only ever increase.
      */
     private int size;
 
-    public IndexedComponentContainer() {
-        this.universeSize = 0;
-        this.keyUniverse = new ComponentType[universeSize];
-        this.size = 0;
-        this.vals = new Component[size];
+    /**
+     * Creates a new {@code IndexedComponentContainer} using the settings from an existing one.
+     * This operation will not copy the content of the container.
+     * This method can be useful to create pre-sized containers from an existing model.
+     */
+    public static IndexedComponentContainer withSettingsFrom(IndexedComponentContainer other) {
+        IndexedComponentContainer ret = new IndexedComponentContainer();
+        ret.universeSize = other.universeSize;
+        ret.keyUniverse = other.keyUniverse;
+        ret.vals = new Component[other.universeSize];
+        return ret;
     }
 
-    public IndexedComponentContainer(ComponentContainer original) {
-        this.putAll(original);
+    public IndexedComponentContainer() {
+        this.universeSize = 0;
+        this.minIndex = Integer.MAX_VALUE;
+        this.keyUniverse = null;
+        this.size = 0;
+        this.vals = null;
     }
 
     /**
@@ -61,16 +73,25 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
      * {@inheritDoc}
      */
     @Override
-    public boolean containsKey(Object type) {
-        final int rawId = ((ComponentType)type).getRawId();
-        final Component[] vals = this.vals;
-        return rawId < vals.length && vals[rawId] != null;
+    public boolean containsKey(Object key) {
+        if (key != null && key.getClass() == ComponentType.class) {
+            return this.containsKey(key);
+        }
+        return false;
+    }
+
+    public boolean containsKey(ComponentType<?> key) {
+        final int index = ((ComponentType)key).getRawId() - this.minIndex;
+        return index >= 0 && index < this.universeSize && this.vals[index] != null;
     }
 
     @Nullable
     @Override
-    public Component get(Object key) {
-        return get((ComponentType<?>) key);
+    public Component get(@Nullable Object key) {
+        if (key != null && key.getClass() == ComponentType.class) {
+            return get((ComponentType<?>) key);
+        }
+        return null;
     }
 
     /**
@@ -80,9 +101,8 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Component> T get(ComponentType<T> key) {
-        final int rawId = key.getRawId();
-        final Component[] vals = this.vals;
-        return rawId < vals.length ? (T) vals[rawId] : null;
+        final int index = key.getRawId() - this.minIndex;
+        return index >= 0 && index < this.universeSize ? (T) this.vals[index] : null;
     }
 
     /**
@@ -95,14 +115,24 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
         Preconditions.checkNotNull(value);
         Preconditions.checkArgument(key.getComponentClass().isInstance(value), value + " is not of type " + key);
         Component[] vals = this.vals;
-        int index = key.getRawId();
-        if (index >= vals.length) {
+        final int rawId = key.getRawId();
+        int index = rawId - this.minIndex;
+        if (index < 0 || index >= this.universeSize) {
             // update the underlying component array to accept the new component
-            this.keyUniverse = ComponentRegistry.stream().toArray(ComponentType[]::new);
-            universeSize = keyUniverse.length;
+            int newMinIndex = Math.min(this.minIndex, rawId);
+            int newUniverseSize = Math.max(this.universeSize, rawId - newMinIndex);
+            this.keyUniverse = ComponentRegistry.stream().skip(newMinIndex).limit(newUniverseSize).toArray(ComponentType[]::new);
+
+            assert keyUniverse.length > this.universeSize : "universe must expand when resized during put operation";
             vals = new Component[universeSize];
-            System.arraycopy(this.vals, 0, vals, 0, this.vals.length);
+            if (this.vals != null) {
+                assert this.minIndex >= newMinIndex : "minimum index cannot increase";
+                System.arraycopy(this.vals, 0, vals, this.minIndex - newMinIndex, this.vals.length);
+            }
             this.vals = vals;
+            this.minIndex = newMinIndex;
+            this.universeSize = this.keyUniverse.length;
+            index = rawId - this.minIndex; // compute index again since min index changed
         }
         V oldValue = key.getComponentClass().cast(vals[index]);
         vals[index] = value;

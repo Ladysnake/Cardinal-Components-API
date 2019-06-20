@@ -13,6 +13,9 @@ import java.util.Map;
  */
 public interface ComponentContainer extends Map<ComponentType<?>, Component> {
 
+    // TODO javadoc
+    boolean containsKey(ComponentType<?> key);
+
     /**
      * Returns the value to which the specified component type is mapped,
      * or {@code null} if this container contains no component of that type.
