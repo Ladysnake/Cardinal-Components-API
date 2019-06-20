@@ -2,26 +2,17 @@
 package nerdhub.cardinal.components.api.event;
 
 import nerdhub.cardinal.components.api.component.SidedContainerCompound;
+import nerdhub.cardinal.components.internal.BlockEntityTypeCaller;
 import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 
-import java.util.HashMap;
-import java.util.Map;
-
+@FunctionalInterface
 public interface BlockEntityComponentCallback<T extends BlockEntity> {
 
-    Map<Class<? extends BlockEntity>, Event> EVENTS = new HashMap<>();
-
     @SuppressWarnings("unchecked")
-    static <T extends BlockEntity> Event<BlockEntityComponentCallback<T>> event(Class<T> clazz) {
-        return (Event<BlockEntityComponentCallback<T>>) EVENTS.computeIfAbsent(clazz, c ->
-            EventFactory.createArrayBacked(BlockEntityComponentCallback.class, callbacks -> (be, components) -> {
-                for(BlockEntityComponentCallback callback : callbacks) {
-                    callback.attachComponents(be, components);
-                }
-            })
-        );
+    static <T extends BlockEntity> Event<BlockEntityComponentCallback<T>> event(BlockEntityType<T> type) {
+        return (Event<BlockEntityComponentCallback<T>>) ((BlockEntityTypeCaller)type).getBlockEntityComponentEvent();
     }
 
     void attachComponents(T blockEntity, SidedContainerCompound components);
