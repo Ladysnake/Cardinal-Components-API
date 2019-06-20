@@ -1,4 +1,6 @@
-package nerdhub.cardinal.components.api.internal;
+package nerdhub.cardinal.components.internal;
+
+import nerdhub.cardinal.components.api.util.impl.IndexedComponentContainer;
 
 /**
  * A {@code ComponentContainer} factory that takes feedback to optimize

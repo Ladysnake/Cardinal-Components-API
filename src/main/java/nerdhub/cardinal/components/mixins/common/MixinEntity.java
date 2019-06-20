@@ -4,7 +4,6 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.provider.ComponentProvider;
-import nerdhub.cardinal.components.api.util.impl.IndexedComponentContainer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundTag;
@@ -32,7 +31,7 @@ public abstract class MixinEntity implements ComponentProvider {
     private void initDataTracker(CallbackInfo ci) {
         // Mixin classes can be referenced from other mixin classes
         //noinspection ReferenceToMixin,ConstantConditions
-        this.components = ((MixinEntityType)(Object)this.getType()).cardinal_createContainer((Entity) (Object) this);
+        this.components = ((MixinEntityType)(Object)this.getType()).cardinal_fireComponentEvents((Entity) (Object) this);
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))

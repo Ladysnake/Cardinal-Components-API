@@ -1,5 +1,13 @@
 package nerdhub.cardinal.components.internal;
 
+import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.entity.Entity;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public final class CardinalEventsInternals {
     private CardinalEventsInternals() { throw new AssertionError(); }
 
