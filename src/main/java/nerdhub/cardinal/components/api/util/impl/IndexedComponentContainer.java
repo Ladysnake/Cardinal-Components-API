@@ -11,6 +11,14 @@ import java.util.function.BiConsumer;
 
 /**
  * An efficient container for attached {@link Component}.
+ * 
+ * <p> <b>Note that this implementation is not synchronized./b> 
+ * If multiple threads access an indexed container concurrently, and at least one of the threads 
+ * modifies the container structurally, it must be synchronized externally. 
+ * (A structural modification is any operation that adds one or more mappings; 
+ * merely changing the value associated with a key that an instance already contains is not 
+ * a structural modification.) This is typically accomplished by synchronizing on some object 
+ * that naturally encapsulates the container.
  *
  * @implNote The implementation is based on {@link java.util.EnumMap} and offers constant time
  * execution for all read operations.
