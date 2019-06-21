@@ -29,6 +29,7 @@ public abstract class MixinItemStack implements ComponentProvider {
 
     @Inject(method = "areTagsEqual", at = @At("RETURN"), cancellable = true)
     private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
+        // If the tags are equal, either both stacks are empty or neither is.
         if(cir.getReturnValueZ() && !Components.areComponentsEqual(stack1, stack2)) {
             cir.setReturnValue(false);
         }
@@ -36,6 +37,7 @@ public abstract class MixinItemStack implements ComponentProvider {
 
     @Inject(method = "isEqualIgnoreDamage", at = @At("RETURN"), cancellable = true)
     private void isEqual(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+        // If the tags are equal, either both stacks are empty or neither is.
         if(cir.getReturnValueZ() && !Components.areComponentsEqual((ItemStack) (Object) this, stack)) {
             cir.setReturnValue(false);
         }
@@ -73,18 +75,18 @@ public abstract class MixinItemStack implements ComponentProvider {
 
     @Override
     public boolean hasComponent(ComponentType<?> type) {
-        return components.containsKey(type);
+        return !this.isEmpty() && components.containsKey(type);
     }
 
     @Nullable
     @Override
     public Component getComponent(ComponentType<?> type) {
-        return components.getOrDefault(type, null);
+        return this.isEmpty() ? null : components.get(type);
     }
 
     @Override
     public Set<ComponentType<? extends Component>> getComponentTypes() {
-        return Collections.unmodifiableSet(components.keySet());
+        return this.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(components.keySet());
     }
 
     <T extends Component> void setComponentValue(ComponentType<T> type, Component obj) {
