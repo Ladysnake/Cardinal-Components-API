@@ -10,7 +10,12 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 /**
- * An efficient container for attached {@link Component}.
+ * An efficient container for attached {@link Component components}.
+ *
+ * <p> This implementation is best suited for tightly packed ids
+ * (eg. component types registered together). Wide id ranges result
+ * in a sparse collection with a higher memory requirement than
+ * other implementations like {@link FastComponentContainer}.
  * 
  * <p> <b>Note that this implementation is not synchronized./b> 
  * If multiple threads access an indexed container concurrently, and at least one of the threads 
@@ -21,7 +26,8 @@ import java.util.function.BiConsumer;
  * that naturally encapsulates the container.
  *
  * @implNote The implementation is based on {@link java.util.EnumMap} and offers constant time
- * execution for all read operations.
+ * execution for all read operations. They may be faster than their {@link FastComponentContainer}
+ * counterparts.
  */
 public final class IndexedComponentContainer extends AbstractComponentContainer {
     /**
@@ -201,8 +207,8 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
      * The returned collection obeys the general contract outlined in
      * {@link Map#values()}.  The collection's iterator will return the
      * values in the order their corresponding keys appear in map,
-     * which is their natural order (the order in which the enum constants
-     * are declared).
+     * which is their natural order (the order in which the component types
+     * are registered).
      *
      * @return a collection view of the values contained in this map
      */
@@ -220,9 +226,9 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
      * The returned set obeys the general contract outlined in
      * {@link Map#keySet()}.  The set's iterator will return the
      * mappings in the order their keys appear in map, which is their
-     * natural order (the order in which the enum constants are declared).
+     * natural order (the order in which the component types are registered).
      *
-     * @return a set view of the mappings contained in this enum map
+     * @return a set view of the mappings contained in this container
      */
     public Set<Map.Entry<ComponentType<?>, Component>> entrySet() {
         Set<Map.Entry<ComponentType<?>,Component>> es = entrySet;

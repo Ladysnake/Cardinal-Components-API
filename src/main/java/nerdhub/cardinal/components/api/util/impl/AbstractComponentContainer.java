@@ -13,6 +13,26 @@ import java.util.AbstractMap;
 
 public abstract class AbstractComponentContainer extends AbstractMap<ComponentType<?>, Component> implements ComponentContainer {
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean containsKey(Object key) {
+        if (key != null && key.getClass() == ComponentType.class) {
+            return this.containsKey((ComponentType<?>) key);
+        }
+        return false;
+    }
+
+    @Nullable
+    @Override
+    public Component get(@Nullable Object key) {
+        if (key != null && key.getClass() == ComponentType.class) {
+            return get((ComponentType<?>) key);
+        }
+        return null;
+    }
+
     @Override
     public void fromTag(CompoundTag tag) {
         if(tag.containsKey("cardinal_components", NbtType.LIST)) {
