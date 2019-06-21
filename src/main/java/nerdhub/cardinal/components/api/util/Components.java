@@ -22,7 +22,10 @@ public final class Components {
     }
 
     /**
-     * Checks equality between two providers based on the components they expose.
+     * Compares a provider with another for equality based on the components they expose.
+     * Returns {@code true} if the two providers expose the same component types through
+     * {@link ComponentProvider#getComponentTypes}, and, for each of the types exposed as such,
+     * the corresponding component values are equal according to {@link Component#isComponentEqual}.
      */
     public static boolean areComponentsEqual(ComponentProvider accessor, ComponentProvider other) {
         Set<ComponentType<? extends Component>> types = accessor.getComponentTypes();

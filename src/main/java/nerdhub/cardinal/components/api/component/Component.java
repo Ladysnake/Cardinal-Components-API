@@ -27,9 +27,9 @@ public interface Component {
     }
 
     /**
-     * used for comparing two instances of item components
+     * Used to compare two instances of components for equality.
      */
     default boolean isComponentEqual(Component other) {
-        throw new UnsupportedOperationException("Tried to compare block component, or not implemented on Item!");
+        return this.equals(other);
     }
 }
