@@ -11,13 +11,20 @@ import java.util.Set;
 public final class Components {
     private Components() { throw new AssertionError(); }
 
-
+    /**
+     * Checks item stack equality based on their exposed components.
+     *
+     * <p> Two {@link ItemStack#isEmpty empty} item stacks will be considered
+     * equal, as they would expose no component.
+     */
     public static boolean areComponentsEqual(ItemStack stack1, ItemStack stack2) {
-        if(stack1.isEmpty() && stack2.isEmpty()) {
-            return true;
-        }
-        ComponentProvider accessor = ComponentProvider.fromItemStack(stack1);
-        ComponentProvider other = ComponentProvider.fromItemStack(stack2);
+        return (stack1.isEmpty() && stack2.isEmpty()) || areComponentsEqual(ComponentProvider.fromItemStack(stack1), ComponentProvider.fromItemStack(stack2));
+    }
+
+    /**
+     * Checks equality between two providers based on the components they expose.
+     */
+    public static boolean areComponentsEqual(ComponentProvider accessor, ComponentProvider other) {
         Set<ComponentType<? extends Component>> types = accessor.getComponentTypes();
         if(types.size() == other.getComponentTypes().size()) {
             for(ComponentType<? extends Component> type : types) {
