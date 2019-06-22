@@ -7,13 +7,13 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.util.Identifier;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
 public final class ComponentRegistryImpl implements ComponentRegistry {
     
-    private final Map<Identifier, ComponentType<?>> registry = new HashMap<>();
+    private final Map<Identifier, ComponentType<?>> registry = new LinkedHashMap<>();
     private final ComponentTypeAccess access;
     private int nextRawId = 0;
 
@@ -35,6 +35,7 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
             registered = access.create(componentId, componentClass, nextRawId++);
             registry.put(componentId, registered);
         }
+        SharedComponentSecrets.registeredComponents = this.registry.values().toArray(new ComponentType[0]);
         return registered;
     }
     

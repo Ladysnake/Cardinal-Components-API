@@ -20,8 +20,7 @@ public final class ComponentType<T extends Component> {
      *
      * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
      */
-
-    ComponentType(Identifier id, Class<T> componentClass, int rawId) {
+  ComponentType(Identifier id, Class<T> componentClass, int rawId) {
         this.componentClass = componentClass;
         this.id = id;
         this.rawId = rawId;

@@ -267,7 +267,7 @@ public final class FastComponentContainer extends AbstractComponentContainer {
             }
 
             public ComponentType<?> getKey() {
-                return keyUniverse[rawId];
+                return keyUniverse == null ? null : keyUniverse[rawId];
             }
 
             public Component getValue() {

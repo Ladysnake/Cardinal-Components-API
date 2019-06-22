@@ -67,10 +67,10 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
 
     public IndexedComponentContainer() {
         this.universeSize = 0;
-        this.minIndex = Integer.MAX_VALUE;
-        this.keyUniverse = null;
+        this.minIndex = 0;
+        this.keyUniverse = new ComponentType[0];
         this.size = 0;
-        this.vals = null;
+        this.vals = new Component[0];
     }
 
     /**
@@ -86,7 +86,7 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
      * {@inheritDoc}
      */
     @Override
-    public boolean containsKey(Object key) {
+    public boolean containsKey(@Nullable Object key) {
         if (key != null && key.getClass() == ComponentType.class) {
             return this.containsKey((ComponentType<?>) key);
         }
@@ -95,7 +95,8 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
 
     public boolean containsKey(ComponentType<?> key) {
         final int index = key.getRawId() - this.minIndex;
-        return index >= 0 && index < this.universeSize && this.vals[index] != null;
+        Component[] vals = this.vals;
+        return index >= 0 && index < vals.length && vals[index] != null;
     }
 
     @Nullable
@@ -134,22 +135,20 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
         if (index < 0 || index >= this.universeSize) {
             // update the underlying component array to accept the new component
             int newMinIndex = Math.min(this.minIndex, rawId);
-            int newUniverseSize = Math.max(this.universeSize, rawId - newMinIndex);
-            this.keyUniverse = ComponentRegistry.INSTANCE.stream().skip(newMinIndex).limit(newUniverseSize).toArray(ComponentType[]::new);
+            this.universeSize++;
+            this.keyUniverse = ComponentRegistry.INSTANCE.stream().skip(newMinIndex).limit(universeSize).toArray(ComponentType[]::new);
 
-            assert keyUniverse.length > this.universeSize : "universe must expand when resized during put operation";
-            vals = new Component[universeSize];
-            if (this.vals != null) {
-                assert this.minIndex >= newMinIndex : "minimum index cannot increase";
-                System.arraycopy(this.vals, 0, vals, this.minIndex - newMinIndex, this.vals.length);
-            }
+            vals = new Component[newUniverseSize];
+            assert this.minIndex >= newMinIndex : "minimum index cannot increase";
+            System.arraycopy(this.vals, 0, vals, this.minIndex - newMinIndex, this.vals.length);
             this.vals = vals;
             this.minIndex = newMinIndex;
-            this.universeSize = this.keyUniverse.length;
+            this.universeSize = newUniverseSize;
             index = rawId - this.minIndex; // compute index again since min index changed
         }
         V oldValue = key.getComponentClass().cast(vals[index]);
         vals[index] = value;
+        assert vals[0] != null && vals[universeSize-1] != null;
         if (oldValue == null) {
             size++;
         }
@@ -158,7 +157,8 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
 
     @Override
     public void forEach(BiConsumer<? super ComponentType<?>, ? super Component> action) {
-        for (int i = 0; i < universeSize; i++) {
+        Component[] vals = this.vals;
+        for (int i = 0; i < vals.length; i++) {
             Component val = vals[i];
             if (val != null) {
                 action.accept(keyUniverse[i], val);
