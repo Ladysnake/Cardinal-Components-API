@@ -11,6 +11,13 @@ group = "com.github.NerdHubMC"
 archivesBaseName = "Cardinal-Components-API"
 version = System.getenv("TRAVIS_TAG") ?: project.mod_version
 
+sourceSets {
+    testmod {
+        compileClasspath += main.compileClasspath
+        runtimeClasspath += main.runtimeClasspath
+    }
+}
+
 repositories {
     maven {
         name = "FabricMC"
@@ -26,6 +33,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
 
+    testmodCompile sourceSets.main.output
     testCompile "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
 }
 
