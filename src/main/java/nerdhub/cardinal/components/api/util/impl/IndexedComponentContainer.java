@@ -135,7 +135,7 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
             // update the underlying component array to accept the new component
             int newMinIndex = Math.min(this.minIndex, rawId);
             int newUniverseSize = Math.max(this.universeSize, rawId - newMinIndex);
-            this.keyUniverse = ComponentRegistry.stream().skip(newMinIndex).limit(newUniverseSize).toArray(ComponentType[]::new);
+            this.keyUniverse = ComponentRegistry.INSTANCE.stream().skip(newMinIndex).limit(newUniverseSize).toArray(ComponentType[]::new);
 
             assert keyUniverse.length > this.universeSize : "universe must expand when resized during put operation";
             vals = new Component[universeSize];

@@ -61,6 +61,8 @@ public abstract class MixinItemStack implements ComponentProvider {
     @Shadow
     public abstract Item getItem();
 
+    @Shadow public abstract boolean isEmpty();
+
     @SuppressWarnings("DuplicatedCode")
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("RETURN"))
     private void initComponents(ItemConvertible item, int amount, CallbackInfo ci) {

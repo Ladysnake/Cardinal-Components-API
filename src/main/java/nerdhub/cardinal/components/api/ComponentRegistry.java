@@ -1,47 +1,25 @@
 package nerdhub.cardinal.components.api;
 
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.internal.ComponentRegistryImpl;
 import net.minecraft.util.Identifier;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Stream;
 
-public final class ComponentRegistry {
-
-    private static final Map<Identifier, ComponentType<?>> REGISTRY = new HashMap<>();
-    private static int nextRawId = 0;
+public interface ComponentRegistry {
+    ComponentRegistry INSTANCE = new ComponentRegistryImpl(ComponentType::new);
 
     /**
      * used to obtain a shared instance of {@link ComponentType}
      *
      * @param componentClass the interface of which to obtain a {@link ComponentType}
      */
-    public static <T extends Component> ComponentType<T> registerIfAbsent(Identifier componentId, Class<T> componentClass) {
-        @SuppressWarnings("unchecked")
-        ComponentType<T> registered = (ComponentType<T>) REGISTRY.get(componentId);
-        if(!componentClass.isInterface()) {
-            throw new IllegalArgumentException("Base component class must be an interface: " + componentClass.getCanonicalName());
-        } else if(registered != null && registered.getComponentClass() != componentClass) {
-            throw new IllegalStateException("Registered component " + componentId + " twice with 2 different classes: " + registered.getComponentClass() + ", " + componentClass);
-        } else if(registered == null) {
-            // Not using computeIfAbsent since we need to check the possibly registered class first
-            registered = new ComponentType<>(componentId, componentClass, nextRawId++);
-            REGISTRY.put(componentId, registered);
-        }
-        return registered;
-    }
-    
+    <T extends Component> ComponentType<T> registerIfAbsent(Identifier componentId, Class<T> componentClass);
+
     /**
      * Directly retrieves a ComponentType from its id.
      */
-    public static ComponentType<?> get(Identifier id) {
-        return REGISTRY.get(id);
-    }
+    ComponentType<?> get(Identifier id);
 
-    public static Stream<ComponentType<?>> stream() {
-        return REGISTRY.values().stream();
-    }
-
-    private ComponentRegistry() { throw new AssertionError(); }
+    Stream<ComponentType<?>> stream();
 }
