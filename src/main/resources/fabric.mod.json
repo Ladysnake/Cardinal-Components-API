@@ -6,11 +6,6 @@
     "description": "dynamically exposing components",
     "version": "${version}",
     "side": "universal",
-    "entrypoints": {
-        "main": [
-            "nerdhub.cardinal.components.CardinalComponents"
-        ]
-    },
     "custom": {
         "modmenu:api": true
     },
