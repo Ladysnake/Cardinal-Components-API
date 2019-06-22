@@ -41,7 +41,7 @@ public abstract class MixinPacketByteBuf {
             ListTag componentList = containerTag.getList("cardinal_components", 10);
             for(int i = 0; i < componentList.size(); i++) {
                 CompoundTag tag = componentList.getCompoundTag(i);
-                ComponentType<?> type = ComponentRegistry.get(new Identifier(tag.getString("id")));
+                ComponentType<?> type = ComponentRegistry.INSTANCE.get(new Identifier(tag.getString("id")));
                 stack.getComponent(type).deserialize(tag.getCompound("data"));
             }
         }

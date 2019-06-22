@@ -1,11 +1,15 @@
 package nerdhub.cardinal.components.api.util.impl;
 
 import com.google.common.base.Preconditions;
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
+import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.provider.ComponentProvider;
+import nerdhub.cardinal.components.internal.SharedComponentSecrets;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -34,14 +38,14 @@ public final class FastComponentContainer extends AbstractComponentContainer {
     private final Int2ObjectOpenHashMap<Component> vals;
 
     public FastComponentContainer() {
-        this.vals = new Int2ObjectOpenHashMap<>();
+        this(Hash.DEFAULT_INITIAL_SIZE);
     }
 
     /**
      * @param expected the expected number of elements in the container
      */
     public FastComponentContainer(int expected) {
-        this.vals = new Int2ObjectOpenHashMap<>(expected, 0.6);
+        this.vals = new Int2ObjectOpenHashMap<>(expected, Hash.VERY_FAST_LOAD_FACTOR);
     }
 
     /**
@@ -50,7 +54,7 @@ public final class FastComponentContainer extends AbstractComponentContainer {
      * @return the number of components in this container
      */
     public int size() {
-        return size;
+        return this.vals.size();
     }
 
     public boolean containsKey(ComponentType<?> key) {
@@ -64,7 +68,7 @@ public final class FastComponentContainer extends AbstractComponentContainer {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Component> T get(ComponentType<T> key) {
-        return this.vals.get(key.getRawId());
+        return (T) this.vals.get(key.getRawId());
     }
 
     /**
@@ -81,7 +85,7 @@ public final class FastComponentContainer extends AbstractComponentContainer {
 
     @Override
     public void forEach(BiConsumer<? super ComponentType<?>, ? super Component> action) {
-        this.vals.entrySet().fastForEach((e) ->
+        this.vals.int2ObjectEntrySet().fastForEach((e) ->
             action.accept(this.keyUniverse[e.getIntKey()], e.getValue()));
     }
 
@@ -176,7 +180,7 @@ public final class FastComponentContainer extends AbstractComponentContainer {
             throw new UnsupportedOperationException();
         }
         public int size() {
-            return size;
+            return FastComponentContainer.this.size();
         }
         public void clear() {
             throw new UnsupportedOperationException();
@@ -185,7 +189,7 @@ public final class FastComponentContainer extends AbstractComponentContainer {
 
     private class KeySet extends AbstractSet<ComponentType<?>> {
         public Iterator<ComponentType<?>> iterator() {
-            return new KeyIterator<>();
+            return new KeyIterator();
         }
         public int size() {
             return FastComponentContainer.this.size();
@@ -200,7 +204,7 @@ public final class FastComponentContainer extends AbstractComponentContainer {
 
     private class Values extends AbstractCollection<Component> {
         public Iterator<Component> iterator() {
-            return new ValueIterator<>();
+            return new ValueIterator();
         }
         public int size() {
             return FastComponentContainer.this.size();
@@ -213,26 +217,18 @@ public final class FastComponentContainer extends AbstractComponentContainer {
         }
     }
 
-    private class ValueIterator<Component> implements Iterator<Component> {
+    private class ValueIterator implements Iterator<Component> {
         ObjectIterator<Component> it = vals.values().iterator();
-
-        public DelegatingIterator(ObjectIterator<T> backingIterator) {
-            this.it = backingIterator;
-        }
 
         @Override
         public boolean hasNext() {
             return it.hasNext();
         }
 
-        public T next() {
+        public Component next() {
             return it.next();
         }
 
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
     }
 
     private class KeyIterator implements Iterator<ComponentType<?>> {
@@ -247,10 +243,6 @@ public final class FastComponentContainer extends AbstractComponentContainer {
             return keyUniverse[it.nextInt()];
         }
 
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
     }
 
     private class EntryIterator implements Iterator<Entry<ComponentType<?>, Component>> {
@@ -260,6 +252,10 @@ public final class FastComponentContainer extends AbstractComponentContainer {
             return new Entry(entry.getIntKey(), entry.getValue());
         }
 
+        @Override
+        public boolean hasNext() {
+            return it.hasNext();
+        }
 
         private class Entry implements Map.Entry<ComponentType<?>, Component> {
             private int rawId;

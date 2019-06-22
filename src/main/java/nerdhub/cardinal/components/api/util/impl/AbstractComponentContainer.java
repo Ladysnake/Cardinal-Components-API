@@ -9,9 +9,16 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.util.Identifier;
 
+import javax.annotation.Nullable;
 import java.util.AbstractMap;
 
 public abstract class AbstractComponentContainer extends AbstractMap<ComponentType<?>, Component> implements ComponentContainer {
+
+    @Deprecated
+    @Override
+    public Component remove(Object key) {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * {@inheritDoc}
@@ -38,7 +45,7 @@ public abstract class AbstractComponentContainer extends AbstractMap<ComponentTy
         if(tag.containsKey("cardinal_components", NbtType.LIST)) {
             ListTag componentList = tag.getList("cardinal_components", NbtType.COMPOUND);
             componentList.stream().map(CompoundTag.class::cast).forEach(nbt -> {
-                ComponentType<?> type = ComponentRegistry.get(new Identifier(nbt.getString("id")));
+                ComponentType<?> type = ComponentRegistry.INSTANCE.get(new Identifier(nbt.getString("id")));
                 Component component = this.get(type);
                 if (component != null) {
                     component.deserialize(nbt.getCompound("component"));
