@@ -10,10 +10,10 @@ import net.minecraft.nbt.CompoundTag;
 public interface ItemComponent extends Component {
 
     @Override
-    void deserialize(CompoundTag tag);
+    void fromTag(CompoundTag tag);
 
     @Override
-    CompoundTag serialize(CompoundTag tag);
+    CompoundTag toTag(CompoundTag tag);
 
     @Override
     Component newInstance();
