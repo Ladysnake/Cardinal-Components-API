@@ -4,10 +4,19 @@ import nerdhub.cardinal.components.api.util.impl.IndexedComponentContainer;
 
 /**
  * A {@code ComponentContainer} factory that takes feedback to optimize
- * future container instanciations.
+ * future container instantiations.
  */
 public final class FeedbackContainerFactory {
     private IndexedComponentContainer model = new IndexedComponentContainer();
+    private boolean useFastUtil;
+
+    public FeedbackContainerFactory() {
+        this(false);
+    }
+
+    public FeedbackContainerFactory(boolean useFastUtil) {
+        this.useFastUtil = useFastUtil;
+    }
 
     /**
      * Creates a new {@code IndexedComponentContainer}.

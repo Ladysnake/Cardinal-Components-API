@@ -4,14 +4,14 @@ import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.internal.ItemCaller;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
 @FunctionalInterface
 public interface ItemComponentCallback<T extends Item> {
-    @SuppressWarnings("unchecked")
-    static <T extends Item> Event<ItemComponentCallback<T>> event(T item) {
-        return (Event<ItemComponentCallback<T>>) (Event) ((ItemCaller)item).getItemComponentEvent();
+    static Event<ItemComponentCallback> event(Item item) {
+        return ((ItemCaller)item).getItemComponentEvent();
     }
 
-    void attachComponents(T item, ComponentContainer components);
+    void attachComponents(ItemStack stack, ComponentContainer components);
 
 }
