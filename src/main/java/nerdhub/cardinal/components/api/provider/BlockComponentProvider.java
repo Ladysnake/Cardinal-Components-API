@@ -7,6 +7,9 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
+/**
+ * A component provider compound
+ */
 public interface BlockComponentProvider {
 
     static BlockComponentProvider get(BlockState state) {

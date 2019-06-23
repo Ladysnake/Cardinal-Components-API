@@ -4,9 +4,9 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.provider.ComponentProvider;
-import nerdhub.cardinal.components.api.provider.ItemComponentProvider;
 import nerdhub.cardinal.components.api.util.Components;
 import nerdhub.cardinal.components.api.util.impl.IndexedComponentContainer;
+import nerdhub.cardinal.components.internal.ItemCaller;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -49,7 +49,7 @@ public abstract class MixinItemStack implements ComponentProvider {
         MixinItemStack other = (MixinItemStack) (Object) cir.getReturnValue();
         this.components.forEach((type, component) -> {
             Component copy = Components.copyOf(component);
-            other.setComponentValue(type, copy);
+            other.components.put(type, copy);
         });
     }
 
@@ -66,12 +66,13 @@ public abstract class MixinItemStack implements ComponentProvider {
     @SuppressWarnings("DuplicatedCode")
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("RETURN"))
     private void initComponents(ItemConvertible item, int amount, CallbackInfo ci) {
-        ((ItemComponentProvider) this.getItem()).createComponents((ItemStack) (Object) this);
+        // TODO create the components through a factory held by the Item
+        ((ItemCaller) this.getItem()).getItemComponentEvent().invoker().attachComponents((ItemStack) (Object) this, this.components);
     }
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
-        ((ItemComponentProvider) this.getItem()).createComponents((ItemStack) (Object) this);
+        ((ItemCaller) this.getItem()).getItemComponentEvent().invoker().attachComponents((ItemStack) (Object) this, this.components);
         this.components.fromTag(tag);
     }
 
