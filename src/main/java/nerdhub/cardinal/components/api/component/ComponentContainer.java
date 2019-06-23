@@ -1,7 +1,7 @@
 package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
-import net.minecraft.nbt.CompoundTag;
+import nerdhub.cardinal.components.api.util.NbtSerializable;
 
 import java.util.Map;
 
@@ -11,9 +11,17 @@ import java.util.Map;
  * Components can be added or replaced, but removal of existing component types
  * is unsupported. This guarantees consistent behaviour for consumers.
  */
-public interface ComponentContainer extends Map<ComponentType<?>, Component> {
+public interface ComponentContainer extends Map<ComponentType<?>, Component>, NbtSerializable {
 
-    // TODO javadoc
+    /**
+     * Returns <tt>true</tt> if this container contains a component associated with
+     * the specified key. (There can be at most one such mapping.)
+     *
+     * @param key key whose presence in this container is to be tested
+     * @return <tt>true</tt> if this container contains a mapping for the specified
+     * key
+     * @throws NullPointerException if the specified key is null
+     */
     boolean containsKey(ComponentType<?> key);
 
     /**
@@ -28,6 +36,7 @@ public interface ComponentContainer extends Map<ComponentType<?>, Component> {
      * @param key a registered component type
      * @param <T> the class of the component
      * @return a component of that type, of {@code null} if none has been attached
+     * @throws NullPointerException if the specified key is null
      */
     <T extends Component> T get(ComponentType<T> key);
 
@@ -36,19 +45,15 @@ public interface ComponentContainer extends Map<ComponentType<?>, Component> {
      * If the map previously contained a mapping for this key, the old
      * value is replaced.
      *
-     * @param key the key with which the specified value is to be associated
+     * @param key   the key with which the specified value is to be associated
      * @param value the value to be associated with the specified key
-     *
      * @return the previous value associated with specified key, or
-     *     <tt>null</tt> if there was no mapping for key.  (A <tt>null</tt>
-     *     return can also indicate that the map previously associated
-     *     <tt>null</tt> with the specified key.)
-     * @throws NullPointerException if the specified key or value is null
+     * <tt>null</tt> if there was no mapping for key.
+     * @throws NullPointerException          if the specified key or value is null
      * @throws UnsupportedOperationException if the <tt>put</tt> operation
-     *         is not supported by this container
-     *
+     *                                       is not supported by this container
      * @implSpec Implementations that do not support modification should
-     *           document their immutability properties
+     * document their immutability properties
      */
     <V extends Component> V put(ComponentType<V> key, V value);
 
@@ -57,8 +62,4 @@ public interface ComponentContainer extends Map<ComponentType<?>, Component> {
     default Component remove(Object key) {
         throw new UnsupportedOperationException();
     }
-
-    void fromTag(CompoundTag serialized);
-
-    CompoundTag toTag(CompoundTag tag);
 }
