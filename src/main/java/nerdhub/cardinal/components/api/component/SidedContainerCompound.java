@@ -20,4 +20,6 @@ public interface SidedContainerCompound {
     void fromTag(CompoundTag serialized);
 
     CompoundTag toTag(CompoundTag tag);
+
+    // TODO add a toMap() method
 }
