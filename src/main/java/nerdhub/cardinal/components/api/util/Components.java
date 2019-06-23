@@ -42,7 +42,7 @@ public final class Components {
 
     public static Component copyOf(Component toCopy) {
         Component ret = toCopy.newInstance();
-        ret.deserialize(toCopy.serialize(new CompoundTag()));
+        ret.fromTag(toCopy.toTag(new CompoundTag()));
         return ret;
     }
 

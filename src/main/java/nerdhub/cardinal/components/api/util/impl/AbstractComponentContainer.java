@@ -45,10 +45,10 @@ public abstract class AbstractComponentContainer extends AbstractMap<ComponentTy
         if(tag.containsKey("cardinal_components", NbtType.LIST)) {
             ListTag componentList = tag.getList("cardinal_components", NbtType.COMPOUND);
             componentList.stream().map(CompoundTag.class::cast).forEach(nbt -> {
-                ComponentType<?> type = ComponentRegistry.INSTANCE.get(new Identifier(nbt.getString("id")));
+                ComponentType<?> type = ComponentRegistry.INSTANCE.get(new Identifier(nbt.getString("componentId")));
                 Component component = this.get(type);
                 if (component != null) {
-                    component.deserialize(nbt.getCompound("component"));
+                    component.fromTag(nbt);
                 }
             });
         }
@@ -60,9 +60,8 @@ public abstract class AbstractComponentContainer extends AbstractMap<ComponentTy
             ListTag componentList = new ListTag();
             this.forEach((type, component) -> {
                 CompoundTag componentTag = new CompoundTag();
-                componentTag.putString("id", type.getId().toString());
-                componentTag.put("component", component.serialize(new CompoundTag()));
-                componentList.add(componentTag);
+                componentTag.putString("componentId", type.getId().toString());
+                componentList.add(component.toTag(componentTag));
             });
             tag.put("cardinal_components", componentList);
         }

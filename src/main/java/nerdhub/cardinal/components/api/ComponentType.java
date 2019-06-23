@@ -81,4 +81,8 @@ public final class ComponentType<T extends Component> {
         return Optional.empty();
     }
 
+    @Override
+    public String toString() {
+        return "ComponentType[\"" + id + "\"]";
+    }
 }

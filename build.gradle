@@ -33,8 +33,9 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
 
-    testmodCompile sourceSets.main.output
-    testCompile "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
+    testmodImplementation sourceSets.main.output
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.0-M1"
 }
 
 jar {
