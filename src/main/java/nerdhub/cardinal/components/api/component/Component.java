@@ -22,9 +22,7 @@ public interface Component extends Serializable {
      * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
      * version.
      */
-    default void fromTag(CompoundTag tag) {
-        throw new UnsupportedOperationException("deserialization");
-    }
+    void fromTag(CompoundTag tag);
 
     /**
      * Writes this component's properties to a {@link CompoundTag}.
@@ -34,16 +32,12 @@ public interface Component extends Serializable {
      * @implSpec this method must <strong>NOT</strong> write any value associated with the {@code "componentId"} key
      * in the given tag.
      */
-    default CompoundTag toTag(CompoundTag tag) {
-        throw new UnsupportedOperationException("serialization");
-    }
+    CompoundTag toTag(CompoundTag tag);
 
     /**
      * used for copying components to another {@link ItemStack} or {@link Entity}
      */
-    default Component newInstance() {
-        throw new UnsupportedOperationException("new instance");
-    }
+    Component newInstance();
 
     /**
      * Used to compare two instances of components for equality.
