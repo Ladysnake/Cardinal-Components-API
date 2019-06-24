@@ -1,4 +1,3 @@
-
 package nerdhub.cardinal.components.api.event;
 
 import nerdhub.cardinal.components.api.component.SidedContainerCompound;
@@ -15,5 +14,15 @@ public interface BlockEntityComponentCallback<T extends BlockEntity> {
         return (Event<BlockEntityComponentCallback<T>>) ((BlockEntityTypeCaller)type).getBlockEntityComponentEvent();
     }
 
-    void attachComponents(T blockEntity, SidedContainerCompound components);
+    /**
+     * Example code: 
+     * <pre><code>
+     * BlockComponentCallback.EVENT.register(b -> b == Blocks.CHEST 
+     *      ? (be, scc) -> scc.get(NORTH).put(TYPE, new MyComponent((ChestBlockEntity)be)) 
+     *      : null)
+     * </code></pre>
+     */
+    @Nullable
+    SidedComponentGatherer<BlockEntity> getComponentGatherer(Block block);
+    
 }

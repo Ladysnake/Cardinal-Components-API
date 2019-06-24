@@ -12,6 +12,9 @@ public interface ItemComponentCallback<T extends Item> {
         return ((ItemCaller)item).getItemComponentEvent();
     }
 
-    void attachComponents(ItemStack stack, ComponentContainer components);
+    /**
+     * Example code: {@code ItemComponentCallback.EVENT.register(i -> i == DIAMOND_PICKAXE ? (stack, cc) -> cc.put(TYPE, new MyComponent()) : null)}
+     */
+    ComponentGatherer<ItemStack> getComponentGatherer(Item item);
 
 }
