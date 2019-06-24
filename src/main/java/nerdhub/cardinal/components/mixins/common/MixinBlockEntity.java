@@ -33,6 +33,7 @@ public abstract class MixinBlockEntity implements SidedProviderCompound {
     @SuppressWarnings("unchecked")
     @Inject(method = "<init>", at = @At("RETURN"))
     private void fireComponentCallback(CallbackInfo ci) {
+        // TODO attach when the block entity is added to the world, for full context
         // Mixin classes can be referenced from other mixin classes
         //noinspection ReferenceToMixin,ConstantConditions
         ((MixinBlockEntityType)(Object)this.getType()).cardinal_fireComponentEvents((BlockEntity) (Object) this, this.componentContainer);
