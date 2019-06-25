@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.api.util.impl;
+package nerdhub.cardinal.components.api.util.component.container;
 
 import com.google.common.base.Preconditions;
 import nerdhub.cardinal.components.api.ComponentRegistry;
@@ -134,9 +134,12 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
         int index = rawId - this.minIndex;
         if (index < 0 || index >= this.universeSize) {
             // update the underlying component array to accept the new component
+            if (this.universeSize == 0) this.minIndex = rawId;
             int newMinIndex = Math.min(this.minIndex, rawId);
-            this.universeSize++;
-            this.keyUniverse = ComponentRegistry.INSTANCE.stream().skip(newMinIndex).limit(universeSize).toArray(ComponentType[]::new);
+            int newUniverseSize = Math.max(this.universeSize + this.minIndex, rawId+1) - newMinIndex;
+            this.keyUniverse = ComponentRegistry.INSTANCE.stream().skip(newMinIndex).limit(newUniverseSize).toArray(ComponentType[]::new);
+
+            assert keyUniverse.length > this.universeSize : "universe must expand when resized during put operation";
 
             vals = new Component[newUniverseSize];
             assert this.minIndex >= newMinIndex : "minimum index cannot increase";

@@ -1,10 +1,12 @@
 package nerdhub.cardinal.components.api.event;
 
-import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.internal.ItemCaller;
+import nerdhub.cardinal.components.api.util.gatherer.ItemComponentGatherer;
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nullable;
 
 @FunctionalInterface
 public interface ItemComponentCallback {
@@ -13,13 +15,13 @@ public interface ItemComponentCallback {
             (callbacks) -> (item) -> {
                 ComponentGatherer<ItemStack> ret = item instanceof ItemComponentGatherer ? (ItemComponentGatherer) item : null;
                 for (ItemComponentCallback callback : callbacks) {
-                    ComponentGatherer<Item> g = callback.getComponentGatherer(item);
-                    if (g != null) {
-                        ret = ret == null ? g : ret.andThen(g);
+                    ComponentGatherer<ItemStack> gatherer = callback.getComponentGatherer(item);
+                    if (gatherer != null) {
+                        ret = ret == null ? gatherer : ret.andThen(gatherer);
                     }
                 }
                 return ret == null ? (s, cc) -> {} : ret;
-            })
+            });
 
     /**
      * Example code: <pre><code>

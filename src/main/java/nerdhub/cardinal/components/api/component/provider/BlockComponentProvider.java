@@ -1,6 +1,6 @@
-package nerdhub.cardinal.components.api.provider;
+package nerdhub.cardinal.components.api.component.provider;
 
-import nerdhub.cardinal.components.api.util.impl.EmptySidedProviderCompound;
+import nerdhub.cardinal.components.api.util.component.provider.EmptySidedProviderCompound;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

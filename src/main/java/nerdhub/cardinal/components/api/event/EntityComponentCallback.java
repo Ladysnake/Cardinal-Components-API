@@ -1,6 +1,6 @@
 package nerdhub.cardinal.components.api.event;
 
-import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.container.ComponentContainer;
 import nerdhub.cardinal.components.internal.CardinalEventsInternals;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.entity.Entity;

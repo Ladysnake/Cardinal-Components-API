@@ -1,8 +1,7 @@
 package nerdhub.cardinal.components.mixins.common;
 
-import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.container.ComponentContainer;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
-import nerdhub.cardinal.components.api.util.impl.IndexedComponentContainer;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.entity.Entity;
@@ -29,7 +28,7 @@ public abstract class MixinEntityType<E extends Entity> {
     @SuppressWarnings("unchecked")
     ComponentContainer cardinal_fireComponentEvents(E e) {
         // assert e.getType() == this;
-        IndexedComponentContainer cc = this.componentContainerFactory.create();
+        ComponentContainer cc = this.componentContainerFactory.create();
         if (cardinal_componentEvents == null) {
             List<Event<EntityComponentCallback<? super E>>> events = new ArrayList<>();
             Class c = e.getClass();

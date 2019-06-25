@@ -3,6 +3,7 @@ package nerdhub.cardinal.components.internal;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -41,7 +42,16 @@ class ComponentRegistryImplTest {
 
     interface TestNotComponentItf {}
 
-    class TestComponentNotItf implements Component {}
+    class TestComponentNotItf implements Component {
+        @Override
+        public void fromTag(CompoundTag tag) { }
+
+        @Override
+        public CompoundTag toTag(CompoundTag tag) { throw new UnsupportedOperationException(); }
+
+        @Override
+        public Component newInstance() { throw new UnsupportedOperationException(); }
+    }
 
     interface TestComponentItf extends Component {}
 

@@ -20,8 +20,7 @@ public final class CardinalEventsInternals {
                 for(EntityComponentCallback callback : callbacks) {
                     callback.attachComponents(entity, components);
                 }
-            });
-        );
+            }));
     }
     
 }

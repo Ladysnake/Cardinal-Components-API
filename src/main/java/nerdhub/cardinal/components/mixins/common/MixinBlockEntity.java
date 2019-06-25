@@ -1,11 +1,11 @@
 package nerdhub.cardinal.components.mixins.common;
 
-import nerdhub.cardinal.components.api.component.SidedContainerCompound;
-import nerdhub.cardinal.components.api.provider.ComponentProvider;
-import nerdhub.cardinal.components.api.provider.SidedProviderCompound;
-import nerdhub.cardinal.components.api.util.impl.DirectSidedProviderCompound;
-import nerdhub.cardinal.components.api.util.impl.IndexedComponentContainer;
-import nerdhub.cardinal.components.api.util.impl.SuppliedSidedContainerCompound;
+import nerdhub.cardinal.components.api.component.container.SidedContainerCompound;
+import nerdhub.cardinal.components.api.component.provider.ComponentProvider;
+import nerdhub.cardinal.components.api.component.provider.SidedProviderCompound;
+import nerdhub.cardinal.components.api.util.component.container.IndexedComponentContainer;
+import nerdhub.cardinal.components.api.util.component.container.SuppliedSidedContainerCompound;
+import nerdhub.cardinal.components.api.util.component.provider.DirectSidedProviderCompound;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.CompoundTag;
@@ -30,13 +30,9 @@ public abstract class MixinBlockEntity implements SidedProviderCompound {
     @Unique
     private DirectSidedProviderCompound components = new DirectSidedProviderCompound(componentContainer);
 
-    @SuppressWarnings("unchecked")
     @Inject(method = "<init>", at = @At("RETURN"))
     private void fireComponentCallback(CallbackInfo ci) {
-        // TODO attach when the block entity is added to the world, for full context
-        // Mixin classes can be referenced from other mixin classes
-        //noinspection ReferenceToMixin,ConstantConditions
-        ((MixinBlockEntityType)(Object)this.getType()).cardinal_fireComponentEvents((BlockEntity) (Object) this, this.componentContainer);
+        // TODO inject the component gathering into Chunk#setBlockEntity
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))

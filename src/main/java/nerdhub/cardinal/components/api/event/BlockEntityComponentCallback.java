@@ -1,17 +1,19 @@
 package nerdhub.cardinal.components.api.event;
 
-import nerdhub.cardinal.components.api.component.SidedContainerCompound;
-import nerdhub.cardinal.components.internal.BlockEntityTypeCaller;
+import nerdhub.cardinal.components.api.util.gatherer.BlockEntityComponentGatherer;
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
+
+import javax.annotation.Nullable;
 
 @FunctionalInterface
 public interface BlockEntityComponentCallback {
 
     Event<BlockEntityComponentCallback> EVENT = EventFactory.createArrayBacked(BlockEntityComponentCallback.class,
             (callbacks) -> (b) -> {
-                SidedComponentGatherer<BlockEntity> ret = (be -> ((SelfSidedComponentGatherer) be).initComponents(cc));
+                SidedComponentGatherer<BlockEntity> ret = ((be, cc) -> ((BlockEntityComponentGatherer) be).initComponents(cc));
                 for (BlockEntityComponentCallback callback : callbacks) {
                     SidedComponentGatherer<BlockEntity> g = callback.getComponentGatherer(b);
                     if (g != null) {
@@ -19,7 +21,7 @@ public interface BlockEntityComponentCallback {
                     }
                 }
                 return ret;
-            })
+            });
 
     /**
      * Example code: 

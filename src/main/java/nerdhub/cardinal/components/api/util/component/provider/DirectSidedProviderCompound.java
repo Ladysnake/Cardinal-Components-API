@@ -1,8 +1,8 @@
-package nerdhub.cardinal.components.api.util.impl;
+package nerdhub.cardinal.components.api.util.component.provider;
 
-import nerdhub.cardinal.components.api.component.SidedContainerCompound;
-import nerdhub.cardinal.components.api.provider.ComponentProvider;
-import nerdhub.cardinal.components.api.provider.SidedProviderCompound;
+import nerdhub.cardinal.components.api.component.container.SidedContainerCompound;
+import nerdhub.cardinal.components.api.component.provider.ComponentProvider;
+import nerdhub.cardinal.components.api.component.provider.SidedProviderCompound;
 import net.minecraft.util.math.Direction;
 
 import javax.annotation.Nullable;

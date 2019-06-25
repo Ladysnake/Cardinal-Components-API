@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.api.util.impl;
+package nerdhub.cardinal.components.api.util.component.container;
 
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.Hash;
@@ -8,7 +8,7 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.provider.ComponentProvider;
+import nerdhub.cardinal.components.api.component.provider.ComponentProvider;
 import nerdhub.cardinal.components.internal.SharedComponentSecrets;
 
 import javax.annotation.Nullable;
@@ -267,7 +267,7 @@ public final class FastComponentContainer extends AbstractComponentContainer {
             }
 
             public ComponentType<?> getKey() {
-                return keyUniverse == null ? null : keyUniverse[rawId];
+                return keyUniverse[rawId];
             }
 
             public Component getValue() {
