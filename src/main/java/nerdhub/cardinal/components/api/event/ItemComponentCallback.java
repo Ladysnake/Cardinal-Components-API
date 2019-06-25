@@ -7,14 +7,26 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 @FunctionalInterface
-public interface ItemComponentCallback<T extends Item> {
-    static Event<ItemComponentCallback> event(Item item) {
-        return ((ItemCaller)item).getItemComponentEvent();
-    }
+public interface ItemComponentCallback {
+
+    Event<ItemComponentCallback> EVENT = EventFactory.createArrayBacked(ItemComponentCallback.class,
+            (callbacks) -> (item) -> {
+                ComponentGatherer<ItemStack> ret = item instanceof ItemComponentGatherer ? (ItemComponentGatherer) item : null;
+                for (ItemComponentCallback callback : callbacks) {
+                    ComponentGatherer<Item> g = callback.getComponentGatherer(item);
+                    if (g != null) {
+                        ret = ret == null ? g : ret.andThen(g);
+                    }
+                }
+                return ret == null ? (s, cc) -> {} : ret;
+            })
 
     /**
-     * Example code: {@code ItemComponentCallback.EVENT.register(i -> i == DIAMOND_PICKAXE ? (stack, cc) -> cc.put(TYPE, new MyComponent()) : null)}
+     * Example code: <pre><code>
+     *  ItemComponentCallback.EVENT.register(i -> i == DIAMOND_PICKAXE ? (stack, cc) -> cc.put(TYPE, new MyComponent()) : null);
+     * </code></pre>
      */
+    @Nullable
     ComponentGatherer<ItemStack> getComponentGatherer(Item item);
 
 }
