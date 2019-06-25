@@ -2,6 +2,13 @@ package nerdhub.cardinal.api.event;
 
 @FunctionalInterface
 public interface ComponentGatherer<T> extends BiFunction<T, ComponentContainer> {
-    @Override
-    void apply(T object, ComponentContainer cc);
+    void initComponents(T object, ComponentContainer cc);
+
+    default ComponentGatherer<T> andThen(ComponentGatherer after) {
+        return (object, cc) -> {
+            this.initComponents(object, cc);
+            after.initComponents(object, cc);
+        }
+    }
+    
 }

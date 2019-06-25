@@ -7,12 +7,19 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 
 @FunctionalInterface
-public interface BlockEntityComponentCallback<T extends BlockEntity> {
+public interface BlockEntityComponentCallback {
 
-    @SuppressWarnings("unchecked")
-    static <T extends BlockEntity> Event<BlockEntityComponentCallback<T>> event(BlockEntityType<T> type) {
-        return (Event<BlockEntityComponentCallback<T>>) ((BlockEntityTypeCaller)type).getBlockEntityComponentEvent();
-    }
+    Event<BlockEntityComponentCallback> EVENT = EventFactory.createArrayBacked(BlockEntityComponentCallback.class,
+            (callbacks) -> (b) -> {
+                SidedComponentGatherer<BlockEntity> ret = (be -> ((SelfSidedComponentGatherer) be).initComponents(cc));
+                for (BlockEntityComponentCallback callback : callbacks) {
+                    SidedComponentGatherer<BlockEntity> g = callback.getComponentGatherer(b);
+                    if (g != null) {
+                        ret = ret.andThen(g);
+                    }
+                }
+                return ret;
+            })
 
     /**
      * Example code: 
