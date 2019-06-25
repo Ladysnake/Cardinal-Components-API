@@ -1,5 +1,5 @@
 /**
- * This package includes several implementations of providers and containers, for use by custom API implementations
+ * This package includes several implementations of component containers, for use by custom API implementations
  */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
