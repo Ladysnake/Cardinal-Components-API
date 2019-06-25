@@ -24,18 +24,21 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
     @Override public <T extends Component> ComponentType<T> registerIfAbsent(Identifier componentId, Class<T> componentClass) {
         Preconditions.checkArgument(componentClass.isInterface(), "Base component class must be an interface: " + componentClass.getCanonicalName());
         Preconditions.checkArgument(Component.class.isAssignableFrom(componentClass), "Component interface must extend " + Component.class.getCanonicalName());
-        @SuppressWarnings("unchecked")
-        ComponentType<T> registered = (ComponentType<T>) registry.get(componentId);
-        if (registered != null) {
-            Preconditions.checkState(registered.getComponentClass() == componentClass,
-                    "Registered component " + componentId + " twice with 2 different classes: " + registered.getComponentClass() + ", " + componentClass);
-        }
-        if(registered == null) {
+        // make sure 2+ components cannot get registered at the same time
+        synchronized (registry) {
             // Not using computeIfAbsent since we need to check the possibly registered class first
-            registered = access.create(componentId, componentClass, nextRawId++);
-            registry.put(componentId, registered);
+            @SuppressWarnings("unchecked")
+            ComponentType<T> registered = (ComponentType<T>) registry.get(componentId);
+            if (registered != null) {
+                if (registered.getComponentClass() == componentClass) {
+                    throw new IllegalStateException("Registered component " + componentId + " twice with 2 different classes: " + registered.getComponentClass() + ", " + componentClass);
+                }
+            } else {
+                registered = access.create(componentId, componentClass, nextRawId++);
+                registry.put(componentId, registered);
+                SharedComponentSecrets.registeredComponents = this.registry.values().toArray(new ComponentType[0]);
+            }
         }
-        SharedComponentSecrets.registeredComponents = this.registry.values().toArray(new ComponentType[0]);
         return registered;
     }
     

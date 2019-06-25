@@ -9,23 +9,32 @@ import javax.annotation.Nullable;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+/**
+ * The representation of a component type registered through {@link ComponentRegistry#registerIfAbsent}
+ *
+ * @see ComponentRegistry
+ */
 public final class ComponentType<T extends Component> {
 
     private final Class<T> componentClass;
     private final Identifier id;
     private final int rawId;
 
+    /* ------------ internal methods ------------- */
+
     /**
      * Constructs a new immutable ComponentType
      *
      * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
      */
-  ComponentType(Identifier id, Class<T> componentClass, int rawId) {
+    /* package-private */
+    ComponentType(Identifier id, Class<T> componentClass, int rawId) {
         this.componentClass = componentClass;
         this.id = id;
         this.rawId = rawId;
     }
 
+    /** Gets the component represented by this type from the given provider, if any */
     @SuppressWarnings("unchecked")
     @Nullable
     private T apply(ComponentProvider componentProvider) {
@@ -33,6 +42,9 @@ public final class ComponentType<T extends Component> {
         assert ret == null || this.getComponentClass().isInstance(ret);
         return (T) ret;
     }
+
+    
+    /* ------------- public methods -------------- */
 
     public Identifier getId() {
         return this.id;
