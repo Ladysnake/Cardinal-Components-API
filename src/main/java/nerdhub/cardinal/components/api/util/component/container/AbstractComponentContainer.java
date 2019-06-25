@@ -1,9 +1,9 @@
-package nerdhub.cardinal.components.api.util.impl;
+package nerdhub.cardinal.components.api.util.component.container;
 
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.container.ComponentContainer;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -14,6 +14,7 @@ import java.util.AbstractMap;
 
 public abstract class AbstractComponentContainer extends AbstractMap<ComponentType<?>, Component> implements ComponentContainer {
 
+    @SuppressWarnings("deprecation")    // overriding the deprecated method to avoid the compiler's warning...
     @Deprecated
     @Override
     public Component remove(Object key) {

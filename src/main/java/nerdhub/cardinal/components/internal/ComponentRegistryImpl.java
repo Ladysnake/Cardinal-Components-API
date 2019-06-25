@@ -30,7 +30,7 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
             @SuppressWarnings("unchecked")
             ComponentType<T> registered = (ComponentType<T>) registry.get(componentId);
             if (registered != null) {
-                if (registered.getComponentClass() == componentClass) {
+                if (registered.getComponentClass() != componentClass) {
                     throw new IllegalStateException("Registered component " + componentId + " twice with 2 different classes: " + registered.getComponentClass() + ", " + componentClass);
                 }
             } else {
@@ -38,8 +38,8 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
                 registry.put(componentId, registered);
                 SharedComponentSecrets.registeredComponents = this.registry.values().toArray(new ComponentType[0]);
             }
+            return registered;
         }
-        return registered;
     }
     
     @Override public ComponentType<?> get(Identifier id) {

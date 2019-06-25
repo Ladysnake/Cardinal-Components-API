@@ -1,7 +1,7 @@
 package nerdhub.cardinal.components.api;
 
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.provider.ComponentProvider;
+import nerdhub.cardinal.components.api.component.provider.ComponentProvider;
 import nerdhub.cardinal.components.api.util.ObjectPath;
 import net.minecraft.util.Identifier;
 

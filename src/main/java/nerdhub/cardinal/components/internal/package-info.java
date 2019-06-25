@@ -1,9 +1,9 @@
 /**
- * This package includes several implementations of component providers, for use by custom API implementations
+ * Internal classes. Should never be referenced from other projects.
  */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.api.util.component.provider;
+package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 

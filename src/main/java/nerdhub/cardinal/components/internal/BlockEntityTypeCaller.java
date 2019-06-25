@@ -5,5 +5,5 @@ import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.block.entity.BlockEntity;
 
 public interface BlockEntityTypeCaller<B extends BlockEntity> {
-	Event<BlockEntityComponentCallback<B>> getBlockEntityComponentEvent();
+	Event<BlockEntityComponentCallback> getBlockEntityComponentEvent();
 }

@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.api.component;
+package nerdhub.cardinal.components.api.component.container;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.Direction;

@@ -1,6 +1,7 @@
-package nerdhub.cardinal.components.api.component;
+package nerdhub.cardinal.components.api.component.container;
 
 import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.util.NbtSerializable;
 
 import java.util.Map;

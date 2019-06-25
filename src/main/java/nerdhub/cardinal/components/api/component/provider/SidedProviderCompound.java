@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.api.provider;
+package nerdhub.cardinal.components.api.component.provider;
 
 import net.minecraft.util.math.Direction;
 

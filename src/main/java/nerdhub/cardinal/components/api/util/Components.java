@@ -1,12 +1,23 @@
 package nerdhub.cardinal.components.api.util;
 
+import com.google.common.annotations.Beta;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.provider.ComponentProvider;
+import nerdhub.cardinal.components.api.component.container.SidedContainerCompound;
+import nerdhub.cardinal.components.api.component.provider.ComponentProvider;
+import nerdhub.cardinal.components.api.event.BlockEntityComponentCallback;
+import nerdhub.cardinal.components.api.event.SidedComponentGatherer;
+import net.minecraft.block.Block;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tag.Tag;
+import net.minecraft.util.math.Direction;
 
+import javax.annotation.Nullable;
 import java.util.Set;
+import java.util.function.Function;
 
 public final class Components {
     private Components() { throw new AssertionError(); }
@@ -30,13 +41,13 @@ public final class Components {
      * @see #addAttachedComponent(ComponentType, Function, BlockEntityType, Direction, Direction[])
      */
     @Beta
-    public static <T> void addAttachedComponent(ComponentType<T> type, Function<BlockEntity, T> factory, Tag<Block> blocks, @Nullable Direction first, Direction... moreSides) {
-        ComponentGatherer gatherer = (be, cc) -> {
+    public static <T extends Component> void addAttachedComponent(ComponentType<T> type, Function<BlockEntity, T> factory, Tag<Block> blocks, @Nullable Direction first, Direction... moreSides) {
+        SidedComponentGatherer<BlockEntity> gatherer = (be, cc) -> {
             cc.get(first).put(type, factory.apply(be));
             for (Direction d : moreSides) {
                 cc.get(d).put(type, factory.apply(be));
             }
-        }
+        };
         BlockEntityComponentCallback.EVENT.register(b -> blocks.contains(b) ? gatherer : null);
     }
 
@@ -51,16 +62,17 @@ public final class Components {
      *
      * @see SidedContainerCompound
      */
-    public static <T, B> void addAttachedComponent(ComponentType<T> type, Function<B, T> factory, BlockEntityType<B> beType, @Nullable Direction side, Direction... moreSides) {
-        SidedComponentGatherer gatherer = (be, cc) -> {
-            if (be.getType() == beType) {
-                cc.put(factory.apply((T) be));
+    public static <T extends Component, B extends BlockEntity> void addAttachedComponent(ComponentType<T> type, Function<B, T> factory, BlockEntityType<B> beType, @Nullable Direction side, Direction... moreSides) {
+        SidedComponentGatherer<BlockEntity> gatherer = (blockEntity, cc) -> {
+            if (blockEntity.getType() == beType) {
+                @SuppressWarnings("unchecked") B be = (B) blockEntity;
+                cc.get(side).put(type, factory.apply(be));
                 for (Direction d : moreSides) {
                     cc.get(d).put(type, factory.apply(be));
                 }
             }
-        }
-        BlockEntityComponentCallback.EVENT.register(b -> beType.supportsBlock(b) ? gatherer : null);
+        };
+        BlockEntityComponentCallback.EVENT.register(b -> beType.supports(b) ? gatherer : null);
     }
 
     /**

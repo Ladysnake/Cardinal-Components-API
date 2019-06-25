@@ -1,6 +1,6 @@
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.api.util.impl;
+package nerdhub.cardinal.components.api.util.component;
 
 import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 

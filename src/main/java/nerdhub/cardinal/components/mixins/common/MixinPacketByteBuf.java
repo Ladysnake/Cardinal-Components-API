@@ -2,7 +2,7 @@ package nerdhub.cardinal.components.mixins.common;
 
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.provider.ComponentProvider;
+import nerdhub.cardinal.components.api.component.provider.ComponentProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

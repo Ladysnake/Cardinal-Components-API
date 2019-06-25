@@ -1,8 +1,8 @@
 package nerdhub.cardinal.components.mixins.common;
 
-import nerdhub.cardinal.components.api.provider.BlockComponentProvider;
-import nerdhub.cardinal.components.api.provider.SidedProviderCompound;
-import nerdhub.cardinal.components.api.util.impl.EmptySidedProviderCompound;
+import nerdhub.cardinal.components.api.component.provider.BlockComponentProvider;
+import nerdhub.cardinal.components.api.component.provider.SidedProviderCompound;
+import nerdhub.cardinal.components.api.util.component.provider.EmptySidedProviderCompound;
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
