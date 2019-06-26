@@ -10,6 +10,7 @@ import nerdhub.cardinal.components.api.util.component.container.IndexedComponent
 public final class FeedbackContainerFactory {
     private IndexedComponentContainer model = new IndexedComponentContainer();
     private boolean useFastUtil;
+    private int expectedSize;
 
     public FeedbackContainerFactory() {
         this(false);
@@ -24,6 +25,9 @@ public final class FeedbackContainerFactory {
      * The returned container will be pre-sized based on previous {@link #adjustFrom adjustments}.
      */
     public ComponentContainer create() {
+        if (this.useFastUtil) {
+            return new FastComponentContainer(this.expectedSize);
+        }
         return IndexedComponentContainer.withSettingsFrom(model);
     }
 
@@ -34,11 +38,17 @@ public final class FeedbackContainerFactory {
      */
     public void adjustFrom(ComponentContainer initialized) {
         if (initialized instanceof IndexedComponentContainer) {
+            IndexedComponentContainer icc = ((IndexedComponentContainer) initialized);
             // If the container was created by this factory, its value range can only be equal or higher to the model.
             // As such, a lower minimum index will always translate to a higher universe size.
-            if (model.getUniverseSize() < ((IndexedComponentContainer) initialized).getUniverseSize()) {
-                this.model = IndexedComponentContainer.withSettingsFrom((IndexedComponentContainer) initialized);
+            if (model.getUniverseSize() < icc.getUniverseSize()) {
+                // Threshold at which the fastutil map becomes more memory efficient
+                if (icc.getUniverseSize() > 4 * icc.size()) {
+                    this.useFastUtil = true;
+                }
+                this.model = IndexedComponentContainer.withSettingsFrom(icc);
             }
         }
+        this.expectedSize = initialized.size();
     }
 }
