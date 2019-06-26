@@ -1,5 +1,6 @@
 package nerdhub.cardinal.components.api.component.container;
 
+import nerdhub.cardinal.components.api.util.NbtSerializable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.Direction;
 
@@ -14,7 +15,7 @@ import javax.annotation.Nullable;
  * a {@code null} side should only be made when the caller does not have specific
  * side information, and will return only elements attached to the {@code null} side.
  */
-public interface SidedContainerCompound {
+public interface SidedContainerCompound extends NbtSerializable {
     ComponentContainer get(@Nullable Direction side);
 
     void fromTag(CompoundTag serialized);

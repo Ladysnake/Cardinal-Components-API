@@ -23,6 +23,8 @@ public interface BlockEntityComponentCallback {
                 return ret;
             });
 
+    /* BlockComponentGatherers.append((be, scc) -> scc.get(NORTH).put(TYPE, new MyComponent((SidedInventory)be), Blocks.CHEST, Blocks.DISPENSER)) */
+
     /**
      * Example code: 
      * <pre><code>

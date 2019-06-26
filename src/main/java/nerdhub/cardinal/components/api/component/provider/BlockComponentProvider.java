@@ -30,4 +30,6 @@ public interface BlockComponentProvider {
         return be != null ? (SidedProviderCompound) be : EmptySidedProviderCompound.instance();
     }
 
+    <T extends Component> T getComponent(BlockState state, BlockView view, BlockPos pos, Direction side, ComponentType<T> type);
+
 }
