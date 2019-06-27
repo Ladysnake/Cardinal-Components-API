@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
  * a {@code null} side should only be made when the caller does not have specific
  * side information, and will return only elements attached to the {@code null} side.
  */
+ // TODO move to util
 public interface SidedContainerCompound extends NbtSerializable {
     ComponentContainer get(@Nullable Direction side);
 

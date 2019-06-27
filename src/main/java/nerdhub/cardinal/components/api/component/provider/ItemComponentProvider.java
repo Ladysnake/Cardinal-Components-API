@@ -4,6 +4,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.item.ItemStack;
 
+// TODO remove
 public interface ItemComponentProvider {
 
     /**

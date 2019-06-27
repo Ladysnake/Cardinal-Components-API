@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 /**
  * A side-aware component provider.
  */
+// TODO move to util
 public interface SidedProviderCompound {
 
     ComponentProvider getComponents(@Nullable Direction side);
