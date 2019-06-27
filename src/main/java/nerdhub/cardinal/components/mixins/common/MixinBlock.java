@@ -1,22 +1,38 @@
 package nerdhub.cardinal.components.mixins.common;
 
-import nerdhub.cardinal.components.api.component.provider.BlockComponentProvider;
-import nerdhub.cardinal.components.api.component.provider.SidedProviderCompound;
-import nerdhub.cardinal.components.api.util.component.provider.EmptySidedProviderCompound;
+import com.google.common.collect.ImmutableSet;
+import nerdhub.cardinal.components.api.BlockComponentProvider;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.Block;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+
+import javax.annotation.Nullable;
+import java.util.Set;
 
 @Mixin(Block.class)
-public abstract class MixinBlock implements BlockComponentProvider {
-
-    @Shadow public abstract boolean hasBlockEntity();
+public class MixinBlock implements BlockComponentProvider {
 
     @Override
-    public SidedProviderCompound getComponents(BlockView view, BlockPos pos) {
-        return this.hasBlockEntity() ? BlockComponentProvider.super.getComponents(view, pos) : EmptySidedProviderCompound.instance();
+    public <T extends Component> boolean hasComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
+        BlockEntity be = blockView.getBlockEntity(pos);
+        return be instanceof BlockComponentProvider && ((BlockComponentProvider) be).hasComponent(blockView, pos, type, side);
     }
 
+    @Nullable
+    @Override
+    public <T extends Component> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
+        BlockEntity be = blockView.getBlockEntity(pos);
+        return be instanceof BlockComponentProvider ? ((BlockComponentProvider) be).getComponent(blockView, pos, type, side) : null;
+    }
+
+    @Override
+    public Set<ComponentType<? extends Component>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side) {
+        BlockEntity be = blockView.getBlockEntity(pos);
+        return be instanceof BlockComponentProvider ? ((BlockComponentProvider) be).getComponentTypes(blockView, pos, side) : ImmutableSet.of();
+    }
 }
