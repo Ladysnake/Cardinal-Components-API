@@ -1,6 +1,8 @@
 package nerdhub.cardinal.components.internal;
 
+import com.google.common.base.Preconditions;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.Entity;
@@ -16,11 +18,11 @@ public final class CardinalEventsInternals {
 
     @SuppressWarnings("unchecked")
     public static <T extends Entity> Event<EntityComponentCallback<T>> event(Class<T> clazz) {
-        Preconditions.checkArgument(Entity.class.isAssignableFrom(class), "Entity component events must be registered on entity classes.");
+        Preconditions.checkArgument(Entity.class.isAssignableFrom(clazz), "Entity component events must be registered on entity classes.");
         return (Event<EntityComponentCallback<T>>) EVENTS.computeIfAbsent(clazz, c ->
                 EventFactory.createArrayBacked(EntityComponentCallback.class, callbacks -> (entity, components) -> {
                 for(EntityComponentCallback callback : callbacks) {
-                    callback.attachComponents(entity, components);
+                    callback.initComponents(entity, components);
                 }
             }));
     }

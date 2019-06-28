@@ -1,6 +1,6 @@
 package nerdhub.cardinal.components.api.event;
 
-import nerdhub.cardinal.components.api.component.container.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.internal.CardinalEventsInternals;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.entity.Entity;
@@ -18,7 +18,7 @@ import net.minecraft.entity.Entity;
  * is registered for a class {@code E}, its {@code initComponents} method will
  * be invoked for any entity {@code e} verifying {@code e instanceof E}.
  *
- * @param E the type of entity targeted by this callback
+ * @param <E> the type of entity targeted by this callback
  */
 @FunctionalInterface
 public interface EntityComponentCallback<E extends Entity> {

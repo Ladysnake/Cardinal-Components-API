@@ -1,5 +1,6 @@
 package nerdhub.cardinal.components.api.util.component.sided;
 
+import nerdhub.cardinal.components.api.component.ComponentProvider;
 import net.minecraft.util.math.Direction;
 
 import javax.annotation.Nullable;

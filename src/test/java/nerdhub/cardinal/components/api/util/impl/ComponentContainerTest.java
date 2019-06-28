@@ -7,7 +7,7 @@ import nerdhub.cardinal.components.TestComponent;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.container.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.util.component.container.FastComponentContainer;
 import nerdhub.cardinal.components.api.util.component.container.IndexedComponentContainer;
 import net.minecraft.nbt.CompoundTag;
@@ -43,6 +43,7 @@ class ComponentContainerTest {
                 .collect(Collectors.toList());
     }
 
+    @SuppressWarnings("ConstantConditions")
     @ContainerTest
     void size(ComponentContainer cc) {
         for (int i : new int[] {5, 4, 4, 1, 9, 5}) {

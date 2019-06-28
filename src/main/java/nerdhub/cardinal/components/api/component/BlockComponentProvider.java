@@ -1,6 +1,6 @@
 package nerdhub.cardinal.components.api.component;
 
-import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -31,6 +31,7 @@ public interface BlockComponentProvider {
     /**
      * @return an instance of the requested component, or {@code null}
      */
+    @Nullable
     <T extends Component> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side);
 
     default <T extends Component> Optional<T> optionally(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {

@@ -1,6 +1,7 @@
 package nerdhub.cardinal.components.internal;
 
-import nerdhub.cardinal.components.api.component.container.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.util.component.container.FastComponentContainer;
 import nerdhub.cardinal.components.api.util.component.container.IndexedComponentContainer;
 
 /**

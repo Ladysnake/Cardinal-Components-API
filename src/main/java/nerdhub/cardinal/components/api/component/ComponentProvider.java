@@ -1,15 +1,14 @@
 package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.Set;
 
 /**
  * used to access an object's components.
- * if you want to expose components see {@link ItemComponentProvider}
  */
 public interface ComponentProvider {
 
@@ -41,6 +40,7 @@ public interface ComponentProvider {
      * @see ComponentType#get(Object)
      * @see ComponentType#maybeGet(Object)
      */
+    @Nullable
     Component getComponent(ComponentType<?> type);
 
     /**

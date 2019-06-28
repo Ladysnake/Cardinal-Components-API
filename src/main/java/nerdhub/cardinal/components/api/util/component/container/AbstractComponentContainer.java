@@ -3,7 +3,7 @@ package nerdhub.cardinal.components.api.util.component.container;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.container.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -66,7 +66,7 @@ public abstract class AbstractComponentContainer extends AbstractMap<ComponentTy
      */
     @Nullable
     @Override
-    public <V extends Component> put(ComponentType<V> key, V value) {
+    public <V extends Component> V put(ComponentType<V> key, V value) {
         throw new UnsupportedOperationException("put");
     }
 
@@ -86,9 +86,11 @@ public abstract class AbstractComponentContainer extends AbstractMap<ComponentTy
             ListTag componentList = tag.getList("cardinal_components", NbtType.COMPOUND);
             componentList.stream().map(CompoundTag.class::cast).forEach(nbt -> {
                 ComponentType<?> type = ComponentRegistry.INSTANCE.get(new Identifier(nbt.getString("componentId")));
-                Component component = this.get(type);
-                if (component != null) {
-                    component.fromTag(nbt);
+                if (type != null) {
+                    Component component = this.get(type);
+                    if (component != null) {
+                        component.fromTag(nbt);
+                    }
                 }
             });
         }

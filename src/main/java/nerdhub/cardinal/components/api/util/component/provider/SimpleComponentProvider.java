@@ -2,8 +2,8 @@ package nerdhub.cardinal.components.api.util.component.provider;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.container.ComponentContainer;
-import nerdhub.cardinal.components.api.component.provider.ComponentProvider;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
