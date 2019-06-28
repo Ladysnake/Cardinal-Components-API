@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.api;
+package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.Block;

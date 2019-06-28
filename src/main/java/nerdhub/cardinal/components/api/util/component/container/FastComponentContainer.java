@@ -89,18 +89,6 @@ public final class FastComponentContainer extends AbstractComponentContainer {
             action.accept(this.keyUniverse[e.getIntKey()], e.getValue()));
     }
 
-    // FastComponentContainer specific methods
-
-    /**
-     * The actual fastutil map backing this container.
-     * This accessor is there for optimization purposes, to reduce indirections
-     * in {@link ComponentProvider} implementations.
-     * The returned map must not be exposed!
-     */
-    public Int2ObjectMap<Component> getBackingMap() {
-        return this.vals;
-    }
-
     // Views
 
     /**
