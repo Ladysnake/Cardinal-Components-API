@@ -1,8 +1,9 @@
 package nerdhub.cardinal.components.api.event;
 
-import nerdhub.cardinal.components.api.util.gatherer.ItemComponentGatherer;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.internal.CardinalEventsInternals;
+import nerdhub.cardinal.components.internal.ItemCaller;
 import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -61,7 +62,6 @@ public interface ItemComponentCallback {
      * should avoid side effects and keep costly computations at a minimum. Lazy initialization
      * should be considered for components that are costly to initialize.
      */
-    @Nullable
-    ComponentGatherer<ItemStack> initComponents(ItemStack stack, ComponentContainer components);
+    void initComponents(ItemStack stack, ComponentContainer components);
 
 }

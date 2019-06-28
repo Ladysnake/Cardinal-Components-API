@@ -3,7 +3,7 @@ package nerdhub.cardinal.components.api.util.component.provider;
 import com.google.common.collect.Sets;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.provider.ComponentProvider;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
 
 import javax.annotation.Nullable;
 import java.util.Set;

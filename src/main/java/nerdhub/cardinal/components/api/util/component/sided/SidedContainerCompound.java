@@ -1,5 +1,6 @@
 package nerdhub.cardinal.components.api.util.component.sided;
 
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.util.NbtSerializable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.Direction;

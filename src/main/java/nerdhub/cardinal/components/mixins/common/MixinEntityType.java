@@ -1,6 +1,6 @@
 package nerdhub.cardinal.components.mixins.common;
 
-import nerdhub.cardinal.components.api.component.container.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
 import net.fabricmc.fabric.api.event.Event;
@@ -39,7 +39,7 @@ public abstract class MixinEntityType<E extends Entity> {
             cardinal_componentEvents = events.toArray(new Event[0]);
         }
         for (Event<EntityComponentCallback<? super E>> event : cardinal_componentEvents) {
-            event.invoker().attachComponents(e, cc);
+            event.invoker().initComponents(e, cc);
         }
         this.componentContainerFactory.adjustFrom(cc);
         return cc;

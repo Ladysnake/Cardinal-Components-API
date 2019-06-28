@@ -1,9 +1,9 @@
 package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.util.NbtSerializable;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -39,6 +39,7 @@ public interface ComponentContainer extends Map<ComponentType<?>, Component>, Nb
      * @return a component of that type, of {@code null} if none has been attached
      * @throws NullPointerException if the specified key is null
      */
+    @Nullable
     <T extends Component> T get(ComponentType<T> key);
 
     /**
@@ -56,6 +57,7 @@ public interface ComponentContainer extends Map<ComponentType<?>, Component>, Nb
      * @implSpec Implementations that do not support modification should
      * document their immutability properties
      */
+    @Nullable
     <V extends Component> V put(ComponentType<V> key, V value);
 
     @Override
