@@ -1,4 +1,4 @@
-package nerdhub.cardinal.components.api.util.component.container;
+package nerdhub.cardinal.components.api.util.component.sided;
 
 import nerdhub.cardinal.components.api.component.container.ComponentContainer;
 import nerdhub.cardinal.components.api.component.container.SidedContainerCompound;

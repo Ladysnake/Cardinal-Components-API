@@ -66,13 +66,13 @@ public abstract class MixinItemStack implements ComponentProvider {
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("RETURN"))
     private void initComponents(ItemConvertible item, int amount, CallbackInfo ci) {
         // TODO create the components through a factory held by the Item
-//        ((ItemCaller) this.getItem()).getItemComponentEvent().invoker().attachComponents((ItemStack) (Object) this, this.components);
+        ((ItemCaller) this.getItem()).getItemComponentEvent().invoker().attachComponents((ItemStack) (Object) this, this.components);
     }
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
         // TODO
-//        ((ItemCaller) this.getItem()).getItemComponentEvent().invoker().attachComponents((ItemStack) (Object) this, this.components);
+        ((ItemCaller) this.getItem()).getItemComponentEvent().invoker().attachComponents((ItemStack) (Object) this, this.components);
         this.components.fromTag(tag);
     }
 
