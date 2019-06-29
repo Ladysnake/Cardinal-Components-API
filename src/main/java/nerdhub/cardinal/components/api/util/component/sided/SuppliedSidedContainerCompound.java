@@ -32,12 +32,14 @@ public final class SuppliedSidedContainerCompound implements SidedContainerCompo
 
     @Override
     public void fromTag(CompoundTag serialized) {
-        // TODO
+        sides.forEach((direction, componentContainer) -> componentContainer.fromTag(serialized.getCompound(direction.name())));
+        core.fromTag(serialized.getCompound("core"));
     }
 
     @Override
     public CompoundTag toTag(CompoundTag tag) {
-        // TODO
+        sides.forEach((direction, componentContainer) -> tag.put(direction.name(), componentContainer.toTag(new CompoundTag())));
+        tag.put("core", core.toTag(new CompoundTag()));
         return tag;
     }
 }
