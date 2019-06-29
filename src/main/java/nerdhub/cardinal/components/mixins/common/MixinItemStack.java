@@ -5,8 +5,8 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.util.Components;
-import nerdhub.cardinal.components.api.util.component.container.IndexedComponentContainer;
 import nerdhub.cardinal.components.internal.ItemCaller;
+import nerdhub.cardinal.components.internal.ItemStackAccessor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -23,9 +23,9 @@ import java.util.Collections;
 import java.util.Set;
 
 @Mixin(value = ItemStack.class, priority = 900)
-public abstract class MixinItemStack implements ComponentProvider {
+public abstract class MixinItemStack implements ComponentProvider, ItemStackAccessor {
 
-    private final ComponentContainer components = new IndexedComponentContainer();
+    private ComponentContainer components;
 
     @Inject(method = "areTagsEqual", at = @At("RETURN"), cancellable = true)
     private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
@@ -46,10 +46,10 @@ public abstract class MixinItemStack implements ComponentProvider {
     @SuppressWarnings("ConstantConditions")
     @Inject(method = "copy", at = @At("RETURN"))
     private void copy(CallbackInfoReturnable<ItemStack> cir) {
-        MixinItemStack other = (MixinItemStack) (Object) cir.getReturnValue();
+        ComponentContainer other = ((ItemStackAccessor) (Object) cir.getReturnValue()).cardinal_getComponentContainer();
         this.components.forEach((type, component) -> {
             Component copy = Components.copyOf(component);
-            other.components.put(type, copy);
+            other.put(type, copy);
         });
     }
 
@@ -63,17 +63,16 @@ public abstract class MixinItemStack implements ComponentProvider {
 
     @Shadow public abstract boolean isEmpty();
 
-    @SuppressWarnings("DuplicatedCode")
+    @SuppressWarnings({"DuplicatedCode", "ConstantConditions"})
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("RETURN"))
     private void initComponents(ItemConvertible item, int amount, CallbackInfo ci) {
-        // TODO create the components through a factory held by the Item
-        ((ItemCaller) this.getItem()).cardinal_getItemComponentEvent().invoker().initComponents((ItemStack) (Object) this, this.components);
+        this.components = ((ItemCaller) this.getItem()).cardinal_createComponents((ItemStack) (Object) this);
     }
 
+    @SuppressWarnings({"DuplicatedCode", "ConstantConditions"})
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
-        // TODO
-        ((ItemCaller) this.getItem()).cardinal_getItemComponentEvent().invoker().initComponents((ItemStack) (Object) this, this.components);
+        this.components = ((ItemCaller) this.getItem()).cardinal_createComponents((ItemStack) (Object) this);
         this.components.fromTag(tag);
     }
 
@@ -84,16 +83,17 @@ public abstract class MixinItemStack implements ComponentProvider {
 
     @Nullable
     @Override
-    public Component getComponent(ComponentType<?> type) {
+    public <C extends Component> C getComponent(ComponentType<C> type) {
         return this.isEmpty() ? null : components.get(type);
     }
 
     @Override
-    public Set<ComponentType<? extends Component>> getComponentTypes() {
+    public Set<ComponentType<?>> getComponentTypes() {
         return this.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(components.keySet());
     }
 
-    <T extends Component> void setComponentValue(ComponentType<T> type, Component obj) {
-        components.put(type, obj);
+    @Override
+    public ComponentContainer cardinal_getComponentContainer() {
+        return this.components;
     }
 }

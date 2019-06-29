@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "environment": "*",
-    "id": "cardinal_test_components_test",
+    "id": "componenttest",
     "name": "Cardinal Components API Test Mod",
     "description": "Test mod for Cardinal Components API",
     "version": "${version}",

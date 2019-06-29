@@ -46,6 +46,18 @@ public interface ItemComponentCallback {
     }
 
     /**
+     * Convenience method to register an item that implements its own component callback
+     *
+     * @param item an item that initializes itself the components of its stacks
+     * @param <I> the type of the item
+     * @return {@code item} for easy chaining
+     */
+    static <I extends Item & ItemComponentCallback> I registerSelf(I item) {
+        event(item).register(item);
+        return item;
+    }
+
+    /**
      * Initialize components for the given item stack.
      * Components that are added to the given container will be available
      * on the stack as soon as all callbacks have been invoked.

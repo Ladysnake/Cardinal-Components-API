@@ -4,6 +4,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
+import nerdhub.cardinal.components.internal.EntityTypeAccessor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundTag;
@@ -30,8 +31,8 @@ public abstract class MixinEntity implements ComponentProvider {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initDataTracker(CallbackInfo ci) {
         // Mixin classes can be referenced from other mixin classes
-        //noinspection ReferenceToMixin,ConstantConditions
-        this.components = ((MixinEntityType)(Object)this.getType()).cardinal_fireComponentEvents((Entity) (Object) this);
+        // noinspection ConstantConditions
+        this.components = ((EntityTypeAccessor<Entity>) this.getType()).cardinal_createComponents((Entity) (Object) this);
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))
@@ -51,13 +52,12 @@ public abstract class MixinEntity implements ComponentProvider {
 
     @Nullable
     @Override
-    public Component getComponent(ComponentType<?> type) {
-        // TODO use generics again
+    public <C extends Component> C getComponent(ComponentType<C> type) {
         return this.components.get(type);
     }
 
     @Override
-    public Set<ComponentType<? extends Component>> getComponentTypes() {
+    public Set<ComponentType<?>> getComponentTypes() {
         return Collections.unmodifiableSet(this.components.keySet());
     }
 }

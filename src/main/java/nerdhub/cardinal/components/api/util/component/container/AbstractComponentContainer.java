@@ -63,15 +63,6 @@ public abstract class AbstractComponentContainer extends AbstractMap<ComponentTy
 
     /**
      * {@inheritDoc}
-     */
-    @Nullable
-    @Override
-    public <V extends Component> V put(ComponentType<V> key, V value) {
-        throw new UnsupportedOperationException("put");
-    }
-
-    /**
-     * {@inheritDoc}
      *
      * @implSpec This implementation first checks if {@code tag} has a tag list
      * mapped to the "cardinal_components" key; if not it returns immediately.

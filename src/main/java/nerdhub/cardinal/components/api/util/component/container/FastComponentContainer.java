@@ -75,7 +75,7 @@ public final class FastComponentContainer extends AbstractComponentContainer {
      */
     @Nullable
     @Override
-    public <V extends Component> V put(ComponentType<V> key, V value) {
+    public Component put(ComponentType<?> key, Component value) {
         Preconditions.checkNotNull(key);
         Preconditions.checkNotNull(value);
         Preconditions.checkArgument(key.getComponentClass().isInstance(value), value + " is not of type " + key);

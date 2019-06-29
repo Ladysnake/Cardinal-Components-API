@@ -54,15 +54,16 @@ public interface ComponentContainer extends Map<ComponentType<?>, Component>, Nb
      * @throws NullPointerException          if the specified key or value is null
      * @throws UnsupportedOperationException if the <tt>put</tt> operation
      *                                       is not supported by this container
+     * @throws IllegalArgumentException      if {@code value} is not a valid instance for {@code key}
      * @implSpec Implementations that do not support modification should
      * document their immutability properties
      */
     @Nullable
-    <V extends Component> V put(ComponentType<V> key, V value);
-
     @Override
+    Component put(ComponentType<?> key, Component value);
+
     @Deprecated
-    default Component remove(Object key) {
+    @Override default Component remove(Object key) {
         throw new UnsupportedOperationException();
     }
 }

@@ -125,7 +125,7 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
      */
     @Nullable
     @Override
-    public <V extends Component> V put(ComponentType<V> key, V value) {
+    public Component put(ComponentType<?> key, Component value) {
         Preconditions.checkNotNull(key);
         Preconditions.checkNotNull(value);
         Preconditions.checkArgument(key.getComponentClass().isInstance(value), value + " is not of type " + key);
@@ -149,7 +149,7 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
             this.universeSize = newUniverseSize;
             index = rawId - this.minIndex; // compute index again since min index changed
         }
-        V oldValue = key.getComponentClass().cast(vals[index]);
+        Component oldValue = key.getComponentClass().cast(vals[index]);
         vals[index] = value;
         assert vals[0] != null && vals[universeSize-1] != null;
         if (oldValue == null) {
