@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(Item.class)
 public abstract class MixinItem implements ItemCaller {
     @Unique private final Event<ItemComponentCallback> cardinal_componentsEvent = CardinalEventsInternals.createItemComponentsEvent();
-    @Unique private final FeedbackContainerFactory cardinal_containerFactory = new FeedbackContainerFactory();
+    @Unique private FeedbackContainerFactory<ItemStack> cardinal_containerFactory;
 
     @Override
     public Event<ItemComponentCallback> cardinal_getItemComponentEvent() {
@@ -24,10 +24,12 @@ public abstract class MixinItem implements ItemCaller {
     @Override
     public ComponentContainer cardinal_createComponents(ItemStack stack) {
         // assert stack.getItem() == this;
-        ComponentContainer components = this.cardinal_containerFactory.create();
-        CardinalEventsInternals.WILDCARD_ITEM_EVENT.invoker().initComponents(stack, components);
-        this.cardinal_componentsEvent.invoker().initComponents(stack, components);
-        this.cardinal_containerFactory.adjustFrom(components);
-        return components;
+        if (this.cardinal_containerFactory == null) {
+            cardinal_containerFactory = new FeedbackContainerFactory<>(
+                    CardinalEventsInternals.WILDCARD_ITEM_EVENT,
+                    cardinal_componentsEvent
+            );
+        }
+        return this.cardinal_containerFactory.create(stack);
     }
 }
