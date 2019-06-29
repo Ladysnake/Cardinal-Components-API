@@ -1,5 +1,4 @@
 {
   "componenttest:tooltip.vitality": "Vitality stored: %d",
-  "componenttest:tooltip.player_vitality": "Your vitality: %d",
   "item.componenttest.vita_stick": "Vita Stick"
 }

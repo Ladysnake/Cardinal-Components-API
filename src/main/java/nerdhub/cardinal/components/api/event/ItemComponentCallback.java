@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
  * verifying {@code s.getItem() == i}.
  */
 @FunctionalInterface
-public interface ItemComponentCallback {
+public interface ItemComponentCallback extends ComponentCallback<ItemStack> {
 
     /**
      * Returns the {@code Event} used to register component callbacks for
@@ -74,6 +74,7 @@ public interface ItemComponentCallback {
      * should avoid side effects and keep costly computations at a minimum. Lazy initialization
      * should be considered for components that are costly to initialize.
      */
+    @Override
     void initComponents(ItemStack stack, ComponentContainer components);
 
 }

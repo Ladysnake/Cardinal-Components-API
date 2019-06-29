@@ -4,7 +4,6 @@ import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -48,7 +47,6 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Component> lines, TooltipContext ctx) {
         super.appendTooltip(stack, world, lines, ctx);
         lines.add(new TranslatableComponent("componenttest:tooltip.vitality", CardinalComponentsTest.VITA.get(stack).getVitality()));
-        lines.add(new TranslatableComponent("componenttest:tooltip.player_vitality", CardinalComponentsTest.VITA.get(MinecraftClient.getInstance().player).getVitality()));
     }
 
     @Override

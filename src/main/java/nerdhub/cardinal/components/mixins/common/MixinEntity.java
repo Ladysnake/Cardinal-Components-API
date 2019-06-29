@@ -4,7 +4,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.internal.EntityTypeAccessor;
+import nerdhub.cardinal.components.internal.CardinalEventsInternals;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundTag;
@@ -30,9 +30,7 @@ public abstract class MixinEntity implements ComponentProvider {
     @SuppressWarnings("unchecked")
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initDataTracker(CallbackInfo ci) {
-        // Mixin classes can be referenced from other mixin classes
-        // noinspection ConstantConditions
-        this.components = ((EntityTypeAccessor<Entity>) this.getType()).cardinal_createComponents((Entity) (Object) this);
+        this.components = CardinalEventsInternals.getEntityContainerFactory((Class) this.getClass()).create(this);
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))

@@ -21,7 +21,7 @@ import net.minecraft.entity.Entity;
  * @param <E> the type of entity targeted by this callback
  */
 @FunctionalInterface
-public interface EntityComponentCallback<E extends Entity> {
+public interface EntityComponentCallback<E extends Entity> extends ComponentCallback<E> {
 
     /**
      * Returns the {@code Event} used to register component callbacks for
@@ -58,5 +58,6 @@ public interface EntityComponentCallback<E extends Entity> {
      * should avoid side effects and keep costly computations at a minimum. Lazy initialization
      * should be considered for components that are costly to initialize.
      */
+    @Override
     void initComponents(E entity, ComponentContainer components);
 }
