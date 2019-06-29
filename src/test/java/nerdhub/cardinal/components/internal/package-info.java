@@ -20,12 +20,9 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/**
- * This package includes several implementations of component containers, for use by custom API implementations
- */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.api.util.component.container;
+package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
