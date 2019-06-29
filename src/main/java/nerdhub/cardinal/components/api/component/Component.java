@@ -22,18 +22,17 @@
  */
 package nerdhub.cardinal.components.api.component;
 
+import nerdhub.cardinal.components.api.util.NbtSerializable;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-
-import java.io.Serializable;
 
 /**
  * base class for components.<br/>
  * provides basic serialization capability.<br/>
  * <p>Item Components <strong>MUST</strong> override and implement all methods of this interface!</p>
  */
-public interface Component extends Serializable {
+public interface Component extends NbtSerializable {
 
     /**
      * Reads this component's properties from a {@link CompoundTag}.
@@ -44,6 +43,7 @@ public interface Component extends Serializable {
      * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
      * version.
      */
+    @Override
     void fromTag(CompoundTag tag);
 
     /**
@@ -54,6 +54,7 @@ public interface Component extends Serializable {
      * @implSpec this method must <strong>NOT</strong> write any value associated with the {@code "componentId"} key
      * in the given tag.
      */
+    @Override
     CompoundTag toTag(CompoundTag tag);
 
     /**
