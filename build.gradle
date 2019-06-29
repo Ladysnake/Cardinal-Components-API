@@ -1,8 +1,11 @@
+import java.nio.charset.StandardCharsets
+import java.time.Year
+
 plugins {
     id "fabric-loom" version "0.2.4-SNAPSHOT"
+    id "net.minecrell.licenser" version "0.2.1"
     id "com.matthewprenger.cursegradle" version "1.2.0"
     id "maven-publish"
-    // TODO add code quality plugin
 }
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
@@ -30,7 +33,7 @@ dependencies {
     mappings "net.fabricmc:yarn:${minecraft_version}+build.${yarn_mappings}"
     modImplementation "net.fabricmc:fabric-loader:${loader_version}"
 
-    modImplementation "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     // used by the test mod
     modRuntime "net.fabricmc.fabric-api:fabric-resource-loader:${fabric_resource_loader_version}"
@@ -38,6 +41,7 @@ dependencies {
     testmodImplementation sourceSets.main.output
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.0-M1"
+    testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 jar {
@@ -90,5 +94,23 @@ processResources {
     // copy everything else, that"s not the fabric.mod.json
     from(sourceSets.main.resources.srcDirs) {
         exclude "fabric.mod.json"
+    }
+}
+
+license {
+    header = file("code_quality/${project.license_header}_HEADER.txt")
+    include "**/*.java"
+    charset = StandardCharsets.UTF_8.name()
+
+    style {
+        java = "BLOCK_COMMENT"
+    }
+    newLine = false // Disables the empty line between the header and package name
+    //ignoreFailures = true //Ignore failures and only print a warning on license violations
+
+    //export variables
+    ext {
+        year = Year.now()
+        projectDisplayName = project.archivesBaseName
     }
 }
