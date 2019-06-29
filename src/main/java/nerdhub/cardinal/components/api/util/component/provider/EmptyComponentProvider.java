@@ -33,7 +33,7 @@ public final class EmptyComponentProvider implements ComponentProvider {
      */
     @Nullable
     @Override
-    public Component getComponent(ComponentType<?> type) {
+    public <C extends Component> C getComponent(ComponentType<C> type) {
         return null;
     }
 

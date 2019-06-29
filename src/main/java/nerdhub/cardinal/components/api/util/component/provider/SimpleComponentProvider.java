@@ -37,7 +37,7 @@ public class SimpleComponentProvider implements ComponentProvider {
      */
     @Nullable
     @Override
-    public Component getComponent(ComponentType<?> type) {
+    public <C extends Component> C getComponent(ComponentType<C> type) {
         return backing.get(type);
     }
 
@@ -45,7 +45,7 @@ public class SimpleComponentProvider implements ComponentProvider {
      * @return an unmodifiable view of the component types
      */
     @Override
-    public Set<ComponentType<? extends Component>> getComponentTypes() {
+    public Set<ComponentType<?>> getComponentTypes() {
         return Collections.unmodifiableSet(backing.keySet());
     }
 }

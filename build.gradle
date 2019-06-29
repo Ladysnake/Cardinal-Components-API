@@ -32,6 +32,8 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
+    // used by the test mod
+    modRuntime "net.fabricmc.fabric-api:fabric-resource-loader:${fabric_resource_loader_version}"
 
     testmodImplementation sourceSets.main.output
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"

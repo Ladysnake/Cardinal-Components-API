@@ -33,16 +33,6 @@ public final class ComponentType<T extends Component> {
         this.id = id;
         this.rawId = rawId;
     }
-
-    /** Gets the component represented by this type from the given provider, if any */
-    @SuppressWarnings("unchecked")
-    @Nullable
-    private T apply(ComponentProvider componentProvider) {
-        Component ret = componentProvider.getComponent(this);
-        assert ret == null || this.getComponentClass().isInstance(ret);
-        return (T) ret;
-    }
-
     
     /* ------------- public methods -------------- */
 
@@ -59,7 +49,7 @@ public final class ComponentType<T extends Component> {
     }
 
     public ObjectPath<ComponentProvider, T> asComponentPath() {
-        return this::apply;
+        return c -> c.getComponent(this);
     }
 
     /**
@@ -71,7 +61,8 @@ public final class ComponentType<T extends Component> {
      * @see #maybeGet(Object)
      */
     public <V> T get(V holder) {
-        T component = this.apply(((ComponentProvider) holder));
+        T component = (((ComponentProvider) holder)).getComponent(this);
+        assert component == null || this.getComponentClass().isInstance(component);
         if (component == null) {
             throw new NoSuchElementException();
         }
@@ -88,7 +79,7 @@ public final class ComponentType<T extends Component> {
      */
     public <V> Optional<T> maybeGet(@Nullable V holder) {
         if (holder instanceof ComponentProvider) {
-            return Optional.ofNullable(this.apply(((ComponentProvider) holder)));
+            return Optional.ofNullable(((ComponentProvider) holder).getComponent(this));
         }
         return Optional.empty();
     }

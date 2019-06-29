@@ -41,7 +41,7 @@ public interface ComponentProvider {
      * @see ComponentType#maybeGet(Object)
      */
     @Nullable
-    Component getComponent(ComponentType<?> type);
+    <C extends Component> C getComponent(ComponentType<C> type);
 
     /**
      * @return an unmodifiable view of the component types

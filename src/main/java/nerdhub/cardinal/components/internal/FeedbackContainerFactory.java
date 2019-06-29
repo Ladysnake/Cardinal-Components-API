@@ -13,14 +13,6 @@ public final class FeedbackContainerFactory {
     private boolean useFastUtil;
     private int expectedSize;
 
-    public FeedbackContainerFactory() {
-        this(false);
-    }
-
-    public FeedbackContainerFactory(boolean useFastUtil) {
-        this.useFastUtil = useFastUtil;
-    }
-
     /**
      * Creates a new {@code IndexedComponentContainer}.
      * The returned container will be pre-sized based on previous {@link #adjustFrom adjustments}.

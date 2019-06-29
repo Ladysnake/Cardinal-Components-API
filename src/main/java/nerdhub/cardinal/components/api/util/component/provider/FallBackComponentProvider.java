@@ -38,8 +38,8 @@ public class FallBackComponentProvider implements ComponentProvider {
      */
     @Nullable
     @Override
-    public Component getComponent(ComponentType<?> type) {
-        Component c = main.getComponent(type);
+    public <C extends Component> C getComponent(ComponentType<C> type) {
+        C c = main.getComponent(type);
         return c != null ? c : fallback.getComponent(type);
     }
 

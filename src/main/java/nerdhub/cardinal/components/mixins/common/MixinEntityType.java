@@ -2,6 +2,7 @@ package nerdhub.cardinal.components.mixins.common;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.internal.EntityTypeAccessor;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.entity.Entity;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(EntityType.class)
-public abstract class MixinEntityType<E extends Entity> {
+public abstract class MixinEntityType<E extends Entity> implements EntityTypeAccessor<E> {
     @Nullable
 	private Event<EntityComponentCallback<? super E>>[] cardinal_componentEvents;
     @Unique
@@ -26,7 +27,7 @@ public abstract class MixinEntityType<E extends Entity> {
      * This method has undefined behaviour if several entity classes share the same entity type.
      */
     @SuppressWarnings("unchecked")
-    ComponentContainer cardinal_fireComponentEvents(E e) {
+    public ComponentContainer cardinal_createComponents(E e) {
         // assert e.getType() == this;
         ComponentContainer cc = this.componentContainerFactory.create();
         if (cardinal_componentEvents == null) {
