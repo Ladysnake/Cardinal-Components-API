@@ -23,14 +23,10 @@ You can find the current version of the API in the [releases](https://github.com
 ## Usage
 
 To get started, you only need 2 things: an interface extending `Component`, and a class implementing this interface.
-Components are provided by various objects through the `ComponentProvider` interface. To interact with those,
-you need to register your component type, using `ComponentRegistry.registerIfAbsent`. The resulting `ComponentType`
-instance is used as a key for component providers.
 
 Minimal code example:
 ```java
-interface IntComponent {
-    ComponentType<IntComponent> TYPE = ComponentRegistry.registerIfAbsent(new Identifier("mymod:int"), IntComponent.class);
+interface IntComponent extends Component {
     int getValue();
 }
 class RandomIntComponent implements IntComponent {
@@ -44,7 +40,15 @@ class RandomIntComponent implements IntComponent {
     }
 }
 ```
-All that is left is to actually attach that component to one or more component providers.
+All that is left is to actually use that component.
+
+Components are provided by various objects through the `ComponentProvider` interface. 
+To interact with those, you need to register your component type, using `ComponentRegistry.registerIfAbsent`;
+the resulting `ComponentType` instance is used as a key for component providers.
+```java
+    public static final ComponentType<IntComponent> TYPE = ComponentRegistry.registerIfAbsent(new Identifier("mymod:int"), IntComponent.class);
+```
+
 Cardinal Components API offers component provider implementations for a few vanilla types:
 
 ### Entities
