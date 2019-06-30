@@ -31,8 +31,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -66,9 +66,9 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
 
     @Environment(EnvType.CLIENT)
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Component> lines, TooltipContext ctx) {
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> lines, TooltipContext ctx) {
         super.appendTooltip(stack, world, lines, ctx);
-        lines.add(new TranslatableComponent("componenttest:tooltip.vitality", CardinalComponentsTest.VITA.get(stack).getVitality()));
+        lines.add(new TranslatableText("componenttest:tooltip.vitality", CardinalComponentsTest.VITA.get(stack).getVitality()));
     }
 
     @Override
