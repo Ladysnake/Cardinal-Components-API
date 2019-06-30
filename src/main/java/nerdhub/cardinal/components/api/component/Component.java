@@ -23,8 +23,6 @@
 package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.util.NbtSerializable;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 
 /**
@@ -56,11 +54,6 @@ public interface Component extends NbtSerializable {
      */
     @Override
     CompoundTag toTag(CompoundTag tag);
-
-    /**
-     * used for copying components to another {@link ItemStack} or {@link Entity}
-     */
-    Component newInstance();
 
     /**
      * Used to compare two instances of components for equality.

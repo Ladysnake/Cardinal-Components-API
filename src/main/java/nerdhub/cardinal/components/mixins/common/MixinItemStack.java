@@ -26,6 +26,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
+import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
 import nerdhub.cardinal.components.api.util.Components;
 import nerdhub.cardinal.components.internal.ItemCaller;
 import nerdhub.cardinal.components.internal.ItemStackAccessor;
@@ -47,7 +48,7 @@ import java.util.Set;
 @Mixin(value = ItemStack.class, priority = 900)
 public abstract class MixinItemStack implements ComponentProvider, ItemStackAccessor {
 
-    private ComponentContainer components;
+    private ComponentContainer<CloneableComponent<?>> components;
 
     @Inject(method = "areTagsEqual", at = @At("RETURN"), cancellable = true)
     private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
@@ -68,9 +69,9 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
     @SuppressWarnings("ConstantConditions")
     @Inject(method = "copy", at = @At("RETURN"))
     private void copy(CallbackInfoReturnable<ItemStack> cir) {
-        ComponentContainer other = ((ItemStackAccessor) (Object) cir.getReturnValue()).cardinal_getComponentContainer();
+        ComponentContainer<CloneableComponent<?>> other = ((ItemStackAccessor) (Object) cir.getReturnValue()).cardinal_getComponentContainer();
         this.components.forEach((type, component) -> {
-            Component copy = Components.copyOf(component);
+            CloneableComponent<?> copy = component.cloneComponent();
             other.put(type, copy);
         });
     }
@@ -115,7 +116,7 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
     }
 
     @Override
-    public ComponentContainer cardinal_getComponentContainer() {
+    public ComponentContainer<CloneableComponent<?>> cardinal_getComponentContainer() {
         return this.components;
     }
 }

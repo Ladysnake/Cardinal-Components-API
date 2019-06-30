@@ -67,7 +67,7 @@ class ComponentContainerTest {
 
     @SuppressWarnings("ConstantConditions")
     @ContainerTest
-    void size(ComponentContainer cc) {
+    void size(ComponentContainer<Component> cc) {
         for (int i : new int[] {5, 4, 4, 1, 9, 5}) {
             cc.put(testComponentTypes.get(i), new TestComponent.Impl(i));
         }
@@ -78,7 +78,7 @@ class ComponentContainerTest {
     }
 
     @ContainerTest
-    void get(ComponentContainer cc) {
+    void get(ComponentContainer<Component> cc) {
         Map<Integer, Component> indices = new HashMap<>();
         for (int i : new int[] {5, 1, 4, 5}) {
             TestComponent.Impl value = new TestComponent.Impl(i);
@@ -92,7 +92,7 @@ class ComponentContainerTest {
     }
 
     @ContainerTest
-    void serializesCorrectly(ComponentContainer cc, ComponentContainer cc1) {
+    void serializesCorrectly(ComponentContainer<Component> cc, ComponentContainer<Component> cc1) {
         for (int i : new int[] {5, 4, 4, 1, 9, 5}) {
             cc.put(testComponentTypes.get(i), new TestComponent.Impl(i));
             cc1.put(testComponentTypes.get(i), new TestComponent.Impl(i+1));
@@ -104,7 +104,7 @@ class ComponentContainerTest {
     }
 
     @ContainerTest
-    void viewsWork(ComponentContainer cc) {
+    void viewsWork(ComponentContainer<Component> cc) {
         Map<ComponentType<?>, Component> map = new HashMap<>();
         for (int i : new int[] {5, 4, 4, 1, 9, 5}) {
             cc.put(testComponentTypes.get(i), new TestComponent.Impl(i));

@@ -49,14 +49,14 @@ import java.util.function.BiConsumer;
  * that naturally encapsulates the container.
  *
  */
-public final class FastComponentContainer extends AbstractComponentContainer {
+public final class FastComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
     /**
      * All of the component types that can be stored in this container.
      * (Cached for performance.)
      */
     private ComponentType<?>[] keyUniverse = SharedComponentSecrets.getRegisteredComponents();
 
-    private final Int2ObjectOpenHashMap<Component> vals;
+    private final Int2ObjectOpenHashMap<C> vals;
 
     public FastComponentContainer() {
         this(Hash.DEFAULT_INITIAL_SIZE);
@@ -97,15 +97,15 @@ public final class FastComponentContainer extends AbstractComponentContainer {
      */
     @Nullable
     @Override
-    public Component put(ComponentType<?> key, Component value) {
+    public C put(ComponentType<?> key, C value) {
         Preconditions.checkNotNull(key);
         Preconditions.checkNotNull(value);
         Preconditions.checkArgument(key.getComponentClass().isInstance(value), value + " is not of type " + key);
-        return key.getComponentClass().cast(this.vals.put(key.getRawId(), value));
+        return this.vals.put(key.getRawId(), value);
     }
 
     @Override
-    public void forEach(BiConsumer<? super ComponentType<?>, ? super Component> action) {
+    public void forEach(BiConsumer<? super ComponentType<?>, ? super C> action) {
         this.vals.int2ObjectEntrySet().fastForEach((e) ->
             action.accept(this.keyUniverse[e.getIntKey()], e.getValue()));
     }
@@ -117,9 +117,9 @@ public final class FastComponentContainer extends AbstractComponentContainer {
      * view the first time this view is requested.  The view is stateless,
      * so there's no reason to create more than one.
      */
-    private Set<Map.Entry<ComponentType<?>, Component>> entrySet;
+    private Set<Map.Entry<ComponentType<?>, C>> entrySet;
     private Set<ComponentType<?>> keySet;
-    private Collection<Component> values;
+    private Collection<C> values;
 
     /**
      * Returns a {@link Set} view of the keys contained in this map.
@@ -148,8 +148,8 @@ public final class FastComponentContainer extends AbstractComponentContainer {
      * @return a collection view of the values contained in this map
      */
     @Override
-    public Collection<Component> values() {
-        Collection<Component> vs = values;
+    public Collection<C> values() {
+        Collection<C> vs = values;
         if (vs != null) {
             return vs;
         }
@@ -165,16 +165,16 @@ public final class FastComponentContainer extends AbstractComponentContainer {
      *
      * @return a set view of the mappings contained in this enum map
      */
-    public Set<Map.Entry<ComponentType<?>, Component>> entrySet() {
-        Set<Map.Entry<ComponentType<?>,Component>> es = entrySet;
+    public Set<Map.Entry<ComponentType<?>, C>> entrySet() {
+        Set<Map.Entry<ComponentType<?>,C>> es = entrySet;
         if (es != null) {
             return es;
         }
         return entrySet = new EntrySet();
     }
 
-    private class EntrySet extends AbstractSet<Map.Entry<ComponentType<?>,Component>> {
-        public Iterator<Map.Entry<ComponentType<?>,Component>> iterator() {
+    private class EntrySet extends AbstractSet<Map.Entry<ComponentType<?>,C>> {
+        public Iterator<Map.Entry<ComponentType<?>, C>> iterator() {
             return new EntryIterator();
         }
 
@@ -211,8 +211,8 @@ public final class FastComponentContainer extends AbstractComponentContainer {
         }
     }
 
-    private class Values extends AbstractCollection<Component> {
-        public Iterator<Component> iterator() {
+    private class Values extends AbstractCollection<C> {
+        public Iterator<C> iterator() {
             return new ValueIterator();
         }
         public int size() {
@@ -226,15 +226,15 @@ public final class FastComponentContainer extends AbstractComponentContainer {
         }
     }
 
-    private class ValueIterator implements Iterator<Component> {
-        ObjectIterator<Component> it = vals.values().iterator();
+    private class ValueIterator implements Iterator<C> {
+        ObjectIterator<C> it = vals.values().iterator();
 
         @Override
         public boolean hasNext() {
             return it.hasNext();
         }
 
-        public Component next() {
+        public C next() {
             return it.next();
         }
 
@@ -254,10 +254,10 @@ public final class FastComponentContainer extends AbstractComponentContainer {
 
     }
 
-    private class EntryIterator implements Iterator<Entry<ComponentType<?>, Component>> {
-        ObjectIterator<Int2ObjectMap.Entry<Component>> it = vals.int2ObjectEntrySet().fastIterator();
+    private class EntryIterator implements Iterator<Entry<ComponentType<?>, C>> {
+        ObjectIterator<Int2ObjectMap.Entry<C>> it = vals.int2ObjectEntrySet().fastIterator();
         public Entry next() {
-            Int2ObjectMap.Entry<Component> entry = it.next();
+            Int2ObjectMap.Entry<C> entry = it.next();
             return new Entry(entry.getIntKey(), entry.getValue());
         }
 
@@ -266,11 +266,11 @@ public final class FastComponentContainer extends AbstractComponentContainer {
             return it.hasNext();
         }
 
-        private class Entry implements Map.Entry<ComponentType<?>, Component> {
+        private class Entry implements Map.Entry<ComponentType<?>, C> {
             private int rawId;
-            private Component value;
+            private C value;
 
-            private Entry(int rawId, Component value) {
+            private Entry(int rawId, C value) {
                 this.rawId = rawId;
                 this.value = value;
             }
@@ -279,12 +279,12 @@ public final class FastComponentContainer extends AbstractComponentContainer {
                 return keyUniverse[rawId];
             }
 
-            public Component getValue() {
+            public C getValue() {
                 return value;
             }
 
             @Nullable
-            public Component setValue(Component value) {
+            public C setValue(C value) {
                 return FastComponentContainer.this.put(getKey(), value);
             }
 

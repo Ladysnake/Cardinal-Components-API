@@ -51,12 +51,12 @@ import java.util.AbstractMap;
  * @see FastComponentContainer
  * @see IndexedComponentContainer
  */
-public abstract class AbstractComponentContainer extends AbstractMap<ComponentType<?>, Component> implements ComponentContainer {
+public abstract class AbstractComponentContainer<C extends Component> extends AbstractMap<ComponentType<?>, C> implements ComponentContainer<C> {
 
     @SuppressWarnings("deprecation")    // overriding the deprecated method to avoid the compiler's warning...
     @Deprecated
     @Override
-    public Component remove(Object key) {
+    public C remove(Object key) {
         throw new UnsupportedOperationException();
     }
 
@@ -74,11 +74,12 @@ public abstract class AbstractComponentContainer extends AbstractMap<ComponentTy
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public Component get(@Nullable Object key) {
+    public C get(@Nullable Object key) {
         if (key != null && key.getClass() == ComponentType.class) {
-            return get((ComponentType<?>) key);
+            return (C) get((ComponentType<?>) key);
         }
         return null;
     }

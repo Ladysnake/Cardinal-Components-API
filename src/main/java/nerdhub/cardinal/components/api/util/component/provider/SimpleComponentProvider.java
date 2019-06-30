@@ -35,9 +35,9 @@ import java.util.Set;
  * A component provider backed by a container.
  */
 public class SimpleComponentProvider implements ComponentProvider {
-    protected ComponentContainer backing;
+    protected ComponentContainer<?> backing;
 
-    public SimpleComponentProvider(ComponentContainer backing) {
+    public SimpleComponentProvider(ComponentContainer<?> backing) {
         this.backing = backing;
     }
 

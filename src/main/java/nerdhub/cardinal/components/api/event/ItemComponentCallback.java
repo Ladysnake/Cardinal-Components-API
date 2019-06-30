@@ -23,6 +23,8 @@
 package nerdhub.cardinal.components.api.event;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
+import nerdhub.cardinal.components.api.util.component.ItemComponent;
 import nerdhub.cardinal.components.internal.CardinalEventsInternals;
 import nerdhub.cardinal.components.internal.ItemCaller;
 import net.fabricmc.fabric.api.event.Event;
@@ -46,7 +48,7 @@ import javax.annotation.Nullable;
  * verifying {@code s.getItem() == i}.
  */
 @FunctionalInterface
-public interface ItemComponentCallback extends ComponentCallback<ItemStack> {
+public interface ItemComponentCallback extends ComponentCallback<ItemStack, CloneableComponent<?>> {
 
     /**
      * Returns the {@code Event} used to register component callbacks for
@@ -91,12 +93,12 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack> {
      *
      * @param stack      the {@code ItemStack} being constructed
      * @param components the stack's component container
-     *
      * @implNote Because this method is called for each stack creation, implementations
      * should avoid side effects and keep costly computations at a minimum. Lazy initialization
      * should be considered for components that are costly to initialize.
+     * @see ItemComponent
      */
     @Override
-    void initComponents(ItemStack stack, ComponentContainer components);
+    void initComponents(ItemStack stack, ComponentContainer<CloneableComponent<?>> components);
 
 }

@@ -23,6 +23,7 @@
 package nerdhub.cardinal.componentstest;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -72,7 +73,7 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     }
 
     @Override
-    public void initComponents(ItemStack stack, ComponentContainer components) {
+    public void initComponents(ItemStack stack, ComponentContainer<CloneableComponent<?>> components) {
         components.put(CardinalComponentsTest.VITA, new BaseVita());
     }
 }

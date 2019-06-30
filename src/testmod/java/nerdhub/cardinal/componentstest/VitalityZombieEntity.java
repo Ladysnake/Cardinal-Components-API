@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.componentstest;
 
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.ZombieEntity;
@@ -41,7 +42,7 @@ public class VitalityZombieEntity extends ZombieEntity {
         }
     }
 
-    protected void initComponents(ComponentContainer components) {
+    protected void initComponents(ComponentContainer<Component> components) {
         components.put(CardinalComponentsTest.VITA, new EntityVita(this, 20));
     }
 }
