@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components;
 
+import nerdhub.cardinal.components.internal.CardinalNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +32,7 @@ public final class CardinalComponents {
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking")) {
-
+            CardinalNetworking.init();
         }
     }
 }

@@ -68,5 +68,5 @@ public interface ComponentProvider {
     /**
      * @return an unmodifiable view of the component types
      */
-    Set<ComponentType<? extends Component>> getComponentTypes();
+    Set<ComponentType<?>> getComponentTypes();
 }
