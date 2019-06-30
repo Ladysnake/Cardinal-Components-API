@@ -17,6 +17,9 @@
     "depends": {
         "fabric-api-base": "*"
     },
+    "recommends": {
+        "fabric-networking": "*"
+    },
     "authors": [
         {
             "name": "UpcraftLP",

@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.api.util.component.sync;
 
 import nerdhub.cardinal.components.api.component.Component;
+import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.PacketByteBuf;
 
@@ -31,7 +32,5 @@ public interface SyncedComponent extends Component {
 
     void syncWith(ServerPlayerEntity player);
 
-    void writeToPacket(PacketByteBuf buf);
-
-    void readFromPacket(PacketByteBuf buf);
+    void processPacket(PacketContext ctx, PacketByteBuf buf);
 }
