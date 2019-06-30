@@ -35,6 +35,7 @@ dependencies {
 
     modApi "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-networking:${fabric_networking_version}"
     // used by the test mod
     modRuntime "net.fabricmc.fabric-api:fabric-resource-loader:${fabric_resource_loader_version}"
 
