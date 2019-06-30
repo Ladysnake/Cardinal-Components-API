@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.api.util.component;
 
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.Objects;
@@ -30,7 +31,7 @@ import java.util.Objects;
 /**
  * A component that stores data in a {@link CompoundTag}.
  */
-public interface NbtStorageComponent extends Component {
+public interface NbtStorageComponent extends Component, CloneableComponent<NbtStorageComponent> {
 
     CompoundTag getData();
 

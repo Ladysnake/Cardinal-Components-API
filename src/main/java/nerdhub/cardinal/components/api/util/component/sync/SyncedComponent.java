@@ -20,18 +20,18 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components;
+package nerdhub.cardinal.components.api.util.component.sync;
 
-import net.fabricmc.loader.api.FabricLoader;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.PacketByteBuf;
 
-public final class CardinalComponents {
-    public static final Logger LOGGER = LogManager.getLogger("cardinal-components");
+public interface SyncedComponent extends Component {
+    void markDirty();
 
-    public static void init() {
-        if (FabricLoader.getInstance().isModLoaded("fabric-networking")) {
+    void syncWith(ServerPlayerEntity player);
 
-        }
-    }
+    void writeToPacket(PacketByteBuf buf);
+
+    void readFromPacket(PacketByteBuf buf);
 }
