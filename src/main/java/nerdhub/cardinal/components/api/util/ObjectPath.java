@@ -166,7 +166,7 @@ public interface ObjectPath<T, R> extends Function<T, R> {
      * and then performs the {@code after} operation
      * @throws NullPointerException if {@code after} is null
      */
-    default Consumer<T> andThen(Consumer<? super R> after) {
+    default Consumer<T> andThenDo(Consumer<? super R> after) {
         Objects.requireNonNull(after);
         return (T t) -> {
             R r = this.apply(t);
@@ -191,7 +191,7 @@ public interface ObjectPath<T, R> extends Function<T, R> {
      * function and then evaluates the {@code after} predicate
      * @throws NullPointerException if {@code after} is null
      */
-    default Predicate<T> andThen(Predicate<? super R> after) {
+    default Predicate<T> andThenTest(Predicate<? super R> after) {
         Objects.requireNonNull(after);
         return (T t) -> {
             R r = this.apply(t);
