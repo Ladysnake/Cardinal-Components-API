@@ -24,6 +24,7 @@ package nerdhub.cardinal.components.internal;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import net.fabricmc.fabric.api.event.Event;
@@ -40,7 +41,7 @@ public final class CardinalEventsInternals {
 
     public static final Event<ItemComponentCallback> WILDCARD_ITEM_EVENT = createItemComponentsEvent();
     private static final Map<Class<? extends Entity>, Event> ENTITY_EVENTS = new HashMap<>();
-    private static final Map<Class<? extends Entity>, FeedbackContainerFactory<Entity>> ENTITY_CONTAINER_FACTORIES = new HashMap<>();
+    private static final Map<Class<? extends Entity>, FeedbackContainerFactory<Entity, Component>> ENTITY_CONTAINER_FACTORIES = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     public static <T extends Entity> Event<EntityComponentCallback<T>> event(Class<T> clazz) {
@@ -65,7 +66,7 @@ public final class CardinalEventsInternals {
      * and every superclass, in order from least specific (Entity) to most specific ({@code clazz}).
      */
     @SuppressWarnings("unchecked")
-    public static FeedbackContainerFactory<Entity> getEntityContainerFactory(Class<? extends Entity> clazz) {
+    public static FeedbackContainerFactory<Entity, Component> getEntityContainerFactory(Class<? extends Entity> clazz) {
         return ENTITY_CONTAINER_FACTORIES.computeIfAbsent(clazz, cl -> {
             List<Event<EntityComponentCallback<? extends Entity>>> events = new ArrayList<>();
             Class c = clazz;

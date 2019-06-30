@@ -47,7 +47,6 @@ public interface TestComponent extends Component {
             return tag;
         }
 
-        @Override
         public Component newInstance() {
             return new Impl(i);
         }

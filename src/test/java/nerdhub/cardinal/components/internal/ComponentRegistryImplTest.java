@@ -71,7 +71,6 @@ class ComponentRegistryImplTest {
         @Override
         public CompoundTag toTag(CompoundTag tag) { throw new UnsupportedOperationException(); }
 
-        @Override
         public Component newInstance() { throw new UnsupportedOperationException(); }
     }
 

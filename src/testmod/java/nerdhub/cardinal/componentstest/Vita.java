@@ -23,6 +23,7 @@
 package nerdhub.cardinal.componentstest;
 
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -40,7 +41,7 @@ public interface Vita extends Component {
     }
 }
 
-class BaseVita implements Vita {
+class BaseVita implements Vita, CloneableComponent<BaseVita> {
     protected int vitality;
 
     @Override
@@ -64,17 +65,15 @@ class BaseVita implements Vita {
         return tag;
     }
 
-    @Override
-    public Component newInstance() {
+    public BaseVita newInstance() {
         return new BaseVita();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        BaseVita baseVita = (BaseVita) o;
-        return vitality == baseVita.vitality;
+        if (!(o instanceof Vita)) return false;
+        return vitality == ((Vita) o).getVitality();
     }
 
     @Override

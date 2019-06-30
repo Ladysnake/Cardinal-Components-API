@@ -51,7 +51,7 @@ import java.util.function.BiConsumer;
  * execution for all read operations. They may be faster than their {@link FastComponentContainer}
  * counterparts.
  */
-public final class IndexedComponentContainer extends AbstractComponentContainer {
+public final class IndexedComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
     /**
      * All of the component types that can be stored in this container.
      * (Cached for performance.)
@@ -79,8 +79,8 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
      * This operation will not copy the content of the container.
      * This method can be useful to create pre-sized containers from an existing model.
      */
-    public static IndexedComponentContainer withSettingsFrom(IndexedComponentContainer other) {
-        IndexedComponentContainer ret = new IndexedComponentContainer();
+    public static <C extends Component> IndexedComponentContainer<C> withSettingsFrom(IndexedComponentContainer<C> other) {
+        IndexedComponentContainer<C> ret = new IndexedComponentContainer<>();
         ret.universeSize = other.universeSize;
         ret.keyUniverse = other.keyUniverse;
         ret.vals = new Component[other.universeSize];
@@ -121,11 +121,12 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
         return index >= 0 && index < vals.length && vals[index] != null;
     }
 
+    @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public Component get(@Nullable Object key) {
+    public C get(@Nullable Object key) {
         if (key != null && key.getClass() == ComponentType.class) {
-            return get((ComponentType<?>) key);
+            return (C) get((ComponentType<?>) key);
         }
         return null;
     }
@@ -147,7 +148,7 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
      */
     @Nullable
     @Override
-    public Component put(ComponentType<?> key, Component value) {
+    public C put(ComponentType<?> key, C value) {
         Preconditions.checkNotNull(key);
         Preconditions.checkNotNull(value);
         Preconditions.checkArgument(key.getComponentClass().isInstance(value), value + " is not of type " + key);
@@ -171,7 +172,7 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
             this.universeSize = newUniverseSize;
             index = rawId - this.minIndex; // compute index again since min index changed
         }
-        Component oldValue = key.getComponentClass().cast(vals[index]);
+        @SuppressWarnings("unchecked") C oldValue = (C) vals[index];
         vals[index] = value;
         assert vals[0] != null && vals[universeSize-1] != null;
         if (oldValue == null) {
@@ -181,10 +182,10 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
     }
 
     @Override
-    public void forEach(BiConsumer<? super ComponentType<?>, ? super Component> action) {
+    public void forEach(BiConsumer<? super ComponentType<?>, ? super C> action) {
         Component[] vals = this.vals;
         for (int i = 0; i < vals.length; i++) {
-            Component val = vals[i];
+            @SuppressWarnings("unchecked") C val = (C) vals[i];
             if (val != null) {
                 action.accept(keyUniverse[i], val);
             }
@@ -207,9 +208,9 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
      * view the first time this view is requested.  The view is stateless,
      * so there's no reason to create more than one.
      */
-    private Set<Map.Entry<ComponentType<?>, Component>> entrySet;
+    private Set<Map.Entry<ComponentType<?>, C>> entrySet;
     private Set<ComponentType<?>> keySet;
-    private Collection<Component> values;
+    private Collection<C> values;
 
     /**
      * Returns a {@link Set} view of the keys contained in this map.
@@ -238,8 +239,8 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
      * @return a collection view of the values contained in this map
      */
     @Override
-    public Collection<Component> values() {
-        Collection<Component> vs = values;
+    public Collection<C> values() {
+        Collection<C> vs = values;
         if (vs != null) {
             return vs;
         }
@@ -255,16 +256,16 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
      *
      * @return a set view of the mappings contained in this container
      */
-    public Set<Map.Entry<ComponentType<?>, Component>> entrySet() {
-        Set<Map.Entry<ComponentType<?>,Component>> es = entrySet;
+    public Set<Map.Entry<ComponentType<?>, C>> entrySet() {
+        Set<Map.Entry<ComponentType<?>,C>> es = entrySet;
         if (es != null) {
             return es;
         }
         return entrySet = new EntrySet();
     }
 
-    private class EntrySet extends AbstractSet<Map.Entry<ComponentType<?>,Component>> {
-        public Iterator<Map.Entry<ComponentType<?>,Component>> iterator() {
+    private class EntrySet extends AbstractSet<Map.Entry<ComponentType<?>,C>> {
+        public Iterator<Map.Entry<ComponentType<?>, C>> iterator() {
             return new EntryIterator();
         }
 
@@ -301,8 +302,8 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
         }
     }
 
-    private class Values extends AbstractCollection<Component> {
-        public Iterator<Component> iterator() {
+    private class Values extends AbstractCollection<C> {
+        public Iterator<C> iterator() {
             return new ValueIterator();
         }
         public int size() {
@@ -339,21 +340,22 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
         }
     }
 
-    private class ValueIterator extends ComponentContainerIterator<Component> {
-        public Component next() {
+    private class ValueIterator extends ComponentContainerIterator<C> {
+        @SuppressWarnings("unchecked")
+        public C next() {
             if (!hasNext()) throw new NoSuchElementException();
-            return vals[index++];
+            return (C) vals[index++];
         }
     }
 
-    private class EntryIterator extends ComponentContainerIterator<Entry<ComponentType<?>, Component>> {
+    private class EntryIterator extends ComponentContainerIterator<Entry<ComponentType<?>, C>> {
         public Entry next() {
             if (!hasNext()) throw new NoSuchElementException();
             return new Entry(index++);
         }
 
 
-        private class Entry implements Map.Entry<ComponentType<?>, Component> {
+        private class Entry implements Map.Entry<ComponentType<?>, C> {
             private int index;
 
             private Entry(int index) {
@@ -364,12 +366,13 @@ public final class IndexedComponentContainer extends AbstractComponentContainer 
                 return keyUniverse[index];
             }
 
-            public Component getValue() {
-                return vals[index];
+            @SuppressWarnings("unchecked")
+            public C getValue() {
+                return (C) vals[index];
             }
 
             @Nullable
-            public Component setValue(Component value) {
+            public C setValue(C value) {
                 return IndexedComponentContainer.this.put(getKey(), value);
             }
 

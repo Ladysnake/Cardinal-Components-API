@@ -34,7 +34,7 @@ public interface NbtStorageComponent extends Component {
 
     CompoundTag getData();
 
-    final class Impl implements NbtStorageComponent {
+    class Impl implements NbtStorageComponent {
         private CompoundTag data = new CompoundTag();
 
         @Override

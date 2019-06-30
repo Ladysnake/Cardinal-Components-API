@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.api.event;
 
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 
 /**
@@ -29,6 +30,6 @@ import nerdhub.cardinal.components.api.component.ComponentContainer;
  * @see ItemComponentCallback
  */
 @FunctionalInterface
-public interface ComponentCallback<T> {
-    void initComponents(T object, ComponentContainer components);
+public interface ComponentCallback<T, C extends Component> {
+    void initComponents(T object, ComponentContainer<C> components);
 }

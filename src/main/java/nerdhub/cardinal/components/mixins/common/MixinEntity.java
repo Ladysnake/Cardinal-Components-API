@@ -44,7 +44,7 @@ import java.util.Set;
 @Mixin(Entity.class)
 public abstract class MixinEntity implements ComponentProvider {
 
-    private ComponentContainer components;
+    private ComponentContainer<?> components;
 
     @Shadow
     public abstract EntityType<?> getType();

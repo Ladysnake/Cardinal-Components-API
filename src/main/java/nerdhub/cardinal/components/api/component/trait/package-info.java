@@ -20,45 +20,13 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.component;
-
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
-import net.minecraft.nbt.CompoundTag;
-
 /**
- * A component that has no inherent properties and is only used to indicate the existence
- * of a property on an object.
+ * Special component traits
  */
-public interface MarkerComponent extends Component, CloneableComponent<MarkerComponent> {
-    MarkerComponent INSTANCE = new Impl();
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package nerdhub.cardinal.components.api.component.trait;
 
-    /**
-     * Marker components are all equal to each other.
-     */
-    @Override
-    boolean isComponentEqual(Component other);
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-    final class Impl implements MarkerComponent {
-
-        @Override
-        public void fromTag(CompoundTag tag) {
-            // NO-OP
-        }
-
-        @Override
-        public CompoundTag toTag(CompoundTag tag) {
-            return tag;
-        }
-
-        @Override
-        public MarkerComponent newInstance() {
-            return INSTANCE;
-        }
-
-        @Override
-        public boolean isComponentEqual(Component other) {
-            return other instanceof MarkerComponent;
-        }
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;

@@ -31,11 +31,21 @@ import java.util.Map;
 
 /**
  * A container for components.
+ *
+ * <p> Component values obey 2 constraints.
+ * <ul>
+ *     <li>Every component in a {@code ComponentContainer<C>} is an instance of {@code C}</li>
+ *     <li>A component mapped to a {@code ComponentType<T>} is also an instance of {@code T}</li>
+ * </ul>
+ * Both type constraints should generally be interfaces, to allow multiple inheritance.<br><br>
+ *
  * <p> A {@code ComponentContainer} cannot have its components removed.
  * Components can be added or replaced, but removal of existing component types
  * is unsupported. This guarantees consistent behaviour for consumers.
+ *
+ * @param <C> The upper bound for components stored in this container
  */
-public interface ComponentContainer extends Map<ComponentType<?>, Component>, NbtSerializable {
+public interface ComponentContainer<C extends Component> extends Map<ComponentType<?>, C>, NbtSerializable {
 
     /**
      * Returns <tt>true</tt> if this container contains a component associated with
@@ -83,10 +93,10 @@ public interface ComponentContainer extends Map<ComponentType<?>, Component>, Nb
      */
     @Nullable
     @Override
-    Component put(@Nonnull ComponentType<?> key, @Nonnull Component value);
+    C put(@Nonnull ComponentType<?> key, @Nonnull C value);
 
     @Deprecated
-    @Override default Component remove(Object key) {
+    @Override default C remove(Object key) {
         throw new UnsupportedOperationException();
     }
 }

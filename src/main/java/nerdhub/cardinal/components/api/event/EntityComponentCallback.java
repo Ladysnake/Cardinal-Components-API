@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.api.event;
 
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.internal.CardinalEventsInternals;
 import net.fabricmc.fabric.api.event.Event;
@@ -43,7 +44,7 @@ import net.minecraft.entity.Entity;
  * @param <E> the type of entity targeted by this callback
  */
 @FunctionalInterface
-public interface EntityComponentCallback<E extends Entity> extends ComponentCallback<E> {
+public interface EntityComponentCallback<E extends Entity> extends ComponentCallback<E, Component> {
 
     /**
      * Returns the {@code Event} used to register component callbacks for
@@ -81,5 +82,5 @@ public interface EntityComponentCallback<E extends Entity> extends ComponentCall
      * should be considered for components that are costly to initialize.
      */
     @Override
-    void initComponents(E entity, ComponentContainer components);
+    void initComponents(E entity, ComponentContainer<Component> components);
 }

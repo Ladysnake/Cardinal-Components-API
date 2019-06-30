@@ -26,7 +26,6 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 
 import java.util.Set;
 
@@ -60,12 +59,6 @@ public final class Components {
             return true;
         }
         return false;
-    }
-
-    public static Component copyOf(Component toCopy) {
-        Component ret = toCopy.newInstance();
-        ret.fromTag(toCopy.toTag(new CompoundTag()));
-        return ret;
     }
 
 }
