@@ -20,30 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package nerdhub.cardinal.componentstest.vita;
 
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.componentstest.vita.EntityVita;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.world.World;
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-public class VitalityZombieEntity extends ZombieEntity {
-    public VitalityZombieEntity(EntityType<? extends ZombieEntity> type, World world) {
-        super(type, world);
-    }
-
-    @Override
-    public void tickMovement() {
-        super.tickMovement();
-        if (this.world.isClient) {
-            this.world.addParticle(ParticleTypes.DRAGON_BREATH, this.x, this.y + 0.3D, this.z, this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D);
-        }
-    }
-
-    protected void initComponents(ComponentContainer<Component> components) {
-        components.put(CardinalComponentsTest.VITA, new EntityVita(this, 20));
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;
