@@ -63,7 +63,7 @@ public final class EmptyComponentProvider implements ComponentProvider {
      * {@inheritDoc}
      * @return an empty set representing this provider's supported component types
      */
-    public Set<ComponentType<? extends Component>> getComponentTypes() {
+    public Set<ComponentType<?>> getComponentTypes() {
         return Collections.emptySet();
     }
 
