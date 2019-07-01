@@ -170,7 +170,7 @@ public interface ObjectPath<T, R> extends Function<T, R> {
         Objects.requireNonNull(after);
         return (T t) -> {
             R r = this.apply(t);
-            if (t != null) {
+            if (r != null) {
                 after.accept(r);
             }
         };

@@ -40,7 +40,9 @@ public interface EntitySyncedComponent extends SyncedComponent, TypeAwareCompone
 
     @Override
     default void markDirty() {
-        PlayerStream.watching(this.getEntity()).map(ServerPlayerEntity.class::cast).forEach(this::syncWith);
+        if (!this.getEntity().world.isClient) {
+            PlayerStream.watching(this.getEntity()).map(ServerPlayerEntity.class::cast).forEach(this::syncWith);
+        }
     }
 
     @Override
