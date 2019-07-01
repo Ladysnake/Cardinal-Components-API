@@ -34,10 +34,6 @@ class RandomIntComponent implements IntComponent {
     @Override public int getValue() { return this.value; }
     @Override public void fromTag(CompoundTag tag) { this.value = tag.getInt("value"); }
     @Override public CompoundTag toTag(CompoundTag tag) { tag.putInt("value", this.value); }
-    @Override public IntComponent newInstance() { return new RandomIntComponent(); }
-    @Override public boolean isComponentEqual(Component other) {
-        return other instanceof IntComponent && this.value == ((IntComponent)other).value;
-    }
 }
 ```
 All that is left is to actually use that component.
@@ -46,7 +42,7 @@ Components are provided by various objects through the `ComponentProvider` inter
 To interact with those, you need to register your component type, using `ComponentRegistry.registerIfAbsent`;
 the resulting `ComponentType` instance is used as a key for component providers.
 ```java
-    public static final ComponentType<IntComponent> TYPE = ComponentRegistry.registerIfAbsent(new Identifier("mymod:int"), IntComponent.class);
+public static final ComponentType<IntComponent> INT_TYPE = ComponentRegistry.registerIfAbsent(new Identifier("mymod:int"), IntComponent.class);
 ```
 
 Cardinal Components API offers component provider implementations for a few vanilla types:
@@ -54,17 +50,29 @@ Cardinal Components API offers component provider implementations for a few vani
 ### Entities
 
 Components can be added to entities of any type (modded or vanilla) by registering an `EntityComponentCallback`.
-Entity components are saved automatically with the entity, but synchronization is manual.
+Entity components are saved automatically with the entity. Synchronization must be done either manually or with
+help of the `SyncedComponent` and `EntitySyncedComponent` interfaces.
+
+**Example:**
+```java
+EntityComponentCallback.EVENT.register(PlayerEntity.class, (player, components) -> components.put(INT_TYPE, new RandomIntComponent()));
+```
 
 ### Item Stacks
 
 Components can be added to stacks of any item (modded or vanilla) by registering an `ItemComponentCallback`.
 Item stack components are saved and synchronized automatically.
 
-**Changes to Vanilla**
+**Notes:**
 - `ItemStack` equality: stack equality methods `areTagsEqual` and `isEqualIgnoreDamage` check component equality.
 If you have issues when attaching components to item stacks, it usually means you forgot to implement a proper
 `equals` check on your component.
+- Empty `ItemStack`: empty item stacks never expose any components, no matter what was originally attached to them.
+
+**Example:**
+```java
+ItemComponentCallback.EVENT.register(Items.DIAMOND_PICKAXE, (stack, components) -> components.put(INT_TYPE, new RandomIntComponent()));
+```
 
 ### Blocks
 
@@ -75,6 +83,11 @@ implement `BlockComponentProvider` if the block already has a custom implementat
 slightly less convenient to provide as they require their own implementations, but several utility classes
 are available to help.
 
+Components are entirely compatible with [LibBlockAttributes](https://github.com/AlexIIL/LibBlockAttributes)' attributes.
+Since `Component` is an interface, any attribute instance can easily implement it. Conversely, making an `Attribute`
+for an existing `Component` is as simple as calling `Attributes.create(MyComponent.class)`.
+
 
 ## Example Mod
 An example mod for the API is available in this repository, under `src/testmod`.
+Its code is detailed in a secondary [readme](https://github.com/Pyrofab/Cardinal-Components-API/blob/sync/src/testmod/readme.md).
