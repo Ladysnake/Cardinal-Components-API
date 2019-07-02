@@ -25,8 +25,11 @@ package nerdhub.cardinal.componentstest;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
+import nerdhub.cardinal.componentstest.vita.BaseVita;
+import nerdhub.cardinal.componentstest.vita.Vita;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -70,6 +73,10 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> lines, TooltipContext ctx) {
         super.appendTooltip(stack, world, lines, ctx);
         lines.add(new TranslatableText("componenttest:tooltip.vitality", CardinalComponentsTest.VITA.get(stack).getVitality()));
+        PlayerEntity holder = MinecraftClient.getInstance().player;
+        if (holder != null) {
+            lines.add(new TranslatableText("componenttest:tooltip.self_vitality", CardinalComponentsTest.VITA.get(holder).getVitality()));
+        }
     }
 
     @Override

@@ -24,6 +24,7 @@ package nerdhub.cardinal.componentstest;
 
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.componentstest.vita.EntityVita;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.particle.ParticleTypes;

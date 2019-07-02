@@ -76,7 +76,7 @@ public class FallBackComponentProvider implements ComponentProvider {
      * @return an unmodifiable view of the component types of both backing providers
      */
     @Override
-    public Set<ComponentType<? extends Component>> getComponentTypes() {
+    public Set<ComponentType<?>> getComponentTypes() {
         return Sets.union(main.getComponentTypes(), fallback.getComponentTypes());
     }
 }

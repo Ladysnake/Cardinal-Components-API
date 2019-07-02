@@ -20,12 +20,29 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.component;
+package nerdhub.cardinal.componentstest.vita;
 
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 
-public interface ItemComponent extends Component, CloneableComponent<ItemComponent> {
+public class EntityVita extends BaseVita {
+    protected LivingEntity owner;
+
+    public EntityVita(LivingEntity owner, int baseVitality) {
+        this.owner = owner;
+        this.vitality = baseVitality;
+    }
+
     @Override
-    boolean isComponentEqual(Component other);
+    public void setVitality(int value) {
+        super.setVitality(value);
+        if (!this.owner.world.isClient) {
+            if (this.getVitality() == 0) {
+                owner.addPotionEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
+            } else if (this.getVitality() > 10) {
+                owner.addPotionEffect(new StatusEffectInstance(StatusEffects.SPEED, 1000));
+            }
+        }
+    }
 }

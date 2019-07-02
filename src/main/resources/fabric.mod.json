@@ -6,11 +6,19 @@
     "description": "dynamically exposing components",
     "version": "${version}",
     "side": "universal",
+    "entrypoints": {
+        "main": [
+            "nerdhub.cardinal.components.CardinalComponents::init"
+        ]
+    },
     "custom": {
         "modmenu:api": true
     },
     "depends": {
         "fabric-api-base": "*"
+    },
+    "recommends": {
+        "fabric-networking": "*"
     },
     "authors": [
         {
