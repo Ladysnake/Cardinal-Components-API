@@ -20,12 +20,17 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.component;
+package nerdhub.cardinal.components.api.util.component.sync;
 
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.PacketByteBuf;
 
-public interface ItemComponent extends Component, CloneableComponent<ItemComponent> {
-    @Override
-    boolean isComponentEqual(Component other);
+public interface SyncedComponent extends Component {
+    void markDirty();
+
+    void syncWith(ServerPlayerEntity player);
+
+    void processPacket(PacketContext ctx, PacketByteBuf buf);
 }

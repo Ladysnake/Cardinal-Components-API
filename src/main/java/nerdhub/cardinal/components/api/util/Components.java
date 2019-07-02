@@ -28,6 +28,7 @@ import nerdhub.cardinal.components.api.component.ComponentProvider;
 import net.minecraft.item.ItemStack;
 
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 public final class Components {
     private Components() { throw new AssertionError(); }
@@ -59,6 +60,12 @@ public final class Components {
             return true;
         }
         return false;
+    }
+
+    public static void forEach(ComponentProvider provider, BiConsumer<ComponentType<?>, Component> op) {
+        for (ComponentType<?> type : provider.getComponentTypes()) {
+            op.accept(type, type.get(provider));
+        }
     }
 
 }

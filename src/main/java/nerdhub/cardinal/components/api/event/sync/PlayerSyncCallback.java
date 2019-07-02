@@ -20,12 +20,22 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.component;
+package nerdhub.cardinal.components.api.event.sync;
 
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.server.network.ServerPlayerEntity;
 
-public interface ItemComponent extends Component, CloneableComponent<ItemComponent> {
-    @Override
-    boolean isComponentEqual(Component other);
+/**
+ * Called when a player joins the server or changes dimension, can be used to synchronize the player's own data
+ */
+@FunctionalInterface
+public interface PlayerSyncCallback {
+    Event<PlayerSyncCallback> EVENT = EventFactory.createArrayBacked(PlayerSyncCallback.class, (p) -> {}, listeners -> (player) -> {
+        for (PlayerSyncCallback callback : listeners) {
+            callback.onPlayerSync(player);
+        }
+    });
+
+    void onPlayerSync(ServerPlayerEntity player);
 }

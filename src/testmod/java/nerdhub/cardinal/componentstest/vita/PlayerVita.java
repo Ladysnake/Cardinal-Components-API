@@ -20,52 +20,46 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.component.provider;
+package nerdhub.cardinal.componentstest.vita;
 
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
+import nerdhub.cardinal.components.api.util.component.sync.EntitySyncedComponent;
+import nerdhub.cardinal.componentstest.CardinalComponentsTest;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
- * A provider that never exposes any component
+ * A Vita component attached to players, and automatically synchronized with their owner
  */
-public final class EmptyComponentProvider implements ComponentProvider {
-    private static final ComponentProvider EMPTY_PROVIDER = new EmptyComponentProvider();
+public class PlayerVita extends EntityVita implements EntitySyncedComponent {
 
-    public static ComponentProvider instance() {
-        return EMPTY_PROVIDER;
+    public PlayerVita(PlayerEntity owner, int baseVitality) {
+        super(owner, baseVitality);
     }
 
-    /**
-     * {@inheritDoc}
-     * @return {@code false}
-     */
     @Override
-    public boolean hasComponent(ComponentType<?> type) {
-        return false;
+    public void markDirty() {
+        if (!this.getEntity().world.isClient) {
+            // We only sync with the holder, not with everyone around
+            this.syncWith((ServerPlayerEntity) this.getEntity());
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     * @return {@code null}
-     */
-    @Nullable
     @Override
-    public <C extends Component> C getComponent(ComponentType<C> type) {
-        return null;
+    public void setVitality(int value) {
+        super.setVitality(value);
+        this.markDirty();
     }
 
-    /**
-     * {@inheritDoc}
-     * @return an empty set representing this provider's supported component types
-     */
-    public Set<ComponentType<?>> getComponentTypes() {
-        return Collections.emptySet();
+    @Override
+    public LivingEntity getEntity() {
+        return this.owner;
     }
 
-    private EmptyComponentProvider() {}
+    @Override
+    public ComponentType<?> getComponentType() {
+        // Hardcoded but could be passed in the constructor
+        return CardinalComponentsTest.VITA;
+    }
 }

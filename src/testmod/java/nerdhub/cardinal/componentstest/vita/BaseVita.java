@@ -20,28 +20,12 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest;
+package nerdhub.cardinal.componentstest.vita;
 
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.CompoundTag;
 
-public interface Vita extends Component {
-    int getVitality();
-    void setVitality(int value);
-    default int transferTo(Vita dest, int amount) {
-        int sourceVitality = this.getVitality();
-        int actualAmount = Math.min(sourceVitality, amount);
-        this.setVitality(sourceVitality - actualAmount);
-        dest.setVitality(dest.getVitality() + actualAmount);
-        return amount - actualAmount;
-    }
-}
-
-class BaseVita implements Vita, CloneableComponent<BaseVita> {
+public class BaseVita implements Vita, CloneableComponent<BaseVita> {
     protected int vitality;
 
     @Override
@@ -79,24 +63,5 @@ class BaseVita implements Vita, CloneableComponent<BaseVita> {
     @Override
     public int hashCode() {
         return Integer.hashCode(vitality);
-    }
-}
-
-class EntityVita extends BaseVita {
-    private LivingEntity owner;
-
-    public EntityVita(LivingEntity owner, int baseVitality) {
-        this.owner = owner;
-        this.vitality = baseVitality;
-    }
-
-    @Override
-    public void setVitality(int value) {
-        super.setVitality(value);
-        if (this.getVitality() == 0) {
-            owner.addPotionEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
-        } else if (this.getVitality() > 10) {
-            owner.addPotionEffect(new StatusEffectInstance(StatusEffects.SPEED, 1000));
-        }
     }
 }

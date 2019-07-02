@@ -8,7 +8,9 @@
         "common.MixinEntity",
         "common.MixinItem",
         "common.MixinItemStack",
-        "common.MixinPacketByteBuf"
+        "common.MixinPacketByteBuf",
+        "common.sync.MixinPlayerManager",
+        "common.sync.MixinServerPlayerEntity"
     ],
     "injectors": {
         "defaultRequire": 1

@@ -20,12 +20,18 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.component;
+package nerdhub.cardinal.componentstest.vita;
 
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
 
-public interface ItemComponent extends Component, CloneableComponent<ItemComponent> {
-    @Override
-    boolean isComponentEqual(Component other);
+public interface Vita extends Component {
+    int getVitality();
+    void setVitality(int value);
+    default void transferTo(Vita dest, int amount) {
+        int sourceVitality = this.getVitality();
+        int actualAmount = Math.min(sourceVitality, amount);
+        this.setVitality(sourceVitality - actualAmount);
+        dest.setVitality(dest.getVitality() + actualAmount);
+    }
 }
+
