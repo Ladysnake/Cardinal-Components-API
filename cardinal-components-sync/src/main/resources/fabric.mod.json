@@ -1,13 +1,26 @@
 {
     "schemaVersion": 1,
     "environment": "*",
-    "id": "cardinal-components",
+    "id": "cardinal-components-sync",
     "name": "Cardinal Components API",
     "description": "dynamically exposing components",
     "version": "${version}",
     "side": "universal",
+    "entrypoints": {
+        "main": [
+            "nerdhub.cardinal.components.ComponentsNetworking::init"
+        ]
+    },
     "custom": {
-        "modmenu:api": true
+        "modmenu:api": true,
+        "modmenu:parent": "cardinal-components"
+    },
+    "depends": {
+        "fabric-api-base": "*",
+        "cardinal-components-base": "*"
+    },
+    "recommends": {
+        "fabric-networking": "*"
     },
     "authors": [
         {
@@ -22,5 +35,11 @@
         "issues": "https://github.com/NerdHubMC/Cardinal-Components-API/issues",
         "sources": "https://github.com/NerdHubMC/Cardinal-Components-API"
     },
-    "license": "MIT"
+    "license": "MIT",
+    "mixins": [
+        {
+            "environment": "*",
+            "config": "mixins.cardinal_components_sync.json"
+        }
+    ]
 }
