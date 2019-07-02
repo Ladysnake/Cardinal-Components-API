@@ -8,11 +8,88 @@ plugins {
     id "maven-publish"
 }
 
-sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
-
 group = "com.github.NerdHubMC"
 archivesBaseName = "Cardinal-Components-API"
-version = System.getenv("TRAVIS_TAG") ?: project.mod_version
+
+subprojects {
+    apply plugin: 'fabric-loom'
+    apply plugin: 'net.minecrell.licenser'
+    apply plugin: 'com.matthewprenger.cursegradle'
+    apply plugin: 'maven-publish'
+
+    archivesBaseName = "${rootProject.archivesBaseName}-${project.name.toLowerCase(Locale.ROOT)}"
+    group = "${rootProject.group}.${rootProject.archivesBaseName}"
+}
+
+allprojects {
+
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+    version = System.getenv("TRAVIS_TAG") ?: rootProject.mod_version
+
+    repositories {
+        maven {
+            name = "FabricMC"
+            url = "https://maven.fabricmc.net"
+        }
+    }
+
+    dependencies {
+        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+        mappings "net.fabricmc:yarn:${rootProject.minecraft_version}+build.${rootProject.yarn_mappings}"
+        modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+
+        modApi "net.fabricmc.fabric-api:fabric-api-base:${rootProject.fabric_base_version}"
+        modImplementation "net.fabricmc.fabric-api:fabric-networking:${fabric_networking_version}"
+        // used by the test mod
+        modRuntime "net.fabricmc.fabric-api:fabric-resource-loader:${fabric_resource_loader_version}"
+
+        testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.0-M1"
+        testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
+    }
+
+    configurations {
+        dev
+    }
+
+    apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/basic_project.gradle"
+
+    processResources {
+        // this will ensure that this task is redone when there"s a change
+        inputs.property "version", project.version
+
+        // replace stuff in fabric.mod.json, nothing else
+        from(sourceSets.main.resources.srcDirs) {
+            include "fabric.mod.json"
+
+            // add mod metadata
+            expand "version": project.version
+        }
+
+        // copy everything else, that"s not the fabric.mod.json
+        from(sourceSets.main.resources.srcDirs) {
+            exclude "fabric.mod.json"
+        }
+    }
+
+    license {
+        header = rootProject.file("code_quality/${project.license_header}_HEADER.txt")
+        include "**/*.java"
+        charset = StandardCharsets.UTF_8.name()
+
+        style {
+            java = "BLOCK_COMMENT"
+        }
+        newLine = false // Disables the empty line between the header and package name
+        //ignoreFailures = true //Ignore failures and only print a warning on license violations
+
+        //export variables
+        ext {
+            year = Year.now()
+            projectDisplayName = rootProject.archivesBaseName
+        }
+    }
+}
 
 sourceSets {
     testmod {
@@ -21,97 +98,17 @@ sourceSets {
     }
 }
 
-repositories {
-    maven {
-        name = "FabricMC"
-        url = "https://maven.fabricmc.net"
-    }
-}
+task licenseFormatAll
+subprojects { p -> licenseFormatAll.dependsOn("${p.path}:licenseFormat") }
+subprojects.each { remapJar.dependsOn("${it.path}:remapJar") }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings "net.fabricmc:yarn:${minecraft_version}+build.${yarn_mappings}"
-    modImplementation "net.fabricmc:fabric-loader:${loader_version}"
-
-    modApi "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-networking:${fabric_networking_version}"
-    // used by the test mod
-    modRuntime "net.fabricmc.fabric-api:fabric-resource-loader:${fabric_resource_loader_version}"
-
+    afterEvaluate {
+        subprojects.each {
+            compile project(":${it.name}")
+            include project("${it.name}:")
+        }
+    }
     testmodImplementation sourceSets.main.output
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.0-M1"
-    testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
-}
-
-jar {
-    exclude "nerdhub/cardinal/components/testmod/**"
-}
-
-//task apiJar(type: Jar, dependsOn: classes) {
-//    onlyIf {
-//        project.hasProperty("api_package")
-//    }
-//    from(sourceSets.main.allJava) {
-//        include String.valueOf(findProperty("api_package")).replace('.', '/') + "/**"
-//    }
-//    from "LICENSE.md"
-//    manifest.mainAttributes(
-//            "Implementation-Title": project.archivesBaseName + "-api",
-//            "Implementation-Version": project.version,
-//            "Maven-Artifact": "${project.group}:${project.name}:${project.version}:api".toLowerCase(Locale.ROOT),
-//            "Built-On-Minecraft": project.minecraft_version,
-//            "Built-On-Java": "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})"
-//    )
-//    classifier = "api"
-//}
-
-//task remapApiJar(type: RemapJar, dependsOn: apiJar) {
-//    onlyIf {
-//        project.hasProperty("api_package")
-//    }
-//    jar = apiJar.archiveFile.get().asFile
-//}
-//
-//if (project.hasProperty("api_package")) {
-//    tasks.jar.dependsOn project.tasks.getByName("apiJar")
-//}
-
-apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/basic_project.gradle"
-
-processResources {
-    // this will ensure that this task is redone when there"s a change
-    inputs.property "version", project.version
-
-    // replace stuff in fabric.mod.json, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include "fabric.mod.json"
-
-        // add mod metadata
-        expand "version": project.version
-    }
-
-    // copy everything else, that"s not the fabric.mod.json
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "fabric.mod.json"
-    }
-}
-
-license {
-    header = file("code_quality/${project.license_header}_HEADER.txt")
-    include "**/*.java"
-    charset = StandardCharsets.UTF_8.name()
-
-    style {
-        java = "BLOCK_COMMENT"
-    }
-    newLine = false // Disables the empty line between the header and package name
-    //ignoreFailures = true //Ignore failures and only print a warning on license violations
-
-    //export variables
-    ext {
-        year = Year.now()
-        projectDisplayName = project.archivesBaseName
-    }
 }
