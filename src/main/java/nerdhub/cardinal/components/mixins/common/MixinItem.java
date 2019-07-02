@@ -23,7 +23,7 @@
 package nerdhub.cardinal.components.mixins.common;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import nerdhub.cardinal.components.internal.CardinalEventsInternals;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;

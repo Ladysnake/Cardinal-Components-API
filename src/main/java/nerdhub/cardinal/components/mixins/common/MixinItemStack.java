@@ -26,7 +26,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
 import nerdhub.cardinal.components.api.util.Components;
 import nerdhub.cardinal.components.internal.ItemCaller;
 import nerdhub.cardinal.components.internal.ItemStackAccessor;

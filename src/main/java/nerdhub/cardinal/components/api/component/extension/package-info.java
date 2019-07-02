@@ -25,7 +25,7 @@
  */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.api.component.trait;
+package nerdhub.cardinal.components.api.component.extension;
 
 import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
