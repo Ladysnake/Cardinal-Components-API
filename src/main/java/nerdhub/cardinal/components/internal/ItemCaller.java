@@ -23,7 +23,7 @@
 package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.ItemStack;

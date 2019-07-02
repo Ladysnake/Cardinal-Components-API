@@ -23,7 +23,7 @@
 package nerdhub.cardinal.componentstest;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import nerdhub.cardinal.componentstest.vita.BaseVita;
 import nerdhub.cardinal.componentstest.vita.Vita;

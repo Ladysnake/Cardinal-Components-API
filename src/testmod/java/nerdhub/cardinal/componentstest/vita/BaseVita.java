@@ -22,7 +22,7 @@
  */
 package nerdhub.cardinal.componentstest.vita;
 
-import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
 import net.minecraft.nbt.CompoundTag;
 
 public class BaseVita implements Vita, CloneableComponent<BaseVita> {

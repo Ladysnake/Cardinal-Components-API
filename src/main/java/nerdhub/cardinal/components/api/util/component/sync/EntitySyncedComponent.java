@@ -23,7 +23,7 @@
 package nerdhub.cardinal.components.api.util.component.sync;
 
 import io.netty.buffer.Unpooled;
-import nerdhub.cardinal.components.api.component.trait.TypeAwareComponent;
+import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;

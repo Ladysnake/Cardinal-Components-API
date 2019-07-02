@@ -23,7 +23,7 @@
 package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
 
 public interface ItemStackAccessor {
     ComponentContainer<CloneableComponent<?>> cardinal_getComponentContainer();

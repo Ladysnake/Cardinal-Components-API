@@ -23,7 +23,7 @@
 package nerdhub.cardinal.components.api.util.component;
 
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.trait.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
 import net.minecraft.nbt.CompoundTag;
 
 /**
