@@ -29,6 +29,7 @@ Minimal code example:
 interface IntComponent extends Component {
     int getValue();
 }
+
 class RandomIntComponent implements IntComponent {
     private int value = (int) (Math.random() * 20);
     @Override public int getValue() { return this.value; }
@@ -42,8 +43,9 @@ Components are provided by various objects through the `ComponentProvider` inter
 To interact with those, you need to register your component type, using `ComponentRegistry.registerIfAbsent`;
 the resulting `ComponentType` instance is used as a key for component providers.
 ```java
-public static final ComponentType<IntComponent> INT_TYPE = ComponentRegistry.registerIfAbsent(new Identifier("mymod:int"), IntComponent.class);
+public static final ComponentType<IntComponent> MAGIK = ComponentRegistry.registerIfAbsent(new Identifier("mymod:magik"), IntComponent.class);
 ```
+*Note: a component class can be reused for several component types*
 
 Cardinal Components API offers component provider implementations for a few vanilla types:
 
@@ -55,7 +57,7 @@ help of the `SyncedComponent` and `EntitySyncedComponent` interfaces.
 
 **Example:**
 ```java
-EntityComponentCallback.EVENT.register(PlayerEntity.class, (player, components) -> components.put(INT_TYPE, new RandomIntComponent()));
+EntityComponentCallback.EVENT.register(PlayerEntity.class, (player, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
 
 ### Item Stacks
@@ -71,7 +73,7 @@ If you have issues when attaching components to item stacks, it usually means yo
 
 **Example:**
 ```java
-ItemComponentCallback.EVENT.register(Items.DIAMOND_PICKAXE, (stack, components) -> components.put(INT_TYPE, new RandomIntComponent()));
+ItemComponentCallback.EVENT.register(Items.DIAMOND_PICKAXE, (stack, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
 
 ### Blocks
@@ -90,4 +92,4 @@ for an existing `Component` is as simple as calling `Attributes.create(MyCompone
 
 ## Example Mod
 An example mod for the API is available in this repository, under `src/testmod`.
-Its code is detailed in a secondary [readme](https://github.com/Pyrofab/Cardinal-Components-API/blob/sync/src/testmod/readme.md).
+Its code is outlined in a secondary [readme](https://github.com/Pyrofab/Cardinal-Components-API/blob/sync/src/testmod/readme.md).
