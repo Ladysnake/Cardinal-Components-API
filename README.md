@@ -92,4 +92,4 @@ for an existing `Component` is as simple as calling `Attributes.create(MyCompone
 
 ## Example Mod
 An example mod for the API is available in this repository, under `src/testmod`.
-Its code is outlined in a secondary [readme](https://github.com/Pyrofab/Cardinal-Components-API/blob/sync/src/testmod/readme.md).
+Its code is outlined in a secondary [readme](https://github.com/Pyrofab/Cardinal-Components-API/blob/v2/src/testmod/readme.md).
