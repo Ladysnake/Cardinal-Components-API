@@ -1,0 +1,30 @@
+{
+    "schemaVersion": 1,
+    "environment": "*",
+    "id": "cardinal-components-base",
+    "name": "Cardinal Components API",
+    "description": "dynamically exposing components",
+    "version": "${version}",
+    "side": "universal",
+    "custom": {
+        "modmenu:api": true,
+        "modmenu:parent": "cardinal-components"
+    },
+    "depends": {
+        "fabric-api-base": "*"
+    },
+    "authors": [
+        {
+            "name": "UpcraftLP",
+            "contact": {
+                "homepage": "https://twitter.com/UpcraftLP"
+            }
+        }
+    ],
+    "contact": {
+        "homepage": "https://minecraft.curseforge.com/projects/318449",
+        "issues": "https://github.com/NerdHubMC/Cardinal-Components-API/issues",
+        "sources": "https://github.com/NerdHubMC/Cardinal-Components-API"
+    },
+    "license": "MIT"
+}
