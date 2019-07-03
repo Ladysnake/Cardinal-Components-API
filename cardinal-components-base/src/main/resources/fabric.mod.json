@@ -1,13 +1,17 @@
 {
     "schemaVersion": 1,
     "environment": "*",
-    "id": "cardinal-components",
+    "id": "cardinal-components-base",
     "name": "Cardinal Components API",
     "description": "dynamically exposing components",
     "version": "${version}",
     "side": "universal",
     "custom": {
-        "modmenu:api": true
+        "modmenu:api": true,
+        "modmenu:parent": "cardinal-components"
+    },
+    "depends": {
+        "fabric-api-base": "*"
     },
     "authors": [
         {

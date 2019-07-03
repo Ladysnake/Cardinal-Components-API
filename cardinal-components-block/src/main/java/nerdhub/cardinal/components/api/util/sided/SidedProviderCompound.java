@@ -20,48 +20,18 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest.vita;
+package nerdhub.cardinal.components.api.util.sided;
 
-import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
-import net.minecraft.nbt.CompoundTag;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
+import net.minecraft.util.math.Direction;
 
-public class BaseVita implements Vita, CloneableComponent<BaseVita> {
-    protected int vitality;
+import javax.annotation.Nullable;
 
-    @Override
-    public int getVitality() {
-        return this.vitality;
-    }
+/**
+ * A side-aware component provider.
+ */
+public interface SidedProviderCompound {
 
-    @Override
-    public void setVitality(int value) {
-        this.vitality = value;
-    }
+    ComponentProvider getComponents(@Nullable Direction side);
 
-    @Override
-    public void fromTag(CompoundTag tag) {
-        this.vitality = tag.getInt("vitality");
-    }
-
-    @Override
-    public CompoundTag toTag(CompoundTag tag) {
-        tag.putInt("vitality", this.vitality);
-        return tag;
-    }
-
-    public BaseVita newInstance() {
-        return new BaseVita();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Vita)) return false;
-        return vitality == ((Vita) o).getVitality();
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(vitality);
-    }
 }
