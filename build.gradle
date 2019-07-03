@@ -17,8 +17,10 @@ subprojects {
     apply plugin: 'com.matthewprenger.cursegradle'
     apply plugin: 'maven-publish'
 
-    archivesBaseName = "${rootProject.archivesBaseName}-${project.name.toLowerCase(Locale.ROOT)}"
+    archivesBaseName = project.name
     group = "${rootProject.group}.${rootProject.archivesBaseName}"
+
+    apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/basic_project.gradle"
 }
 
 allprojects {
@@ -47,12 +49,6 @@ allprojects {
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.0-M1"
         testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
     }
-
-    configurations {
-        dev
-    }
-
-    apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/basic_project.gradle"
 
     processResources {
         // this will ensure that this task is redone when there"s a change
@@ -107,8 +103,20 @@ dependencies {
     afterEvaluate {
         subprojects.each {
             compile project(":${it.name}")
-            include project("${it.name}:")
+            include project(":${it.name}")
         }
     }
     testmodImplementation sourceSets.main.output
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifact(remapJar.output) {
+                    builtBy remapJar
+                }
+            }
+        }
+    }
 }
