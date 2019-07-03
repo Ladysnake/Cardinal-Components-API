@@ -1,5 +1,5 @@
 # Cardinal-Components-API
-Fabric Component API for Entity-Component-System code in Minecraft.
+A components API for Fabric that is easy, modular, and fast.
 
 ## Adding the API to your buildscript (loom 0.2.4):
 ```gradle
@@ -44,16 +44,22 @@ To interact with those, you need to register your component type, using `Compone
 the resulting `ComponentType` instance is used as a key for component providers.
 ```java
 public static final ComponentType<IntComponent> MAGIK = ComponentRegistry.registerIfAbsent(new Identifier("mymod:magik"), IntComponent.class);
+
+public static void useMagik(ComponentProvider provider) {
+    int magik = MAGIK.get(provider).getValue();
+    // ...
+}
 ```
 *Note: a component class can be reused for several component types*
 
-Cardinal Components API offers component provider implementations for a few vanilla types:
+Cardinal Components API offers component provider implementations for a few vanilla types, each in its own module:
 
 ### Entities
 
 Components can be added to entities of any type (modded or vanilla) by registering an `EntityComponentCallback`.
 Entity components are saved automatically with the entity. Synchronization must be done either manually or with
-help of the `SyncedComponent` and `EntitySyncedComponent` interfaces.
+help of the [`SyncedComponent`](https://github.com/Pyrofab/Cardinal-Components-API/blob/refactor%2Fmodularization/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`EntitySyncedComponent`](https://github.com/Pyrofab/Cardinal-Components-API/blob/refactor%2Fmodularization/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/util/component/sync/EntitySyncedComponent.java) interfaces.
 
 **Example:**
 ```java
