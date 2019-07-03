@@ -1,0 +1,21 @@
+{
+    "schemaVersion": 1,
+    "environment": "*",
+    "id": "componenttest",
+    "name": "Cardinal Components API Test Mod",
+    "description": "Test mod for Cardinal Components API",
+    "version": "${version}",
+    "side": "universal",
+    "entrypoints": {
+        "main": [
+            "nerdhub.cardinal.componentstest.CardinalComponentsTest::init"
+        ]
+    },
+    "depends": {
+        "fabric-api-base": "*"
+    },
+    "authors": [
+        "Pyrofab"
+    ],
+    "license": "MIT"
+}

@@ -9,3 +9,8 @@ pluginManagement {
     }
 }
 rootProject.name = 'Cardinal-Components-API'
+
+include 'cardinal-components-base'
+include 'cardinal-components-block'
+include 'cardinal-components-entity'
+include 'cardinal-components-item'
