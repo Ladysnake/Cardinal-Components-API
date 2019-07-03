@@ -27,7 +27,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class SharedComponentSecrets {
-    static final AtomicReference<ComponentType<?>[]> registeredComponents = new AtomicReference<>(ComponentType[0]);
+    static final AtomicReference<ComponentType<?>[]> registeredComponents = new AtomicReference<>(new ComponentType<?>[0]);
 
     public static AtomicReference<ComponentType<?>[]> getRegisteredComponents() {
         return registeredComponents;
