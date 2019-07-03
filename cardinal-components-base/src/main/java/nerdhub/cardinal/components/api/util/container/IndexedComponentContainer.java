@@ -26,10 +26,12 @@ import com.google.common.base.Preconditions;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.internal.SharedComponentSecrets;
 
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An efficient container for attached {@link Component components}.
@@ -56,7 +58,7 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
      * All of the component types that can be stored in this container.
      * (Cached for performance.)
      */
-    private ComponentType<?>[] keyUniverse;
+    private final AtomicReference<ComponentType<?>[]> keyUniverse = SharedComponentSecrets.getRegisteredComponents();
 
     private int universeSize;
     private int minIndex;
@@ -82,7 +84,6 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
     public static <C extends Component> IndexedComponentContainer<C> withSettingsFrom(IndexedComponentContainer<C> other) {
         IndexedComponentContainer<C> ret = new IndexedComponentContainer<>();
         ret.universeSize = other.universeSize;
-        ret.keyUniverse = other.keyUniverse;
         ret.vals = new Component[other.universeSize];
         return ret;
     }
@@ -90,7 +91,6 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
     public IndexedComponentContainer() {
         this.universeSize = 0;
         this.minIndex = 0;
-        this.keyUniverse = new ComponentType[0];
         this.size = 0;
         this.vals = new Component[0];
     }
@@ -160,9 +160,8 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
             if (this.universeSize == 0) this.minIndex = rawId;
             int newMinIndex = Math.min(this.minIndex, rawId);
             int newUniverseSize = Math.max(this.universeSize + this.minIndex, rawId+1) - newMinIndex;
-            this.keyUniverse = ComponentRegistry.INSTANCE.stream().skip(newMinIndex).limit(newUniverseSize).toArray(ComponentType[]::new);
 
-            assert keyUniverse.length > this.universeSize : "universe must expand when resized during put operation";
+            assert newUniverseSize > this.universeSize : "universe must expand when resized during put operation";
 
             vals = new Component[newUniverseSize];
             assert this.minIndex >= newMinIndex : "minimum index cannot increase";
@@ -187,7 +186,7 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
         for (int i = 0; i < vals.length; i++) {
             @SuppressWarnings("unchecked") C val = (C) vals[i];
             if (val != null) {
-                action.accept(keyUniverse[i], val);
+                action.accept(this.keyUniverse.get()[this.minIndex + i], val);
             }
         }
     }
@@ -336,7 +335,7 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
         public ComponentType<?> next() {
             if (!hasNext())
                 throw new NoSuchElementException();
-            return keyUniverse[index++];
+            return keyUniverse.get()[minIndex + index++];
         }
     }
 
@@ -363,7 +362,7 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
             }
 
             public ComponentType<?> getKey() {
-                return keyUniverse[index];
+                return keyUniverse.get()[minIndex + index];
             }
 
             @SuppressWarnings("unchecked")
@@ -386,25 +385,19 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
                 Map.Entry<?,?> e = (Map.Entry<?,?>)o;
                 Component ourValue = vals[index];
                 Object hisValue = e.getValue();
-                return (e.getKey() == keyUniverse[index] && Objects.equals(ourValue, hisValue));
+                return (e.getKey() == keyUniverse.get()[minIndex + index] && Objects.equals(ourValue, hisValue));
             }
 
             public int hashCode() {
-                return entryHashCode(index);
+                return (keyUniverse.get()[minIndex + index].hashCode() ^ vals[index].hashCode());
             }
 
             public String toString() {
-                return keyUniverse[index] + "=" + vals[index];
+                return keyUniverse.get()[minIndex + index] + "=" + vals[index];
             }
 
         }
 
     }
-
-    private int entryHashCode(int index) {
-        return (keyUniverse[index].hashCode() ^ vals[index].hashCode());
-    }
-
-
 
 }
