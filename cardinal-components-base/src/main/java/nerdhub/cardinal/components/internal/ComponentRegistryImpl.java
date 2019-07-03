@@ -58,7 +58,7 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
             } else {
                 registered = access.create(componentId, componentClass, nextRawId++);
                 registry.put(componentId, registered);
-                SharedComponentSecrets.registeredComponents = this.registry.values().toArray(new ComponentType[0]);
+                SharedComponentSecrets.registeredComponents.set(this.registry.values().toArray(new ComponentType[0]));
             }
             return registered;
         }

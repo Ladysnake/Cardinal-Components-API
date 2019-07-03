@@ -35,6 +35,7 @@ import nerdhub.cardinal.components.internal.SharedComponentSecrets;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A {@link Component} container with a fast, small-footprint implementation
@@ -54,7 +55,7 @@ public final class FastComponentContainer<C extends Component> extends AbstractC
      * All of the component types that can be stored in this container.
      * (Cached for performance.)
      */
-    private ComponentType<?>[] keyUniverse = SharedComponentSecrets.getRegisteredComponents();
+    private final AtomicReference<ComponentType<?>[]> keyUniverse = SharedComponentSecrets.getRegisteredComponents();
 
     private final Int2ObjectOpenHashMap<C> vals;
 
@@ -107,7 +108,7 @@ public final class FastComponentContainer<C extends Component> extends AbstractC
     @Override
     public void forEach(BiConsumer<? super ComponentType<?>, ? super C> action) {
         this.vals.int2ObjectEntrySet().fastForEach((e) ->
-            action.accept(this.keyUniverse[e.getIntKey()], e.getValue()));
+            action.accept(this.keyUniverse.get()[e.getIntKey()], e.getValue()));
     }
 
     // Views
@@ -249,7 +250,7 @@ public final class FastComponentContainer<C extends Component> extends AbstractC
         }
 
         public ComponentType<?> next() {
-            return keyUniverse[it.nextInt()];
+            return keyUniverse.get()[it.nextInt()];
         }
 
     }
@@ -276,7 +277,7 @@ public final class FastComponentContainer<C extends Component> extends AbstractC
             }
 
             public ComponentType<?> getKey() {
-                return keyUniverse[rawId];
+                return keyUniverse.get()[rawId];
             }
 
             public C getValue() {

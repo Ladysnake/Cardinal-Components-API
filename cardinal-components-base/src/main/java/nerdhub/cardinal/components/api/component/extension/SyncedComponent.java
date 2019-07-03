@@ -20,17 +20,17 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.internal;
+package nerdhub.cardinal.components.api.component.extension;
 
-import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.PacketByteBuf;
 
-import java.util.concurrent.atomic.AtomicReference;
+public interface SyncedComponent extends Component {
+    void markDirty();
 
-public final class SharedComponentSecrets {
-    static final AtomicReference<ComponentType<?>[]> registeredComponents = new AtomicReference<>(ComponentType[0]);
+    void syncWith(ServerPlayerEntity player);
 
-    public static AtomicReference<ComponentType<?>[]> getRegisteredComponents() {
-        return registeredComponents;
-    }
-
+    void processPacket(PacketContext ctx, PacketByteBuf buf);
 }
