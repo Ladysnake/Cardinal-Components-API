@@ -13,3 +13,9 @@ Code map:
     - `CardinalComponentsTest`: registration + callbacks
     - `VitalityStickItem`: a custom item that attaches a `BaseVita` instance to its item stacks
     - `VitalityZombieEntity`: a custom entity that attaches an `EntityVita` instance to itself
+
+3 different ways of initializing components are shown. All use a `ComponentCallback`;
+the player vita uses a regular lambda, the stick item vita has the item itself implement the `ItemComponentCallback`
+interface, and the zombie vita uses a method reference to a `VitalityZombieEntity` instance method.
+As such, the various `initComponents` methods are just one way of structuring the code and can be just as
+easily replaced with lambdas.
