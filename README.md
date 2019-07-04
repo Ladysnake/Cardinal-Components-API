@@ -58,8 +58,8 @@ Cardinal Components API offers component provider implementations for a few vani
 
 Components can be added to entities of any type (modded or vanilla) by registering an `EntityComponentCallback`.
 Entity components are saved automatically with the entity. Synchronization must be done either manually or with
-help of the [`SyncedComponent`](https://github.com/Pyrofab/Cardinal-Components-API/blob/refactor%2Fmodularization/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
-and [`EntitySyncedComponent`](https://github.com/Pyrofab/Cardinal-Components-API/blob/refactor%2Fmodularization/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/util/component/sync/EntitySyncedComponent.java) interfaces.
+help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`EntitySyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/util/sync/EntitySyncedComponent.java) interfaces.
 
 **Example:**
 ```java
@@ -82,6 +82,13 @@ If you have issues when attaching components to item stacks, it usually means yo
 ItemComponentCallback.EVENT.register(Items.DIAMOND_PICKAXE, (stack, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
 
+### Worlds
+
+Components can be added to any world by registering a `WorldComponentCallback`.
+World components are saved automatically with the world. Synchronization must be done either manually or with
+help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`WorldSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-world/src/main/java/nerdhub/cardinal/components/api/util/sync/WorldSyncedComponent.java) interfaces.
+
 ### Blocks
 
 Blocks actually implement the `BlockComponentProvider` interface instead of the regular `ComponentProvider`.
@@ -98,4 +105,4 @@ for an existing `Component` is as simple as calling `Attributes.create(MyCompone
 
 ## Example Mod
 An example mod for the API is available in this repository, under `src/testmod`.
-Its code is outlined in a secondary [readme](https://github.com/Pyrofab/Cardinal-Components-API/blob/v2/src/testmod/readme.md).
+Its code is outlined in a secondary [readme](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/src/testmod/readme.md).
