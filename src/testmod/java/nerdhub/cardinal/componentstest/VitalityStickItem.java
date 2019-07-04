@@ -55,7 +55,11 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
         ItemStack stack = player.getStackInHand(hand);
         Vita vita = CardinalComponentsTest.VITA.get(stack);
         if (vita.getVitality() > 0) {
-            vita.transferTo(CardinalComponentsTest.VITA.get(player), vita.getVitality());
+            if (player.isSneaking()) {
+                vita.transferTo(CardinalComponentsTest.VITA.get(world), 1);
+            } else {
+                vita.transferTo(CardinalComponentsTest.VITA.get(player), vita.getVitality());
+            }
         }
         return new TypedActionResult<>(ActionResult.PASS, stack);
     }
