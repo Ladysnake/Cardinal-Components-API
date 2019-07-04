@@ -25,6 +25,7 @@ package nerdhub.cardinal.components.api.component;
 import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -35,7 +36,8 @@ import java.util.Set;
 public interface ComponentProvider {
 
     /**
-     * convenience method to retrieve ComponentProvider from a given {@link ItemStack}
+     * Convenience method to retrieve ComponentProvider from a given {@link ItemStack}
+     * Requires the <tt>cardinal-components-item</tt> module.
      */
     @SuppressWarnings("ConstantConditions")
     static ComponentProvider fromItemStack(ItemStack stack) {
@@ -43,10 +45,19 @@ public interface ComponentProvider {
     }
 
     /**
-     * convenience method to retrieve a ComponentProvider from a given {@link Entity}
+     * Convenience method to retrieve a ComponentProvider from a given {@link Entity}.
+     * Requires the <tt>cardinal-components-entity</tt> module.
      */
     static ComponentProvider fromEntity(Entity entity) {
         return (ComponentProvider) entity;
+    }
+
+    /**
+     * Convenience method to retrieve a ComponentProvider from a given {@link World}.
+     * Requires the <tt>cardinal-components-world</tt> module.
+     */
+    static ComponentProvider fromWorld(World world) {
+        return (ComponentProvider) world;
     }
 
     /**
