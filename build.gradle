@@ -2,11 +2,10 @@ import java.nio.charset.StandardCharsets
 import java.time.Year
 
 plugins {
-    id "fabric-loom" version "0.2.4-SNAPSHOT"
+    id "fabric-loom" version "0.2.5-SNAPSHOT"
     id "net.minecrell.licenser" version "0.2.1"
     id "com.matthewprenger.cursegradle" version "1.2.0"
     id "maven-publish"
-    id "java-library"
 }
 
 group = "com.github.NerdHubMC"
@@ -17,10 +16,9 @@ subprojects {
     apply plugin: 'net.minecrell.licenser'
     apply plugin: 'com.matthewprenger.cursegradle'
     apply plugin: 'maven-publish'
-    apply plugin: 'java-library'
 
     archivesBaseName = project.name
-    group = "${project.group}.${project.archivesBaseName}"
+    group = "${rootProject.group}.${rootProject.archivesBaseName}"
 
     apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/basic_project.gradle"
 }
@@ -28,7 +26,7 @@ subprojects {
 allprojects {
 
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
-    version = System.getenv("TRAVIS_TAG") ?: project.mod_version
+    version = System.getenv("TRAVIS_TAG") ?: rootProject.mod_version
 
     repositories {
         maven {
@@ -38,9 +36,9 @@ allprojects {
     }
 
     dependencies {
-        minecraft "com.mojang:minecraft:${project.minecraft_version}"
-        mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_mappings}"
-        modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+        mappings "net.fabricmc:yarn:${rootProject.minecraft_version}+build.${rootProject.yarn_mappings}"
+        modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
 
         modApi "net.fabricmc.fabric-api:fabric-api-base:${project.fabric_base_version}"
         modImplementation "net.fabricmc.fabric-api:fabric-networking-v0:${fabric_networking_version}"
@@ -71,7 +69,7 @@ allprojects {
     }
 
     license {
-        header = project.file("code_quality/${project.license_header}_HEADER.txt")
+        header = rootProject.file("code_quality/${project.license_header}_HEADER.txt")
         include "**/*.java"
         charset = StandardCharsets.UTF_8.name()
 
@@ -84,7 +82,7 @@ allprojects {
         //export variables
         ext {
             year = Year.now()
-            projectDisplayName = project.archivesBaseName
+            projectDisplayName = rootProject.archivesBaseName
         }
     }
 }
@@ -109,16 +107,4 @@ dependencies {
         }
     }
     testmodImplementation sourceSets.main.output
-}
-
-afterEvaluate {
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                artifact(remapJar.output) {
-                    builtBy remapJar
-                }
-            }
-        }
-    }
 }
