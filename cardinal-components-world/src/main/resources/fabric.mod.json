@@ -1,14 +1,14 @@
 {
     "schemaVersion": 1,
     "environment": "*",
-    "id": "cardinal-components-entity",
+    "id": "cardinal-components-world",
     "name": "Cardinal Components API",
     "description": "dynamically exposing components",
     "version": "${version}",
     "side": "universal",
     "entrypoints": {
         "main": [
-            "nerdhub.cardinal.components.ComponentsEntityNetworking::init"
+            "nerdhub.cardinal.components.ComponentsWorldNetworking::init"
         ]
     },
     "custom": {

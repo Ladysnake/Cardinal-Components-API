@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.component.sync;
+package nerdhub.cardinal.components.api.util.sync;
 
 import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
@@ -28,37 +28,42 @@ import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;
-import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
+import net.minecraft.world.World;
 
-public interface EntitySyncedComponent extends SyncedComponent, TypeAwareComponent {
-    Identifier PACKET_ID = new Identifier("cardinal_components", "entity_sync");
+public interface WorldSyncedComponent extends SyncedComponent, TypeAwareComponent {
+    Identifier PACKET_ID = new Identifier("cardinal_components", "world_sync");
 
-    Entity getEntity();
+    World getWorld();
 
     @Override
     default void markDirty() {
-        if (!this.getEntity().world.isClient) {
-            PlayerStream.watching(this.getEntity()).map(ServerPlayerEntity.class::cast).forEach(this::syncWith);
+        if (!this.getWorld().isClient) {
+            PlayerStream.world(this.getWorld()).map(ServerPlayerEntity.class::cast).forEach(this::syncWith);
         }
     }
 
     @Override
     default void syncWith(ServerPlayerEntity player) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        buf.writeInt(this.getEntity().getEntityId());
         buf.writeIdentifier(this.getComponentType().getId());
         this.writeToPacket(buf);
         ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, PACKET_ID, buf);
     }
 
+    /**
+     * Implementations are encouraged to override this to read the data off-thread.
+     */
     @Override
     default void processPacket(PacketContext ctx, PacketByteBuf buf) {
-        assert ctx.getTaskQueue().isOnThread();
-        this.readFromPacket(buf);
+        PacketByteBuf copy = new PacketByteBuf(buf.copy());
+        ctx.getTaskQueue().execute(() -> {
+            this.readFromPacket(copy);
+            copy.release();
+        });
     }
 
     default void writeToPacket(PacketByteBuf buf) {

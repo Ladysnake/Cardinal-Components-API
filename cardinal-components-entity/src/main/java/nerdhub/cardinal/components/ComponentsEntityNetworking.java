@@ -31,7 +31,7 @@ import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
 import nerdhub.cardinal.components.api.event.TrackingStartCallback;
 import nerdhub.cardinal.components.api.util.Components;
 import nerdhub.cardinal.components.api.util.ObjectPath;
-import nerdhub.cardinal.components.api.util.component.sync.EntitySyncedComponent;
+import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
@@ -41,13 +41,13 @@ import net.minecraft.util.PacketByteBuf;
 
 import java.util.function.Consumer;
 
-public final class ComponentsNetworking {
+public final class ComponentsEntityNetworking {
     public static void init() {
         if (!FabricLoader.getInstance().isModLoaded("fabric-networking")) {
             return;
         }
         PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
-        TrackingStartCallback.EVENT.register(ComponentsNetworking::syncEntityComponents);
+        TrackingStartCallback.EVENT.register(ComponentsEntityNetworking::syncEntityComponents);
         ClientSidePacketRegistry.INSTANCE.register(EntitySyncedComponent.PACKET_ID, (context, buffer) -> {
             int entityId = buffer.readInt();
             Identifier componentTypeId = buffer.readIdentifier();
