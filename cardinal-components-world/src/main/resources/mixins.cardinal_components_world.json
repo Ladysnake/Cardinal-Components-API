@@ -4,8 +4,9 @@
     "compatibilityLevel": "JAVA_8",
     "package": "nerdhub.cardinal.components.mixins",
     "mixins": [
-        "common.world.MixinPlayerManager",
-        "common.world.MixinWorld"
+      "common.world.MixinPlayerManager",
+      "common.world.MixinServerWorld",
+      "common.world.MixinWorld"
     ],
     "injectors": {
         "defaultRequire": 1

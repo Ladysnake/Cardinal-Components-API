@@ -28,7 +28,7 @@ public abstract class MixinWorld implements ComponentProvider {
     @Unique
     private static final FeedbackContainerFactory<World, ?> componentContainerFactory = new FeedbackContainerFactory<>(WorldComponentCallback.EVENT);
     @Unique
-    private ComponentContainer<?> components;
+    protected ComponentContainer<?> components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(LevelProperties props, DimensionType dim, BiFunction<World, Dimension, ChunkManager> managerFactory, Profiler profiler, boolean client, CallbackInfo ci) {

@@ -54,7 +54,7 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
         Vita vita = CardinalComponentsTest.VITA.get(stack);
-        if (vita.getVitality() > 0) {
+        if (vita.getVitality() > 0 && !world.isClient) {
             if (player.isSneaking()) {
                 vita.transferTo(CardinalComponentsTest.VITA.get(world), 1);
             } else {
