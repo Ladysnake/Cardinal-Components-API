@@ -6,6 +6,7 @@ plugins {
     id "net.minecrell.licenser" version "0.2.1"
     id "com.matthewprenger.cursegradle" version "1.2.0"
     id "maven-publish"
+    id "java-library"
 }
 
 group = "com.github.NerdHubMC"
@@ -16,6 +17,7 @@ subprojects {
     apply plugin: 'net.minecrell.licenser'
     apply plugin: 'com.matthewprenger.cursegradle'
     apply plugin: 'maven-publish'
+    apply plugin: 'java-library'
 
     archivesBaseName = project.name
     group = "${project.group}.${project.archivesBaseName}"
@@ -41,9 +43,9 @@ allprojects {
         modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
         modApi "net.fabricmc.fabric-api:fabric-api-base:${project.fabric_base_version}"
-        modImplementation "net.fabricmc.fabric-api:fabric-networking:${fabric_networking_version}"
+        modImplementation "net.fabricmc.fabric-api:fabric-networking-v0:${fabric_networking_version}"
         // used by the test mod
-        modRuntime "net.fabricmc.fabric-api:fabric-resource-loader:${fabric_resource_loader_version}"
+        modRuntime "net.fabricmc.fabric-api:fabric-resource-loader-v0:${fabric_resource_loader_version}"
 
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.0-M1"
