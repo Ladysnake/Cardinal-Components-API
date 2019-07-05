@@ -195,7 +195,7 @@ public interface ObjectPath<T, R> extends Function<T, R> {
         Objects.requireNonNull(after);
         return (T t) -> {
             R r = this.apply(t);
-            return t != null && after.test(r);
+            return r != null && after.test(r);
         };
     }
 
