@@ -43,7 +43,8 @@ Components are provided by various objects through the `ComponentProvider` inter
 To interact with those, you need to register your component type, using `ComponentRegistry.registerIfAbsent`;
 the resulting `ComponentType` instance is used as a key for component providers.
 ```java
-public static final ComponentType<IntComponent> MAGIK = ComponentRegistry.registerIfAbsent(new Identifier("mymod:magik"), IntComponent.class);
+public static final ComponentType<IntComponent> MAGIK = 
+        ComponentRegistry.registerIfAbsent(new Identifier("mymod:magik"), IntComponent.class);
 
 public static void useMagik(ComponentProvider provider) {
     int magik = MAGIK.get(provider).getValue();
@@ -63,7 +64,8 @@ and [`EntitySyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-A
 
 **Example:**
 ```java
-EntityComponentCallback.EVENT.register(PlayerEntity.class, (player, components) -> components.put(MAGIK, new RandomIntComponent()));
+// Add the component to every instance of PlayerEntity
+EntityComponentCallback.event(PlayerEntity.class).register((player, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
 
 ### Item Stacks
@@ -72,14 +74,15 @@ Components can be added to stacks of any item (modded or vanilla) by registering
 Item stack components are saved and synchronized automatically.
 
 **Notes:**
-- `ItemStack` equality: stack equality methods `areTagsEqual` and `isEqualIgnoreDamage` check component equality.
+- `ItemStack` equality: stack equality methods `areTagsEqual` and `isEqualIgnoreDamage` are modified to check component equality.
 If you have issues when attaching components to item stacks, it usually means you forgot to implement a proper
 `equals` check on your component.
 - Empty `ItemStack`: empty item stacks never expose any components, no matter what was originally attached to them.
 
 **Example:**
 ```java
-ItemComponentCallback.EVENT.register(Items.DIAMOND_PICKAXE, (stack, components) -> components.put(MAGIK, new RandomIntComponent()));
+// Adds the component to every stack of diamond pick
+ItemComponentCallback.event(Items.DIAMOND_PICKAXE).register((stack, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
 
 ### Worlds
@@ -88,6 +91,12 @@ Components can be added to any world by registering a `WorldComponentCallback`.
 World components are saved automatically with the world. Synchronization must be done either manually or with
 help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
 and [`WorldSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-world/src/main/java/nerdhub/cardinal/components/api/util/sync/WorldSyncedComponent.java) interfaces.
+
+**Example:**
+```java
+// Add the component to every world
+WorldComponentCallback.EVENT.register((world, components) -> components.put(MAGIK, new RandomIntComponent()));
+```
 
 ### Blocks
 
