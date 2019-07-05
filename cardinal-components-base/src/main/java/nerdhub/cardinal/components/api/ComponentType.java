@@ -86,7 +86,7 @@ public final class ComponentType<T extends Component> {
         T component = (((ComponentProvider) holder)).getComponent(this);
         assert component == null || this.getComponentClass().isInstance(component);
         if (component == null) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException(holder + " provides no component of type " + this.id);
         }
         return component;
     }
