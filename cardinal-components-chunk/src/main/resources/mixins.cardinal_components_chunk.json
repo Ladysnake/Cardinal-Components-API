@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.7.11",
+  "compatibilityLevel": "JAVA_8",
+  "package": "nerdhub.cardinal.components.mixins",
+  "mixins": [
+    "common.chunk.MixinChunk",
+    "common.chunk.MixinChunkHolder",
+    "common.chunk.MixinEmptyChunk",
+    "common.chunk.MixinReadOnlyChunk",
+    "common.chunk.MixinThreadedAnvilChunkStorage",
+    "common.chunk.MixinWorldChunk"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

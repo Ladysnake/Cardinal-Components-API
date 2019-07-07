@@ -22,37 +22,41 @@
  */
 package nerdhub.cardinal.components.api.event;
 
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.world.level.LevelProperties;
+import net.minecraft.world.chunk.Chunk;
 
 /**
  * The callback interface for receiving component initialization events
- * during {@code LevelProperty} construction. The element that is interested in attaching
- * components to levels implements this interface, and is
+ * during chunk construction. The element that is interested in attaching
+ * components to entities implements this interface, and is
  * registered with the event, using {@link Event#register(Object)}.
- * When a {@code LevelProperties} is constructed, the callback's {@code initComponents} method is invoked.
+ * When an {@code Chunk} is constructed, the callback's
+ * {@code initComponents} method is invoked.
  */
 @FunctionalInterface
-public interface LevelComponentCallback extends ComponentCallback<LevelProperties, Component> {
+public interface ChunkComponentCallback extends ComponentCallback<Chunk, CloneableComponent<?>> {
 
-    Event<LevelComponentCallback> EVENT = EventFactory.createArrayBacked(LevelComponentCallback.class,
-            (callbacks) -> (level, components) -> {
-                for (LevelComponentCallback callback : callbacks) {
-                    callback.initComponents(level, components);
+    Event<ChunkComponentCallback> EVENT = EventFactory.createArrayBacked(ChunkComponentCallback.class,
+            (callbacks) -> (chunk, components) -> {
+                for (ChunkComponentCallback callback : callbacks) {
+                    callback.initComponents(chunk, components);
                 }
             });
 
     /**
-     * Initialize components for the given level properties object.
+     * Initialize components for the given chunk.
      * Components that are added to the given container will be available
-     * on the level as soon as all callbacks have been invoked.
+     * on the chunk as soon as all callbacks have been invoked.
      *
-     * @param level     the level being constructed
-     * @param components the level's component container
+     * @param chunk      the chunk being constructed
+     * @param components the chunk's component container
+     * @implNote Because this method is called for each chunk creation, implementations
+     * should avoid side effects and keep costly computations at a minimum. Lazy initialization
+     * should be considered for components that are costly to initialize.
      */
     @Override
-    void initComponents(LevelProperties level, ComponentContainer<Component> components);
+    void initComponents(Chunk chunk, ComponentContainer<CloneableComponent<?>> components);
 }

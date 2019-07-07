@@ -52,10 +52,6 @@ public interface WorldComponentCallback extends ComponentCallback<World, Compone
      *
      * @param world     the world being constructed
      * @param components the world's component container
-     *
-     * @implNote Because this method is called for each world creation, implementations
-     * should avoid side effects and keep costly computations at a minimum. Lazy initialization
-     * should be considered for components that are costly to initialize.
      */
     @Override
     void initComponents(World world, ComponentContainer<Component> components);
