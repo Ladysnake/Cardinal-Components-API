@@ -43,12 +43,12 @@ import java.util.Set;
 @Mixin({ProtoChunk.class, WorldChunk.class})
 public abstract class MixinChunk implements Chunk, ComponentProvider, ChunkAccessor {
     @Unique
-    private static final FeedbackContainerFactory<Chunk, CloneableComponent<?>> componentsContainerFactory = new FeedbackContainerFactory<>(ChunkComponentCallback.EVENT);
+    private static final FeedbackContainerFactory<Chunk, CloneableComponent> componentsContainerFactory = new FeedbackContainerFactory<>(ChunkComponentCallback.EVENT);
     @Unique
-    private ComponentContainer<CloneableComponent<?>> components = componentsContainerFactory.create(this);
+    private ComponentContainer<CloneableComponent> components = componentsContainerFactory.create(this);
 
     @Override
-    public ComponentContainer<CloneableComponent<?>> cardinal_getComponentContainer() {
+    public ComponentContainer<CloneableComponent> cardinal_getComponentContainer() {
         return this.components;
     }
 

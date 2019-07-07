@@ -17,10 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinWorldChunk implements Chunk, ComponentProvider, ChunkAccessor {
     @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/world/chunk/ProtoChunk;)V", at = @At("RETURN"))
     private void copyFromProto(World world, ProtoChunk proto, CallbackInfo ci) {
-        ComponentContainer<CloneableComponent<?>> ourComponents = this.cardinal_getComponentContainer();
-        ComponentContainer<CloneableComponent<?>> theirComponents = ((ChunkAccessor)proto).cardinal_getComponentContainer();
+        ComponentContainer<CloneableComponent> ourComponents = this.cardinal_getComponentContainer();
+        ComponentContainer<CloneableComponent> theirComponents = ((ChunkAccessor)proto).cardinal_getComponentContainer();
         theirComponents.forEach((type, component) -> {
-            CloneableComponent<?> copy = component.cloneComponent();
+            CloneableComponent copy = component.cloneComponent();
             ourComponents.put(type, copy);
         });
     }

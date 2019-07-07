@@ -92,7 +92,7 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     }
 
     @Override
-    public void initComponents(ItemStack stack, ComponentContainer<CloneableComponent<?>> components) {
+    public void initComponents(ItemStack stack, ComponentContainer<CloneableComponent> components) {
         components.put(CardinalComponentsTest.VITA, new BaseVita());
     }
 }

@@ -50,6 +50,11 @@ public class BaseVita implements Vita, NativeCloneableComponent {
     }
 
     @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Vita)) return false;

@@ -65,7 +65,7 @@ public abstract class MixinReadOnlyChunk extends ProtoChunk implements Component
     }
 
     @Override
-    public ComponentContainer<CloneableComponent<?>> cardinal_getComponentContainer() {
+    public ComponentContainer<CloneableComponent> cardinal_getComponentContainer() {
         return ((ChunkAccessor) this.wrapped).cardinal_getComponentContainer();
     }
 }

@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "componenttest:block/vita_condenser" }
+  }
+}
