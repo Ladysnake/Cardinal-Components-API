@@ -24,15 +24,40 @@ package nerdhub.cardinal.components.api.util.sync;
 
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
+import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.PacketByteBuf;
 
+/**
+ * {@code SyncedComponent} extension with read and write methods that can respectively be used
+ * as defaults in {@link #syncWith(ServerPlayerEntity)} and {@link #processPacket(PacketContext, PacketByteBuf)}
+ * implementations.
+ */
 public interface BaseSyncedComponent extends SyncedComponent, TypeAwareComponent {
 
+    /**
+     * Write this component's data to {@code buf}.
+     *
+     * @implSpec The default implementation writes the whole NBT representation
+     * of this component to the buffer using {@link #toTag(CompoundTag)}.
+     * @implNote The default implementation should generally be overridden.
+     * The serialization done by the default implementation sends possibly hidden
+     * information to clients and is wasteful. Implementing classes can nearly always provide a
+     * better implementation.
+     * @see #readFromPacket(PacketByteBuf)
+     */
     default void writeToPacket(PacketByteBuf buf) {
         buf.writeCompoundTag(this.toTag(new CompoundTag()));
     }
 
+    /**
+     * Reads this component's data from {@code buf}.
+     *
+     * @implSpec The default implementation converts the buffer's content
+     * to a {@code TagCompound} and calls {@link #fromTag(CompoundTag)}.
+     * @see #writeToPacket(PacketByteBuf)
+     */
     default void readFromPacket(PacketByteBuf buf) {
         CompoundTag tag = buf.readCompoundTag();
         if (tag != null) {

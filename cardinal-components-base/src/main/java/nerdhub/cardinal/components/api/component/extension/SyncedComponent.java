@@ -33,6 +33,8 @@ import net.minecraft.util.PacketByteBuf;
  * <p> Component providers that support synchronization should call
  * {@link #syncWith(ServerPlayerEntity)} on provided {@code SyncedComponent} instances
  * when needed.
+ *
+ * @see nerdhub.cardinal.components.api.util.sync.BaseSyncedComponent
  */
 public interface SyncedComponent extends Component {
     /**
