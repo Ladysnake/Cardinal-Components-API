@@ -26,6 +26,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraft.world.level.LevelProperties;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -58,6 +59,14 @@ public interface ComponentProvider {
      */
     static ComponentProvider fromWorld(World world) {
         return (ComponentProvider) world;
+    }
+
+    /**
+     * Convenience method to retrieve a ComponentProvider from given {@link LevelProperties}.
+     * Requires the <tt>cardinal-components-level</tt> module.
+     */
+    static ComponentProvider fromLevel(LevelProperties level) {
+        return (ComponentProvider) level;
     }
 
     /**
