@@ -6,6 +6,7 @@
   "mixins": [
     "common.chunk.MixinChunk",
     "common.chunk.MixinChunkHolder",
+    "common.chunk.MixinChunkSerializer",
     "common.chunk.MixinEmptyChunk",
     "common.chunk.MixinReadOnlyChunk",
     "common.chunk.MixinThreadedAnvilChunkStorage",
