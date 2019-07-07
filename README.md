@@ -20,6 +20,16 @@ dependencies {
 
 You can find the current version of the API in the [releases](https://github.com/NerdHubMC/Cardinal-Components-API/releases) tab of the repository on Github.
 
+Cardinal Components API is split into several modules. The main artifact bundles every module, but often all
+are not required for a project. To depend on a specific module, use the dependency string
+`com.github.NerdHubMC.Cardinal-Components-API:<MODULE>:<VERSION>`. Module names can be found below.
+
+Example:
+```gradle
+// Adds an API dependency on the base cardinal components module
+modApi "com.github.NerdHubMC.Cardinal-Components-API:cardinal-components-base:<VERSION>"
+```
+
 ## Usage
 
 To get started, you only need 2 things: an interface extending `Component`, and a class implementing this interface.
@@ -68,6 +78,8 @@ and [`EntitySyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-A
 EntityComponentCallback.event(PlayerEntity.class).register((player, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
 
+*module: cardinal-components-entity*
+
 ### Item Stacks
 
 Components can be added to stacks of any item (modded or vanilla) by registering an `ItemComponentCallback`.
@@ -81,9 +93,11 @@ If you have issues when attaching components to item stacks, it usually means yo
 
 **Example:**
 ```java
-// Adds the component to every stack of diamond pick
+// Add the component to every stack of diamond pick
 ItemComponentCallback.event(Items.DIAMOND_PICKAXE).register((stack, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
+
+*module: cardinal-components-item*
 
 ### Worlds
 
@@ -98,6 +112,39 @@ and [`WorldSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-AP
 WorldComponentCallback.EVENT.register((world, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
 
+*module: cardinal-components-world*
+
+### Levels
+
+Components can be added to `LevelProperties` objects by registering a `LevelComponentCallback`.
+Level properties are shared between every world in a server, making them useful to store global data.
+Level components are saved automatically with the save. Synchronization must be done either manually or with
+help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`LevelSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-level/src/main/java/nerdhub/cardinal/components/api/util/sync/LevelSyncedComponent.java) interfaces.
+
+**Example:**
+```java
+// Add the component to level properties
+LevelComponentCallback.EVENT.register((levelProperties, components) -> components.put(MAGIK, new RandomIntComponent()));
+```
+
+*module: cardinal-components-level*
+
+### Chunks
+
+Components can be added to chunks by registering a `ChunkComponentCallback`.
+Chunk components are saved automatically with the chunk. Synchronization must be done either manually or with
+help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`ChunkSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-chunk/src/main/java/nerdhub/cardinal/components/api/util/sync/ChunkSyncedComponent.java) interfaces.
+
+**Example:**
+```java
+// Add the component to every chunk in every world
+ChunkComponentCallback.EVENT.register((chunk, components) -> components.put(MAGIK, new RandomIntComponent()));
+```
+
+*module: cardinal-components-chunk*
+
 ### Blocks
 
 Blocks actually implement the `BlockComponentProvider` interface instead of the regular `ComponentProvider`.
@@ -110,6 +157,8 @@ are available to help.
 Components are entirely compatible with [LibBlockAttributes](https://github.com/AlexIIL/LibBlockAttributes)' attributes.
 Since `Component` is an interface, any attribute instance can easily implement it. Conversely, making an `Attribute`
 for an existing `Component` is as simple as calling `Attributes.create(MyComponent.class)`.
+
+*module: cardinal-components-block*
 
 
 ## Example Mod
