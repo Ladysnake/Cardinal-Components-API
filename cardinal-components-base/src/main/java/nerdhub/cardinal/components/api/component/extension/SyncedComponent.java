@@ -27,10 +27,41 @@ import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.PacketByteBuf;
 
+/**
+ * A component that is synchronized with clients observing it.
+ *
+ * <p> Component providers that support synchronization should call
+ * {@link #syncWith(ServerPlayerEntity)} on provided {@code SyncedComponent} instances
+ * when needed.
+ */
 public interface SyncedComponent extends Component {
+    /**
+     * Marks this component as dirty.
+     *
+     * <p> Calling {@code markDirty} effectively suggests to this component
+     * that its state should be sent to relevant clients.
+     * A component may send an update as soon as this method is called, or it may merely
+     * record the change so that an external system performs the synchronization.
+     */
     void markDirty();
 
+    /**
+     * Immediately synchronizes this component with the given player.
+     *
+     * <p>
+     * This method may be called when a component provider implementation is itself
+     * synchronized with {@code player}. A component may ignore a synchronization
+     * request if it does not need to send any data to the given {@code player}.
+     *
+     * @see #processPacket(PacketContext, PacketByteBuf)
+     */
     void syncWith(ServerPlayerEntity player);
 
+    /**
+     * Process a synchronization packet
+     *
+     * @see #syncWith(ServerPlayerEntity)
+     * @see net.fabricmc.fabric.api.network.PacketConsumer
+     */
     void processPacket(PacketContext ctx, PacketByteBuf buf);
 }

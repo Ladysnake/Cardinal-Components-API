@@ -54,7 +54,7 @@ To interact with those, you need to register your component type, using `Compone
 the resulting `ComponentType` instance is used as a key for component providers.
 ```java
 public static final ComponentType<IntComponent> MAGIK = 
-        ComponentRegistry.registerIfAbsent(new Identifier("mymod:magik"), IntComponent.class);
+        ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("mymod:magik"), IntComponent.class);
 
 public static void useMagik(ComponentProvider provider) {
     int magik = MAGIK.get(provider).getValue();
