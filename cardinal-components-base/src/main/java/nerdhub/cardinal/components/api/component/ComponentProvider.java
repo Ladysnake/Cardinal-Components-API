@@ -26,6 +26,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.level.LevelProperties;
 
 import javax.annotation.Nullable;
@@ -67,6 +68,14 @@ public interface ComponentProvider {
      */
     static ComponentProvider fromLevel(LevelProperties level) {
         return (ComponentProvider) level;
+    }
+
+    /**
+     * Convenience method to retrieve a ComponentProvider from given {@link Chunk}.
+     * Requires the <tt>cardinal-components-chunk</tt> module.
+     */
+    static ComponentProvider fromChunk(Chunk chunk) {
+        return (ComponentProvider) chunk;
     }
 
     /**

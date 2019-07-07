@@ -20,55 +20,54 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components;
+package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
-import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
-import nerdhub.cardinal.components.api.event.TrackingStartCallback;
+import nerdhub.cardinal.components.api.event.ChunkSyncCallback;
 import nerdhub.cardinal.components.api.util.Components;
-import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
+import nerdhub.cardinal.components.api.util.sync.ChunkSyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
+import net.minecraft.world.chunk.Chunk;
 
 import java.util.function.Consumer;
 
-public final class ComponentsEntityNetworking {
+public final class ComponentsChunkNetworking {
     public static void init() {
         if (!FabricLoader.getInstance().isModLoaded("fabric-networking")) {
             return;
         }
-        PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
-        TrackingStartCallback.EVENT.register(ComponentsEntityNetworking::syncEntityComponents);
-        ClientSidePacketRegistry.INSTANCE.register(EntitySyncedComponent.PACKET_ID, (context, buffer) -> {
-            int entityId = buffer.readInt();
+        ChunkSyncCallback.EVENT.register(ComponentsChunkNetworking::syncChunkComponents);
+        ClientSidePacketRegistry.INSTANCE.register(ChunkSyncedComponent.PACKET_ID, (context, buffer) -> {
+            int chunkX = buffer.readInt();
+            int chunkZ = buffer.readInt();
             Identifier componentTypeId = buffer.readIdentifier();
             ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
             if (componentType == null) {
                 return;
             }
             PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-            // Functional null avoidance with off-thread lambda instantiation
-            Consumer<Entity> entitySync = componentType.asComponentPath()
-                    .compose(ComponentProvider::fromEntity)
+            Consumer<Chunk> chunkSync = componentType.asComponentPath()
+                    .compose(ComponentProvider::fromChunk)
                     .thenCastTo(SyncedComponent.class)
                     .andThenDo(component -> component.processPacket(context, copy));
             context.getTaskQueue().execute(() -> {
-                Entity entity = context.getPlayer().world.getEntityById(entityId);
-                entitySync.accept(entity);
+                // On the client, unloaded chunks return EmptyChunk
+                Chunk chunk = context.getPlayer().world.getChunk(chunkX, chunkZ);
+                chunkSync.accept(chunk);
                 copy.release();
             });
         });
     }
 
-    private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {
-        Components.forEach(ComponentProvider.fromEntity(tracked), (componentType, component) -> {
+    private static void syncChunkComponents(ServerPlayerEntity player, Chunk tracked) {
+        Components.forEach(ComponentProvider.fromChunk(tracked), (componentType, component) -> {
             if (component instanceof SyncedComponent) {
                 ((SyncedComponent) component).syncWith(player);
             }

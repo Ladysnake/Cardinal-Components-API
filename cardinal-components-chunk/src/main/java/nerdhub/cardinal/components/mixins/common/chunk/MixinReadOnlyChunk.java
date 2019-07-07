@@ -20,65 +20,52 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.mixins.common;
+package nerdhub.cardinal.components.mixins.common.chunk;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.internal.CardinalEntityInternals;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.CompoundTag;
+import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import nerdhub.cardinal.components.internal.ChunkAccessor;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.chunk.ProtoChunk;
+import net.minecraft.world.chunk.ReadOnlyChunk;
+import net.minecraft.world.chunk.UpgradeData;
+import net.minecraft.world.chunk.WorldChunk;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.Set;
 
-@Mixin(Entity.class)
-public abstract class MixinEntity implements ComponentProvider {
-    @Unique
-    private ComponentContainer<?> components;
+@Mixin(ReadOnlyChunk.class)
+public abstract class MixinReadOnlyChunk extends ProtoChunk implements ComponentProvider, ChunkAccessor {
+    @Shadow @Final private WorldChunk wrapped;
 
-    @Shadow
-    public abstract EntityType<?> getType();
-
-    @SuppressWarnings("unchecked")
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void initDataTracker(CallbackInfo ci) {
-        this.components = CardinalEntityInternals.getEntityContainerFactory((Class) this.getClass()).create(this);
-    }
-
-    @Inject(method = "toTag", at = @At("RETURN"))
-    private void toTag(CompoundTag inputTag, CallbackInfoReturnable<CompoundTag> cir) {
-        this.components.toTag(cir.getReturnValue());
-    }
-
-    @Inject(method = "fromTag", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V", shift = At.Shift.AFTER))
-    private void fromTag(CompoundTag tag, CallbackInfo ci) {
-        this.components.fromTag(tag);
+    public MixinReadOnlyChunk(ChunkPos pos, UpgradeData data) {
+        super(pos, data);
     }
 
     @Override
     public boolean hasComponent(ComponentType<?> type) {
-        return this.components.containsKey(type);
+        return ((ComponentProvider) this.wrapped).hasComponent(type);
     }
 
     @Nullable
     @Override
     public <C extends Component> C getComponent(ComponentType<C> type) {
-        return this.components.get(type);
+        return ((ComponentProvider) this.wrapped).getComponent(type);
     }
 
     @Override
     public Set<ComponentType<?>> getComponentTypes() {
-        return Collections.unmodifiableSet(this.components.keySet());
+        return ((ComponentProvider) this.wrapped).getComponentTypes();
+    }
+
+    @Override
+    public ComponentContainer<CloneableComponent<?>> cardinal_getComponentContainer() {
+        return ((ChunkAccessor) this.wrapped).cardinal_getComponentContainer();
     }
 }

@@ -24,7 +24,7 @@ package nerdhub.cardinal.components.api.event;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
-import nerdhub.cardinal.components.api.util.component.ItemComponent;
+import nerdhub.cardinal.components.api.util.ItemComponent;
 import nerdhub.cardinal.components.internal.CardinalItemInternals;
 import nerdhub.cardinal.components.internal.ItemCaller;
 import net.fabricmc.fabric.api.event.Event;

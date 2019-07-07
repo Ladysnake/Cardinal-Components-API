@@ -12,6 +12,7 @@ rootProject.name = 'Cardinal-Components-API'
 
 include 'cardinal-components-base'
 include 'cardinal-components-block'
+include 'cardinal-components-chunk'
 include 'cardinal-components-entity'
 include 'cardinal-components-level'
 include 'cardinal-components-item'
