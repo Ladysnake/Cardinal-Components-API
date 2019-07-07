@@ -25,11 +25,27 @@ package nerdhub.cardinal.components.api.component.extension;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.nbt.CompoundTag;
 
-public interface CloneableComponent<C extends CloneableComponent> extends Component {
-    C newInstance();
+/**
+ * A component that can be cloned
+ * @see nerdhub.cardinal.components.api.util.NativeCloneableComponent
+ */
+public interface CloneableComponent extends Component {
+    /**
+     * Creates a brand new instance of this object's class.
+     * There are no guarantees on the state of the returned instance's fields.
+     */
+    CloneableComponent newInstance();
 
-    default C cloneComponent() {
-        C clone = this.newInstance();
+    /**
+     * Creates a brand new instance of this object's class that is functionally identical
+     * to this component.
+     * @return a clone of this component
+     * @implSpec this default implementation uses the component's serialization methods
+     * to copy properties.
+     */
+    default CloneableComponent cloneComponent() {
+        CloneableComponent clone = this.newInstance();
+        assert clone.getClass() == this.getClass();
         clone.fromTag(this.toTag(new CompoundTag()));
         return clone;
     }

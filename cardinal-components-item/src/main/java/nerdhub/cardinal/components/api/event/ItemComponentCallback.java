@@ -48,7 +48,7 @@ import javax.annotation.Nullable;
  * verifying {@code s.getItem() == i}.
  */
 @FunctionalInterface
-public interface ItemComponentCallback extends ComponentCallback<ItemStack, CloneableComponent<?>> {
+public interface ItemComponentCallback extends ComponentCallback<ItemStack, CloneableComponent> {
 
     /**
      * Returns the {@code Event} used to register component callbacks for
@@ -99,6 +99,6 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Clon
      * @see ItemComponent
      */
     @Override
-    void initComponents(ItemStack stack, ComponentContainer<CloneableComponent<?>> components);
+    void initComponents(ItemStack stack, ComponentContainer<CloneableComponent> components);
 
 }
