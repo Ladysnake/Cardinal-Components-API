@@ -23,19 +23,16 @@
 package nerdhub.cardinal.components.api.util.sync;
 
 import io.netty.buffer.Unpooled;
-import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
-import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
 import net.minecraft.world.World;
 
-public interface WorldSyncedComponent extends SyncedComponent, TypeAwareComponent {
-    Identifier PACKET_ID = new Identifier("cardinal_components", "world_sync");
+public interface WorldSyncedComponent extends BaseSyncedComponent {
+    Identifier PACKET_ID = new Identifier("cardinal-components", "world_sync");
 
     World getWorld();
 
@@ -64,16 +61,5 @@ public interface WorldSyncedComponent extends SyncedComponent, TypeAwareComponen
             this.readFromPacket(copy);
             copy.release();
         });
-    }
-
-    default void writeToPacket(PacketByteBuf buf) {
-        buf.writeCompoundTag(this.toTag(new CompoundTag()));
-    }
-
-    default void readFromPacket(PacketByteBuf buf) {
-        CompoundTag tag = buf.readCompoundTag();
-        if (tag != null) {
-            this.fromTag(tag);
-        }
     }
 }

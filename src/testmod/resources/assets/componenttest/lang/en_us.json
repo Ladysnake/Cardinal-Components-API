@@ -1,6 +1,6 @@
 {
   "componenttest:tooltip.vitality": "Vitality stored: %d",
   "componenttest:tooltip.self_vitality": "Your vitality: %d",
-  "componenttest:title.world_vitality": "Current vitality: %d",
+  "componenttest:title.world_vitality": "Current vitality: %d + %d",
   "item.componenttest.vita_stick": "Vita Stick"
 }

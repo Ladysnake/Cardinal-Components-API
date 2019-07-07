@@ -25,6 +25,7 @@ package nerdhub.cardinal.componentstest;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
+import nerdhub.cardinal.componentstest.vita.AmbientVita;
 import nerdhub.cardinal.componentstest.vita.BaseVita;
 import nerdhub.cardinal.componentstest.vita.Vita;
 import net.fabricmc.api.EnvType;
@@ -35,6 +36,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
@@ -56,7 +58,13 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
         Vita vita = CardinalComponentsTest.VITA.get(stack);
         if (vita.getVitality() > 0 && !world.isClient) {
             if (player.isSneaking()) {
-                vita.transferTo(CardinalComponentsTest.VITA.get(world), 1);
+                AmbientVita worldVita = (AmbientVita) CardinalComponentsTest.VITA.get(
+                        world.random.nextInt(10) == 0
+                                ? world.getLevelProperties()
+                                : world
+                );
+                vita.transferTo(worldVita, 1);
+                worldVita.syncWithAll(((ServerWorld)world).getServer());
             } else {
                 vita.transferTo(CardinalComponentsTest.VITA.get(player), vita.getVitality());
             }

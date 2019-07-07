@@ -1,0 +1,46 @@
+{
+    "schemaVersion": 1,
+    "environment": "*",
+    "id": "cardinal-components-level",
+    "name": "Cardinal Components API",
+    "description": "dynamically exposing components",
+    "version": "${version}",
+    "side": "universal",
+    "entrypoints": {
+        "main": [
+            "nerdhub.cardinal.components.ComponentsLevelNetworking::init"
+        ]
+    },
+    "custom": {
+        "modmenu:api": true,
+        "modmenu:parent": "cardinal-components"
+    },
+    "depends": {
+        "fabric-api-base": "*",
+        "cardinal-components-base": "*"
+    },
+    "recommends": {
+        "fabric-networking": "*",
+        "cardinal-components-world": "*"
+    },
+    "authors": [
+        {
+            "name": "UpcraftLP",
+            "contact": {
+                "homepage": "https://twitter.com/UpcraftLP"
+            }
+        }
+    ],
+    "contact": {
+        "homepage": "https://minecraft.curseforge.com/projects/318449",
+        "issues": "https://github.com/NerdHubMC/Cardinal-Components-API/issues",
+        "sources": "https://github.com/NerdHubMC/Cardinal-Components-API"
+    },
+    "license": "MIT",
+    "mixins": [
+        {
+            "environment": "*",
+            "config": "mixins.cardinal_components_level.json"
+        }
+    ]
+}

@@ -26,10 +26,11 @@ import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
+import nerdhub.cardinal.components.api.event.LevelComponentCallback;
 import nerdhub.cardinal.components.api.event.WorldComponentCallback;
+import nerdhub.cardinal.componentstest.vita.AmbientVita;
 import nerdhub.cardinal.componentstest.vita.PlayerVita;
 import nerdhub.cardinal.componentstest.vita.Vita;
-import nerdhub.cardinal.componentstest.vita.WorldVita;
 import net.minecraft.entity.EntityCategory;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -57,7 +58,8 @@ public class CardinalComponentsTest {
         // Method reference on instance method, allows override by subclasses + access to protected variables
         EntityComponentCallback.event(VitalityZombieEntity.class).register(VitalityZombieEntity::initComponents);
         EntityComponentCallback.event(PlayerEntity.class).register((player, components) -> components.put(VITA, new PlayerVita(player, 0)));
-        WorldComponentCallback.EVENT.register((world, components) -> components.put(VITA, new WorldVita(world)));
+        WorldComponentCallback.EVENT.register((world, components) -> components.put(VITA, new AmbientVita.WorldVita(world)));
+        LevelComponentCallback.EVENT.register((level, components) -> components.put(VITA, new AmbientVita.LevelVita()));
     }
 }
 

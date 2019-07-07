@@ -26,35 +26,47 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;
-import net.minecraft.entity.Entity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
 
-public interface EntitySyncedComponent extends BaseSyncedComponent {
-    Identifier PACKET_ID = new Identifier("cardinal-components", "entity_sync");
+public interface LevelSyncedComponent extends BaseSyncedComponent {
+    Identifier PACKET_ID = new Identifier("cardinal-components", "level_sync");
 
-    Entity getEntity();
-
+    /**
+     * @see #syncWithAll(MinecraftServer)
+     */
     @Override
     default void markDirty() {
-        if (!this.getEntity().world.isClient) {
-            PlayerStream.watching(this.getEntity()).map(ServerPlayerEntity.class::cast).forEach(this::syncWith);
-        }
+        // NO-OP
+        // We have no straightforward way to obtain player instances through LevelProperties
+    }
+
+    /**
+     * Synchronizes this component with every player in {@code server}
+     */
+    default void syncWithAll(MinecraftServer server) {
+        PlayerStream.all(server).map(ServerPlayerEntity.class::cast).forEach(this::syncWith);
     }
 
     @Override
     default void syncWith(ServerPlayerEntity player) {
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        buf.writeInt(this.getEntity().getEntityId());
         buf.writeIdentifier(this.getComponentType().getId());
         this.writeToPacket(buf);
         ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, PACKET_ID, buf);
     }
 
+    /**
+     * Implementations are encouraged to override this to read the data off-thread.
+     */
     @Override
     default void processPacket(PacketContext ctx, PacketByteBuf buf) {
-        assert ctx.getTaskQueue().isOnThread();
-        this.readFromPacket(buf);
+        PacketByteBuf copy = new PacketByteBuf(buf.copy());
+        ctx.getTaskQueue().execute(() -> {
+            this.readFromPacket(copy);
+            copy.release();
+        });
     }
 }
