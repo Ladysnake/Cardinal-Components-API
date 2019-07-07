@@ -39,7 +39,7 @@
     "mixins": [
         {
             "environment": "*",
-            "config": "mixins.cardinal_components_entity.json"
+            "config": "mixins.cardinal_components_chunk.json"
         }
     ]
 }

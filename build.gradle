@@ -101,6 +101,12 @@ subprojects { p -> licenseFormatAll.dependsOn("${p.path}:licenseFormat") }
 subprojects.each { remapJar.dependsOn("${it.path}:remapJar") }
 
 dependencies {
+    // used by the test mod
+    modImplementation "net.fabricmc.fabric-api:fabric-object-builders-v0:${fabric_object_builders_version}"
+    modRuntime "net.fabricmc.fabric-api:fabric-resource-loader-v0:${fabric_resource_loader_version}"
+    modRuntime "net.fabricmc.fabric-api:fabric-mining-levels-v0:${fabric_mining_levels_version}"
+    modRuntime "net.fabricmc.fabric-api:fabric-tag-extensions-v0:${fabric_tag_extensions_version}"
+
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     afterEvaluate {
         subprojects.each {

@@ -37,7 +37,7 @@ import net.minecraft.world.chunk.Chunk;
  * {@code initComponents} method is invoked.
  */
 @FunctionalInterface
-public interface ChunkComponentCallback extends ComponentCallback<Chunk, CloneableComponent<?>> {
+public interface ChunkComponentCallback extends ComponentCallback<Chunk, CloneableComponent> {
 
     Event<ChunkComponentCallback> EVENT = EventFactory.createArrayBacked(ChunkComponentCallback.class,
             (callbacks) -> (chunk, components) -> {
@@ -58,5 +58,5 @@ public interface ChunkComponentCallback extends ComponentCallback<Chunk, Cloneab
      * should be considered for components that are costly to initialize.
      */
     @Override
-    void initComponents(Chunk chunk, ComponentContainer<CloneableComponent<?>> components);
+    void initComponents(Chunk chunk, ComponentContainer<CloneableComponent> components);
 }

@@ -4,5 +4,5 @@ import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
 
 public interface ChunkAccessor {
-    ComponentContainer<CloneableComponent<?>> cardinal_getComponentContainer();
+    ComponentContainer<CloneableComponent> cardinal_getComponentContainer();
 }

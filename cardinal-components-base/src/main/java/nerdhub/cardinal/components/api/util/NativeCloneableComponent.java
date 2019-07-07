@@ -21,4 +21,9 @@ public interface NativeCloneableComponent extends CloneableComponent, Cloneable 
             throw new IllegalStateException(e);
         }
     }
+
+    /**
+     * The object implementing this method simply needs to call {@code super.clone()}
+     */
+    Object clone() throws CloneNotSupportedException;
 }
