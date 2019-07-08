@@ -25,6 +25,20 @@ package nerdhub.cardinal.components.api.component.extension;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 
+/**
+ * A component that is aware of its {@code ComponentType}.
+ */
 public interface TypeAwareComponent extends Component {
+    /**
+     * Return the component type this component instance is associated with.
+     *
+     * <p> The returned type may differ between instances of the same class,
+     * but remains constant between calls on the same instance.
+     * The general contract is that, for a given provider {@code p} that
+     * maps a component type {@code t} to a component {@code c} implementing
+     * {@code TypeAwareComponent}, the expression
+     * {@code ((TypeAwareComponent)t.get(p)).getComponentType() == t}
+     * always evaluates to {@code true}.
+     */
     ComponentType<?> getComponentType();
 }
