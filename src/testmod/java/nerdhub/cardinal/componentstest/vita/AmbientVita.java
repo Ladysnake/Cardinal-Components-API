@@ -65,6 +65,9 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
         });
     }
 
+    /**
+     * proper implementation of {@code writeToPacket}, writes a single int instead of a whole tag
+     */
     @Override
     public void writeToPacket(PacketByteBuf buf) {
         buf.writeInt(this.getVitality());
