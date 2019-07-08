@@ -30,7 +30,7 @@ import net.minecraft.util.PacketByteBuf;
 /**
  * A component that is synchronized with clients observing it.
  *
- * <p> Component providers that support synchronization should call
+ * <p> Component providers that support synchronization call
  * {@link #syncWith(ServerPlayerEntity)} on provided {@code SyncedComponent} instances
  * when needed.
  *

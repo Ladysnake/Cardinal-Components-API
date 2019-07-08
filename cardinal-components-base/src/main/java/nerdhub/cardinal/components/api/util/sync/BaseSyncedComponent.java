@@ -43,8 +43,10 @@ public interface BaseSyncedComponent extends SyncedComponent, TypeAwareComponent
      * of this component to the buffer using {@link #toTag(CompoundTag)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation sends possibly hidden
-     * information to clients and is wasteful. Implementing classes can nearly always provide a
-     * better implementation.
+     * information to clients, uses a wasteful data format, and does not support
+     * any optimization such as incremental updates. Implementing classes can 
+     * nearly always provide a better implementation.
+     * 
      * @see #readFromPacket(PacketByteBuf)
      */
     default void writeToPacket(PacketByteBuf buf) {
@@ -56,6 +58,9 @@ public interface BaseSyncedComponent extends SyncedComponent, TypeAwareComponent
      *
      * @implSpec The default implementation converts the buffer's content
      * to a {@code TagCompound} and calls {@link #fromTag(CompoundTag)}.
+     * @implNote any implementing class overriding {@link #writeToPacket(PacketByteBuf)}
+     * such that it uses a different data format must override this method.
+     *
      * @see #writeToPacket(PacketByteBuf)
      */
     default void readFromPacket(PacketByteBuf buf) {

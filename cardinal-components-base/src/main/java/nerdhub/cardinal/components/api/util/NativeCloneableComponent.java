@@ -30,10 +30,14 @@ import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
  */
 public interface NativeCloneableComponent extends CloneableComponent, Cloneable {
     /**
-     * Creates a brand new instance of this object's class.
-     * The returned instance is a shallow copy of this component.
-     * <p>
-     * Note: this does <strong>not</strong> call the class' constructor!
+     * Creates a brand new instance of this object's class using the {@link #clone()}
+     * method.
+     * 
+     * <p> Note: this does <strong>not</strong> call the class' constructor!
+     * Components depending on specific initialization code should consider
+     * using the more generic {@code CloneableComponent} interface.
+     *
+     * @implNote The default implementation creates a shallow copy of this component.
      */
     @Override
     default CloneableComponent newInstance() {
@@ -45,7 +49,7 @@ public interface NativeCloneableComponent extends CloneableComponent, Cloneable 
     }
 
     /**
-     * The object implementing this method simply needs to call {@code super.clone()}
+     * @implNote The object implementing this method simply needs to call {@code super.clone()}
      */
     Object clone() throws CloneNotSupportedException;
 }

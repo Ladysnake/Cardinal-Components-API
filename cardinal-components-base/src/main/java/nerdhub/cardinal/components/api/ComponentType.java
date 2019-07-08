@@ -75,33 +75,33 @@ public final class ComponentType<T extends Component> {
     }
 
     /**
-     * @param holder a component holder
-     * @param <V>    the class of the component holder
+     * @param provider a component provider
+     * @param <V>      the class of the component provider
      * @return the nonnull value of the held component of this type
-     * @throws NoSuchElementException if the holder does not provide this type of component
-     * @throws ClassCastException     if <code>holder</code> does not implement {@link ComponentProvider}
+     * @throws NoSuchElementException if the provider does not provide this type of component
+     * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      * @see #maybeGet(Object)
      */
-    public <V> T get(V holder) {
-        T component = (((ComponentProvider) holder)).getComponent(this);
+    public <V> T get(V provider) {
+        T component = (((ComponentProvider) provider)).getComponent(this);
         assert component == null || this.getComponentClass().isInstance(component);
         if (component == null) {
-            throw new NoSuchElementException(holder + " provides no component of type " + this.id);
+            throw new NoSuchElementException(provider + " provides no component of type " + this.id);
         }
         return component;
     }
 
     /**
      *
-     * @param holder a component holder
-     * @param <V>    the class of the component holder
+     * @param provider a component provider
+     * @param <V>      the class of the component provider
      * @return an {@code Optional} describing a component of this type, or an empty
-     * {@code Optional} if {@code holder} does not have such a component.
+     * {@code Optional} if {@code provider} does not have such a component.
      * @see #get(Object)
      */
-    public <V> Optional<T> maybeGet(@Nullable V holder) {
-        if (holder instanceof ComponentProvider) {
-            return Optional.ofNullable(((ComponentProvider) holder).getComponent(this));
+    public <V> Optional<T> maybeGet(@Nullable V provider) {
+        if (provider instanceof ComponentProvider) {
+            return Optional.ofNullable(((ComponentProvider) provider).getComponent(this));
         }
         return Optional.empty();
     }
