@@ -28,6 +28,7 @@ import nerdhub.cardinal.components.api.util.sync.ChunkSyncedComponent;
 import nerdhub.cardinal.componentstest.CardinalComponentsTest;
 import net.minecraft.world.chunk.Chunk;
 
+// if synchronization was not needed, BaseVita could have been used directly
 public class ChunkVita extends BaseVita implements ChunkSyncedComponent {
     private final Chunk chunk;
 
