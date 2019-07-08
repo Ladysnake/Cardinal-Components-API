@@ -44,7 +44,7 @@ class RandomIntComponent implements IntComponent {
     private int value = (int) (Math.random() * 20);
     @Override public int getValue() { return this.value; }
     @Override public void fromTag(CompoundTag tag) { this.value = tag.getInt("value"); }
-    @Override public CompoundTag toTag(CompoundTag tag) { tag.putInt("value", this.value); }
+    @Override public CompoundTag toTag(CompoundTag tag) { tag.putInt("value", this.value); return tag; }
 }
 ```
 All that is left is to actually use that component.
@@ -118,7 +118,7 @@ WorldComponentCallback.EVENT.register((world, components) -> components.put(MAGI
 
 Components can be added to `LevelProperties` objects by registering a `LevelComponentCallback`.
 Level properties are shared between every world in a server, making them useful to store global data.
-Level components are saved automatically with the save. Synchronization must be done either manually or with
+Level components are saved automatically with the global state. Synchronization must be done either manually or with
 help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
 and [`LevelSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-level/src/main/java/nerdhub/cardinal/components/api/util/sync/LevelSyncedComponent.java) interfaces.
 
@@ -161,6 +161,6 @@ for an existing `Component` is as simple as calling `Attributes.create(MyCompone
 *module: cardinal-components-block*
 
 
-## Example Mod
-An example mod for the API is available in this repository, under `src/testmod`.
+## Test Mod
+A test mod for the API is available in this repository, under `src/testmod`. It makes uses of most features from the API.
 Its code is outlined in a secondary [readme](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/src/testmod/readme.md).
