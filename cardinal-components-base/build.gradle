@@ -1,3 +1,5 @@
 dependencies {
+    loom.deobf api("net.fabricmc.fabric-api:fabric-api-base:${rootProject.fabric_base_version}")
+    loom.deobf api("net.fabricmc.fabric-api:fabric-networking-v0:${rootProject.fabric_networking_version}")
     testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
 }

@@ -41,12 +41,6 @@ allprojects {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
         mappings "net.fabricmc:yarn:${rootProject.minecraft_version}+build.${rootProject.yarn_mappings}"
         fabricInstall "net.fabricmc:fabric-loader:${rootProject.loader_version}"
-
-        loom.deobf api("net.fabricmc.fabric-api:fabric-api-base:${project.fabric_base_version}")
-        loom.deobf api("net.fabricmc.fabric-api:fabric-networking-v0:${fabric_networking_version}")
-        // used by the test mod
-        loom.deobf runtime("net.fabricmc.fabric-api:fabric-resource-loader-v0:${fabric_resource_loader_version}")
-
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.0-M1"
         compileOnly "com.google.code.findbugs:jsr305:3.0.2"
@@ -102,15 +96,17 @@ subprojects.each { remapJar.dependsOn("${it.path}:remapJar") }
 
 dependencies {
     // used by the test mod
-    modImplementation "net.fabricmc.fabric-api:fabric-object-builders-v0:${fabric_object_builders_version}"
-    modRuntime "net.fabricmc.fabric-api:fabric-resource-loader-v0:${fabric_resource_loader_version}"
-    modRuntime "net.fabricmc.fabric-api:fabric-mining-levels-v0:${fabric_mining_levels_version}"
-    modRuntime "net.fabricmc.fabric-api:fabric-tag-extensions-v0:${fabric_tag_extensions_version}"
+    loom.deobf implementation("net.fabricmc.fabric-api:fabric-api-base:${rootProject.fabric_base_version}")
+    loom.deobf implementation("net.fabricmc.fabric-api:fabric-object-builders-v0:${fabric_object_builders_version}")
+    loom.deobf runtime("net.fabricmc.fabric-api:fabric-networking-v0:${rootProject.fabric_networking_version}")
+    loom.deobf runtime("net.fabricmc.fabric-api:fabric-resource-loader-v0:${fabric_resource_loader_version}")
+    loom.deobf runtime("net.fabricmc.fabric-api:fabric-mining-levels-v0:${fabric_mining_levels_version}")
+    loom.deobf runtime("net.fabricmc.fabric-api:fabric-tag-extensions-v0:${fabric_tag_extensions_version}")
 
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     afterEvaluate {
         subprojects.each {
-            compile project(":${it.name}")
+            api(project(":${it.name}"))
             include project(":${it.name}")
         }
     }
