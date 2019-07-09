@@ -20,6 +20,16 @@ dependencies {
 
 You can find the current version of the API in the [releases](https://github.com/NerdHubMC/Cardinal-Components-API/releases) tab of the repository on Github.
 
+Cardinal Components API is split into several modules. The main artifact bundles every module, but often all
+are not required for a project. To depend on a specific module, use the dependency string
+`com.github.NerdHubMC.Cardinal-Components-API:<MODULE>:<VERSION>`. Module names can be found below.
+
+Example:
+```gradle
+// Adds an API dependency on the base cardinal components module
+modApi "com.github.NerdHubMC.Cardinal-Components-API:cardinal-components-base:<VERSION>"
+```
+
 ## Usage
 
 To get started, you only need 2 things: an interface extending `Component`, and a class implementing this interface.
@@ -34,7 +44,7 @@ class RandomIntComponent implements IntComponent {
     private int value = (int) (Math.random() * 20);
     @Override public int getValue() { return this.value; }
     @Override public void fromTag(CompoundTag tag) { this.value = tag.getInt("value"); }
-    @Override public CompoundTag toTag(CompoundTag tag) { tag.putInt("value", this.value); }
+    @Override public CompoundTag toTag(CompoundTag tag) { tag.putInt("value", this.value); return tag; }
 }
 ```
 All that is left is to actually use that component.
@@ -43,7 +53,8 @@ Components are provided by various objects through the `ComponentProvider` inter
 To interact with those, you need to register your component type, using `ComponentRegistry.registerIfAbsent`;
 the resulting `ComponentType` instance is used as a key for component providers.
 ```java
-public static final ComponentType<IntComponent> MAGIK = ComponentRegistry.registerIfAbsent(new Identifier("mymod:magik"), IntComponent.class);
+public static final ComponentType<IntComponent> MAGIK = 
+        ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("mymod:magik"), IntComponent.class);
 
 public static void useMagik(ComponentProvider provider) {
     int magik = MAGIK.get(provider).getValue();
@@ -58,13 +69,16 @@ Cardinal Components API offers component provider implementations for a few vani
 
 Components can be added to entities of any type (modded or vanilla) by registering an `EntityComponentCallback`.
 Entity components are saved automatically with the entity. Synchronization must be done either manually or with
-help of the [`SyncedComponent`](https://github.com/Pyrofab/Cardinal-Components-API/blob/refactor%2Fmodularization/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
-and [`EntitySyncedComponent`](https://github.com/Pyrofab/Cardinal-Components-API/blob/refactor%2Fmodularization/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/util/component/sync/EntitySyncedComponent.java) interfaces.
+help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`EntitySyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/util/sync/EntitySyncedComponent.java) interfaces.
 
 **Example:**
 ```java
-EntityComponentCallback.EVENT.register(PlayerEntity.class, (player, components) -> components.put(MAGIK, new RandomIntComponent()));
+// Add the component to every instance of PlayerEntity
+EntityComponentCallback.event(PlayerEntity.class).register((player, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
+
+*module: cardinal-components-entity*
 
 ### Item Stacks
 
@@ -72,15 +86,64 @@ Components can be added to stacks of any item (modded or vanilla) by registering
 Item stack components are saved and synchronized automatically.
 
 **Notes:**
-- `ItemStack` equality: stack equality methods `areTagsEqual` and `isEqualIgnoreDamage` check component equality.
+- `ItemStack` equality: stack equality methods `areTagsEqual` and `isEqualIgnoreDamage` are modified to check component equality.
 If you have issues when attaching components to item stacks, it usually means you forgot to implement a proper
 `equals` check on your component.
 - Empty `ItemStack`: empty item stacks never expose any components, no matter what was originally attached to them.
 
 **Example:**
 ```java
-ItemComponentCallback.EVENT.register(Items.DIAMOND_PICKAXE, (stack, components) -> components.put(MAGIK, new RandomIntComponent()));
+// Add the component to every stack of diamond pick
+ItemComponentCallback.event(Items.DIAMOND_PICKAXE).register((stack, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
+
+*module: cardinal-components-item*
+
+### Worlds
+
+Components can be added to any world by registering a `WorldComponentCallback`.
+World components are saved automatically with the world. Synchronization must be done either manually or with
+help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`WorldSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-world/src/main/java/nerdhub/cardinal/components/api/util/sync/WorldSyncedComponent.java) interfaces.
+
+**Example:**
+```java
+// Add the component to every world
+WorldComponentCallback.EVENT.register((world, components) -> components.put(MAGIK, new RandomIntComponent()));
+```
+
+*module: cardinal-components-world*
+
+### Levels
+
+Components can be added to `LevelProperties` objects by registering a `LevelComponentCallback`.
+Level properties are shared between every world in a server, making them useful to store global data.
+Level components are saved automatically with the global state. Synchronization must be done either manually or with
+help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`LevelSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-level/src/main/java/nerdhub/cardinal/components/api/util/sync/LevelSyncedComponent.java) interfaces.
+
+**Example:**
+```java
+// Add the component to level properties
+LevelComponentCallback.EVENT.register((levelProperties, components) -> components.put(MAGIK, new RandomIntComponent()));
+```
+
+*module: cardinal-components-level*
+
+### Chunks
+
+Components can be added to chunks by registering a `ChunkComponentCallback`.
+Chunk components are saved automatically with the chunk. Synchronization must be done either manually or with
+help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`ChunkSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-chunk/src/main/java/nerdhub/cardinal/components/api/util/sync/ChunkSyncedComponent.java) interfaces.
+
+**Example:**
+```java
+// Add the component to every chunk in every world
+ChunkComponentCallback.EVENT.register((chunk, components) -> components.put(MAGIK, new RandomIntComponent()));
+```
+
+*module: cardinal-components-chunk*
 
 ### Blocks
 
@@ -95,7 +158,9 @@ Components are entirely compatible with [LibBlockAttributes](https://github.com/
 Since `Component` is an interface, any attribute instance can easily implement it. Conversely, making an `Attribute`
 for an existing `Component` is as simple as calling `Attributes.create(MyComponent.class)`.
 
+*module: cardinal-components-block*
 
-## Example Mod
-An example mod for the API is available in this repository, under `src/testmod`.
-Its code is outlined in a secondary [readme](https://github.com/Pyrofab/Cardinal-Components-API/blob/v2/src/testmod/readme.md).
+
+## Test Mod
+A test mod for the API is available in this repository, under `src/testmod`. It makes uses of most features from the API.
+Its code is outlined in a secondary [readme](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/src/testmod/readme.md).

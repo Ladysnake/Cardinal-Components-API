@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * An efficient container for attached {@link Component components}.
  *
- * <p> This implementation is best suited for tightly packed ids
+ * <p> This implementation is best suited for tightly packed numeric ids
  * (eg. component types registered together). Wide id ranges result
  * in a sparse collection with a higher memory requirement than
  * other implementations like {@link FastComponentContainer}.

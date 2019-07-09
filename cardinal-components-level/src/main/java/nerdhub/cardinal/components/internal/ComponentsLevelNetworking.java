@@ -20,59 +20,50 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components;
+package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
-import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
-import nerdhub.cardinal.components.api.event.TrackingStartCallback;
+import nerdhub.cardinal.components.api.event.WorldSyncCallback;
 import nerdhub.cardinal.components.api.util.Components;
-import nerdhub.cardinal.components.api.util.ObjectPath;
-import nerdhub.cardinal.components.api.util.component.sync.EntitySyncedComponent;
+import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.world.World;
 
-import java.util.function.Consumer;
-
-public final class ComponentsNetworking {
+public final class ComponentsLevelNetworking {
     public static void init() {
-        if (!FabricLoader.getInstance().isModLoaded("fabric-networking")) {
+        if (!FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             return;
         }
-        PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
-        TrackingStartCallback.EVENT.register(ComponentsNetworking::syncEntityComponents);
-        ClientSidePacketRegistry.INSTANCE.register(EntitySyncedComponent.PACKET_ID, (context, buffer) -> {
-            int entityId = buffer.readInt();
+        if (FabricLoader.getInstance().isModLoaded("cardinal-components-world")) {
+            WorldSyncCallback.EVENT.register(ComponentsLevelNetworking::syncWorldComponents);
+        }
+        ClientSidePacketRegistry.INSTANCE.register(LevelSyncedComponent.PACKET_ID, (context, buffer) -> {
             Identifier componentTypeId = buffer.readIdentifier();
             ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
             if (componentType == null) {
                 return;
             }
-            PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-            // Functional null avoidance with off-thread lambda instantiation
-            Consumer<Entity> entitySync = ((ObjectPath<Entity, Component>) e -> ((ComponentProvider)e).getComponent(componentType))
-                    .thenCastTo(SyncedComponent.class)
-                    .andThenDo(component -> component.processPacket(context, copy));
-            context.getTaskQueue().execute(() -> {
-                Entity entity = context.getPlayer().world.getEntityById(entityId);
-                entitySync.accept(entity);
-                copy.release();
-            });
+            Component c = componentType.get(MinecraftClient.getInstance().world.getLevelProperties());
+            if (c instanceof SyncedComponent) {
+                ((SyncedComponent) c).processPacket(context, buffer);
+            }
         });
     }
 
-    private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {
-        Components.forEach(ComponentProvider.fromEntity(tracked), (componentType, component) -> {
+    private static void syncWorldComponents(ServerPlayerEntity player, World world) {
+        Components.forEach(ComponentProvider.fromLevel(world.getLevelProperties()), (componentType, component) -> {
             if (component instanceof SyncedComponent) {
                 ((SyncedComponent) component).syncWith(player);
             }
         });
     }
+
 }

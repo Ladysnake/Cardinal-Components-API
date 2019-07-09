@@ -48,7 +48,7 @@ import java.util.Set;
 @Mixin(value = ItemStack.class, priority = 900)
 public abstract class MixinItemStack implements ComponentProvider, ItemStackAccessor {
 
-    private ComponentContainer<CloneableComponent<?>> components;
+    private ComponentContainer<CloneableComponent> components;
 
     @Inject(method = "areTagsEqual", at = @At("RETURN"), cancellable = true)
     private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
@@ -69,9 +69,9 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
     @SuppressWarnings("ConstantConditions")
     @Inject(method = "copy", at = @At("RETURN"))
     private void copy(CallbackInfoReturnable<ItemStack> cir) {
-        ComponentContainer<CloneableComponent<?>> other = ((ItemStackAccessor) (Object) cir.getReturnValue()).cardinal_getComponentContainer();
+        ComponentContainer<CloneableComponent> other = ((ItemStackAccessor) (Object) cir.getReturnValue()).cardinal_getComponentContainer();
         this.components.forEach((type, component) -> {
-            CloneableComponent<?> copy = component.cloneComponent();
+            CloneableComponent copy = component.cloneComponent();
             other.put(type, copy);
         });
     }
@@ -116,7 +116,7 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
     }
 
     @Override
-    public ComponentContainer<CloneableComponent<?>> cardinal_getComponentContainer() {
+    public ComponentContainer<CloneableComponent> cardinal_getComponentContainer() {
         return this.components;
     }
 }

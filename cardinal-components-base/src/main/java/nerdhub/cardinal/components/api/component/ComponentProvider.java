@@ -25,6 +25,9 @@ package nerdhub.cardinal.components.api.component;
 import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.level.LevelProperties;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -35,7 +38,8 @@ import java.util.Set;
 public interface ComponentProvider {
 
     /**
-     * convenience method to retrieve ComponentProvider from a given {@link ItemStack}
+     * Convenience method to retrieve ComponentProvider from a given {@link ItemStack}
+     * Requires the <tt>cardinal-components-item</tt> module.
      */
     @SuppressWarnings("ConstantConditions")
     static ComponentProvider fromItemStack(ItemStack stack) {
@@ -43,10 +47,35 @@ public interface ComponentProvider {
     }
 
     /**
-     * convenience method to retrieve a ComponentProvider from a given {@link Entity}
+     * Convenience method to retrieve a ComponentProvider from a given {@link Entity}.
+     * Requires the <tt>cardinal-components-entity</tt> module.
      */
     static ComponentProvider fromEntity(Entity entity) {
         return (ComponentProvider) entity;
+    }
+
+    /**
+     * Convenience method to retrieve a ComponentProvider from a given {@link World}.
+     * Requires the <tt>cardinal-components-world</tt> module.
+     */
+    static ComponentProvider fromWorld(World world) {
+        return (ComponentProvider) world;
+    }
+
+    /**
+     * Convenience method to retrieve a ComponentProvider from given {@link LevelProperties}.
+     * Requires the <tt>cardinal-components-level</tt> module.
+     */
+    static ComponentProvider fromLevel(LevelProperties level) {
+        return (ComponentProvider) level;
+    }
+
+    /**
+     * Convenience method to retrieve a ComponentProvider from given {@link Chunk}.
+     * Requires the <tt>cardinal-components-chunk</tt> module.
+     */
+    static ComponentProvider fromChunk(Chunk chunk) {
+        return (ComponentProvider) chunk;
     }
 
     /**

@@ -29,7 +29,13 @@ import net.minecraft.item.ItemStack;
 
 import java.util.Set;
 import java.util.function.BiConsumer;
-
+/**
+ * This class consists exclusively of static methods that operate on or return
+ * components.
+ *
+ * @see Component
+ * @see ComponentProvider
+ */
 public final class Components {
     private Components() { throw new AssertionError(); }
 
@@ -62,6 +68,10 @@ public final class Components {
         return false;
     }
 
+    /**
+     * Iterates over every component provided by {@code provider} and applies {@code op} to each
+     * mapping.
+     */
     public static void forEach(ComponentProvider provider, BiConsumer<ComponentType<?>, Component> op) {
         for (ComponentType<?> type : provider.getComponentTypes()) {
             op.accept(type, type.get(provider));

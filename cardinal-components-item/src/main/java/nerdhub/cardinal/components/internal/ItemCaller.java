@@ -31,5 +31,5 @@ import net.minecraft.item.ItemStack;
 public interface ItemCaller {
 	Event<ItemComponentCallback> cardinal_getItemComponentEvent();
 
-	ComponentContainer<CloneableComponent<?>> cardinal_createComponents(ItemStack stack);
+	ComponentContainer<CloneableComponent> cardinal_createComponents(ItemStack stack);
 }

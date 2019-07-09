@@ -22,10 +22,10 @@
  */
 package nerdhub.cardinal.componentstest.vita;
 
-import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import nerdhub.cardinal.components.api.util.NativeCloneableComponent;
 import net.minecraft.nbt.CompoundTag;
 
-public class BaseVita implements Vita, CloneableComponent<BaseVita> {
+public class BaseVita implements Vita, NativeCloneableComponent {
     protected int vitality;
 
     @Override
@@ -49,8 +49,9 @@ public class BaseVita implements Vita, CloneableComponent<BaseVita> {
         return tag;
     }
 
-    public BaseVita newInstance() {
-        return new BaseVita();
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     @Override
