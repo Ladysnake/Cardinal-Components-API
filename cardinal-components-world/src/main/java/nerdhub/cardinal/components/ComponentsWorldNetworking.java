@@ -39,7 +39,7 @@ import net.minecraft.world.World;
 
 public final class ComponentsWorldNetworking {
     public static void init() {
-        if (!FabricLoader.getInstance().isModLoaded("fabric-networking")) {
+        if (!FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             return;
         }
         WorldSyncCallback.EVENT.register(ComponentsWorldNetworking::syncWorldComponents);

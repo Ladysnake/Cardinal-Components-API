@@ -41,7 +41,7 @@ import java.util.function.Consumer;
 
 public final class ComponentsEntityNetworking {
     public static void init() {
-        if (!FabricLoader.getInstance().isModLoaded("fabric-networking")) {
+        if (!FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             return;
         }
         PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));

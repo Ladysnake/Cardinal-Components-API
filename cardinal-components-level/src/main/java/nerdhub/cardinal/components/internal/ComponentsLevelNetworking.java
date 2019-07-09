@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components;
+package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
@@ -39,7 +39,7 @@ import net.minecraft.world.World;
 
 public final class ComponentsLevelNetworking {
     public static void init() {
-        if (!FabricLoader.getInstance().isModLoaded("fabric-networking")) {
+        if (!FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             return;
         }
         if (FabricLoader.getInstance().isModLoaded("cardinal-components-world")) {
