@@ -20,7 +20,7 @@
         "cardinal-components-base": "*"
     },
     "recommends": {
-        "fabric-networking": "*"
+        "fabric-networking-v0": "*"
     },
     "authors": [
         {

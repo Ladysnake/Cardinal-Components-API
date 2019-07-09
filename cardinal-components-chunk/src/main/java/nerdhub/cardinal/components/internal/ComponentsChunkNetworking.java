@@ -40,7 +40,7 @@ import java.util.function.Consumer;
 
 public final class ComponentsChunkNetworking {
     public static void init() {
-        if (!FabricLoader.getInstance().isModLoaded("fabric-networking")) {
+        if (!FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             return;
         }
         ChunkSyncCallback.EVENT.register(ComponentsChunkNetworking::syncChunkComponents);
