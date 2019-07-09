@@ -106,9 +106,27 @@ dependencies {
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     afterEvaluate {
         subprojects.each {
-            api(project(":${it.name}"))
-            include project(":${it.name}")
+            compile it
+            include it
         }
     }
     //loom.deobf testImplementation(sourceSets.main.output) //FIXME deobf + test doesn't work?
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
+            pom.withXml {
+                def depsNode = asNode().appendNode("dependencies")
+                subprojects.each {
+                    def depNode = depsNode.appendNode("dependency")
+                    depNode.appendNode("groupId", it.group)
+                    depNode.appendNode("artifactId", it.name)
+                    depNode.appendNode("version", it.version)
+                    depNode.appendNode("scope", "compile")
+                }
+            }
+        }
+    }
 }
