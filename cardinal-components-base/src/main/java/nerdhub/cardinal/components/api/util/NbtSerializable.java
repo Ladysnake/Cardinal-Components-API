@@ -31,7 +31,8 @@ public interface NbtSerializable {
      * @param tag a {@code CompoundTag} on which this object's serializable data has been written
      * @implNote implementations must not assert that the data written on the tag corresponds to any
      * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
-     * version.
+     * version. They should also store values into {@code tag} using only unique namespaced keys, as other
+     * information may be stored in said tag.
      */
     void fromTag(CompoundTag tag);
 

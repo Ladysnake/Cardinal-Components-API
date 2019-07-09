@@ -1,0 +1,4 @@
+dependencies {
+    compile project(":cardinal-components-base")
+    compile project(":cardinal-components-world")
+}

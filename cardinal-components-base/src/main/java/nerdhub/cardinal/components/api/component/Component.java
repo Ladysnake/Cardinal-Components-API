@@ -37,7 +37,7 @@ public interface Component extends NbtSerializable {
      *
      * @param tag a {@code CompoundTag} on which this component's serializable data has been written
      * @throws UnsupportedOperationException if this {@code Component} does not support serialization to NBT
-     * @implSpec implementations must not assert that the data written on the tag corresponds to any
+     * @implNote implementations must not assert that the data written on the tag corresponds to any
      * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
      * version.
      */
@@ -49,7 +49,7 @@ public interface Component extends NbtSerializable {
      *
      * @param tag a {@code CompoundTag} on which to write this component's serializable data
      * @return {@code tag}
-     * @implSpec this method must <strong>NOT</strong> write any value associated with the {@code "componentId"} key
+     * @implNote this method must <strong>NOT</strong> write any value associated with the {@code "componentId"} key
      * in the given tag.
      */
     @Override

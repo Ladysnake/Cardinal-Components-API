@@ -63,5 +63,5 @@ public interface BlockComponentProvider {
     /**
      * @return an <strong>immutable</strong> view of the component types exposed by this {@link BlockComponentProvider}
      */
-    Set<ComponentType<? extends Component>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side);
+    Set<ComponentType<?>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side);
 }

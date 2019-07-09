@@ -59,7 +59,7 @@ public abstract class MixinBlock implements BlockComponentProvider {
     }
 
     @Override
-    public Set<ComponentType<? extends Component>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side) {
+    public Set<ComponentType<?>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side) {
         if (!this.hasBlockEntity()) return Collections.emptySet();
         BlockEntity be = blockView.getBlockEntity(pos);
         return be instanceof BlockComponentProvider ? ((BlockComponentProvider) be).getComponentTypes(blockView, pos, side) : ImmutableSet.of();

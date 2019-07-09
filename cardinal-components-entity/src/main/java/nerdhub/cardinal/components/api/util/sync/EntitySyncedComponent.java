@@ -20,22 +20,19 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.component.sync;
+package nerdhub.cardinal.components.api.util.sync;
 
 import io.netty.buffer.Unpooled;
-import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
-import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
 
-public interface EntitySyncedComponent extends SyncedComponent, TypeAwareComponent {
-    Identifier PACKET_ID = new Identifier("cardinal_components", "entity_sync");
+public interface EntitySyncedComponent extends BaseSyncedComponent {
+    Identifier PACKET_ID = new Identifier("cardinal-components", "entity_sync");
 
     Entity getEntity();
 
@@ -59,16 +56,5 @@ public interface EntitySyncedComponent extends SyncedComponent, TypeAwareCompone
     default void processPacket(PacketContext ctx, PacketByteBuf buf) {
         assert ctx.getTaskQueue().isOnThread();
         this.readFromPacket(buf);
-    }
-
-    default void writeToPacket(PacketByteBuf buf) {
-        buf.writeCompoundTag(this.toTag(new CompoundTag()));
-    }
-
-    default void readFromPacket(PacketByteBuf buf) {
-        CompoundTag tag = buf.readCompoundTag();
-        if (tag != null) {
-            this.fromTag(tag);
-        }
     }
 }

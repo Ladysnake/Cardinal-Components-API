@@ -23,7 +23,7 @@
 package nerdhub.cardinal.componentstest.vita;
 
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.util.component.sync.EntitySyncedComponent;
+import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
 import nerdhub.cardinal.componentstest.CardinalComponentsTest;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;

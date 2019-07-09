@@ -20,12 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.component;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package nerdhub.cardinal.components;
 
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-public interface ItemComponent extends Component, CloneableComponent<ItemComponent> {
-    @Override
-    boolean isComponentEqual(Component other);
-}
+import javax.annotation.ParametersAreNonnullByDefault;
