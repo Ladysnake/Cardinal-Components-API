@@ -57,7 +57,10 @@ public static final ComponentType<IntComponent> MAGIK =
         ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("mymod:magik"), IntComponent.class);
 
 public static void useMagik(ComponentProvider provider) {
+    // Retrieve a provided component
     int magik = MAGIK.get(provider).getValue();
+    // Or, if the provider is not guaranteed to provide that component:
+    int magik = MAGIK.maybeGet(provider).map(IntComponent::getValue).orElse(0);
     // ...
 }
 ```
@@ -93,8 +96,8 @@ If you have issues when attaching components to item stacks, it usually means yo
 
 **Example:**
 ```java
-// Add the component to every stack of diamond pick
-ItemComponentCallback.event(Items.DIAMOND_PICKAXE).register((stack, components) -> components.put(MAGIK, new RandomIntComponent()));
+// Add the component to every stack of wasted diamonds
+ItemComponentCallback.event(Items.DIAMOND_HOE).register((stack, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
 
 *module: cardinal-components-item*
@@ -137,6 +140,11 @@ Chunk components are saved automatically with the chunk. Synchronization must be
 help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
 and [`ChunkSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-chunk/src/main/java/nerdhub/cardinal/components/api/util/sync/ChunkSyncedComponent.java) interfaces.
 
+**Notes:**
+- `EmptyChunk`: empty chunks never expose any components, no matter what was originally attached to them.
+As such, when chunk components are queried on the client, one should make sure the chunk is loaded, or use
+`ComponentType#maybeGet` to retrieve a component.
+
 **Example:**
 ```java
 // Add the component to every chunk in every world
@@ -151,7 +159,7 @@ Blocks actually implement the `BlockComponentProvider` interface instead of the 
 Custom blocks may re-implement that interface themselves to provide components independently of the presence of
 a BlockEntity. Usually the block simply proxies its Block Entity, however the Block Entity does not need to 
 implement `BlockComponentProvider` if the block already has a custom implementation. Block components can be
-slightly less convenient to provide as they require their own implementations, but several utility classes
+slightly less convenient to provide as they require their own implementations, but [several utility classes](https://github.com/NerdHubMC/Cardinal-Components-API/tree/master/cardinal-components-block/src/main/java/nerdhub/cardinal/components/api/util/sided)
 are available to help.
 
 Components are entirely compatible with [LibBlockAttributes](https://github.com/AlexIIL/LibBlockAttributes)' attributes.
