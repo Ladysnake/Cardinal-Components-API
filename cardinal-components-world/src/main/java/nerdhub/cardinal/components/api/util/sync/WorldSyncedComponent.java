@@ -23,15 +23,26 @@
 package nerdhub.cardinal.components.api.util.sync;
 
 import io.netty.buffer.Unpooled;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;
+import net.minecraft.client.network.packet.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
 import net.minecraft.world.World;
 
+/**
+ * Default implementations of {@link SyncedComponent} methods, specialized for world components
+ */
 public interface WorldSyncedComponent extends BaseSyncedComponent {
+    /**
+     * {@link CustomPayloadS2CPacket} channel for default world component
+     * synchronization. Packets emitted on this channel must begin with the
+     * {@link ComponentType#getId() component's type} (as an Identifier).
+     */
     Identifier PACKET_ID = new Identifier("cardinal-components", "world_sync");
 
     World getWorld();

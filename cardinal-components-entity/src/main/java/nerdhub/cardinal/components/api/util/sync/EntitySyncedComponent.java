@@ -23,15 +23,26 @@
 package nerdhub.cardinal.components.api.util.sync;
 
 import io.netty.buffer.Unpooled;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;
+import net.minecraft.client.network.packet.CustomPayloadS2CPacket;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
 
+/**
+ * Default implementations of {@link SyncedComponent} methods, specialized for entity components
+ */
 public interface EntitySyncedComponent extends BaseSyncedComponent {
+    /**
+     * {@link CustomPayloadS2CPacket} channel for default entity component synchronization.
+     * Packets emitted on this channel must begin with, in order, the {@link Entity#getEntityId() entity id} (as an int),
+     * and the {@link ComponentType#getId() component's type} (as an Identifier).
+     */
     Identifier PACKET_ID = new Identifier("cardinal-components", "entity_sync");
 
     Entity getEntity();
