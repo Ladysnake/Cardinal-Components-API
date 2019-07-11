@@ -2,7 +2,7 @@ import java.nio.charset.StandardCharsets
 import java.time.Year
 
 plugins {
-    id "moe.nikky.fabric-loom" version "0.2.6-SNAPSHOT"
+    id "fabric-loom" version "0.2.4-SNAPSHOT"
     id "net.minecrell.licenser" version "0.2.1"
     id "com.matthewprenger.cursegradle" version "1.2.0"
     id "maven-publish"
@@ -13,7 +13,7 @@ group = "com.github.NerdHubMC"
 archivesBaseName = "Cardinal-Components-API"
 
 subprojects {
-    apply plugin: 'moe.nikky.fabric-loom'
+    apply plugin: 'fabric-loom'
     apply plugin: 'net.minecrell.licenser'
     apply plugin: 'com.matthewprenger.cursegradle'
     apply plugin: 'maven-publish'
@@ -40,7 +40,9 @@ allprojects {
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
         mappings "net.fabricmc:yarn:${rootProject.minecraft_version}+build.${rootProject.yarn_mappings}"
-        fabricInstall "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+        modApi "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+        modApi("net.fabricmc.fabric-api:fabric-api-base:${rootProject.fabric_base_version}")
+        modImplementation("net.fabricmc.fabric-api:fabric-networking-v0:${rootProject.fabric_networking_version}")
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.0-M1"
         compileOnly "com.google.code.findbugs:jsr305:3.0.2"
@@ -96,12 +98,12 @@ subprojects.each { remapJar.dependsOn("${it.path}:remapJar") }
 
 dependencies {
     // used by the test mod
-    loom.deobf implementation("net.fabricmc.fabric-api:fabric-api-base:${rootProject.fabric_base_version}")
-    loom.deobf implementation("net.fabricmc.fabric-api:fabric-object-builders-v0:${fabric_object_builders_version}")
-    loom.deobf runtime("net.fabricmc.fabric-api:fabric-networking-v0:${rootProject.fabric_networking_version}")
-    loom.deobf runtime("net.fabricmc.fabric-api:fabric-resource-loader-v0:${fabric_resource_loader_version}")
-    loom.deobf runtime("net.fabricmc.fabric-api:fabric-mining-levels-v0:${fabric_mining_levels_version}")
-    loom.deobf runtime("net.fabricmc.fabric-api:fabric-tag-extensions-v0:${fabric_tag_extensions_version}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api-base:${rootProject.fabric_base_version}")
+    modImplementation("net.fabricmc.fabric-api:fabric-object-builders-v0:${fabric_object_builders_version}")
+    modRuntime("net.fabricmc.fabric-api:fabric-networking-v0:${rootProject.fabric_networking_version}")
+    modRuntime("net.fabricmc.fabric-api:fabric-resource-loader-v0:${fabric_resource_loader_version}")
+    modRuntime("net.fabricmc.fabric-api:fabric-mining-levels-v0:${fabric_mining_levels_version}")
+    modRuntime("net.fabricmc.fabric-api:fabric-tag-extensions-v0:${fabric_tag_extensions_version}")
 
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     afterEvaluate {
@@ -110,21 +112,24 @@ dependencies {
             include it
         }
     }
-    //loom.deobf testImplementation(sourceSets.main.output) //FIXME deobf + test doesn't work?
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
-            pom.withXml {
-                def depsNode = asNode().appendNode("dependencies")
-                subprojects.each {
-                    def depNode = depsNode.appendNode("dependency")
-                    depNode.appendNode("groupId", it.group)
-                    depNode.appendNode("artifactId", it.name)
-                    depNode.appendNode("version", it.version)
-                    depNode.appendNode("scope", "compile")
+afterEvaluate {
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifact(remapJar.output) {
+                    builtBy remapJar
+                }
+                pom.withXml {
+                    def depsNode = asNode().appendNode("dependencies")
+                    subprojects.each {
+                        def depNode = depsNode.appendNode("dependency")
+                        depNode.appendNode("groupId", it.group)
+                        depNode.appendNode("artifactId", it.name)
+                        depNode.appendNode("version", it.version)
+                        depNode.appendNode("scope", "compile")
+                    }
                 }
             }
         }

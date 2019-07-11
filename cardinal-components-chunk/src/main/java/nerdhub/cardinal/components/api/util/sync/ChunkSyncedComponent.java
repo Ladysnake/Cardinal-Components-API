@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.api.util.sync;
 
 import io.netty.buffer.Unpooled;
+import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.util.ChunkComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
@@ -35,6 +36,9 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
 
+/**
+ * Default implementations of {@link SyncedComponent} methods, specialized for chunk components
+ */
 public interface ChunkSyncedComponent extends ChunkComponent, BaseSyncedComponent {
     /**
      * {@link CustomPayloadS2CPacket} channel for default chunk component synchronization.
