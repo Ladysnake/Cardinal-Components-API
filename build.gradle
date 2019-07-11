@@ -85,6 +85,10 @@ allprojects {
     }
 }
 
+subprojects {
+    version = rootProject.version
+}
+
 sourceSets {
     testmod {
         compileClasspath += main.compileClasspath
