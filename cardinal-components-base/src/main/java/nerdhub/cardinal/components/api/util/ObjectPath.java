@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Represents a function that extracts a property from a given object.
@@ -148,6 +149,27 @@ public interface ObjectPath<T, R> extends Function<T, R> {
         return (s) -> {
             R r = this.apply(s);
             return r != null ? after.apply(r) : null;
+        };
+    }
+
+    /**
+     * Returns a composed function that first applies this function to
+     * its input, and then calls {@code other} if there is no result.
+     * If evaluation of either function throws an exception, it is relayed to
+     * the caller of the composed function.
+     *
+     * @param other a {@code Supplier} whose result is returned if no value
+     * is present
+     * @return a composed function that first applies this function and then
+     * returns the result or calls {@code other} if none is given
+     * @throws NullPointerException if other is null
+     * @see Optional#orElseGet(Supplier)
+     */
+    default ObjectPath<T, R> orElseGet(Supplier<R> other) {
+        Objects.requireNonNull(other);
+        return (s) -> {
+            R r = this.apply(s);
+            return r != null ? r : other.get();
         };
     }
 
