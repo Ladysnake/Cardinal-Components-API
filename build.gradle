@@ -40,7 +40,7 @@ allprojects {
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
         mappings "net.fabricmc:yarn:${rootProject.minecraft_version}+build.${rootProject.yarn_mappings}"
-        modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+        modApi "net.fabricmc:fabric-loader:${rootProject.loader_version}"
         modApi("net.fabricmc.fabric-api:fabric-api-base:${rootProject.fabric_base_version}")
         modImplementation("net.fabricmc.fabric-api:fabric-networking-v0:${rootProject.fabric_networking_version}")
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
