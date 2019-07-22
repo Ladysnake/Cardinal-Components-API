@@ -5,29 +5,29 @@ A components API for Fabric that is easy, modular, and fast.
 ```gradle
 repositories {
     maven {
-        name = "NerdHubMC"
-        url = "https://maven.abusedmaster.xyz"
+        name = "JitPack"
+        url "https://jitpack.io"
     }
 }
 
 dependencies {
     // Replace modImplementation with modApi if you expose components in your own API
-    modImplementation "com.github.NerdHubMC:Cardinal-Components-API:<VERSION>"
+    modImplementation "com.github.Pyrofab:Cardinal-Components-API:<VERSION>"
     // Includes Cardinal Components API as a Jar-in-Jar dependency (optional)
-    include "com.github.NerdHubMC:Cardinal-Components-API:<VERSION>"
+    include "com.github.Pyrofab:Cardinal-Components-API:<VERSION>"
 }
 ```
 
-You can find the current version of the API in the [releases](https://github.com/NerdHubMC/Cardinal-Components-API/releases) tab of the repository on Github.
+You can find the current version of the API in the [releases](https://github.com/Pyrofab/Cardinal-Components-API/releases) tab of the repository on Github.
 
 Cardinal Components API is split into several modules. The main artifact bundles every module, but often all
 are not required for a project. To depend on a specific module, use the dependency string
-`com.github.NerdHubMC.Cardinal-Components-API:<MODULE>:<VERSION>`. Module names can be found below.
+`com.github.Pyrofab.Cardinal-Components-API:<MODULE>:<VERSION>`. Module names can be found below.
 
 Example:
 ```gradle
 // Adds an API dependency on the base cardinal components module
-modApi "com.github.NerdHubMC.Cardinal-Components-API:cardinal-components-base:<VERSION>"
+modApi "com.github.Pyrofab.Cardinal-Components-API:cardinal-components-base:<VERSION>"
 ```
 
 ## Usage
