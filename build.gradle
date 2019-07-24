@@ -2,7 +2,7 @@ import java.nio.charset.StandardCharsets
 import java.time.Year
 
 plugins {
-    id "fabric-loom" version "0.2.4-SNAPSHOT"
+    id "fabric-loom" version "0.2.5-SNAPSHOT" apply false
     id "net.minecrell.licenser" version "0.2.1"
     id "com.matthewprenger.cursegradle" version "1.2.0"
     id "maven-publish"
@@ -26,7 +26,7 @@ subprojects {
 }
 
 allprojects {
-
+    apply plugin: "fabric-loom"
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
     version = System.getenv("TRAVIS_TAG") ?: rootProject.mod_version
 
@@ -121,7 +121,9 @@ dependencies {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
+            artifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
+                builtBy(remapJar)
+            }
             pom.withXml {
                 def depsNode = asNode().appendNode("dependencies")
                 subprojects.each {
