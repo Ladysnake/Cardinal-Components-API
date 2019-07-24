@@ -137,3 +137,4 @@ publishing {
         }
     }
 }
+tasks.publish.dependsOn build //stupid fix for maven/loom not publishing the main artifact
