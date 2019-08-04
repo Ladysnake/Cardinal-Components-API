@@ -1,7 +1,11 @@
 # Cardinal-Components-API
 A components API for Fabric that is easy, modular, and fast.
 
-## Adding the API to your buildscript (loom 0.2.4):
+## Adding the API to your buildscript (loom 0.2.5):
+*Note: as no 2.0 version of Cardinal Components API is available on the main maven, this fork offers an alternative using [Jitpack](https://jitpack.io/#Pyrofab/Cardinal-Components-API)*
+
+[![](https://jitpack.io/v/Pyrofab/Cardinal-Components-API.svg)](https://jitpack.io/#Pyrofab/Cardinal-Components-API)
+
 ```gradle
 repositories {
     maven {
