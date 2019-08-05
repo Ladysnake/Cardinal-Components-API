@@ -33,37 +33,37 @@ import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 public final class ComponentsLevelNetworking {
     public static void init() {
-        if (!FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            return;
-        }
-        if (FabricLoader.getInstance().isModLoaded("cardinal-components-world")) {
-            WorldSyncCallback.EVENT.register(ComponentsLevelNetworking::syncWorldComponents);
-        }
-        ClientSidePacketRegistry.INSTANCE.register(LevelSyncedComponent.PACKET_ID, (context, buffer) -> {
-            Identifier componentTypeId = buffer.readIdentifier();
-            ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
-            if (componentType == null) {
-                return;
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
+            if (FabricLoader.getInstance().isModLoaded("cardinal-components-world")) {
+                WorldSyncCallback.EVENT.register((player, world) -> {
+                    Components.forEach(ComponentProvider.fromLevel(world.getLevelProperties()), (componentType, component) -> {
+                        if (component instanceof SyncedComponent) {
+                            ((SyncedComponent) component).syncWith(player);
+                        }
+                    });
+                });
             }
-            Component c = componentType.get(MinecraftClient.getInstance().world.getLevelProperties());
-            if (c instanceof SyncedComponent) {
-                ((SyncedComponent) c).processPacket(context, buffer);
-            }
-        });
+        }
     }
 
-    private static void syncWorldComponents(ServerPlayerEntity player, World world) {
-        Components.forEach(ComponentProvider.fromLevel(world.getLevelProperties()), (componentType, component) -> {
-            if (component instanceof SyncedComponent) {
-                ((SyncedComponent) component).syncWith(player);
-            }
-        });
+    // Safe to put in the same class as no client-only class is directly referenced
+    public static void initClient() {
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
+            ClientSidePacketRegistry.INSTANCE.register(LevelSyncedComponent.PACKET_ID, (context, buffer) -> {
+                Identifier componentTypeId = buffer.readIdentifier();
+                ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+                if (componentType == null) {
+                    return;
+                }
+                Component c = componentType.get(MinecraftClient.getInstance().world.getLevelProperties());
+                if (c instanceof SyncedComponent) {
+                    ((SyncedComponent) c).processPacket(context, buffer);
+                }
+            });
+        }
     }
-
 }

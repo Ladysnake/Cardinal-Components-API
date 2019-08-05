@@ -31,7 +31,6 @@ import nerdhub.cardinal.components.api.util.Components;
 import nerdhub.cardinal.components.api.util.sync.ChunkSyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
 import net.minecraft.world.chunk.Chunk;
@@ -40,37 +39,40 @@ import java.util.function.Consumer;
 
 public final class ComponentsChunkNetworking {
     public static void init() {
-        if (!FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            return;
-        }
-        ChunkSyncCallback.EVENT.register(ComponentsChunkNetworking::syncChunkComponents);
-        ClientSidePacketRegistry.INSTANCE.register(ChunkSyncedComponent.PACKET_ID, (context, buffer) -> {
-            int chunkX = buffer.readInt();
-            int chunkZ = buffer.readInt();
-            Identifier componentTypeId = buffer.readIdentifier();
-            ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
-            if (componentType == null) {
-                return;
-            }
-            PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-            Consumer<Chunk> chunkSync = componentType.asComponentPath()
-                    .compose(ComponentProvider::fromChunk)
-                    .thenCastTo(SyncedComponent.class)
-                    .andThenDo(component -> component.processPacket(context, copy));
-            context.getTaskQueue().execute(() -> {
-                // On the client, unloaded chunks return EmptyChunk
-                Chunk chunk = context.getPlayer().world.getChunk(chunkX, chunkZ);
-                chunkSync.accept(chunk);
-                copy.release();
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
+            ChunkSyncCallback.EVENT.register((player, tracked) -> {
+                Components.forEach(ComponentProvider.fromChunk(tracked), (componentType, component) -> {
+                    if (component instanceof SyncedComponent) {
+                        ((SyncedComponent) component).syncWith(player);
+                    }
+                });
             });
-        });
+        }
     }
 
-    private static void syncChunkComponents(ServerPlayerEntity player, Chunk tracked) {
-        Components.forEach(ComponentProvider.fromChunk(tracked), (componentType, component) -> {
-            if (component instanceof SyncedComponent) {
-                ((SyncedComponent) component).syncWith(player);
-            }
-        });
+    // Safe to put in the same class as no client-only class is directly referenced
+    public static void initClient() {
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
+            ClientSidePacketRegistry.INSTANCE.register(ChunkSyncedComponent.PACKET_ID, (context, buffer) -> {
+                int chunkX = buffer.readInt();
+                int chunkZ = buffer.readInt();
+                Identifier componentTypeId = buffer.readIdentifier();
+                ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+                if (componentType == null) {
+                    return;
+                }
+                PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                Consumer<Chunk> chunkSync = componentType.asComponentPath()
+                        .compose(ComponentProvider::fromChunk)
+                        .thenCastTo(SyncedComponent.class)
+                        .andThenDo(component -> component.processPacket(context, copy));
+                context.getTaskQueue().execute(() -> {
+                    // On the client, unloaded chunks return EmptyChunk
+                    Chunk chunk = context.getPlayer().world.getChunk(chunkX, chunkZ);
+                    chunkSync.accept(chunk);
+                    copy.release();
+                });
+            });
+        }
     }
 }

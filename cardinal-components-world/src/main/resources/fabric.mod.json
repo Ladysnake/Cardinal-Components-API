@@ -9,6 +9,9 @@
     "entrypoints": {
         "main": [
             "nerdhub.cardinal.components.ComponentsWorldNetworking::init"
+        ],
+        "client": [
+            "nerdhub.cardinal.components.ComponentsWorldNetworking::initClient"
         ]
     },
     "custom": {
