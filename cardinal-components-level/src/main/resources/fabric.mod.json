@@ -9,6 +9,9 @@
     "entrypoints": {
         "main": [
             "nerdhub.cardinal.components.internal.ComponentsLevelNetworking::init"
+        ],
+        "client": [
+            "nerdhub.cardinal.components.internal.ComponentsLevelNetworking::initClient"
         ]
     },
     "custom": {

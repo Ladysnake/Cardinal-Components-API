@@ -41,30 +41,10 @@ import java.util.function.Consumer;
 
 public final class ComponentsEntityNetworking {
     public static void init() {
-        if (!FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            return;
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
+            PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
+            TrackingStartCallback.EVENT.register(ComponentsEntityNetworking::syncEntityComponents);
         }
-        PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
-        TrackingStartCallback.EVENT.register(ComponentsEntityNetworking::syncEntityComponents);
-        ClientSidePacketRegistry.INSTANCE.register(EntitySyncedComponent.PACKET_ID, (context, buffer) -> {
-            int entityId = buffer.readInt();
-            Identifier componentTypeId = buffer.readIdentifier();
-            ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
-            if (componentType == null) {
-                return;
-            }
-            PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-            // Functional null avoidance with off-thread lambda instantiation
-            Consumer<Entity> entitySync = componentType.asComponentPath()
-                    .compose(ComponentProvider::fromEntity)
-                    .thenCastTo(SyncedComponent.class)
-                    .andThenDo(component -> component.processPacket(context, copy));
-            context.getTaskQueue().execute(() -> {
-                Entity entity = context.getPlayer().world.getEntityById(entityId);
-                entitySync.accept(entity);
-                copy.release();
-            });
-        });
     }
 
     private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {
@@ -73,5 +53,30 @@ public final class ComponentsEntityNetworking {
                 ((SyncedComponent) component).syncWith(player);
             }
         });
+    }
+
+    // Safe to put in the same class as no client-only class is directly referenced
+    public static void initClient() {
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
+            ClientSidePacketRegistry.INSTANCE.register(EntitySyncedComponent.PACKET_ID, (context, buffer) -> {
+                int entityId = buffer.readInt();
+                Identifier componentTypeId = buffer.readIdentifier();
+                ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+                if (componentType == null) {
+                    return;
+                }
+                PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                // Functional null avoidance with off-thread lambda instantiation
+                Consumer<Entity> entitySync = componentType.asComponentPath()
+                        .compose(ComponentProvider::fromEntity)
+                        .thenCastTo(SyncedComponent.class)
+                        .andThenDo(component -> component.processPacket(context, copy));
+                context.getTaskQueue().execute(() -> {
+                    Entity entity = context.getPlayer().world.getEntityById(entityId);
+                    entitySync.accept(entity);
+                    copy.release();
+                });
+            });
+        }
     }
 }
