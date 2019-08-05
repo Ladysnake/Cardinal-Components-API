@@ -33,16 +33,23 @@ import nerdhub.cardinal.components.api.util.sync.WorldSyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 public final class ComponentsWorldNetworking {
     public static void init() {
-        if (!FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            return;
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
+            WorldSyncCallback.EVENT.register((player, world) -> {
+                Components.forEach(ComponentProvider.fromWorld(world), (componentType, component) -> {
+                    if (component instanceof SyncedComponent) {
+                        ((SyncedComponent) component).syncWith(player);
+                    }
+                });
+            });
         }
-        WorldSyncCallback.EVENT.register(ComponentsWorldNetworking::syncWorldComponents);
+    }
+
+    // Safe to put in the same class as no client-only class is directly referenced
+    public static void initClient() {
         ClientSidePacketRegistry.INSTANCE.register(WorldSyncedComponent.PACKET_ID, (context, buffer) -> {
             Identifier componentTypeId = buffer.readIdentifier();
             ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
@@ -52,14 +59,6 @@ public final class ComponentsWorldNetworking {
             Component c = componentType.get(MinecraftClient.getInstance().world);
             if (c instanceof SyncedComponent) {
                 ((SyncedComponent) c).processPacket(context, buffer);
-            }
-        });
-    }
-
-    private static void syncWorldComponents(ServerPlayerEntity player, World world) {
-        Components.forEach(ComponentProvider.fromWorld(world), (componentType, component) -> {
-            if (component instanceof SyncedComponent) {
-                ((SyncedComponent) component).syncWith(player);
             }
         });
     }
