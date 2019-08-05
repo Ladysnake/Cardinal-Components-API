@@ -9,6 +9,9 @@
     "entrypoints": {
         "main": [
             "nerdhub.cardinal.components.internal.ComponentsChunkNetworking::init"
+        ],
+        "client": [
+            "nerdhub.cardinal.components.internal.ComponentsChunkNetworking::initClient"
         ]
     },
     "custom": {
