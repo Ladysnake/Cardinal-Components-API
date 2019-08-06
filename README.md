@@ -17,10 +17,9 @@ repositories {
 dependencies {
     // Replace modImplementation with modApi if you expose components in your own API
     modImplementation "com.github.Pyrofab:Cardinal-Components-API:<VERSION>"
-    // Includes Cardinal Components API as a Jar-in-Jar dependency (optional)
-    include "com.github.Pyrofab:Cardinal-Components-API:<VERSION>"
 }
 ```
+**The include configuration will not work with JitPack and the master jar! See how to include individual modules below.**
 
 You can find the current version of the API in the [releases](https://github.com/Pyrofab/Cardinal-Components-API/releases) tab of the repository on Github.
 
@@ -32,6 +31,9 @@ Example:
 ```gradle
 // Adds an API dependency on the base cardinal components module
 modApi "com.github.Pyrofab.Cardinal-Components-API:cardinal-components-base:<VERSION>"
+// Includes the base module as a Jar-in-Jar dependency (optional)
+include "com.github.Pyrofab.Cardinal-Components-API:cardinal-components-base:<VERSION>"
+
 ```
 
 ## Usage
