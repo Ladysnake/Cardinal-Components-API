@@ -8,6 +8,7 @@
     "side": "universal",
     "entrypoints": {
         "main": [
+          "nerdhub.cardinal.components.ComponentsEntityNetworking::init"
         ],
         "client": [
             "nerdhub.cardinal.components.ComponentsEntityNetworking::initClient"
