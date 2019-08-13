@@ -24,8 +24,10 @@ package nerdhub.cardinal.components.internal;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.Entity;
@@ -40,6 +42,7 @@ public final class CardinalEntityInternals {
 
     private static final Map<Class<? extends Entity>, Event> ENTITY_EVENTS = new HashMap<>();
     private static final Map<Class<? extends Entity>, FeedbackContainerFactory<Entity, Component>> ENTITY_CONTAINER_FACTORIES = new HashMap<>();
+    private static final Map<ComponentType<?>, RespawnCopyStrategy<?>> RESPAWN_COPY_STRATEGIES = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     public static <T extends Entity> Event<EntityComponentCallback<T>> event(Class<T> clazz) {
@@ -76,4 +79,12 @@ public final class CardinalEntityInternals {
         });
     }
 
+    public static <C extends Component> void registerRespawnCopyStrat(ComponentType<C> type, RespawnCopyStrategy<C> strategy) {
+        RESPAWN_COPY_STRATEGIES.put(type, strategy);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <C extends Component> RespawnCopyStrategy<C> getRespawnCopyStrat(ComponentType<C> type) {
+        return (RespawnCopyStrategy<C>) RESPAWN_COPY_STRATEGIES.getOrDefault(type, RespawnCopyStrategy.LOSSLESS_ONLY);
+    }
 }
