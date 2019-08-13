@@ -1,8 +1,19 @@
 package nerdhub.cardinal.components.api.util;
 
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import net.minecraft.nbt.CompoundTag;
 
+/**
+ * Represents a strategy to copy a component from a player to another.
+ *
+ * <p> Copy strategies can be registered using {@link EntityComponents#registerRespawnCopyStrat(ComponentType, RespawnCopyStrategy)}.
+ *
+ * @param <C> the type of components handled by this strategy
+ * @see PlayerCopyCallback
+ * @see EntityComponents
+ */
 @FunctionalInterface
 public interface RespawnCopyStrategy<C extends Component> {
     void copyForRespawn(C from, C to, boolean lossless, boolean keepInventory);
@@ -32,6 +43,13 @@ public interface RespawnCopyStrategy<C extends Component> {
             copy(from, to);
         }
     };
+
+    /**
+     * Never copy a component no matter the cause of respawn.
+     * This strategy can be used when {@code RespawnCopyStrategy} does not offer enough context,
+     * in which case {@link PlayerCopyCallback} may be used directly.
+     */
+    RespawnCopyStrategy<?> NEVER_COPY = (from, to, lossless, keepInventory) -> {};
 
     static <C extends Component> void copy(C from, C to) {
         to.fromTag(from.toTag(new CompoundTag()));
