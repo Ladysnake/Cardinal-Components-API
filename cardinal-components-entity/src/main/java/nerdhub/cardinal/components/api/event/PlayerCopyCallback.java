@@ -16,6 +16,7 @@
 
 package nerdhub.cardinal.components.api.event;
 
+import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -23,6 +24,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 /**
  * The callback interface for receiving player data copy events during
  * {@link ServerPlayerEntity#copyFrom(ServerPlayerEntity, boolean) player cloning}.
+ *
+ * @see CloneableComponent
  */
 @FunctionalInterface
 public interface PlayerCopyCallback {
