@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.mixins.common;
 
+import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
 import nerdhub.cardinal.components.api.event.TrackingStartCallback;
 import net.minecraft.entity.Entity;
@@ -43,5 +44,10 @@ public abstract class MixinServerPlayerEntity {
     @Inject(method = "changeDimension", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;getStatusEffects()Ljava/util/Collection;"))
     private void onDimensionChange(DimensionType dimension, CallbackInfoReturnable<Entity> cir) {
         PlayerSyncCallback.EVENT.invoker().onPlayerSync((ServerPlayerEntity)(Object) this);
+    }
+
+    @Inject(method = "copyFrom", at = @At("RETURN"))
+    private void copyDataFrom(ServerPlayerEntity original, boolean lossless, CallbackInfo ci) {
+        PlayerCopyCallback.EVENT.invoker().copyData(original, (ServerPlayerEntity) (Object) this, lossless);
     }
 }
