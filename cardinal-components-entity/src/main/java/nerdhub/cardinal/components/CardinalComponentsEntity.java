@@ -26,9 +26,11 @@ import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
+import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
 import nerdhub.cardinal.components.api.event.TrackingStartCallback;
 import nerdhub.cardinal.components.api.util.Components;
+import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
@@ -36,15 +38,27 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.PacketByteBuf;
+import net.minecraft.world.GameRules;
 
 import java.util.function.Consumer;
 
-public final class ComponentsEntityNetworking {
+public final class CardinalComponentsEntity {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
-            TrackingStartCallback.EVENT.register(ComponentsEntityNetworking::syncEntityComponents);
+            TrackingStartCallback.EVENT.register(CardinalComponentsEntity::syncEntityComponents);
         }
+        PlayerCopyCallback.EVENT.register(CardinalComponentsEntity::copyData);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless) {
+        boolean keepInventory = original.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || clone.isSpectator();
+        Components.forEach(ComponentProvider.fromEntity(original),
+                (type, from) -> type.maybeGet(clone).ifPresent(
+                        to -> EntityComponents.getRespawnCopyStrat((ComponentType) type).copyForRespawn(from, to, lossless, keepInventory)
+                )
+        );
     }
 
     private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {
