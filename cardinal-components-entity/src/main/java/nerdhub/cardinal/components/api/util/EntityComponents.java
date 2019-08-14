@@ -29,7 +29,7 @@ import nerdhub.cardinal.components.internal.CardinalEntityInternals;
 public final class EntityComponents {
 
     /**
-     * Register a respawn copy strategy for components of a given type.
+     * Set the respawn copy strategy used for components of a given type.
      *
      * <p> When a player is cloned as part of the respawn process, its components are copied using
      * a {@link RespawnCopyStrategy}. By default, the strategy used is {@link RespawnCopyStrategy#LOSSLESS_ONLY}.
@@ -40,13 +40,13 @@ public final class EntityComponents {
      * @param <C>      the type of components affected
      *
      * @see nerdhub.cardinal.components.api.event.PlayerCopyCallback
-     * @see #getRespawnCopyStrat(ComponentType)
+     * @see #getRespawnCopyStrategy(ComponentType)
      */
-    public static <C extends Component> void registerRespawnCopyStrat(ComponentType<C> type, RespawnCopyStrategy<C> strategy) {
+    public static <C extends Component> void setRespawnCopyStrategy(ComponentType<C> type, RespawnCopyStrategy<C> strategy) {
         CardinalEntityInternals.registerRespawnCopyStrat(type, strategy);
     }
 
-    public static <C extends Component> RespawnCopyStrategy<C> getRespawnCopyStrat(ComponentType<C> type) {
+    public static <C extends Component> RespawnCopyStrategy<C> getRespawnCopyStrategy(ComponentType<C> type) {
         return CardinalEntityInternals.getRespawnCopyStrat(type);
     }
 }
