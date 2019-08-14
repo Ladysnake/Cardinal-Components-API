@@ -56,7 +56,7 @@ public final class CardinalComponentsEntity {
         boolean keepInventory = original.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || clone.isSpectator();
         Components.forEach(ComponentProvider.fromEntity(original),
                 (type, from) -> type.maybeGet(clone).ifPresent(
-                        to -> EntityComponents.getRespawnCopyStrat((ComponentType) type).copyForRespawn(from, to, lossless, keepInventory)
+                        to -> EntityComponents.getRespawnCopyStrategy((ComponentType) type).copyForRespawn(from, to, lossless, keepInventory)
                 )
         );
     }

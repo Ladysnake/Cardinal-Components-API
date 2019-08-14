@@ -26,11 +26,12 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.GameRules;
 
 /**
  * Represents a strategy to copy a component from a player to another.
  *
- * <p> Copy strategies can be registered using {@link EntityComponents#registerRespawnCopyStrat(ComponentType, RespawnCopyStrategy)}.
+ * <p> Copy strategies can be registered using {@link EntityComponents#setRespawnCopyStrategy(ComponentType, RespawnCopyStrategy)}.
  *
  * @param <C> the type of components handled by this strategy
  * @see PlayerCopyCallback
@@ -38,6 +39,15 @@ import net.minecraft.nbt.CompoundTag;
  */
 @FunctionalInterface
 public interface RespawnCopyStrategy<C extends Component> {
+    /**
+     * Copy data from a component to another as part of a player respawn.
+     *
+     * @param from          the component to copy data from
+     * @param to            the component to copy data to
+     * @param lossless      {@code true} if the player is copied exactly, such as when coming back from the End
+     * @param keepInventory {@code true} if the player's inventory and XP are kept, such as when
+     *                      {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
+     */
     void copyForRespawn(C from, C to, boolean lossless, boolean keepInventory);
 
     /**
