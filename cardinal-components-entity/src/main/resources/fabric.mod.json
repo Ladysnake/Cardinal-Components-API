@@ -8,10 +8,10 @@
     "side": "universal",
     "entrypoints": {
         "main": [
-          "nerdhub.cardinal.components.ComponentsEntityNetworking::init"
+          "nerdhub.cardinal.components.CardinalComponentsEntity::init"
         ],
         "client": [
-            "nerdhub.cardinal.components.ComponentsEntityNetworking::initClient"
+            "nerdhub.cardinal.components.CardinalComponentsEntity::initClient"
         ]
     },
     "custom": {

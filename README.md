@@ -74,11 +74,17 @@ Components can be added to entities of any type (modded or vanilla) by registeri
 Entity components are saved automatically with the entity. Synchronization must be done either manually or with
 help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
 and [`EntitySyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/util/sync/EntitySyncedComponent.java) interfaces.
+Cardinal Components also provides mechanisms for handling player respawns. By default, components get copied when
+players return from the End, but mods can customize that behaviour through [`RespawnCopyStrategy`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/util/RespawnCopyStrategy.java)
+and [`PlayerCopyCallback`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/event/PlayerCopyCallback.java)
+to copy all or part of the component data.
 
 **Example:**
 ```java
 // Add the component to every instance of PlayerEntity
 EntityComponentCallback.event(PlayerEntity.class).register((player, components) -> components.put(MAGIK, new RandomIntComponent()));
+// Ensure the component's data is copied when keepInventory is enabled (Optional)
+EntityComponents.registerRespawnCopyStrat(MAGIK, RespawnCopyStrategy.INVENTORY);
 ```
 
 *module: cardinal-components-entity*
