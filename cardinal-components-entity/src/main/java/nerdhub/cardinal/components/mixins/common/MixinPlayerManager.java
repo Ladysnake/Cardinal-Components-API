@@ -26,10 +26,12 @@ import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerManager.class)
 public abstract class MixinPlayerManager {
@@ -42,5 +44,13 @@ public abstract class MixinPlayerManager {
     )
     private void onPlayerLogIn(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
         PlayerSyncCallback.EVENT.invoker().onPlayerSync(player);
+    }
+
+    @Inject(
+            method = "respawnPlayer",
+            at = @At("RETURN")
+    )
+    private void respawnPlayer(ServerPlayerEntity player, DimensionType dimension, boolean end, CallbackInfoReturnable<ServerPlayerEntity> cir) {
+        PlayerSyncCallback.EVENT.invoker().onPlayerSync(cir.getReturnValue());
     }
 }
