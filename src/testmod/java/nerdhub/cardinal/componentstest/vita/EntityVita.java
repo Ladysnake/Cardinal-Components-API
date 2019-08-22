@@ -39,9 +39,9 @@ public class EntityVita extends BaseVita {
         super.setVitality(value);
         if (!this.owner.world.isClient) {
             if (this.getVitality() == 0) {
-                owner.addPotionEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
+                owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
             } else if (this.getVitality() > 10) {
-                owner.addPotionEffect(new StatusEffectInstance(StatusEffects.SPEED, 1000));
+                owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1000));
             }
         }
     }
