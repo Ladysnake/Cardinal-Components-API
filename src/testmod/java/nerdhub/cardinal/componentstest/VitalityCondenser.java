@@ -29,7 +29,9 @@ import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.util.provider.EmptyComponentProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.class_4538;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -51,7 +53,7 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
 
     @Deprecated
     @Override
-    public void onScheduledTick(BlockState state, World world, BlockPos pos, Random rand) {
+    public void onScheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
         CardinalComponentsTest.VITA.get(world).transferTo(
                 Objects.requireNonNull(this.getComponent(world, pos, CardinalComponentsTest.VITA, null)),
                 1
@@ -87,7 +89,8 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
 
     private ComponentProvider getChunkProvider(BlockView blockView, BlockPos pos) {
         if (blockView instanceof ViewableWorld) {
-            return ComponentProvider.fromChunk(((ViewableWorld) blockView).getChunk(pos));
+            // method_22350 == getChunk
+            return ComponentProvider.fromChunk(((class_4538) blockView).method_22350(pos));
         }
         return EmptyComponentProvider.instance();
     }
