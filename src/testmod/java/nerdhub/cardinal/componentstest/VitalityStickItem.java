@@ -30,6 +30,7 @@ import nerdhub.cardinal.componentstest.vita.BaseVita;
 import nerdhub.cardinal.componentstest.vita.Vita;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
@@ -42,6 +43,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -89,6 +91,11 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
         if (holder != null) {
             lines.add(new TranslatableText("componenttest:tooltip.self_vitality", CardinalComponentsTest.VITA.get(holder).getVitality()));
         }
+    }
+
+    @Override
+    public boolean canMine(BlockState block, World world, BlockPos pos, PlayerEntity player) {
+        return !player.isCreative();
     }
 
     @Override
