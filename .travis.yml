@@ -46,4 +46,3 @@ deploy:
         on:
             repo: NerdHubMC/Cardinal-Components-API
             tags: true
-            branch: master
