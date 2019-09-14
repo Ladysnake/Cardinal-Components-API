@@ -40,9 +40,10 @@ deploy:
 
     # if commit tag is created, deploy to curseforge
     -   provider: script
-        script: "./gradlew clean publish" # curseforge"
+        script: "./gradlew clean curseforge"
         target_commitsh: $TRAVIS_TAG
         skip_cleanup: true
         on:
             repo: NerdHubMC/Cardinal-Components-API
             tags: true
+            condition: "false" # curseforge deployment is broken right now
