@@ -36,7 +36,7 @@ deploy:
         skip_cleanup: true
         on:
             repo: NerdHubMC/Cardinal-Components-API
-            branch: master
+            tags: true
 
     # if commit tag is created, deploy to curseforge
     -   provider: script
@@ -46,3 +46,4 @@ deploy:
         on:
             repo: NerdHubMC/Cardinal-Components-API
             tags: true
+            condition: "false" # curseforge deploying is broken right now
