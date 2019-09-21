@@ -50,7 +50,9 @@ public interface EntitySyncedComponent extends BaseSyncedComponent {
     @Override
     default void markDirty() {
         if (!this.getEntity().world.isClient) {
-            PlayerStream.watching(this.getEntity()).map(ServerPlayerEntity.class::cast).forEach(this::syncWith);
+            Entity holder = this.getEntity();
+            if (holder instanceof ServerPlayerEntity) this.syncWith((ServerPlayerEntity) holder);
+            PlayerStream.watching(holder).map(ServerPlayerEntity.class::cast).forEach(this::syncWith);
         }
     }
 
