@@ -79,7 +79,7 @@ public final class CardinalEntityInternals {
         });
     }
 
-    public static <C extends Component> void registerRespawnCopyStrat(ComponentType<C> type, RespawnCopyStrategy<C> strategy) {
+    public static <C extends Component> void registerRespawnCopyStrat(ComponentType<C> type, RespawnCopyStrategy<? super C> strategy) {
         RESPAWN_COPY_STRATEGIES.put(type, strategy);
     }
 

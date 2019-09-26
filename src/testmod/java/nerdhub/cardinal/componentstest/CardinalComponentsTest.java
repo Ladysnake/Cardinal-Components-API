@@ -25,6 +25,8 @@ package nerdhub.cardinal.componentstest;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.event.*;
+import nerdhub.cardinal.components.api.util.EntityComponents;
+import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import nerdhub.cardinal.componentstest.vita.AmbientVita;
 import nerdhub.cardinal.componentstest.vita.ChunkVita;
 import nerdhub.cardinal.componentstest.vita.PlayerVita;
@@ -61,6 +63,7 @@ public class CardinalComponentsTest {
         // Method reference on instance method, allows override by subclasses + access to protected variables
         EntityComponentCallback.event(VitalityZombieEntity.class).register(VitalityZombieEntity::initComponents);
         EntityComponentCallback.event(PlayerEntity.class).register((player, components) -> components.put(VITA, new PlayerVita(player, 0)));
+        EntityComponents.setRespawnCopyStrategy(VITA, RespawnCopyStrategy.ALWAYS_COPY);
         WorldComponentCallback.EVENT.register((world, components) -> components.put(VITA, new AmbientVita.WorldVita(world)));
         LevelComponentCallback.EVENT.register((level, components) -> components.put(VITA, new AmbientVita.LevelVita()));
         ChunkComponentCallback.EVENT.register((chunk, components) -> components.put(VITA, new ChunkVita(chunk)));

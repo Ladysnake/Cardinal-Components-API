@@ -42,7 +42,7 @@ public final class EntityComponents {
      * @see nerdhub.cardinal.components.api.event.PlayerCopyCallback
      * @see #getRespawnCopyStrategy(ComponentType)
      */
-    public static <C extends Component> void setRespawnCopyStrategy(ComponentType<C> type, RespawnCopyStrategy<C> strategy) {
+    public static <C extends Component> void setRespawnCopyStrategy(ComponentType<C> type, RespawnCopyStrategy<? super C> strategy) {
         CardinalEntityInternals.registerRespawnCopyStrat(type, strategy);
     }
 
