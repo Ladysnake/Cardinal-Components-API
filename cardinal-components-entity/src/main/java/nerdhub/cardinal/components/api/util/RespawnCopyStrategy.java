@@ -54,23 +54,23 @@ public interface RespawnCopyStrategy<C extends Component> {
      * Always copy a component no matter the cause of respawn.
      * This strategy is relevant for persistent metadata such as stats.
      */
-    RespawnCopyStrategy<?> ALWAYS_COPY = (from, to, lossless, keepInventory) -> copy(from, to);
+    RespawnCopyStrategy<Component> ALWAYS_COPY = (from, to, lossless, keepInventory) -> copy(from, to);
 
     /**
      * Copy a component whenever the player's inventory would be copied.
      * This strategy is relevant for any data storage tied to items or experience.
      */
-    RespawnCopyStrategy<?> INVENTORY = (from, to, lossless, keepInventory) -> {
+    RespawnCopyStrategy<Component> INVENTORY = (from, to, lossless, keepInventory) -> {
         if (lossless || keepInventory) {
             copy(from, to);
         }
     };
 
     /**
-     * Copy a component only when the entire data is transferred from a player to the other.
+     * Copy a component only when the entire data is transferred from a player to the other (eg. return from the End).
      * This strategy is the default.
      */
-    RespawnCopyStrategy<?> LOSSLESS_ONLY = (from, to, lossless, keepInventory) -> {
+    RespawnCopyStrategy<Component> LOSSLESS_ONLY = (from, to, lossless, keepInventory) -> {
         if (lossless) {
             copy(from, to);
         }
@@ -81,7 +81,7 @@ public interface RespawnCopyStrategy<C extends Component> {
      * This strategy can be used when {@code RespawnCopyStrategy} does not offer enough context,
      * in which case {@link PlayerCopyCallback} may be used directly.
      */
-    RespawnCopyStrategy<?> NEVER_COPY = (from, to, lossless, keepInventory) -> {};
+    RespawnCopyStrategy<Component> NEVER_COPY = (from, to, lossless, keepInventory) -> {};
 
     static <C extends Component> void copy(C from, C to) {
         to.fromTag(from.toTag(new CompoundTag()));
