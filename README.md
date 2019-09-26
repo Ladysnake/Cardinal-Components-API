@@ -84,7 +84,7 @@ to copy all or part of the component data.
 // Add the component to every instance of PlayerEntity
 EntityComponentCallback.event(PlayerEntity.class).register((player, components) -> components.put(MAGIK, new RandomIntComponent()));
 // Ensure the component's data is copied when keepInventory is enabled (Optional)
-EntityComponents.registerRespawnCopyStrat(MAGIK, RespawnCopyStrategy.INVENTORY);
+EntityComponents.setRespawnCopyStrat(MAGIK, RespawnCopyStrategy.INVENTORY);
 ```
 
 *module: cardinal-components-entity*
