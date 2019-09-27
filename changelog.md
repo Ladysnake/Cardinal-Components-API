@@ -1,4 +1,31 @@
 ------------------------------------------------------
+Version 2.0.3
+------------------------------------------------------
+- Fixed NPE crash when a player's component is synced too early
+
+------------------------------------------------------
+Version 2.0.2
+------------------------------------------------------
+- Fixed entity components not getting synced with the holder by default
+- Fixed generics issues in RespawnCopyStrategy
+
+------------------------------------------------------
+Version 2.0.1
+------------------------------------------------------
+Added facilities to handle player respawning
+
+Fixes:
+- Fixed networking initialization causing server crashes
+- Fixed item component synchronization failing
+- Fixed regression in entity component synchronization
+
+------------------------------------------------------
+Version 2.0.0
+------------------------------------------------------
+- Rewrote the API
+- Split the functionality into modules
+
+------------------------------------------------------
 Version 1.2.0
 ------------------------------------------------------
 - add utility methods for getting block/item components
