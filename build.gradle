@@ -104,6 +104,7 @@ dependencies {
     // used by the test mod
     modImplementation("net.fabricmc.fabric-api:fabric-api-base:${rootProject.fabric_base_version}")
     modImplementation("net.fabricmc.fabric-api:fabric-object-builders-v0:${fabric_object_builders_version}")
+    modImplementation("net.fabricmc.fabric-api:fabric-renderer-registries-v1:${fabric_renderer_registry_version}")
     modRuntime("net.fabricmc.fabric-api:fabric-networking-v0:${rootProject.fabric_networking_version}")
     modRuntime("net.fabricmc.fabric-api:fabric-resource-loader-v0:${fabric_resource_loader_version}")
     modRuntime("net.fabricmc.fabric-api:fabric-mining-levels-v0:${fabric_mining_levels_version}")

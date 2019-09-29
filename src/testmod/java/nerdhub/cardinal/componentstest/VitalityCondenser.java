@@ -38,7 +38,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.ViewableWorld;
+import net.minecraft.world.CollisionView;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -88,9 +88,9 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
     }
 
     private ComponentProvider getChunkProvider(BlockView blockView, BlockPos pos) {
-        if (blockView instanceof ViewableWorld) {
+        if (blockView instanceof CollisionView) {
             // method_22350 == getChunk
-            return ComponentProvider.fromChunk(((class_4538) blockView).method_22350(pos));
+            return ComponentProvider.fromChunk(((class_4538) blockView).getChunk(pos));
         }
         return EmptyComponentProvider.instance();
     }
