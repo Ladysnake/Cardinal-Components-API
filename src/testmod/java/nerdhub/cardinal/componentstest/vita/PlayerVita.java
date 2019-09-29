@@ -34,8 +34,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
  */
 public class PlayerVita extends EntityVita implements EntitySyncedComponent {
 
-    public PlayerVita(PlayerEntity owner, int baseVitality) {
-        super(owner, baseVitality);
+    public PlayerVita(PlayerEntity owner) {
+        super(owner, 0);
     }
 
     @Override

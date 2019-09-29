@@ -46,7 +46,11 @@ import org.apache.logging.log4j.Logger;
 public class CardinalComponentsTest {
 
     public static final Logger LOGGER = LogManager.getLogger("Component Test");
-    public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("componenttest:vita"), Vita.class);
+    public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("componenttest:vita"), Vita.class)
+        .attach(EntityComponentCallback.event(PlayerEntity.class), PlayerVita::new)
+        .attach(WorldComponentCallback.EVENT, AmbientVita.WorldVita::new)
+        .attach(LevelComponentCallback.EVENT, l -> new AmbientVita.LevelVita())
+        .attach(ChunkComponentCallback.EVENT, ChunkVita::new);
 
     // inline self component callback registration
     public static final VitalityStickItem VITALITY_STICK = Registry.register(Registry.ITEM, "componenttest:vita_stick",
@@ -62,11 +66,7 @@ public class CardinalComponentsTest {
         LOGGER.info("Hello, Components!");
         // Method reference on instance method, allows override by subclasses + access to protected variables
         EntityComponentCallback.event(VitalityZombieEntity.class).register(VitalityZombieEntity::initComponents);
-        EntityComponentCallback.event(PlayerEntity.class).register((player, components) -> components.put(VITA, new PlayerVita(player, 0)));
         EntityComponents.setRespawnCopyStrategy(VITA, RespawnCopyStrategy.ALWAYS_COPY);
-        WorldComponentCallback.EVENT.register((world, components) -> components.put(VITA, new AmbientVita.WorldVita(world)));
-        LevelComponentCallback.EVENT.register((level, components) -> components.put(VITA, new AmbientVita.LevelVita()));
-        ChunkComponentCallback.EVENT.register((chunk, components) -> components.put(VITA, new ChunkVita(chunk)));
     }
 }
 
