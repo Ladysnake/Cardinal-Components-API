@@ -71,7 +71,7 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
                 vita.transferTo(CardinalComponentsTest.VITA.get(player), vita.getVitality());
             }
         }
-        return new TypedActionResult<>(ActionResult.PASS, stack);
+        return new TypedActionResult<>(ActionResult.PASS, stack, true);
     }
 
     @Override

@@ -9,6 +9,9 @@
     "entrypoints": {
         "main": [
             "nerdhub.cardinal.componentstest.CardinalComponentsTest::init"
+        ],
+        "client": [
+            "nerdhub.cardinal.componentstest.CardinalComponentsTest::clientInit"
         ]
     },
     "depends": {
