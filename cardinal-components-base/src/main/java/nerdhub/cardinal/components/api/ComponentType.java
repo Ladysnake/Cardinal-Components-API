@@ -24,12 +24,16 @@ package nerdhub.cardinal.components.api;
 
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
+import nerdhub.cardinal.components.api.event.ComponentCallback;
 import nerdhub.cardinal.components.api.util.ObjectPath;
+import nerdhub.cardinal.components.internal.ComponentsInternals;
+import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
 
 import javax.annotation.Nullable;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * The representation of a component type registered through {@link ComponentRegistry#registerIfAbsent}
@@ -55,7 +59,7 @@ public final class ComponentType<T extends Component> {
         this.id = id;
         this.rawId = rawId;
     }
-    
+
     /* ------------- public methods -------------- */
 
     public Identifier getId() {
@@ -104,6 +108,25 @@ public final class ComponentType<T extends Component> {
             return Optional.ofNullable(((ComponentProvider) provider).getComponent(this));
         }
         return Optional.empty();
+    }
+
+    /**
+     * Attaches components of this type to a component provider using a {@link ComponentCallback} for that
+     * type of provider.
+     *
+     * <p> This method behaves as if:
+     * <pre>{@code
+     *      event.register((provider, components) -> components.put(type, factory.apply(provider)));
+     * }</pre>
+     * @param event the event for which components of this type should be attached
+     * @param factory a factory creating instances for this {@code ComponentType}
+     * @param <P> the type of providers targeted by the event
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code event} is not a valid component event
+     */
+    public <P, C extends T, E extends ComponentCallback<P, ? super C>> ComponentType<T> attach(Event<E> event, Function<P, C> factory) {
+        event.register(ComponentsInternals.createCallback(event, (provider, components) -> components.put(this, factory.apply(provider))));
+        return this;
     }
 
     @Override
