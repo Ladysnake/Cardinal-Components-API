@@ -125,7 +125,7 @@ public final class ComponentType<T extends Component> {
      * @throws IllegalArgumentException if {@code event} is not a valid component event
      */
     public <P, C extends T, E extends ComponentCallback<P, ? super C>> ComponentType<T> attach(Event<E> event, Function<P, C> factory) {
-        event.register(ComponentsInternals.createCallback(event, (provider, components) -> components.put(this, factory.apply(provider))));
+        event.register(ComponentsInternals.createCallback(event, this, factory));
         return this;
     }
 
