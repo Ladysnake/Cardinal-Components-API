@@ -24,8 +24,12 @@ package nerdhub.cardinal.components.api.event;
 
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import net.fabricmc.fabric.api.event.Event;
+
+import java.util.function.Function;
 
 /**
+ * @see nerdhub.cardinal.components.api.ComponentType#attach(Event, Function)
  * @see "EntityComponentCallback"
  * @see "ItemComponentCallback"
  */
