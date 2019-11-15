@@ -90,7 +90,7 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
 
         @Override
         public void syncWithAll(MinecraftServer server) {
-            WorldSyncedComponent.super.markDirty();
+            WorldSyncedComponent.super.sync();
         }
     }
 

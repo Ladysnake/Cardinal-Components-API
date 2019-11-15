@@ -49,7 +49,7 @@ public interface LevelSyncedComponent extends BaseSyncedComponent {
      * @see #syncWithAll(MinecraftServer)
      */
     @Override
-    default void markDirty() {
+    default void sync() {
         // NO-OP
         // We have no straightforward way to obtain player instances through LevelProperties
     }
