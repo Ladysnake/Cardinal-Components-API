@@ -25,9 +25,9 @@ package nerdhub.cardinal.components.mixins.common.chunk;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import net.minecraft.class_4548;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeArray;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,7 +38,7 @@ import java.util.Set;
 
 @Mixin(EmptyChunk.class)
 public abstract class MixinEmptyChunk extends WorldChunk implements ComponentProvider {
-    public MixinEmptyChunk(World world, ChunkPos pos, class_4548 biomes) {
+    public MixinEmptyChunk(World world, ChunkPos pos, BiomeArray biomes) {
         super(world, pos, biomes);
     }
 

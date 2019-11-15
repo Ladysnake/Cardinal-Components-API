@@ -2,7 +2,7 @@ import java.nio.charset.StandardCharsets
 import java.time.Year
 
 plugins {
-    id "fabric-loom" version "0.2.5-SNAPSHOT" apply false
+    id "fabric-loom" version "0.2.6-SNAPSHOT" apply false
     id "net.minecrell.licenser" version "0.2.1"
     id "com.matthewprenger.cursegradle" version "1.2.0"
     id "maven-publish"
@@ -39,7 +39,7 @@ allprojects {
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        mappings "net.fabricmc:yarn:${rootProject.minecraft_version}+build.${rootProject.yarn_mappings}"
+        mappings "net.fabricmc:yarn:${rootProject.minecraft_version}+build.${rootProject.yarn_mappings}:v2"
         modApi "net.fabricmc:fabric-loader:${rootProject.loader_version}"
         modApi("net.fabricmc.fabric-api:fabric-api-base:${rootProject.fabric_base_version}")
         modImplementation("net.fabricmc.fabric-api:fabric-networking-v0:${rootProject.fabric_networking_version}")
