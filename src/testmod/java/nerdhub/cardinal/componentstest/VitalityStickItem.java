@@ -40,7 +40,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
@@ -71,7 +70,7 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
                 vita.transferTo(CardinalComponentsTest.VITA.get(player), vita.getVitality());
             }
         }
-        return new TypedActionResult<>(ActionResult.PASS, stack, true);
+        return TypedActionResult.pass(stack);
     }
 
     @Override

@@ -96,7 +96,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
      */
     @Override
     public void fromTag(CompoundTag tag) {
-        if(tag.containsKey("cardinal_components", NbtType.LIST)) {
+        if(tag.contains("cardinal_components", NbtType.LIST)) {
             ListTag componentList = tag.getList("cardinal_components", NbtType.COMPOUND);
             componentList.stream().map(CompoundTag.class::cast).forEach(nbt -> {
                 ComponentType<?> type = ComponentRegistry.INSTANCE.get(new Identifier(nbt.getString("componentId")));
