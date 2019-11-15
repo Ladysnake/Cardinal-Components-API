@@ -39,7 +39,7 @@ public class ChunkVita extends BaseVita implements ChunkSyncedComponent {
     @Override
     public void setVitality(int value) {
         super.setVitality(value);
-        this.markDirty();
+        this.sync();
     }
 
     @Override

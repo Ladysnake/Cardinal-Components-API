@@ -39,7 +39,7 @@ public class PlayerVita extends EntityVita implements EntitySyncedComponent {
     }
 
     @Override
-    public void markDirty() {
+    public void sync() {
         if (!this.getEntity().world.isClient) {
             // We only sync with the holder, not with everyone around
             this.syncWith((ServerPlayerEntity) this.getEntity());
@@ -49,7 +49,7 @@ public class PlayerVita extends EntityVita implements EntitySyncedComponent {
     @Override
     public void setVitality(int value) {
         super.setVitality(value);
-        this.markDirty();
+        this.sync();
     }
 
     @Override

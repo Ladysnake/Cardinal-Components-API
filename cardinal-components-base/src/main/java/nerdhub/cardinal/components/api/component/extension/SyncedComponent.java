@@ -44,8 +44,31 @@ public interface SyncedComponent extends Component {
      * that its state should be sent to relevant clients.
      * A component may send an update as soon as this method is called, or it may merely
      * record the change so that an external system performs the synchronization.
+     *
+     * @deprecated use {@link #sync()} for an alternative with better semantics
      */
-    void markDirty();
+    @Deprecated
+    default void markDirty() {
+        this.sync();
+    }
+
+    /**
+     * Synchronizes this component with any watcher.
+     *
+     * <p> Implementations that wish to keep some property in sync with watching clients
+     * should call this method every time that property is updated.
+     * Example: <pre>{@code
+     *      private int syncedValue;
+     *
+     *      public void setSyncedValue(int newValue) {
+     *          this.syncedValue = newValue;
+     *          this.sync();
+     *      }
+     * }</pre>
+     *
+     * @since 2.1.0
+     */
+    void sync();
 
     /**
      * Immediately synchronizes this component with the given player.
