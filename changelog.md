@@ -1,4 +1,10 @@
 ------------------------------------------------------
+Version 2.1.0
+------------------------------------------------------
+- Added `ComponentType#attach`, a convenience method to subscribe to component initialization events
+- Deprecated `SyncedComponent#markDirty` in favor of `SyncedComponent#sync`, improving semantics
+
+------------------------------------------------------
 Version 2.0.3
 ------------------------------------------------------
 - Fixed NPE crash when a player's component is synced too early
