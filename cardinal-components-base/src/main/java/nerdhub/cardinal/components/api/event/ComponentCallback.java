@@ -24,8 +24,18 @@ package nerdhub.cardinal.components.api.event;
 
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
+import net.fabricmc.fabric.api.event.Event;
+
+import java.util.function.Function;
 
 /**
+ * The base callback interface for receiving component initialization events.
+ *
+ * <p> Specialized versions of this callback are available for every default {@link ComponentProvider}
+ * implementation in their respective module.
+ *
+ * @see nerdhub.cardinal.components.api.ComponentType#attach(Event, Function)
  * @see "EntityComponentCallback"
  * @see "ItemComponentCallback"
  */

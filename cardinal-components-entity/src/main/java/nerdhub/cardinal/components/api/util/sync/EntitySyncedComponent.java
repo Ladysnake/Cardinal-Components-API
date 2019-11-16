@@ -48,7 +48,7 @@ public interface EntitySyncedComponent extends BaseSyncedComponent {
     Entity getEntity();
 
     @Override
-    default void markDirty() {
+    default void sync() {
         if (!this.getEntity().world.isClient) {
             Entity holder = this.getEntity();
             if (holder instanceof ServerPlayerEntity && ((ServerPlayerEntity) holder).networkHandler != null) {
