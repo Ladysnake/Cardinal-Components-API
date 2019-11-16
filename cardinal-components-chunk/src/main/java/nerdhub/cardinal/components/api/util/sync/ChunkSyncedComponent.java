@@ -50,7 +50,7 @@ public interface ChunkSyncedComponent extends ChunkComponent, BaseSyncedComponen
     Chunk getChunk();
 
     @Override
-    default void markDirty() {
+    default void sync() {
         if (this.getChunk() instanceof WorldChunk) {
             WorldChunk chunk = (WorldChunk) this.getChunk();
             if (!chunk.getWorld().isClient) {

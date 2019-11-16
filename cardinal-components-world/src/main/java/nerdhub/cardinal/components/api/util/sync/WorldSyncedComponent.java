@@ -48,7 +48,7 @@ public interface WorldSyncedComponent extends BaseSyncedComponent {
     World getWorld();
 
     @Override
-    default void markDirty() {
+    default void sync() {
         if (!this.getWorld().isClient) {
             PlayerStream.world(this.getWorld()).map(ServerPlayerEntity.class::cast).forEach(this::syncWith);
         }

@@ -66,6 +66,17 @@ public static void useMagik(ComponentProvider provider) {
 ```
 *Note: a component class can be reused for several component types*
 
+Components are normally attached to providers through an adequate [`ComponentCallback`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/event/ComponentCallback.java).
+The usual syntax is of the form `XComponentCallback.EVENT.register((provider, components) -> components.put(componentType, new ComponentImpl(...)));`.
+Alternatively, a shortcut for this syntax is available in ComponentType for every ComponentCallback, as `componentType.attach(XComponentCallback.EVENT, componentFactory)`.
+Example:
+```java
+public static final ComponentType<IntComponent> MAGIK = 
+        ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("mymod:magik"), IntComponent.class)
+            .attach(EntityComponentCallback.event(ZombieEntity.class), zombie -> new RandomIntComponent())
+            .attach(WorldComponentCallback.EVENT, WorldIntComponent::new);
+```
+
 Cardinal Components API offers component provider implementations for a few vanilla types, each in its own module:
 
 ### Entities
