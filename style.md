@@ -11,7 +11,7 @@ These "style guidelines" are used to keep the Cardinal Components codebase clean
     
 **Naming conventions**
 - Modules and packages use singular names
-- Modules names start with `cardinal-components`
+- Module names start with `cardinal-components`
 
 **Java code style**
 - Standard Java conventions apply
