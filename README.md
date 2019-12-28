@@ -1,5 +1,12 @@
 # Cardinal-Components-API
-A components API for Fabric that is easy, modular, and fast.
+A components API for Fabric that is easy, modular, and fast.  
+Cardinal Components API is a library for Minecraft mods to create data
+components that can be attached to various providers. Those components
+provide a standardized interface for mods to interact with otherwise opaque
+objects and behaviours, thereby helping both mod creation and compatibility.
+
+
+TL;DR: It allows you to attach data to things
 
 ## Adding the API to your buildscript (loom 0.2.4):
 ```gradle
