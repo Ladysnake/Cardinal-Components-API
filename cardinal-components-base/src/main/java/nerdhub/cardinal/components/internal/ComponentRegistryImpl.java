@@ -27,6 +27,7 @@ import com.google.common.base.Preconditions;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.event.ComponentRegisteredCallback;
 import net.minecraft.util.Identifier;
 
 import java.util.LinkedHashMap;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public final class ComponentRegistryImpl implements ComponentRegistry {
-    
+
     private final Map<Identifier, ComponentType<?>> registry = new LinkedHashMap<>();
     private final ComponentTypeAccess access;
     private int nextRawId = 0;
@@ -49,22 +50,23 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
         Preconditions.checkArgument(Component.class.isAssignableFrom(componentClass), "Component interface must extend " + Component.class.getCanonicalName());
         // make sure 2+ components cannot get registered at the same time
         synchronized (registry) {
-            // Not using computeIfAbsent since we need to check the possibly registered class first
             @SuppressWarnings("unchecked")
-            ComponentType<T> registered = (ComponentType<T>) registry.get(componentId);
-            if (registered != null) {
-                if (registered.getComponentClass() != componentClass) {
-                    throw new IllegalStateException("Registered component " + componentId + " twice with 2 different classes: " + registered.getComponentClass() + ", " + componentClass);
+            ComponentType<T> existing = (ComponentType<T>) registry.get(componentId);
+            if (existing != null) {
+                if (existing.getComponentClass() != componentClass) {
+                    throw new IllegalStateException("Registered component " + componentId + " twice with 2 different classes: " + existing.getComponentClass() + ", " + componentClass);
                 }
+                return existing;
             } else {
-                registered = access.create(componentId, componentClass, nextRawId++);
+                ComponentType<T> registered = access.create(componentId, componentClass, nextRawId++);
                 registry.put(componentId, registered);
                 SharedComponentSecrets.registeredComponents.set(this.registry.values().toArray(new ComponentType[0]));
+                ComponentRegisteredCallback.EVENT.invoker().onComponentRegistered(componentId, componentClass, registered);
+                return registered;
             }
-            return registered;
         }
     }
-    
+
     @Override
     public ComponentType<?> get(Identifier id) {
         return registry.get(id);

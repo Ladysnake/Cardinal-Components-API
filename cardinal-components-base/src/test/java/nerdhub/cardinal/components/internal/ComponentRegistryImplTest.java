@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 
 class ComponentRegistryImplTest {
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     void checksRegisteredClasses() {
         ComponentRegistry registry = ComponentRegistry.INSTANCE;
@@ -60,18 +60,16 @@ class ComponentRegistryImplTest {
         ((ComponentRegistryImpl) ComponentRegistry.INSTANCE).clear();
     }
 
-    class TestNotComponentNotItf {}
+    static class TestNotComponentNotItf {}
 
     interface TestNotComponentItf {}
 
-    class TestComponentNotItf implements Component {
+    static class TestComponentNotItf implements Component {
         @Override
         public void fromTag(CompoundTag tag) { }
 
         @Override
         public CompoundTag toTag(CompoundTag tag) { throw new UnsupportedOperationException(); }
-
-        public Component newInstance() { throw new UnsupportedOperationException(); }
     }
 
     interface TestComponentItf extends Component {}
