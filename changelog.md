@@ -1,6 +1,7 @@
 ------------------------------------------------------
 Version 2.2.0
 ------------------------------------------------------
+- Updated to 1.15
 - Added `ComponentRegisteredCallback` to let mods react to component registration
 - Fixed crash when using ComponentType#attach with recent versions of Fabric API
 
