@@ -39,12 +39,12 @@ import java.util.function.Function;
 public final class ComponentsInternals {
     private static final Field EVENT$TYPE;
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
-    private static final Map<Event<? extends ComponentCallback>, MethodHandle> FACTORY_CACHE = new HashMap<>();
+    private static final Map<Event<? extends ComponentCallback<?, ?>>, MethodHandle> FACTORY_CACHE = new HashMap<>();
     private static final MethodHandle IMPL_HANDLE;
 
     static {
         try {
-            EVENT$TYPE = Class.forName("net.fabricmc.fabric.impl.event.ArrayBackedEvent").getDeclaredField("type");
+            EVENT$TYPE = Class.forName("net.fabricmc.fabric.impl.base.event.ArrayBackedEvent").getDeclaredField("type");
             EVENT$TYPE.setAccessible(true);
             IMPL_HANDLE = LOOKUP.findStatic(ComponentsInternals.class, "initComponents", MethodType.methodType(void.class, ComponentType.class, Function.class, Object.class, ComponentContainer.class));
         } catch (NoSuchFieldException | ClassNotFoundException e) {
@@ -70,7 +70,7 @@ public final class ComponentsInternals {
     @SuppressWarnings("unchecked")
     private static MethodHandle createCallbackFactory(Event<?> event) {
         try {
-            Class<? extends ComponentCallback> eventType = (Class<? extends ComponentCallback>) EVENT$TYPE.get(event);
+            Class<? extends ComponentCallback<?, ?>> eventType = (Class<? extends ComponentCallback<?, ?>>) EVENT$TYPE.get(event);
             MethodType eventSamType = findSam(eventType);
             return LambdaMetafactory.metafactory(
                 LOOKUP,
@@ -87,7 +87,7 @@ public final class ComponentsInternals {
         }
     }
 
-    private static MethodType findSam(Class<? extends ComponentCallback> callbackClass) {
+    private static MethodType findSam(Class<? extends ComponentCallback<?, ?>> callbackClass) {
         try {
             for (Method m : callbackClass.getMethods()) {
                 if (Modifier.isAbstract(m.getModifiers())) {
