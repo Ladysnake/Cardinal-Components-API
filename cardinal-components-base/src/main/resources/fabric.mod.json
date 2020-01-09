@@ -11,7 +11,7 @@
         "modmenu:parent": "cardinal-components"
     },
     "depends": {
-        "fabric-api-base": "*"
+        "fabric-api-base": ">=0.1.2"
     },
     "authors": [
         {

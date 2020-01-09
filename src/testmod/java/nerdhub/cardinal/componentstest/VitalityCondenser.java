@@ -30,14 +30,17 @@ import nerdhub.cardinal.components.api.util.provider.EmptyComponentProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.ViewableWorld;
+import net.minecraft.world.CollisionView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -51,7 +54,7 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
 
     @Deprecated
     @Override
-    public void onScheduledTick(BlockState state, World world, BlockPos pos, Random rand) {
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
         CardinalComponentsTest.VITA.get(world).transferTo(
                 Objects.requireNonNull(this.getComponent(world, pos, CardinalComponentsTest.VITA, null)),
                 1
@@ -60,13 +63,13 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
 
     @Deprecated
     @Override
-    public boolean activate(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hitInfo) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hitInfo) {
         // only on client side, to confirm that sync works
         if (world.isClient) {
             player.addChatMessage(new TranslatableText("componenttest:action.chunk_vitality",
                     CardinalComponentsTest.VITA.get(this.getChunkProvider(world, pos)).getVitality()), true);
         }
-        return true;
+        return ActionResult.SUCCESS;
     }
 
     @Override
@@ -86,8 +89,9 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
     }
 
     private ComponentProvider getChunkProvider(BlockView blockView, BlockPos pos) {
-        if (blockView instanceof ViewableWorld) {
-            return ComponentProvider.fromChunk(((ViewableWorld) blockView).getChunk(pos));
+        if (blockView instanceof CollisionView) {
+            // method_22350 == getChunk
+            return ComponentProvider.fromChunk(((WorldView) blockView).getChunk(pos));
         }
         return EmptyComponentProvider.instance();
     }
