@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019 GlassPane
+ * Copyright (C) 2019-2020 GlassPane
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,14 @@
 package nerdhub.cardinal.components.api.util.container;
 
 import com.google.common.base.Preconditions;
-import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.internal.SharedComponentSecrets;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 
 /**
  * An efficient container for attached {@link Component components}.
@@ -40,13 +39,13 @@ import java.util.concurrent.atomic.AtomicReference;
  * (eg. component types registered together). Wide id ranges result
  * in a sparse collection with a higher memory requirement than
  * other implementations like {@link FastComponentContainer}.
- * 
- * <p> <b>Note that this implementation is not synchronized./b> 
- * If multiple threads access an indexed container concurrently, and at least one of the threads 
- * modifies the container structurally, it must be synchronized externally. 
- * (A structural modification is any operation that adds one or more mappings; 
- * merely changing the value associated with a key that an instance already contains is not 
- * a structural modification.) This is typically accomplished by synchronizing on some object 
+ *
+ * <p> <b>Note that this implementation is not synchronized./b>
+ * If multiple threads access an indexed container concurrently, and at least one of the threads
+ * modifies the container structurally, it must be synchronized externally.
+ * (A structural modification is any operation that adds one or more mappings;
+ * merely changing the value associated with a key that an instance already contains is not
+ * a structural modification.) This is typically accomplished by synchronizing on some object
  * that naturally encapsulates the container.
  *
  * @implNote The implementation is based on {@link java.util.EnumMap} and offers constant time

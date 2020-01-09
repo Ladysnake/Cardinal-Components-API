@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019 GlassPane
+ * Copyright (C) 2019-2020 GlassPane
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,19 +34,19 @@ import nerdhub.cardinal.components.internal.SharedComponentSecrets;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 
 /**
  * A {@link Component} container with a fast, small-footprint implementation
  * based on {@link Int2ObjectMap}
  *
- * <p> <b>Note that this implementation is not synchronized./b> 
- * If multiple threads access an indexed container concurrently, and at least one of the threads 
- * modifies the container structurally, it must be synchronized externally. 
- * (A structural modification is any operation that adds one or more mappings; 
- * merely changing the value associated with a key that an instance already contains is not 
- * a structural modification.) This is typically accomplished by synchronizing on some object 
+ * <p> <b>Note that this implementation is not synchronized./b>
+ * If multiple threads access an indexed container concurrently, and at least one of the threads
+ * modifies the container structurally, it must be synchronized externally.
+ * (A structural modification is any operation that adds one or more mappings;
+ * merely changing the value associated with a key that an instance already contains is not
+ * a structural modification.) This is typically accomplished by synchronizing on some object
  * that naturally encapsulates the container.
  *
  */
