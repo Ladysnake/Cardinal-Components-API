@@ -40,8 +40,12 @@ import net.minecraft.util.PacketByteBuf;
 public interface EntitySyncedComponent extends BaseSyncedComponent {
     /**
      * {@link CustomPayloadS2CPacket} channel for default entity component synchronization.
-     * Packets emitted on this channel must begin with, in order, the {@link Entity#getEntityId() entity id} (as an int),
+     *
+     * <p> Packets emitted on this channel must begin with, in order, the {@link Entity#getEntityId() entity id} (as an int),
      * and the {@link ComponentType#getId() component's type} (as an Identifier).
+     *
+     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * called on the game thread.
      */
     Identifier PACKET_ID = new Identifier("cardinal-components", "entity_sync");
 
@@ -67,6 +71,11 @@ public interface EntitySyncedComponent extends BaseSyncedComponent {
         ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, PACKET_ID, buf);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see #PACKET_ID
+     */
     @Override
     default void processPacket(PacketContext ctx, PacketByteBuf buf) {
         assert ctx.getTaskQueue().isOnThread();
