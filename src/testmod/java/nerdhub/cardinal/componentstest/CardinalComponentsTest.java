@@ -71,8 +71,10 @@ public class CardinalComponentsTest {
         EntityComponents.setRespawnCopyStrategy(VITA, RespawnCopyStrategy.ALWAYS_COPY);
     }
 
-    public static void clientInit() {
-        EntityRendererRegistry.INSTANCE.register(VITALITY_ZOMBIE, (entityRenderDispatcher, context) -> new ZombieEntityRenderer(entityRenderDispatcher));
+    public static class Client {
+        public static void clientInit() {
+            EntityRendererRegistry.INSTANCE.register(VITALITY_ZOMBIE, (entityRenderDispatcher, context) -> new ZombieEntityRenderer(entityRenderDispatcher));
+        }
     }
 }
 
