@@ -33,6 +33,16 @@ import net.minecraft.nbt.CompoundTag;
  * @since 2.3.0
  */
 public interface CopyableComponent<C extends Component> extends TypeAwareComponent {
+    /**
+     * Copies the data from {@code other} into {@code this}.
+     *
+     * @implSpec The default implementation {@linkplain #toTag(CompoundTag) serializes}
+     * the component data to a {@link CompoundTag} and calls {@link #fromTag(CompoundTag)}.
+     * @implNote The default implementation should generally be overridden.
+     * The serialization done by the default implementation assumes NBT consistency
+     * between implementations, and is generally slower than a direct copy.
+     * Implementing classes can nearly always provide a better implementation.
+     */
     default void copyFrom(C other) {
         this.fromTag(other.toTag(new CompoundTag()));
     }
