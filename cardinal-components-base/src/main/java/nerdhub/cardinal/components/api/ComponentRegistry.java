@@ -31,8 +31,8 @@ import java.util.stream.Stream;
 
 /**
  * A registry for components.
- * 
- * <p> A {@code ComponentRegistry} is used for registering components and obtaining 
+ *
+ * <p> A {@code ComponentRegistry} is used for registering components and obtaining
  * {@link ComponentType} instances serving as keys for those components.
  *
  * @see Component
@@ -51,12 +51,13 @@ public interface ComponentRegistry {
      * Calling this method multiple times with the same id but different component classes
      * is forbidden and will throw an {@link IllegalStateException}.
      *
-     * @param componentId a unique identifier for the registered component type
+     * @param componentId    a unique identifier for the registered component type
      * @param componentClass the interface of which to obtain a {@link ComponentType}
      * @return a shared instance of {@link ComponentType}
-     * @throws IllegalArgumentException if {@code componentClass} is not an interface
      * @throws IllegalArgumentException if {@code componentClass} does not extend {@link Component}
-     * @throws IllegalStateException if a different component class has been registered with the same {@code componentId}
+     * @throws IllegalStateException    if a different component class has been registered with the same {@code componentId}
+     * @apiNote It is recommended that {@code componentClass} be an interface, so that other
+     * mods can interact with a well-defined API rather than directly accessing internals.
      */
     <T extends Component> ComponentType<T> registerIfAbsent(Identifier componentId, Class<T> componentClass);
 
