@@ -23,7 +23,7 @@
 package nerdhub.cardinal.components.mixins.common;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import nerdhub.cardinal.components.internal.CardinalItemInternals;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
@@ -37,7 +37,7 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(Item.class)
 public abstract class MixinItem implements ItemCaller {
     @Unique private final Event<ItemComponentCallback> cardinal_componentsEvent = CardinalItemInternals.createItemComponentsEvent();
-    @Unique private FeedbackContainerFactory<ItemStack, CloneableComponent> cardinal_containerFactory;
+    @Unique private FeedbackContainerFactory<ItemStack, CopyableComponent<?>> cardinal_containerFactory;
 
     @Override
     public Event<ItemComponentCallback> cardinal_getItemComponentEvent() {
@@ -45,7 +45,7 @@ public abstract class MixinItem implements ItemCaller {
     }
 
     @Override
-    public ComponentContainer<CloneableComponent> cardinal_createComponents(ItemStack stack) {
+    public ComponentContainer<CopyableComponent<?>> cardinal_createComponents(ItemStack stack) {
         // assert stack.getItem() == this;
         if (this.cardinal_containerFactory == null) {
             cardinal_containerFactory = new FeedbackContainerFactory<>(
