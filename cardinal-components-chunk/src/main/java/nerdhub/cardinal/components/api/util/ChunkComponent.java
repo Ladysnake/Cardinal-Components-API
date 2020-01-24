@@ -23,7 +23,7 @@
 package nerdhub.cardinal.components.api.util;
 
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 
-public interface ChunkComponent extends Component, CloneableComponent {
+public interface ChunkComponent<C extends Component> extends Component, CopyableComponent<C> {
 }

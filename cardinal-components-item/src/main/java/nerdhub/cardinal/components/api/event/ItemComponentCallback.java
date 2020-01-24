@@ -23,7 +23,7 @@
 package nerdhub.cardinal.components.api.event;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.util.ItemComponent;
 import nerdhub.cardinal.components.internal.CardinalItemInternals;
 import nerdhub.cardinal.components.internal.ItemCaller;
@@ -40,15 +40,15 @@ import javax.annotation.Nullable;
  * registered with an item's event, using {@link Event#register(Object)}.
  * When a stack of that item is constructed, the callback's
  * {@code initComponents} method is invoked.
- * 
+ *
  * <p> Unlike {@code EntityComponentCallback}, item component callbacks are
- * registered per item object, and apply to stacks of that item. 
+ * registered per item object, and apply to stacks of that item.
  * More formally, if a callback is registered for an item {@code i},
  * its {@code initComponents} method will be invoked for any stack {@code s}
  * verifying {@code s.getItem() == i}.
  */
 @FunctionalInterface
-public interface ItemComponentCallback extends ComponentCallback<ItemStack, CloneableComponent> {
+public interface ItemComponentCallback extends ComponentCallback<ItemStack, CopyableComponent<?>> {
 
     /**
      * Returns the {@code Event} used to register component callbacks for
@@ -60,7 +60,7 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Clon
      * where possible. Notably, when registering callbacks for various items,
      * it is often better to register a separate specialized callback for each one
      * than a single generic callback with additional checks.
-     * 
+     *
      * @param item an item, or {@code null} to target every stack.
      * @return the {@code Event} used to register component callbacks for stacks
      *         of the given item.
@@ -99,6 +99,6 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Clon
      * @see ItemComponent
      */
     @Override
-    void initComponents(ItemStack stack, ComponentContainer<CloneableComponent> components);
+    void initComponents(ItemStack stack, ComponentContainer<CopyableComponent<?>> components);
 
 }

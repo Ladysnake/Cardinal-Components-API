@@ -24,6 +24,7 @@ package nerdhub.cardinal.components.api.util;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.GameRules;
@@ -83,7 +84,22 @@ public interface RespawnCopyStrategy<C extends Component> {
      */
     RespawnCopyStrategy<Component> NEVER_COPY = (from, to, lossless, keepInventory) -> {};
 
+    /**
+     * Copies data from one component to the other.
+     *
+     * <p> If {@code to} implements {@link CopyableComponent}, its {@link CopyableComponent#copyFrom(Component)}
+     * method will be called, otherwise data will be copied using NBT serialization.
+     *
+     * @param from the component to copy data from
+     * @param to the component to copy data to
+     * @param <C> the common component type
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     static <C extends Component> void copy(C from, C to) {
-        to.fromTag(from.toTag(new CompoundTag()));
+        if (to instanceof CopyableComponent) {
+            ((CopyableComponent) to).copyFrom(from);
+        } else {
+            to.fromTag(from.toTag(new CompoundTag()));
+        }
     }
 }

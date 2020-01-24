@@ -22,7 +22,6 @@
  */
 package nerdhub.cardinal.componentstest.vita;
 
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.util.sync.BaseSyncedComponent;
 import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
 import nerdhub.cardinal.components.api.util.sync.WorldSyncedComponent;
@@ -39,10 +38,6 @@ import net.minecraft.world.dimension.DimensionType;
 import java.util.Objects;
 
 public abstract class AmbientVita extends BaseVita implements BaseSyncedComponent {
-    @Override
-    public ComponentType<?> getComponentType() {
-        return CardinalComponentsTest.VITA;
-    }
 
     public abstract void syncWithAll(MinecraftServer server);
 

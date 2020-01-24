@@ -27,12 +27,14 @@ import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
 /**
  * A {@link CloneableComponent} implementation that uses java's {@link Cloneable} mechanism for cloning.
  * This removes the need for every subclass to define its own {@code newInstance} implementation.
+ * @deprecated use {@link nerdhub.cardinal.components.api.component.extension.CopyableComponent}
  */
+@Deprecated
 public interface NativeCloneableComponent extends CloneableComponent, Cloneable {
     /**
      * Creates a brand new instance of this object's class using the {@link #clone()}
      * method.
-     * 
+     *
      * <p> Note: this does <strong>not</strong> call the class' constructor!
      * Components depending on specific initialization code should consider
      * using the more generic {@code CloneableComponent} interface.
