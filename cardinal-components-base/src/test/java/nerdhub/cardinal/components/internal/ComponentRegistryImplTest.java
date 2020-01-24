@@ -38,9 +38,8 @@ class ComponentRegistryImplTest {
     void checksRegisteredClasses() {
         ComponentRegistry registry = ComponentRegistry.INSTANCE;
         Identifier id = new Identifier("testmod:test");
-        Assertions.assertThrows(IllegalArgumentException.class, () -> registry.registerIfAbsent(id, (Class) TestNotComponentNotItf.class), "Component class must be an interface extending Component");
         Assertions.assertThrows(IllegalArgumentException.class, () -> registry.registerIfAbsent(id, (Class) TestNotComponentItf.class), "Component class must extend Component");
-        Assertions.assertThrows(IllegalArgumentException.class, () -> registry.registerIfAbsent(id, TestComponentNotItf.class), "Component class must be an interface");
+        Assertions.assertDoesNotThrow(() -> registry.registerIfAbsent(id, TestComponentNotItf.class));
         Assertions.assertDoesNotThrow(() -> registry.registerIfAbsent(id, TestComponentItf.class));
     }
 
@@ -59,8 +58,6 @@ class ComponentRegistryImplTest {
     void tearDown() {
         ((ComponentRegistryImpl) ComponentRegistry.INSTANCE).clear();
     }
-
-    static class TestNotComponentNotItf {}
 
     interface TestNotComponentItf {}
 

@@ -46,7 +46,6 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
 
     @Override
     public <T extends Component> ComponentType<T> registerIfAbsent(Identifier componentId, Class<T> componentClass) {
-        Preconditions.checkArgument(componentClass.isInterface(), "Base component class must be an interface: " + componentClass.getCanonicalName());
         Preconditions.checkArgument(Component.class.isAssignableFrom(componentClass), "Component interface must extend " + Component.class.getCanonicalName());
         // make sure 2+ components cannot get registered at the same time
         synchronized (registry) {
