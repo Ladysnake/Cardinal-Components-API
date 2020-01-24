@@ -39,9 +39,13 @@ import net.minecraft.util.PacketByteBuf;
  */
 public interface LevelSyncedComponent extends BaseSyncedComponent {
     /**
-     * {@link CustomPayloadS2CPacket} channel for default level component
-     * synchronization. Packets emitted on this channel must begin with the
+     * {@link CustomPayloadS2CPacket} channel for default level component synchronization.
+     *
+     * <p> Packets emitted on this channel must begin with the
      * {@link ComponentType#getId() component's type} (as an Identifier).
+     *
+     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * called on the game thread.
      */
     Identifier PACKET_ID = new Identifier("cardinal-components", "level_sync");
 
@@ -70,14 +74,13 @@ public interface LevelSyncedComponent extends BaseSyncedComponent {
     }
 
     /**
-     * Implementations are encouraged to override this to read the data off-thread.
+     * {@inheritDoc}
+     *
+     * @see #PACKET_ID
      */
     @Override
     default void processPacket(PacketContext ctx, PacketByteBuf buf) {
-        PacketByteBuf copy = new PacketByteBuf(buf.copy());
-        ctx.getTaskQueue().execute(() -> {
-            this.readFromPacket(copy);
-            copy.release();
-        });
+        assert ctx.getTaskQueue().isOnThread();
+        this.readFromPacket(buf);
     }
 }

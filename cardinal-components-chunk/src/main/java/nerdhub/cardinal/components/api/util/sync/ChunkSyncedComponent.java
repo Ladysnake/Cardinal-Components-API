@@ -43,8 +43,12 @@ import net.minecraft.world.chunk.WorldChunk;
 public interface ChunkSyncedComponent<C extends Component> extends ChunkComponent<C>, BaseSyncedComponent {
     /**
      * {@link CustomPayloadS2CPacket} channel for default chunk component synchronization.
-     * Packets emitted on this channel must begin with, in order, the chunk x position ({@code int}),
+     *
+     * <p> Packets emitted on this channel must begin with, in order, the chunk x position ({@code int}),
      * the chunk z position ({@code int}), and the {@link Identifier} for the component's type.
+     *
+     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * called on the game thread.
      */
     Identifier PACKET_ID = new Identifier("cardinal-components", "chunk_sync");
 
@@ -71,6 +75,11 @@ public interface ChunkSyncedComponent<C extends Component> extends ChunkComponen
         ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, PACKET_ID, buf);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see #PACKET_ID
+     */
     @Override
     default void processPacket(PacketContext ctx, PacketByteBuf buf) {
         assert ctx.getTaskQueue().isOnThread();
