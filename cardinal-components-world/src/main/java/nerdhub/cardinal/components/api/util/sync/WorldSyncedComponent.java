@@ -39,9 +39,13 @@ import net.minecraft.world.World;
  */
 public interface WorldSyncedComponent extends BaseSyncedComponent {
     /**
-     * {@link CustomPayloadS2CPacket} channel for default world component
-     * synchronization. Packets emitted on this channel must begin with the
+     * {@link CustomPayloadS2CPacket} channel for default world component synchronization.
+     *
+     * <p> Packets emitted on this channel must begin with the
      * {@link ComponentType#getId() component's type} (as an Identifier).
+     *
+     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * called on the game thread.
      */
     Identifier PACKET_ID = new Identifier("cardinal-components", "world_sync");
 
@@ -63,14 +67,13 @@ public interface WorldSyncedComponent extends BaseSyncedComponent {
     }
 
     /**
-     * Implementations are encouraged to override this to read the data off-thread.
+     * {@inheritDoc}
+     *
+     * @see #PACKET_ID
      */
     @Override
     default void processPacket(PacketContext ctx, PacketByteBuf buf) {
-        PacketByteBuf copy = new PacketByteBuf(buf.copy());
-        ctx.getTaskQueue().execute(() -> {
-            this.readFromPacket(copy);
-            copy.release();
-        });
+        assert ctx.getTaskQueue().isOnThread();
+        this.readFromPacket(buf);
     }
 }
