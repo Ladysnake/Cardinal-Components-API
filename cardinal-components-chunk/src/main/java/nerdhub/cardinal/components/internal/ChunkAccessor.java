@@ -23,8 +23,8 @@
 package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 
 public interface ChunkAccessor {
-    ComponentContainer<CloneableComponent> cardinal_getComponentContainer();
+    ComponentContainer<CopyableComponent<?>> cardinal_getComponentContainer();
 }

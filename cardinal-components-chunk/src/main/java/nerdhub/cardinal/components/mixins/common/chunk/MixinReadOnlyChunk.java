@@ -26,7 +26,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.internal.ChunkAccessor;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ProtoChunk;
@@ -65,7 +65,7 @@ public abstract class MixinReadOnlyChunk extends ProtoChunk implements Component
     }
 
     @Override
-    public ComponentContainer<CloneableComponent> cardinal_getComponentContainer() {
+    public ComponentContainer<CopyableComponent<?>> cardinal_getComponentContainer() {
         return ((ChunkAccessor) this.wrapped).cardinal_getComponentContainer();
     }
 }

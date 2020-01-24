@@ -26,7 +26,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ChunkComponentCallback;
 import nerdhub.cardinal.components.internal.ChunkAccessor;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
@@ -43,12 +43,12 @@ import java.util.Set;
 @Mixin({ProtoChunk.class, WorldChunk.class})
 public abstract class MixinChunk implements Chunk, ComponentProvider, ChunkAccessor {
     @Unique
-    private static final FeedbackContainerFactory<Chunk, CloneableComponent> componentsContainerFactory = new FeedbackContainerFactory<>(ChunkComponentCallback.EVENT);
+    private static final FeedbackContainerFactory<Chunk, CopyableComponent<?>> componentsContainerFactory = new FeedbackContainerFactory<>(ChunkComponentCallback.EVENT);
     @Unique
-    private ComponentContainer<CloneableComponent> components = componentsContainerFactory.create(this);
+    private ComponentContainer<CopyableComponent<?>> components = componentsContainerFactory.create(this);
 
     @Override
-    public ComponentContainer<CloneableComponent> cardinal_getComponentContainer() {
+    public ComponentContainer<CopyableComponent<?>> cardinal_getComponentContainer() {
         return this.components;
     }
 

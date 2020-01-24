@@ -23,7 +23,7 @@
 package nerdhub.cardinal.componentstest;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import nerdhub.cardinal.componentstest.vita.AmbientVita;
 import nerdhub.cardinal.componentstest.vita.BaseVita;
@@ -98,7 +98,7 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     }
 
     @Override
-    public void initComponents(ItemStack stack, ComponentContainer<CloneableComponent> components) {
+    public void initComponents(ItemStack stack, ComponentContainer<CopyableComponent<?>> components) {
         components.put(CardinalComponentsTest.VITA, new BaseVita());
     }
 }

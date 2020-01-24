@@ -22,9 +22,7 @@
  */
 package nerdhub.cardinal.componentstest.vita;
 
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
-import nerdhub.cardinal.componentstest.CardinalComponentsTest;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -55,11 +53,5 @@ public class PlayerVita extends EntityVita implements EntitySyncedComponent {
     @Override
     public LivingEntity getEntity() {
         return this.owner;
-    }
-
-    @Override
-    public ComponentType<?> getComponentType() {
-        // Hardcoded but could be passed in the constructor
-        return CardinalComponentsTest.VITA;
     }
 }
