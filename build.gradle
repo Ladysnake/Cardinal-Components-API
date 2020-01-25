@@ -1,3 +1,5 @@
+import net.fabricmc.loom.task.RemapJarTask
+
 import java.nio.charset.StandardCharsets
 import java.time.Year
 
@@ -118,6 +120,26 @@ dependencies {
         }
     }
 }
+
+task testmodJar(type: Jar, dependsOn: testmodClasses) {
+    archiveBaseName = 'CCATest'
+    archiveClassifier = 'dev'
+    from(sourceSets.testmod.output) {
+        include 'fabric.mod.json'
+        expand 'version': project.version
+    }
+    from(sourceSets.testmod.output) {
+        exclude 'fabric.mod.json'
+    }
+}
+
+task remapTestmodJar(type: RemapJarTask, dependsOn: project.testmodJar) {
+    archiveBaseName = 'CCATest'
+    input = testmodJar.archiveFile
+    addNestedDependencies = false
+}
+
+build.dependsOn(remapTestmodJar)
 
 publishing {
     publications {
