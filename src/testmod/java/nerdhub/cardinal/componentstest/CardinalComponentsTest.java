@@ -32,9 +32,7 @@ import nerdhub.cardinal.componentstest.vita.ChunkVita;
 import nerdhub.cardinal.componentstest.vita.PlayerVita;
 import nerdhub.cardinal.componentstest.vita.Vita;
 import net.fabricmc.fabric.api.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityRendererRegistry;
 import net.minecraft.block.Material;
-import net.minecraft.client.render.entity.ZombieEntityRenderer;
 import net.minecraft.entity.EntityCategory;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -71,10 +69,5 @@ public class CardinalComponentsTest {
         EntityComponents.setRespawnCopyStrategy(VITA, RespawnCopyStrategy.ALWAYS_COPY);
     }
 
-    public static class Client {
-        public static void clientInit() {
-            EntityRendererRegistry.INSTANCE.register(VITALITY_ZOMBIE, (entityRenderDispatcher, context) -> new ZombieEntityRenderer(entityRenderDispatcher));
-        }
-    }
 }
 

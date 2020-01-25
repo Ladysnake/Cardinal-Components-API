@@ -11,7 +11,7 @@
             "nerdhub.cardinal.componentstest.CardinalComponentsTest::init"
         ],
         "client": [
-            "nerdhub.cardinal.componentstest.CardinalComponentsTest$Client::clientInit"
+            "nerdhub.cardinal.componentstest.CCATestClient::clientInit"
         ]
     },
     "depends": {
