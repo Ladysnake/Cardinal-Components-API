@@ -63,7 +63,7 @@ public final class ComponentsWorldNetworking {
                     assert MinecraftClient.getInstance().world != null;
                     Component c = componentType.get(MinecraftClient.getInstance().world);
                     if (c instanceof SyncedComponent) {
-                        ((SyncedComponent) c).processPacket(context, buffer);
+                        ((SyncedComponent) c).processPacket(context, copy);
                     }
                 } finally {
                     copy.release();
