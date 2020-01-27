@@ -1,4 +1,14 @@
 ------------------------------------------------------
+Version 2.3.0
+------------------------------------------------------
+**This update may be incompatible with mods using previous versions of `cardinal-components-item` or `cardinal-components-chunk`**
+
+- You can now make component types without an interface. Do not abuse this if you want to make mod compatibility easier.
+- Replaced component cloning with a data copying mechanism between existing component instances (see PR #15).
+    - Deprecated `CloneableComponent` and `NativeCloneableComponent` in favour of `CopyableComponent`
+- Fixed concurrency issues with component synchronization.
+
+------------------------------------------------------
 Version 2.2.0
 ------------------------------------------------------
 - Updated to 1.15
