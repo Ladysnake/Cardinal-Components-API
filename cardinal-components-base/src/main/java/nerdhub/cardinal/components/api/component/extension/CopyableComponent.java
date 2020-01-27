@@ -20,27 +20,33 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest.vita;
+package nerdhub.cardinal.components.api.component.extension;
 
-import nerdhub.cardinal.components.api.util.sync.ChunkSyncedComponent;
-import net.minecraft.world.chunk.Chunk;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.nbt.CompoundTag;
 
-// if synchronization was not needed, BaseVita could have been used directly
-public class ChunkVita extends BaseVita implements ChunkSyncedComponent<Vita> {
-    private final Chunk chunk;
-
-    public ChunkVita(Chunk chunk) {
-        this.chunk = chunk;
+/**
+ * A component that can copy its data from another component of the same type.
+ *
+ * @param <C> this component's type
+ * @since 2.3.0
+ */
+public interface CopyableComponent<C extends Component> extends TypeAwareComponent {
+    /**
+     * Copies the data from {@code other} into {@code this}.
+     *
+     * @implSpec The default implementation {@linkplain #toTag(CompoundTag) serializes}
+     * the component data to a {@link CompoundTag} and calls {@link #fromTag(CompoundTag)}.
+     * @implNote The default implementation should generally be overridden.
+     * The serialization done by the default implementation assumes NBT consistency
+     * between implementations, and is generally slower than a direct copy.
+     * Implementing classes can nearly always provide a better implementation.
+     */
+    default void copyFrom(C other) {
+        this.fromTag(other.toTag(new CompoundTag()));
     }
 
     @Override
-    public void setVitality(int value) {
-        super.setVitality(value);
-        this.sync();
-    }
-
-    @Override
-    public Chunk getChunk() {
-        return this.chunk;
-    }
+    ComponentType<C> getComponentType();
 }

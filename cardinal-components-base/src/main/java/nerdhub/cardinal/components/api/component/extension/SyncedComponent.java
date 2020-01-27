@@ -83,7 +83,12 @@ public interface SyncedComponent extends Component {
     void syncWith(ServerPlayerEntity player);
 
     /**
-     * Process a synchronization packet
+     * Process a synchronization packet.
+     *
+     * <p> This method is usually called on the game thread,
+     * although some callers may allow processing on the network thread.
+     * Component synchronization plugin channels must document the
+     * expected threading behaviour for packet processing.
      *
      * @see #syncWith(ServerPlayerEntity)
      * @see net.fabricmc.fabric.api.network.PacketConsumer

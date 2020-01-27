@@ -26,7 +26,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.util.Components;
 import nerdhub.cardinal.components.internal.ItemCaller;
 import nerdhub.cardinal.components.internal.ItemStackAccessor;
@@ -48,7 +48,7 @@ import java.util.Set;
 @Mixin(value = ItemStack.class, priority = 900)
 public abstract class MixinItemStack implements ComponentProvider, ItemStackAccessor {
 
-    private ComponentContainer<CloneableComponent> components;
+    private ComponentContainer<CopyableComponent<?>> components;
 
     @Inject(method = "areTagsEqual", at = @At("RETURN"), cancellable = true)
     private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
@@ -66,14 +66,11 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
+    @SuppressWarnings({"ConstantConditions", "unchecked", "rawtypes"})
     @Inject(method = "copy", at = @At("RETURN"))
     private void copy(CallbackInfoReturnable<ItemStack> cir) {
-        ComponentContainer<CloneableComponent> other = ((ItemStackAccessor) (Object) cir.getReturnValue()).cardinal_getComponentContainer();
-        this.components.forEach((type, component) -> {
-            CloneableComponent copy = component.cloneComponent();
-            other.put(type, copy);
-        });
+        ComponentContainer<CopyableComponent<?>> other = ((ItemStackAccessor) (Object) cir.getReturnValue()).cardinal_getComponentContainer();
+        this.components.forEach((type, component) -> ((CopyableComponent) other.get(type)).copyFrom(component));
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))
@@ -116,7 +113,7 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
     }
 
     @Override
-    public ComponentContainer<CloneableComponent> cardinal_getComponentContainer() {
+    public ComponentContainer<CopyableComponent<?>> cardinal_getComponentContainer() {
         return this.components;
     }
 }

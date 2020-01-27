@@ -67,10 +67,13 @@ public final class ComponentsChunkNetworking {
                         .thenCastTo(SyncedComponent.class)
                         .andThenDo(component -> component.processPacket(context, copy));
                 context.getTaskQueue().execute(() -> {
-                    // On the client, unloaded chunks return EmptyChunk
-                    Chunk chunk = context.getPlayer().world.getChunk(chunkX, chunkZ);
-                    chunkSync.accept(chunk);
-                    copy.release();
+                    try {
+                        // On the client, unloaded chunks return EmptyChunk
+                        Chunk chunk = context.getPlayer().world.getChunk(chunkX, chunkZ);
+                        chunkSync.accept(chunk);
+                    } finally {
+                        copy.release();
+                    }
                 });
             });
         }

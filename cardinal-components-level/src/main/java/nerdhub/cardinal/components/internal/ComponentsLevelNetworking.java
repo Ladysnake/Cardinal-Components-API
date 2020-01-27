@@ -34,6 +34,7 @@ import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.PacketByteBuf;
 
 public final class ComponentsLevelNetworking {
     public static void init() {
@@ -59,10 +60,18 @@ public final class ComponentsLevelNetworking {
                 if (componentType == null) {
                     return;
                 }
-                Component c = componentType.get(MinecraftClient.getInstance().world.getLevelProperties());
-                if (c instanceof SyncedComponent) {
-                    ((SyncedComponent) c).processPacket(context, buffer);
-                }
+                PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                context.getTaskQueue().execute(() -> {
+                    try {
+                        assert MinecraftClient.getInstance().world != null;
+                        Component c = componentType.get(MinecraftClient.getInstance().world.getLevelProperties());
+                        if (c instanceof SyncedComponent) {
+                            ((SyncedComponent) c).processPacket(context, copy);
+                        }
+                    } finally {
+                        copy.release();
+                    }
+                });
             });
         }
     }

@@ -23,11 +23,9 @@
 package nerdhub.cardinal.components.api.util;
 
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 
-public interface ItemComponent extends Component, CloneableComponent {
-    @Override
-    ItemComponent newInstance();
+public interface ItemComponent<C extends Component> extends Component, CopyableComponent<C> {
 
     @Override
     boolean isComponentEqual(Component other);
