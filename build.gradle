@@ -24,7 +24,7 @@ subprojects {
     archivesBaseName = project.name
     group = "${rootProject.group}.${rootProject.archivesBaseName}"
 
-    apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/basic_project.gradle"
+    apply from: "https://raw.githubusercontent.com/OnyxStudios/Gradle-Scripts/master/scripts/fabric/basic_project.gradle"
 }
 
 allprojects {

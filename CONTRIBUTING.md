@@ -23,8 +23,8 @@ this open source project. In return, they should reciprocate that respect in add
 ## TLDR;
 
 - Creating an Issue or Pull Request requires a [GitHub](http://github.com) account.
-- Issue reports should be **clear**, **concise** and **reproducible**. Check to see if your issue has already been resolved in the [master]() branch or already reported in Cardinal Components' [GitHub Issue Tracker](https://github.com/NerdhubMC/Cardinal-Components-API/issues).
-- Pull Requests must adhere to the project's [coding style guidelines](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/style.md).
+- Issue reports should be **clear**, **concise** and **reproducible**. Check to see if your issue has already been resolved in the [master](https://github.com/OnyxStudios/Cardinal-Components-API/tree/master) branch or already reported in Cardinal Components' [GitHub Issue Tracker](https://github.com/OnyxStudios/Cardinal-Components-API/issues).
+- Pull Requests must adhere to the project's [coding style guidelines](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/style.md).
 - **IMPORTANT**: By submitting a patch, you agree to allow the project owner to license your work under the same license as that used by the project.
 
 
@@ -37,7 +37,7 @@ The issue tracker is the preferred channel for [bug reports](#bugs),
 requests](#pull-requests), but please respect the following restrictions:
 
 * Please **do not** use the issue tracker for personal support requests (you
-  can ask well-formed questions in adequate channels on the [Fabric Discord](https://discord.gg/v6v4pMv)).
+  can ask well-formed questions in adequate channels on the [Fabric Discord](https://discord.gg/v6v4pMv) or on the [OnyxStudios Discord](https://discord.gg/vKV9EgH)).
 * Please **do not** derail or troll issues. Keep the discussion on topic and
   respect the opinions of others
 
@@ -94,7 +94,7 @@ Good pull requests - patches, improvements, new features - are a fantastic help.
 **Please ask first** before embarking on any significant pull request (e.g. implementing features, refactoring code), 
 otherwise you risk spending a lot of time working on something that the project's developers might not want to merge into the project.
 
-Please adhere to the coding conventions used throughout a project (indentation, accurate comments, etc.) and any other requirements (such as test coverage). Please review the [Cardinal Components Coding Style Guide](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/style.md).
+Please adhere to the coding conventions used throughout a project (indentation, accurate comments, etc.) and any other requirements (such as test coverage). Please review the [Cardinal Components Coding Style Guide](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/style.md).
 
 Follow this process if you'd like your work considered for inclusion in the project:
 
@@ -151,7 +151,7 @@ git push origin <topic-branch-name>
 
 Anyone who is a core contributor can publish a release:
 
-1. Go to the [Releases page on Github](https://github.com/NerdHubMC/Cardinal-Components-API/releases)
+1. Go to the [Releases page on Github](https://github.com/OnyxStudios/Cardinal-Components-API/releases)
 2. Hit "Draft a new release" (if you can't see this, you're not a core contributor!)
 3. Write human-friendly Release Notes based on changelog.
   - The release title is "x.x.x" (where x.x.x is the version number)
@@ -167,7 +167,7 @@ Anyone who is a core contributor can publish a release:
 <a name="resources"></a>
 ### Resources
 
-For most of the documentation you are going to want to look at the [README](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/README.md).
+For most of the documentation you are going to want to look at the [README](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md).
 
 <a name="contributors"></a>
 ### Core Contributors
