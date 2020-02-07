@@ -15,12 +15,13 @@
             "contact": {
                 "homepage": "https://twitter.com/UpcraftLP"
             }
-        }
+        },
+        "Pyrofab"
     ],
     "contact": {
-        "homepage": "https://minecraft.curseforge.com/projects/318449",
-        "issues": "https://github.com/NerdHubMC/Cardinal-Components-API/issues",
-        "sources": "https://github.com/NerdHubMC/Cardinal-Components-API"
+        "homepage": "https://www.curseforge.com/minecraft/mc-mods/cardinal-components",
+        "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
+        "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
     },
     "license": "MIT"
 }

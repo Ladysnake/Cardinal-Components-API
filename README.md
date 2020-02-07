@@ -8,12 +8,12 @@ objects and behaviours, thereby helping both mod creation and compatibility.*
 
 **TL;DR: It allows you to attach data to things**
 
-## Adding the API to your buildscript (loom 0.2.4):
+## Adding the API to your buildscript (loom 0.2.6):
 ```gradle
 repositories {
     maven {
-        name = "NerdHubMC"
-        url = "https://maven.abusedmaster.xyz"
+        name = "Onyx Studios"
+        url = "https://maven.onyxstudios.dev"
     }
 }
 
@@ -25,7 +25,7 @@ dependencies {
 }
 ```
 
-You can find the current version of the API in the [releases](https://github.com/NerdHubMC/Cardinal-Components-API/releases) tab of the repository on Github.
+You can find the current version of the API in the [releases](https://github.com/OnyxStudios/Cardinal-Components-API/releases) tab of the repository on Github.
 
 Cardinal Components API is split into several modules. The main artifact bundles every module, but often all
 are not required for a project. To depend on a specific module, use the dependency string
@@ -73,7 +73,7 @@ public static void useMagik(ComponentProvider provider) {
 ```
 *Note: a component class can be reused for several component types*
 
-Components are normally attached to providers through an adequate [`ComponentCallback`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/event/ComponentCallback.java).
+Components are normally attached to providers through an adequate [`ComponentCallback`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/event/ComponentCallback.java).
 The usual syntax is of the form `XComponentCallback.EVENT.register((provider, components) -> components.put(componentType, new ComponentImpl(...)));`.
 Alternatively, a shortcut for this syntax is available in ComponentType for every ComponentCallback, as `componentType.attach(XComponentCallback.EVENT, componentFactory)`.
 Example:
@@ -90,11 +90,11 @@ Cardinal Components API offers component provider implementations for a few vani
 
 Components can be added to entities of any type (modded or vanilla) by registering an `EntityComponentCallback`.
 Entity components are saved automatically with the entity. Synchronization must be done either manually or with
-help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
-and [`EntitySyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/util/sync/EntitySyncedComponent.java) interfaces.
+help of the [`SyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`EntitySyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/util/sync/EntitySyncedComponent.java) interfaces.
 Cardinal Components also provides mechanisms for handling player respawns. By default, components get copied when
-players return from the End, but mods can customize that behaviour through [`RespawnCopyStrategy`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/util/RespawnCopyStrategy.java)
-and [`PlayerCopyCallback`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/event/PlayerCopyCallback.java)
+players return from the End, but mods can customize that behaviour through [`RespawnCopyStrategy`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/util/RespawnCopyStrategy.java)
+and [`PlayerCopyCallback`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-entity/src/main/java/nerdhub/cardinal/components/api/event/PlayerCopyCallback.java)
 to copy all or part of the component data.
 
 **Example:**
@@ -130,8 +130,8 @@ ItemComponentCallback.event(Items.DIAMOND_HOE).register((stack, components) -> c
 
 Components can be added to any world by registering a `WorldComponentCallback`.
 World components are saved automatically with the world. Synchronization must be done either manually or with
-help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
-and [`WorldSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-world/src/main/java/nerdhub/cardinal/components/api/util/sync/WorldSyncedComponent.java) interfaces.
+help of the [`SyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`WorldSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-world/src/main/java/nerdhub/cardinal/components/api/util/sync/WorldSyncedComponent.java) interfaces.
 
 **Example:**
 ```java
@@ -146,8 +146,8 @@ WorldComponentCallback.EVENT.register((world, components) -> components.put(MAGI
 Components can be added to `LevelProperties` objects by registering a `LevelComponentCallback`.
 Level properties are shared between every world in a server, making them useful to store global data.
 Level components are saved automatically with the global state. Synchronization must be done either manually or with
-help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
-and [`LevelSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-level/src/main/java/nerdhub/cardinal/components/api/util/sync/LevelSyncedComponent.java) interfaces.
+help of the [`SyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`LevelSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-level/src/main/java/nerdhub/cardinal/components/api/util/sync/LevelSyncedComponent.java) interfaces.
 
 **Example:**
 ```java
@@ -161,8 +161,8 @@ LevelComponentCallback.EVENT.register((levelProperties, components) -> component
 
 Components can be added to chunks by registering a `ChunkComponentCallback`.
 Chunk components are saved automatically with the chunk. Synchronization must be done either manually or with
-help of the [`SyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
-and [`ChunkSyncedComponent`](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/cardinal-components-chunk/src/main/java/nerdhub/cardinal/components/api/util/sync/ChunkSyncedComponent.java) interfaces.
+help of the [`SyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/component/extension/SyncedComponent.java) 
+and [`ChunkSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-chunk/src/main/java/nerdhub/cardinal/components/api/util/sync/ChunkSyncedComponent.java) interfaces.
 
 **Notes:**
 - `EmptyChunk`: empty chunks never expose any components, no matter what was originally attached to them.
@@ -183,7 +183,7 @@ Blocks actually implement the `BlockComponentProvider` interface instead of the 
 Custom blocks may re-implement that interface themselves to provide components independently of the presence of
 a BlockEntity. Usually the block simply proxies its Block Entity, however the Block Entity does not need to 
 implement `BlockComponentProvider` if the block already has a custom implementation. Block components can be
-slightly less convenient to provide as they require their own implementations, but [several utility classes](https://github.com/NerdHubMC/Cardinal-Components-API/tree/master/cardinal-components-block/src/main/java/nerdhub/cardinal/components/api/util/sided)
+slightly less convenient to provide as they require their own implementations, but [several utility classes](https://github.com/OnyxStudios/Cardinal-Components-API/tree/master/cardinal-components-block/src/main/java/nerdhub/cardinal/components/api/util/sided)
 are available to help.
 
 Components are entirely compatible with [LibBlockAttributes](https://github.com/AlexIIL/LibBlockAttributes)' attributes.
@@ -195,4 +195,4 @@ for an existing `Component` is as simple as calling `Attributes.create(MyCompone
 
 ## Test Mod
 A test mod for the API is available in this repository, under `src/testmod`. It makes uses of most features from the API.
-Its code is outlined in a secondary [readme](https://github.com/NerdHubMC/Cardinal-Components-API/blob/master/src/testmod/readme.md).
+Its code is outlined in a secondary [readme](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/src/testmod/readme.md).
