@@ -44,6 +44,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 @Mixin(World.class)
 public abstract class MixinWorld implements ComponentProvider {
@@ -53,7 +54,7 @@ public abstract class MixinWorld implements ComponentProvider {
     protected ComponentContainer<?> components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void initComponents(LevelProperties props, DimensionType dim, BiFunction<World, Dimension, ChunkManager> managerFactory, Profiler profiler, boolean client, CallbackInfo ci) {
+    private void initComponents(LevelProperties props, DimensionType dim, BiFunction<World, Dimension, ChunkManager> chunkManagerProvider, Supplier<Profiler> supplier, boolean isClient, CallbackInfo ci) {
         this.components = componentContainerFactory.create((World) (Object) this);
     }
 
