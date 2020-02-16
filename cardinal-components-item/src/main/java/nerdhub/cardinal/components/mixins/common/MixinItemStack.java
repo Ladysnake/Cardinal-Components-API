@@ -66,11 +66,11 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
         }
     }
 
-    @SuppressWarnings({"ConstantConditions", "unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Inject(method = "copy", at = @At("RETURN"))
     private void copy(CallbackInfoReturnable<ItemStack> cir) {
-        ComponentContainer<CopyableComponent<?>> other = ((ItemStackAccessor) (Object) cir.getReturnValue()).cardinal_getComponentContainer();
-        this.components.forEach((type, component) -> ((CopyableComponent) other.get(type)).copyFrom(component));
+        ItemStack other = cir.getReturnValue();
+        Components.forEach(this, (type, component) -> ((CopyableComponent) type.get(other)).copyFrom(component));
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))
