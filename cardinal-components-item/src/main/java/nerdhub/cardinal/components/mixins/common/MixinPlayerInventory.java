@@ -45,4 +45,5 @@ public abstract class MixinPlayerInventory
         ((ItemStackAccessor)(Object)newStack).cardinal_getComponentContainer().fromTag(((ItemStackAccessor)(Object)stack).cardinal_getComponentContainer().toTag(new CompoundTag()));
     }
 
-}   
+}
+
