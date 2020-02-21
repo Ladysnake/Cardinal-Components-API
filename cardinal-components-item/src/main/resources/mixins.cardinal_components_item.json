@@ -6,7 +6,8 @@
     "mixins": [
         "common.MixinItem",
         "common.MixinItemStack",
-        "common.MixinPacketByteBuf"
+        "common.MixinPacketByteBuf",
+        "common.MixinPlayerInventory"
     ],
     "injectors": {
         "defaultRequire": 1
