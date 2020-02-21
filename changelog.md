@@ -1,4 +1,15 @@
 ------------------------------------------------------
+Version 2.3.2
+------------------------------------------------------
+- Fixed component initialization in empty item stacks (eg. during inventory insertion)
+
+------------------------------------------------------
+Version 2.3.1
+------------------------------------------------------
+- Fixed crash with item components when picking up items
+- Marked cardinal-components-world as incompatible with 1.16
+
+------------------------------------------------------
 Version 2.3.0
 ------------------------------------------------------
 **This update may be incompatible with mods using previous versions of `cardinal-components-item` or `cardinal-components-chunk`**
