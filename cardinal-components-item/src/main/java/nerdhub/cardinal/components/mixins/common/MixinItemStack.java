@@ -34,6 +34,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -83,16 +84,33 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
 
     @Shadow public abstract boolean isEmpty();
 
+    /**
+     * Direct reference to the item held by this {@code ItemStack}.
+     *
+     * <p> When inserting an item into an inventory, Minecraft creates
+     * an empty itemstack of the right item and then increases the count.
+     * ItemStack#getItem() returns the wrong item in those cases,
+     * causing component initialization to fail.
+     *
+     * <p> This is normally deprecated, but we have to use it for the reason
+     * above.
+     */
+    @Shadow
+    @Final
+    private Item item;
+
     @SuppressWarnings({"DuplicatedCode", "ConstantConditions"})
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("RETURN"))
     private void initComponents(ItemConvertible item, int amount, CallbackInfo ci) {
-        this.components = ((ItemCaller) this.getItem()).cardinal_createComponents((ItemStack) (Object) this);
+        // direct item reference, to avoid uninitialized components from empty stack
+        this.components = ((ItemCaller) this.item).cardinal_createComponents((ItemStack) (Object) this);
     }
 
     @SuppressWarnings({"DuplicatedCode", "ConstantConditions"})
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
-        this.components = ((ItemCaller) this.getItem()).cardinal_createComponents((ItemStack) (Object) this);
+        // direct item reference, to avoid uninitialized components from empty stack
+        this.components = ((ItemCaller) this.item).cardinal_createComponents((ItemStack) (Object) this);
         this.components.fromTag(tag);
     }
 
