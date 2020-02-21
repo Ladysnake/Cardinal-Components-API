@@ -35,7 +35,6 @@ import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
-
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -94,7 +93,9 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
      * <p> This is normally deprecated, but we have to use it for the reason
      * above.
      */
-    @Shadow @Final @Deprecated private Item item;
+    @Shadow
+    @Final
+    private Item item;
 
     @SuppressWarnings({"DuplicatedCode", "ConstantConditions"})
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("RETURN"))
@@ -105,7 +106,8 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
     @SuppressWarnings({"DuplicatedCode", "ConstantConditions"})
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
-        this.components = ((ItemCaller) this.getItem()).cardinal_createComponents((ItemStack) (Object) this);
+        // direct item reference, to avoid uninitialized components from empty stack
+        this.components = ((ItemCaller) this.item).cardinal_createComponents((ItemStack) (Object) this);
         this.components.fromTag(tag);
     }
 
