@@ -28,11 +28,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import nerdhub.cardinal.components.internal.ItemStackAccessor;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import nerdhub.cardinal.components.api.util.Components;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 
 @Mixin(PlayerInventory.class)
 public abstract class MixinPlayerInventory
@@ -42,7 +43,8 @@ public abstract class MixinPlayerInventory
         method="addStack(ILnet/minecraft/item/ItemStack;)I",locals = LocalCapture.CAPTURE_FAILHARD)
     private void initComponentsOnPickup(int slot,ItemStack stack,CallbackInfoReturnable<Integer> ci,Item item,int count,ItemStack newStack)
     {
-        ((ItemStackAccessor)(Object)newStack).cardinal_getComponentContainer().fromTag(((ItemStackAccessor)(Object)stack).cardinal_getComponentContainer().toTag(new CompoundTag()));
+        Components.forEach(ComponentProvider.fromItemStack(stack), (type, component) -> ((CopyableComponent) type.get(newStack)).copyFrom(component));
+        // ((ItemStackAccessor)(Object)newStack).cardinal_getComponentContainer().fromTag(((ItemStackAccessor)(Object)stack).cardinal_getComponentContainer().toTag(new CompoundTag()));
     }
 
 }   
