@@ -1,4 +1,9 @@
 ------------------------------------------------------
+Version 2.3.3
+------------------------------------------------------
+- Fixed item component initialization for real this time
+
+------------------------------------------------------
 Version 2.3.2
 ------------------------------------------------------
 - Fixed component initialization in empty item stacks (eg. during inventory insertion)
