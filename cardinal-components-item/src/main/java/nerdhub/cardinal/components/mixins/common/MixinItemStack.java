@@ -33,10 +33,12 @@ import nerdhub.cardinal.components.internal.ItemStackAccessor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -99,19 +101,22 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
     @Final
     private Item item;
 
-    @SuppressWarnings({"DuplicatedCode", "ConstantConditions"})
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("RETURN"))
     private void initComponents(ItemConvertible item, int amount, CallbackInfo ci) {
-        // direct item reference, to avoid uninitialized components from empty stack
-        this.components = ((ItemCaller) this.item).cardinal_createComponents((ItemStack) (Object) this);
+        this.initComponents();
     }
 
-    @SuppressWarnings({"DuplicatedCode", "ConstantConditions"})
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
-        // direct item reference, to avoid uninitialized components from empty stack
-        this.components = ((ItemCaller) this.item).cardinal_createComponents((ItemStack) (Object) this);
+        this.initComponents();
         this.components.fromTag(tag);
+    }
+
+    @Unique
+    private void initComponents() {
+        // we use the actual item type held by this stack, bypassing empty checks made by ItemStack#getItem(),
+        // so as to avoid uninitialized components from empty stacks.
+        this.components = ((ItemCaller) (this.item == null ? Items.AIR : this.item)).cardinal_createComponents((ItemStack) (Object) this);
     }
 
     @Override
