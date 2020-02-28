@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.mixins.common;
+package nerdhub.cardinal.components.mixins.common.item;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
@@ -28,6 +28,7 @@ import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.util.Components;
+import nerdhub.cardinal.components.internal.CardinalItemInternals;
 import nerdhub.cardinal.components.internal.ItemCaller;
 import nerdhub.cardinal.components.internal.ItemStackAccessor;
 import net.minecraft.item.Item;
@@ -69,11 +70,9 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
         }
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @Inject(method = "copy", at = @At("RETURN"))
     private void copy(CallbackInfoReturnable<ItemStack> cir) {
-        ItemStack other = cir.getReturnValue();
-        Components.forEach(this, (type, component) -> ((CopyableComponent) type.get(other)).copyFrom(component));
+        CardinalItemInternals.copyComponents(((ItemStack)(Object) this), cir.getReturnValue());
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))

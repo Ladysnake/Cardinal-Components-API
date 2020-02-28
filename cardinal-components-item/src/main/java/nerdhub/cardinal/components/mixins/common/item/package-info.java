@@ -22,7 +22,7 @@
  */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.mixins.common;
+package nerdhub.cardinal.components.mixins.common.item;
 
 import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 

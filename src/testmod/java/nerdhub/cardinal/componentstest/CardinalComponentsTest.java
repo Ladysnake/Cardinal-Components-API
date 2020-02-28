@@ -56,6 +56,7 @@ public class CardinalComponentsTest {
 
     public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("componenttest:vita"), Vita.class)
         .attach(EntityComponentCallback.event(PlayerEntity.class), PlayerVita::new)
+        .attach(ItemComponentCallback.event(null), stack -> new BaseVita((int) (Math.random() * 50)))   // will make all items unstackable, terrible for playing, great for testing
         .attach(ItemComponentCallback.event(VITALITY_STICK), stack -> new BaseVita())
         .attach(WorldComponentCallback.EVENT, AmbientVita.WorldVita::new)
         .attach(LevelComponentCallback.EVENT, props -> new AmbientVita.LevelVita())
