@@ -98,7 +98,8 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
     public void fromTag(CompoundTag tag) {
         if(tag.contains("cardinal_components", NbtType.LIST)) {
             ListTag componentList = tag.getList("cardinal_components", NbtType.COMPOUND);
-            componentList.stream().map(CompoundTag.class::cast).forEach(nbt -> {
+            for (int i = 0; i < componentList.size(); i++) {
+                CompoundTag nbt = componentList.getCompound(i);
                 ComponentType<?> type = ComponentRegistry.INSTANCE.get(new Identifier(nbt.getString("componentId")));
                 if (type != null) {
                     Component component = this.get(type);
@@ -106,7 +107,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
                         component.fromTag(nbt);
                     }
                 }
-            });
+            }
         }
     }
 
