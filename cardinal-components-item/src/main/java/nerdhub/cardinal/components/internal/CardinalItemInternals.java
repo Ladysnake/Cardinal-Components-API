@@ -22,9 +22,12 @@
  */
 package nerdhub.cardinal.components.internal;
 
+import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.item.ItemStack;
 
 public final class CardinalItemInternals {
     public static final Event<ItemComponentCallback> WILDCARD_ITEM_EVENT = createItemComponentsEvent();
@@ -36,5 +39,17 @@ public final class CardinalItemInternals {
                     listener.initComponents(stack, components);
                 }
             });
+    }
+
+    @SuppressWarnings({"ConstantConditions", "unchecked", "rawtypes"})
+    public static void copyComponents(ItemStack original, ItemStack copy) {
+        ComponentContainer<CopyableComponent<?>> other = ((ItemStackAccessor) (Object) copy).cardinal_getComponentContainer();
+        ((ItemStackAccessor) (Object) original).cardinal_getComponentContainer().forEach((type, component) -> {
+                CopyableComponent ccp = (CopyableComponent) other.get(type);
+                if (ccp != null) {
+                    ccp.copyFrom(component);
+                }
+            }
+        );
     }
 }
