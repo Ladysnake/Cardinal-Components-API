@@ -1,4 +1,11 @@
 ------------------------------------------------------
+Version 2.3.4
+------------------------------------------------------
+Ok but this time it's true, item components are really fixed for real
+- Item components are now properly copied in every vanilla situation where an item stack is copied
+- Component deserialization is slightly faster
+
+------------------------------------------------------
 Version 2.3.3
 ------------------------------------------------------
 - Fixed item component initialization for real this time
