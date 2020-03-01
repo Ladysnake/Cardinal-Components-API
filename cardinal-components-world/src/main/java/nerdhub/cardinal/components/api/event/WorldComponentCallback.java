@@ -30,10 +30,13 @@ import net.minecraft.world.World;
 
 /**
  * The callback interface for receiving component initialization events
- * during world construction. The element that is interested in attaching
- * components to worlds implements this interface, and is
- * registered with the event, using {@link Event#register(Object)}.
- * When a world is constructed, the callback's {@code initComponents} method is invoked.
+ * during world construction.
+ *
+ * <p> The element that is interested in attaching components
+ * to worlds implements this interface, and is registered
+ * with the event, using {@link Event#register(Object)}.
+ * When a {@code World} object is constructed, the callback's
+ * {@link #initComponents} method is invoked.
  */
 @FunctionalInterface
 public interface WorldComponentCallback extends ComponentCallback<World, Component> {

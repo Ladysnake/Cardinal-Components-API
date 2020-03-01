@@ -28,7 +28,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.chunk.WorldChunk;
 
 /**
- * Called when a chunk's data is sent to a player
+ * The callback interface for receiving chunk synchronization events.
  */
 @FunctionalInterface
 public interface ChunkSyncCallback {
@@ -38,5 +38,8 @@ public interface ChunkSyncCallback {
         }
     });
 
+    /**
+     * Called when a chunk's data is sent to a player
+     */
     void onChunkSync(ServerPlayerEntity player, WorldChunk chunk);
 }

@@ -52,7 +52,7 @@ public interface ComponentRegistry {
      * is forbidden and will throw an {@link IllegalStateException}.
      *
      * @param componentId    a unique identifier for the registered component type
-     * @param componentClass the interface of which to obtain a {@link ComponentType}
+     * @param componentClass the interface or class of which to obtain a {@link ComponentType}
      * @return a shared instance of {@link ComponentType}
      * @throws IllegalArgumentException if {@code componentClass} does not extend {@link Component}
      * @throws IllegalStateException    if a different component class has been registered with the same {@code componentId}
