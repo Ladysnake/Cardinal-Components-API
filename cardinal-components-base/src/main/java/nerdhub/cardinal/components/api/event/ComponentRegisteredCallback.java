@@ -23,20 +23,30 @@
 package nerdhub.cardinal.components.api.event;
 
 import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.util.Identifier;
 
+/**
+ * The callback interface for receiving component registration events.
+ *
+ * @see nerdhub.cardinal.components.api.ComponentRegistry#registerIfAbsent(Identifier, Class)
+ */
 public interface ComponentRegisteredCallback {
-    /**
-     * Called when a {@link nerdhub.cardinal.components.api.ComponentType} is registered
-     */
     Event<ComponentRegisteredCallback> EVENT = EventFactory.createArrayBacked(ComponentRegisteredCallback.class,
-        listeners -> (Identifier id, Class<?> componentClass, ComponentType<?> type) -> {
+        listeners -> (Identifier id, Class<? extends Component> componentClass, ComponentType<?> type) -> {
             for (ComponentRegisteredCallback listener : listeners) {
                 listener.onComponentRegistered(id, componentClass, type);
             }
         });
 
-    void onComponentRegistered(Identifier id, Class<?> componentClass, ComponentType<?> type);
+    /**
+     * Called when a new {@link ComponentType} is registered.
+     *
+     * @param id             the identifier with which the component type was registered
+     * @param componentClass the declared type of the components
+     * @param type           the {@code ComponentType} instantiated by the registration call
+     */
+    void onComponentRegistered(Identifier id, Class<? extends Component> componentClass, ComponentType<?> type);
 }

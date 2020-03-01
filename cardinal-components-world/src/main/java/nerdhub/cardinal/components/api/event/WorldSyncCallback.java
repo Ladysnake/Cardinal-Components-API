@@ -27,6 +27,9 @@ import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 
+/**
+ * Callback interface to receive world synchronization events.
+ */
 @FunctionalInterface
 public interface WorldSyncCallback {
     Event<WorldSyncCallback> EVENT = EventFactory.createArrayBacked(WorldSyncCallback.class, (p, e) -> {}, listeners -> (player, world) -> {
@@ -35,5 +38,8 @@ public interface WorldSyncCallback {
         }
     });
 
+    /**
+     * Called when a player starts tracking a world (eg. by joining it).
+     */
     void onPlayerStartTracking(ServerPlayerEntity player, ServerWorld world);
 }
