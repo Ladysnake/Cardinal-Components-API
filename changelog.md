@@ -1,4 +1,27 @@
 ------------------------------------------------------
+Version 2.3.4
+------------------------------------------------------
+Ok but this time it's true, item components are really fixed for real
+- Item components are now properly copied in every vanilla situation where an item stack is copied
+- Component deserialization is slightly faster
+
+------------------------------------------------------
+Version 2.3.3
+------------------------------------------------------
+- Fixed item component initialization for real this time
+
+------------------------------------------------------
+Version 2.3.2
+------------------------------------------------------
+- Fixed component initialization in empty item stacks (eg. during inventory insertion)
+
+------------------------------------------------------
+Version 2.3.1
+------------------------------------------------------
+- Fixed crash with item components when picking up items
+- Marked cardinal-components-world as incompatible with 1.16
+
+------------------------------------------------------
 Version 2.3.0
 ------------------------------------------------------
 **This update may be incompatible with mods using previous versions of `cardinal-components-item` or `cardinal-components-chunk`**

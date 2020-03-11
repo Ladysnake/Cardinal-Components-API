@@ -51,7 +51,7 @@ public final class CardinalComponentsEntity {
         PlayerCopyCallback.EVENT.register(CardinalComponentsEntity::copyData);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private static void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless) {
         boolean keepInventory = original.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || clone.isSpectator();
         Components.forEach(ComponentProvider.fromEntity(original),
@@ -80,7 +80,7 @@ public final class CardinalComponentsEntity {
                     return;
                 }
                 PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-                // Functional null avoidance with off-thread lambda instantiation
+                // Functional null avoidance with off-thread lambda instantiation, surely it's better than nested ifs...                        right ?
                 Consumer<Entity> entitySync = componentType.asComponentPath()
                         .compose(ComponentProvider::fromEntity)
                         .thenCastTo(SyncedComponent.class)

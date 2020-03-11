@@ -20,39 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.mixins.common;
+package nerdhub.cardinal.components.mixins.common.item;
 
-import nerdhub.cardinal.components.internal.ItemStackAccessor;
+import nerdhub.cardinal.components.internal.CardinalItemInternals;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.recipe.BookCloningRecipe;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import javax.annotation.Nullable;
-
-@Mixin(PacketByteBuf.class)
-public abstract class MixinPacketByteBuf {
-
-    @Shadow public abstract PacketByteBuf writeCompoundTag(@Nullable CompoundTag compoundTag_1);
-
-    @Shadow @Nullable public abstract CompoundTag readCompoundTag();
-
-    @Inject(method = "writeItemStack", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/PacketByteBuf;writeCompoundTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/util/PacketByteBuf;", shift = At.Shift.AFTER), cancellable = true)
-    private void writeItemStack(ItemStack stack, CallbackInfoReturnable<PacketByteBuf> cir) {
-        //noinspection ConstantConditions
-        this.writeCompoundTag(((ItemStackAccessor)(Object)stack).cardinal_getComponentContainer().toTag(new CompoundTag()));
-    }
-
-    @SuppressWarnings({"ConstantConditions"})
-    @Inject(method = "readItemStack", at = @At(value = "RETURN"))
-    private void readStack(CallbackInfoReturnable<ItemStack> cir) {
-        ItemStack stack = cir.getReturnValue();
-        if(!stack.isEmpty()) {
-            ((ItemStackAccessor) ((Object) stack)).cardinal_getComponentContainer().fromTag(this.readCompoundTag());
-        }
+@Mixin(BookCloningRecipe.class)
+public class MixinBookCloningRecipe {
+    @Inject(
+        method = "craft",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;setTag(Lnet/minecraft/nbt/CompoundTag;)V"),
+        locals = LocalCapture.CAPTURE_FAILSOFT
+    )
+    private void craft(CraftingInventory craftingInventory, CallbackInfoReturnable<ItemStack> cir, int copies, ItemStack original, ItemStack copy) {
+        CardinalItemInternals.copyComponents(original, copy);
     }
 }
