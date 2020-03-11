@@ -30,6 +30,14 @@ import net.minecraft.nbt.CompoundTag;
 public class BaseVita implements Vita, CopyableComponent<Vita> {
     protected int vitality;
 
+    public BaseVita() {
+        this(0);
+    }
+
+    public BaseVita(int vitality) {
+        this.vitality = vitality;
+    }
+
     @Override
     public int getVitality() {
         return this.vitality;

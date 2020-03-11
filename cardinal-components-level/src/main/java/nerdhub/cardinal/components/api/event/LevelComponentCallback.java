@@ -30,27 +30,30 @@ import net.minecraft.world.level.LevelProperties;
 
 /**
  * The callback interface for receiving component initialization events
- * during {@code LevelProperty} construction. The element that is interested in attaching
- * components to levels implements this interface, and is
- * registered with the event, using {@link Event#register(Object)}.
- * When a {@code LevelProperties} is constructed, the callback's {@code initComponents} method is invoked.
+ * during {@code LevelProperty} construction.
+ *
+ * <p> The element that is interested in attaching components
+ * to levels implements this interface, and is registered
+ * with the event, using {@link Event#register(Object)}.
+ * When a {@code LevelProperties} object is constructed, the callback's
+ * {@link #initComponents} method is invoked.
  */
 @FunctionalInterface
 public interface LevelComponentCallback extends ComponentCallback<LevelProperties, Component> {
 
     Event<LevelComponentCallback> EVENT = EventFactory.createArrayBacked(LevelComponentCallback.class,
-            (callbacks) -> (level, components) -> {
-                for (LevelComponentCallback callback : callbacks) {
-                    callback.initComponents(level, components);
-                }
-            });
+        (callbacks) -> (level, components) -> {
+            for (LevelComponentCallback callback : callbacks) {
+                callback.initComponents(level, components);
+            }
+        });
 
     /**
      * Initialize components for the given level properties object.
      * Components that are added to the given container will be available
      * on the level as soon as all callbacks have been invoked.
      *
-     * @param level     the level being constructed
+     * @param level      the level being constructed
      * @param components the level's component container
      */
     @Override

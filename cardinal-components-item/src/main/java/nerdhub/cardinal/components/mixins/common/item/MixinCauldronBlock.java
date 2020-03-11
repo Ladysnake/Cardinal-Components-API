@@ -20,26 +20,31 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.event;
+package nerdhub.cardinal.components.mixins.common.item;
 
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.chunk.WorldChunk;
+import nerdhub.cardinal.components.internal.CardinalItemInternals;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.CauldronBlock;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-/**
- * The callback interface for receiving chunk synchronization events.
- */
-@FunctionalInterface
-public interface ChunkSyncCallback {
-    Event<ChunkSyncCallback> EVENT = EventFactory.createArrayBacked(ChunkSyncCallback.class, (p, chunk) -> {}, listeners -> (player, chunk) -> {
-        for (ChunkSyncCallback callback : listeners) {
-            callback.onChunkSync(player, chunk);
-        }
-    });
+@Mixin(CauldronBlock.class)
+public class MixinCauldronBlock {
+    @ModifyVariable(
+        method = "onUse",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;hasTag()Z", ordinal = 0),
+        ordinal = 1
+    )
+    private ItemStack addStack(ItemStack cleanShulker, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        CardinalItemInternals.copyComponents(player.getStackInHand(hand), cleanShulker);
+        return cleanShulker;
+    }
 
-    /**
-     * Called when a chunk's data is sent to a player
-     */
-    void onChunkSync(ServerPlayerEntity player, WorldChunk chunk);
 }

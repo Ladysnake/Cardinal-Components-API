@@ -35,9 +35,11 @@ import javax.annotation.Nullable;
 
 /**
  * The callback interface for receiving component initialization events
- * during {@code ItemStack} construction. The element that is interested in
- * attaching components to item stacks implements this interface, and is
- * registered with an item's event, using {@link Event#register(Object)}.
+ * during {@code ItemStack} construction.
+ *
+ * <p> The element that is interested in attaching components
+ * to item stacks implements this interface, and is registered
+ * with an item's event, using {@link Event#register(Object)}.
  * When a stack of that item is constructed, the callback's
  * {@code initComponents} method is invoked.
  *
@@ -63,7 +65,7 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Copy
      *
      * @param item an item, or {@code null} to target every stack.
      * @return the {@code Event} used to register component callbacks for stacks
-     *         of the given item.
+     * of the given item.
      */
     static Event<ItemComponentCallback> event(@Nullable Item item) {
         return item == null ? CardinalItemInternals.WILDCARD_ITEM_EVENT : ((ItemCaller) item).cardinal_getItemComponentEvent();
@@ -73,7 +75,7 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Copy
      * Convenience method to register an item that implements its own component callback
      *
      * @param item an item that initializes itself the components of its stacks
-     * @param <I> the type of the item
+     * @param <I>  the type of the item
      * @return {@code item} for easy chaining
      */
     static <I extends Item & ItemComponentCallback> I registerSelf(I item) {

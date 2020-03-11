@@ -20,26 +20,28 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.event;
+package nerdhub.cardinal.components.mixins.common.item;
 
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.chunk.WorldChunk;
+import nerdhub.cardinal.components.internal.CardinalItemInternals;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.CarrotOnAStickItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
+import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-/**
- * The callback interface for receiving chunk synchronization events.
- */
-@FunctionalInterface
-public interface ChunkSyncCallback {
-    Event<ChunkSyncCallback> EVENT = EventFactory.createArrayBacked(ChunkSyncCallback.class, (p, chunk) -> {}, listeners -> (player, chunk) -> {
-        for (ChunkSyncCallback callback : listeners) {
-            callback.onChunkSync(player, chunk);
-        }
-    });
+@Mixin(CarrotOnAStickItem.class)
+public class MixinCarrotOnAStickItem {
+    @ModifyVariable(
+        method = "use",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;setTag(Lnet/minecraft/nbt/CompoundTag;)V"),
+        ordinal = 1
+    )
+    private ItemStack addStack(ItemStack cleanShulker, World world, PlayerEntity user, Hand hand) {
+        CardinalItemInternals.copyComponents(user.getStackInHand(hand), cleanShulker);
+        return cleanShulker;
+    }
 
-    /**
-     * Called when a chunk's data is sent to a player
-     */
-    void onChunkSync(ServerPlayerEntity player, WorldChunk chunk);
 }

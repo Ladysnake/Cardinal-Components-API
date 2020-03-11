@@ -20,26 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.event;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package nerdhub.cardinal.components.mixins.common.item;
 
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.chunk.WorldChunk;
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-/**
- * The callback interface for receiving chunk synchronization events.
- */
-@FunctionalInterface
-public interface ChunkSyncCallback {
-    Event<ChunkSyncCallback> EVENT = EventFactory.createArrayBacked(ChunkSyncCallback.class, (p, chunk) -> {}, listeners -> (player, chunk) -> {
-        for (ChunkSyncCallback callback : listeners) {
-            callback.onChunkSync(player, chunk);
-        }
-    });
-
-    /**
-     * Called when a chunk's data is sent to a player
-     */
-    void onChunkSync(ServerPlayerEntity player, WorldChunk chunk);
-}
+import javax.annotation.ParametersAreNonnullByDefault;

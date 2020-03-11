@@ -27,10 +27,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.event.*;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
-import nerdhub.cardinal.componentstest.vita.AmbientVita;
-import nerdhub.cardinal.componentstest.vita.ChunkVita;
-import nerdhub.cardinal.componentstest.vita.PlayerVita;
-import nerdhub.cardinal.componentstest.vita.Vita;
+import nerdhub.cardinal.componentstest.vita.*;
 import net.fabricmc.fabric.api.block.FabricBlockSettings;
 import net.minecraft.block.Material;
 import net.minecraft.entity.EntityCategory;
@@ -46,21 +43,24 @@ import org.apache.logging.log4j.Logger;
 public class CardinalComponentsTest {
 
     public static final Logger LOGGER = LogManager.getLogger("Component Test");
-    public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("componenttest:vita"), Vita.class)
-        .attach(EntityComponentCallback.event(PlayerEntity.class), PlayerVita::new)
-        .attach(WorldComponentCallback.EVENT, AmbientVita.WorldVita::new)
-        .attach(LevelComponentCallback.EVENT, l -> new AmbientVita.LevelVita())
-        .attach(ChunkComponentCallback.EVENT, ChunkVita::new);
 
     // inline self component callback registration
     public static final VitalityStickItem VITALITY_STICK = Registry.register(Registry.ITEM, "componenttest:vita_stick",
-            ItemComponentCallback.registerSelf(new VitalityStickItem(new Item.Settings().group(ItemGroup.COMBAT))));
+            new VitalityStickItem(new Item.Settings().group(ItemGroup.COMBAT)));
 
     public static final VitalityCondenser VITALITY_CONDENSER = Registry.register(Registry.BLOCK, "componenttest:vita_condenser",
             new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().lightLevel(5).ticksRandomly().build()));
 
     public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(Registry.ENTITY_TYPE, "componenttest:vita_zombie",
             EntityType.Builder.create(VitalityZombieEntity::new, EntityCategory.MONSTER).build("zombie"));
+
+    public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("componenttest:vita"), Vita.class)
+        .attach(EntityComponentCallback.event(PlayerEntity.class), PlayerVita::new)
+        .attach(ItemComponentCallback.event(null), stack -> new BaseVita((int) (Math.random() * 50)))   // will make all items unstackable, terrible for playing, great for testing
+        .attach(ItemComponentCallback.event(VITALITY_STICK), stack -> new BaseVita())
+        .attach(WorldComponentCallback.EVENT, AmbientVita.WorldVita::new)
+        .attach(LevelComponentCallback.EVENT, props -> new AmbientVita.LevelVita())
+        .attach(ChunkComponentCallback.EVENT, ChunkVita::new);
 
     public static void init() {
         LOGGER.info("Hello, Components!");

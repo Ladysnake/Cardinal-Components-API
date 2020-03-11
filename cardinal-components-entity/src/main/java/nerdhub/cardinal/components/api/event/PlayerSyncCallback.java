@@ -27,7 +27,7 @@ import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
- * Called when a player joins the server or changes dimension, can be used to synchronize the player's own data
+ * The callback interface for receiving player synchronization events.
  */
 @FunctionalInterface
 public interface PlayerSyncCallback {
@@ -37,5 +37,8 @@ public interface PlayerSyncCallback {
         }
     });
 
+    /**
+     * Called when a player eg. joins the server or changes dimension, can be used to synchronize the player's own data
+     */
     void onPlayerSync(ServerPlayerEntity player);
 }

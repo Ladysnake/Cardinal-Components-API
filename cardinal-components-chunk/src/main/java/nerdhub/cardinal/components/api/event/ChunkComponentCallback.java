@@ -30,11 +30,13 @@ import net.minecraft.world.chunk.Chunk;
 
 /**
  * The callback interface for receiving component initialization events
- * during chunk construction. The element that is interested in attaching
- * components to entities implements this interface, and is
- * registered with the event, using {@link Event#register(Object)}.
- * When an {@code Chunk} is constructed, the callback's
- * {@code initComponents} method is invoked.
+ * during chunk construction.
+ *
+ * <p> The element that is interested in attaching components
+ * to entities implements this interface, and is registered
+ * with the event, using {@link Event#register(Object)}.
+ * When a {@code Chunk} object is constructed, the callback's
+ * {@link #initComponents} method is invoked.
  */
 @FunctionalInterface
 public interface ChunkComponentCallback extends ComponentCallback<Chunk, CopyableComponent<?>> {
