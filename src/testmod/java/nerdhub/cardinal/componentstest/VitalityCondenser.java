@@ -66,7 +66,7 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hitInfo) {
         // only on client side, to confirm that sync works
         if (world.isClient) {
-            player.addChatMessage(new TranslatableText("componenttest:action.chunk_vitality",
+            player.addMessage(new TranslatableText("componenttest:action.chunk_vitality",
                     CardinalComponentsTest.VITA.get(this.getChunkProvider(world, pos)).getVitality()), true);
         }
         return ActionResult.SUCCESS;
