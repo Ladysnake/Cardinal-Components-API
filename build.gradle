@@ -48,6 +48,7 @@ allprojects {
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.0-M1"
         compileOnly "com.google.code.findbugs:jsr305:3.0.2"
+        api "org.jetbrains:annotations:19.0.0"
     }
 
     processResources {
