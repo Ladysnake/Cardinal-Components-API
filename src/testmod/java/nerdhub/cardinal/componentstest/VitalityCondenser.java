@@ -41,6 +41,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.CollisionView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -52,7 +53,8 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
         super(settings);
     }
 
-    @Deprecated
+    @SuppressWarnings("deprecation")
+    @ApiStatus.OverrideOnly
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
         CardinalComponentsTest.VITA.get(world).transferTo(
@@ -61,7 +63,8 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
         );
     }
 
-    @Deprecated
+    @SuppressWarnings("deprecation")
+    @ApiStatus.OverrideOnly
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hitInfo) {
         // only on client side, to confirm that sync works

@@ -25,6 +25,7 @@ package nerdhub.cardinal.components.api;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.internal.ComponentRegistryImpl;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.stream.Stream;
@@ -38,6 +39,7 @@ import java.util.stream.Stream;
  * @see Component
  * @see ComponentType
  */
+@ApiStatus.NonExtendable
 public interface ComponentRegistry {
     /** The component registry */
     ComponentRegistry INSTANCE = new ComponentRegistryImpl(ComponentType::new);

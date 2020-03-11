@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.api.util;
 
 import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A {@link CloneableComponent} implementation that uses java's {@link Cloneable} mechanism for cloning.
@@ -30,6 +31,7 @@ import nerdhub.cardinal.components.api.component.extension.CloneableComponent;
  * @deprecated use {@link nerdhub.cardinal.components.api.component.extension.CopyableComponent}
  */
 @Deprecated
+@ApiStatus.ScheduledForRemoval
 public interface NativeCloneableComponent extends CloneableComponent, Cloneable {
     /**
      * Creates a brand new instance of this object's class using the {@link #clone()}

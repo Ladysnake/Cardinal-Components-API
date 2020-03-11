@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.api.component.extension;
 
 import nerdhub.cardinal.components.api.component.Component;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A component that can be cloned
@@ -30,6 +31,7 @@ import nerdhub.cardinal.components.api.component.Component;
  * @deprecated use {@link CopyableComponent}
  */
 @Deprecated
+@ApiStatus.ScheduledForRemoval
 public interface CloneableComponent extends Component, CopyableComponent<CloneableComponent> {
     /**
      * Creates a brand new instance of this object's class.
