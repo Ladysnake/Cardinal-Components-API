@@ -11,7 +11,8 @@
         "common.item.MixinItemStack",
         "common.item.MixinPacketByteBuf",
         "common.item.MixinPlayerInventory",
-        "common.item.MixinShulkerBoxColoringRecipe"
+        "common.item.MixinShulkerBoxColoringRecipe",
+        "common.item.MixinSmithingScreenHandler"
     ],
     "injectors": {
         "defaultRequire": 1
