@@ -5,7 +5,7 @@
     "package": "nerdhub.cardinal.components.mixins",
     "mixins": [
         "common.item.MixinBookCloningRecipe",
-        "common.item.MixinCarrotOnAStickItem",
+        "common.item.MixinOnAStickItem",
         "common.item.MixinCauldronBlock",
         "common.item.MixinItem",
         "common.item.MixinItemStack",

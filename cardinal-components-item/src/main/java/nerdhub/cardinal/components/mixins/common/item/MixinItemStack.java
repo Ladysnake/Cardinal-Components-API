@@ -62,7 +62,7 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
         }
     }
 
-    @Inject(method = "isEqualIgnoreDamage", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "isItemEqualIgnoreDamage", at = @At("RETURN"), cancellable = true)
     private void isEqual(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         // If the tags are equal, either both stacks are empty or neither is.
         if(cir.getReturnValueZ() && !Components.areComponentsEqual((ItemStack) (Object) this, stack)) {

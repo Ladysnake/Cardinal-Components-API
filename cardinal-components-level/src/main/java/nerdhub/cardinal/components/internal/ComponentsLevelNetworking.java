@@ -33,8 +33,8 @@ import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
 
 public final class ComponentsLevelNetworking {
     public static void init() {
