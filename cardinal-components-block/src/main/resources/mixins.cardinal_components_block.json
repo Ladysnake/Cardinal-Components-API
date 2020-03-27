@@ -4,7 +4,7 @@
     "compatibilityLevel": "JAVA_8",
     "package": "nerdhub.cardinal.components.mixins",
     "mixins": [
-        "common.MixinBlock"
+        "common.MixinAbstractBlock"
     ],
     "injectors": {
         "defaultRequire": 1

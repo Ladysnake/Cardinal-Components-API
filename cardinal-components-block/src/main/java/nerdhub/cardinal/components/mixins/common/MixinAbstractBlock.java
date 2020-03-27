@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableSet;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.BlockComponentProvider;
 import nerdhub.cardinal.components.api.component.Component;
-import net.minecraft.block.Block;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -38,8 +38,8 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
 
-@Mixin(Block.class)
-public abstract class MixinBlock implements BlockComponentProvider {
+@Mixin(AbstractBlock.class)
+public abstract class MixinAbstractBlock implements BlockComponentProvider {
 
     @Shadow public abstract boolean hasBlockEntity();
 
