@@ -25,7 +25,7 @@ package nerdhub.cardinal.components.mixins.common.item;
 import nerdhub.cardinal.components.internal.ItemStackAccessor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.network.PacketByteBuf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,7 +41,7 @@ public abstract class MixinPacketByteBuf {
 
     @Shadow @Nullable public abstract CompoundTag readCompoundTag();
 
-    @Inject(method = "writeItemStack", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/PacketByteBuf;writeCompoundTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/util/PacketByteBuf;", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "writeItemStack", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/PacketByteBuf;writeCompoundTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/network/PacketByteBuf;", shift = At.Shift.AFTER), cancellable = true)
     private void writeItemStack(ItemStack stack, CallbackInfoReturnable<PacketByteBuf> cir) {
         //noinspection ConstantConditions
         this.writeCompoundTag(((ItemStackAccessor)(Object)stack).cardinal_getComponentContainer().toTag(new CompoundTag()));
