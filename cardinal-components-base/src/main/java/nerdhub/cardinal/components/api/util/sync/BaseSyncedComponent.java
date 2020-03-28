@@ -26,8 +26,8 @@ import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.PacketByteBuf;
 
 /**
  * {@code SyncedComponent} extension with read and write methods that can respectively be used
@@ -44,9 +44,9 @@ public interface BaseSyncedComponent extends SyncedComponent, TypeAwareComponent
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation sends possibly hidden
      * information to clients, uses a wasteful data format, and does not support
-     * any optimization such as incremental updates. Implementing classes can 
+     * any optimization such as incremental updates. Implementing classes can
      * nearly always provide a better implementation.
-     * 
+     *
      * @see #readFromPacket(PacketByteBuf)
      */
     default void writeToPacket(PacketByteBuf buf) {

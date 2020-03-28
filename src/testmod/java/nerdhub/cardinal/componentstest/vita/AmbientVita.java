@@ -29,8 +29,8 @@ import nerdhub.cardinal.componentstest.CardinalComponentsTest;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.PacketByteBuf;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
