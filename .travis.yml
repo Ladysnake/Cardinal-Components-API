@@ -35,7 +35,7 @@ deploy:
         script: "./gradlew publish"
         skip_cleanup: true
         on:
-            repo: NerdHubMC/Cardinal-Components-API
+            repo: OnyxStudios/Cardinal-Components-API
             branch: master
 
     # if commit tag is created, deploy to curseforge
@@ -44,6 +44,6 @@ deploy:
         target_commitsh: $TRAVIS_TAG
         skip_cleanup: true
         on:
-            repo: NerdHubMC/Cardinal-Components-API
+            repo: OnyxStudios/Cardinal-Components-API
             tags: true
             condition: "false" # curseforge deployment is broken right now
