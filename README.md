@@ -19,9 +19,9 @@ repositories {
 
 dependencies {
     // Replace modImplementation with modApi if you expose components in your own API
-    modImplementation "com.github.NerdHubMC:Cardinal-Components-API:<VERSION>"
+    modImplementation "com.github.NerdHubMC.Cardinal-Components-API:MODULE>:<VERSION>"
     // Includes Cardinal Components API as a Jar-in-Jar dependency (optional)
-    include "com.github.NerdHubMC:Cardinal-Components-API:<VERSION>"
+    include "com.github.NerdHubMC.Cardinal-Components-API:<MODULE>:<VERSION>"
 }
 ```
 
