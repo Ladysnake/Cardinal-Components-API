@@ -12,32 +12,33 @@ objects and behaviours, thereby helping both mod creation and compatibility.*
 ```gradle
 repositories {
     maven {
-        name = "Onyx Studios"
-        url = "https://maven.onyxstudios.dev"
+        name = "Jitpack"
+        url = "https://jitpack.io"
     }
 }
 
 dependencies {
     // Replace modImplementation with modApi if you expose components in your own API
-    modImplementation "com.github.NerdHubMC:Cardinal-Components-API:<VERSION>"
+    modImplementation "io.github.OnyxStudios:Cardinal-Components-API:<MODULE>:<VERSION>"
     // Includes Cardinal Components API as a Jar-in-Jar dependency (optional)
-    include "com.github.NerdHubMC:Cardinal-Components-API:<VERSION>"
+    include "io.github.OnyxStudios:Cardinal-Components-API:<MODULE>:<VERSION>"
 }
 ```
 
 You can find the current version of the API in the [releases](https://github.com/OnyxStudios/Cardinal-Components-API/releases) tab of the repository on Github.
 
-Cardinal Components API is split into several modules. The main artifact bundles every module, but often all
-are not required for a project. To depend on a specific module, use the dependency string
-`com.github.NerdHubMC.Cardinal-Components-API:<MODULE>:<VERSION>`. Module names can be found below.
+Cardinal Components API is split into several modules. To depend on the all-encompassing master jar, use the dependency string
+`io.github.OnyxStudios.Cardinal-Components-API:Cardinal-Components-API:<VERSION>`. That artifact bundles every module, but often all are not required for a project. Individual module names can be found [below](#modules).
 
 Example:
 ```gradle
-// Adds an API dependency on the base cardinal components module
-modApi "com.github.NerdHubMC.Cardinal-Components-API:cardinal-components-base:<VERSION>"
+// Adds an API dependency on the base cardinal components module (required by every other module)
+modApi "io.github.OnyxStudios.Cardinal-Components-API:cardinal-components-base:<VERSION>"
+// Adds an implementation dependency on the entity module
+modImplementation "io.github.OnyxStudios.Cardinal-Components-API:cardinal-components-entity:<VERSION>"
 ```
 
-## Usage
+## Basic Usage
 
 To get started, you only need 2 things: an interface extending `Component`, and a class implementing this interface.
 
@@ -76,6 +77,7 @@ public static void useMagik(ComponentProvider provider) {
 Components are normally attached to providers through an adequate [`ComponentCallback`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/nerdhub/cardinal/components/api/event/ComponentCallback.java).
 The usual syntax is of the form `XComponentCallback.EVENT.register((provider, components) -> components.put(componentType, new ComponentImpl(...)));`.
 Alternatively, a shortcut for this syntax is available in ComponentType for every ComponentCallback, as `componentType.attach(XComponentCallback.EVENT, componentFactory)`.
+
 Example:
 ```java
 public static final ComponentType<IntComponent> MAGIK = 
@@ -83,6 +85,8 @@ public static final ComponentType<IntComponent> MAGIK =
             .attach(EntityComponentCallback.event(ZombieEntity.class), zombie -> new RandomIntComponent())
             .attach(WorldComponentCallback.EVENT, WorldIntComponent::new);
 ```
+
+## Modules
 
 Cardinal Components API offers component provider implementations for a few vanilla types, each in its own module:
 
