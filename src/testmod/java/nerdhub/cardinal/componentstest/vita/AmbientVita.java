@@ -28,9 +28,11 @@ import nerdhub.cardinal.components.api.util.sync.WorldSyncedComponent;
 import nerdhub.cardinal.componentstest.CardinalComponentsTest;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
@@ -46,8 +48,10 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
         this.setVitality(vita);
         World world = Objects.requireNonNull(MinecraftClient.getInstance().player).world;
         // Very bad shortcut to get a dimension's name
-        String worldName = Objects.requireNonNull(DimensionType.getId(world.getDimension().getType())).getPath().replace('_', ' ');
-        String worldVita = I18n.translate(
+        Text worldName = new LiteralText(
+            Objects.requireNonNull(DimensionType.getId(world.getDimension().getType())).getPath().replace('_', ' ')
+        );
+        Text worldVita = new TranslatableText(
                 "componenttest:title.world_vitality",
                 CardinalComponentsTest.VITA.get(world).getVitality(),
                 CardinalComponentsTest.VITA.get(world.getLevelProperties()).getVitality()

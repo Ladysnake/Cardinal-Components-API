@@ -38,8 +38,8 @@ import java.io.File;
 
 @Mixin(ThreadedAnvilChunkStorage.class)
 public abstract class MixinThreadedAnvilChunkStorage extends VersionedChunkStorage {
-    public MixinThreadedAnvilChunkStorage(File file, DataFixer fixer) {
-        super(file, fixer);
+    public MixinThreadedAnvilChunkStorage(File file, DataFixer dataFixer, boolean bl) {
+        super(file, dataFixer, bl);
     }
 
     @Inject(method = "sendChunkDataPackets", at = @At("RETURN"))

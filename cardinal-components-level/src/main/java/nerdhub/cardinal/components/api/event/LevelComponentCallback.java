@@ -26,7 +26,7 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.world.level.LevelProperties;
+import net.minecraft.class_5217;
 
 /**
  * The callback interface for receiving component initialization events
@@ -38,8 +38,8 @@ import net.minecraft.world.level.LevelProperties;
  * When a {@code LevelProperties} object is constructed, the callback's
  * {@link #initComponents} method is invoked.
  */
-@FunctionalInterface
-public interface LevelComponentCallback extends ComponentCallback<LevelProperties, Component> {
+@FunctionalInterface    // TODO rename the interface when yarn updates
+public interface LevelComponentCallback extends ComponentCallback<class_5217, Component> {
 
     Event<LevelComponentCallback> EVENT = EventFactory.createArrayBacked(LevelComponentCallback.class,
         (callbacks) -> (level, components) -> {
@@ -57,5 +57,5 @@ public interface LevelComponentCallback extends ComponentCallback<LevelPropertie
      * @param components the level's component container
      */
     @Override
-    void initComponents(LevelProperties level, ComponentContainer<Component> components);
+    void initComponents(class_5217 level, ComponentContainer<Component> components);
 }
