@@ -1,4 +1,9 @@
 ------------------------------------------------------
+Version 2.3.5
+------------------------------------------------------
+- Fixed thrown items with different components being able to merge
+
+------------------------------------------------------
 Version 2.3.4
 ------------------------------------------------------
 Ok but this time it's true, item components are really fixed for real

@@ -66,6 +66,11 @@ public class BaseVita implements Vita, CopyableComponent<Vita> {
     }
 
     @Override
+    public void copyFrom(Vita other) {
+        this.vitality = other.getVitality();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Vita)) return false;
