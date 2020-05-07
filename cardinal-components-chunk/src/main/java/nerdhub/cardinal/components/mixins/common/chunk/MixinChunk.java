@@ -45,7 +45,7 @@ public abstract class MixinChunk implements Chunk, ComponentProvider, ChunkAcces
     @Unique
     private static final FeedbackContainerFactory<Chunk, CopyableComponent<?>> componentsContainerFactory = new FeedbackContainerFactory<>(ChunkComponentCallback.EVENT);
     @Unique
-    private ComponentContainer<CopyableComponent<?>> components = componentsContainerFactory.create(this);
+    private final ComponentContainer<CopyableComponent<?>> components = componentsContainerFactory.create(this);
 
     @Override
     public ComponentContainer<CopyableComponent<?>> cardinal_getComponentContainer() {

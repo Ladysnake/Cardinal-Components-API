@@ -268,8 +268,8 @@ public final class FastComponentContainer<C extends Component> extends AbstractC
         }
 
         private class Entry implements Map.Entry<ComponentType<?>, C> {
-            private int rawId;
-            private C value;
+            private final int rawId;
+            private final C value;
 
             private Entry(int rawId, C value) {
                 this.rawId = rawId;
