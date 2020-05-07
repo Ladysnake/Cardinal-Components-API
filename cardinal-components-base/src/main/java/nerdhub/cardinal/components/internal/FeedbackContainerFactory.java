@@ -37,7 +37,7 @@ public final class FeedbackContainerFactory<T, C extends Component> {
     private IndexedComponentContainer<C> model = new IndexedComponentContainer<>();
     private boolean useFastUtil;
     private int expectedSize;
-    private Event<? extends ComponentCallback<T, C>>[] componentEvents;
+    private final Event<? extends ComponentCallback<T, C>>[] componentEvents;
 
     @SafeVarargs
     public FeedbackContainerFactory(Event<? extends ComponentCallback<T, C>>... componentEvents) {

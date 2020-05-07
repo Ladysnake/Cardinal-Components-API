@@ -354,7 +354,7 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
 
 
         private class Entry implements Map.Entry<ComponentType<?>, C> {
-            private int index;
+            private final int index;
 
             private Entry(int index) {
                 this.index = index;
