@@ -50,7 +50,7 @@ import java.util.function.BiConsumer;
  * that naturally encapsulates the container.
  *
  */
-public final class FastComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
+public class FastComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
     /**
      * All of the component types that can be stored in this container.
      * (Cached for performance.)
