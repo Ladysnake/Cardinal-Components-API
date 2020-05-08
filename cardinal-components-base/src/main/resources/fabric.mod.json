@@ -13,6 +13,11 @@
     "depends": {
         "fabric-api-base": ">=0.1.2"
     },
+    "entrypoints": {
+        "preLaunch": [
+            "nerdhub.cardinal.components.internal.CcaBootstrap::INSTANCE"
+        ]
+    },
     "authors": [
         {
             "name": "UpcraftLP",

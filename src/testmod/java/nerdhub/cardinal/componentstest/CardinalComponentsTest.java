@@ -24,10 +24,16 @@ package nerdhub.cardinal.componentstest;
 
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.event.*;
+import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.api.event.ItemComponentCallback;
+import nerdhub.cardinal.components.api.event.LevelComponentCallback;
+import nerdhub.cardinal.components.api.event.WorldComponentCallback;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
-import nerdhub.cardinal.componentstest.vita.*;
+import nerdhub.cardinal.componentstest.vita.AmbientVita;
+import nerdhub.cardinal.componentstest.vita.BaseVita;
+import nerdhub.cardinal.componentstest.vita.PlayerVita;
+import nerdhub.cardinal.componentstest.vita.Vita;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Material;
 import net.minecraft.entity.EntityType;
@@ -56,11 +62,10 @@ public class CardinalComponentsTest {
 
     public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("componenttest:vita"), Vita.class)
         .attach(EntityComponentCallback.event(PlayerEntity.class), PlayerVita::new)
-        .attach(ItemComponentCallback.event(null), stack -> new BaseVita((int) (Math.random() * 50)))   // will make all items unstackable, terrible for playing, great for testing
-        .attach(ItemComponentCallback.event(VITALITY_STICK), stack -> new BaseVita())
+        // the following will make all items unstackable, terrible for playing, great for testing
+        .attach(ItemComponentCallback.event(null), stack -> stack.getItem() == VITALITY_STICK ? new BaseVita() : new BaseVita((int) (Math.random() * 50)))
         .attach(WorldComponentCallback.EVENT, AmbientVita.WorldVita::new)
-        .attach(LevelComponentCallback.EVENT, props -> new AmbientVita.LevelVita())
-        .attach(ChunkComponentCallback.EVENT, ChunkVita::new);
+        .attach(LevelComponentCallback.EVENT, props -> new AmbientVita.LevelVita());
 
     public static void init() {
         LOGGER.info("Hello, Components!");

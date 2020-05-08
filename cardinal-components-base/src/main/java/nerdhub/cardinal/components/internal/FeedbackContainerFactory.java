@@ -26,16 +26,15 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
 import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
-import nerdhub.cardinal.components.api.util.container.IndexedComponentContainer;
 import net.fabricmc.fabric.api.event.Event;
+
+import javax.annotation.Nonnull;
 
 /**
  * A {@code ComponentContainer} factory that takes feedback to optimize
  * future container instantiations.
  */
-public final class FeedbackContainerFactory<T, C extends Component> {
-    private IndexedComponentContainer<C> model = new IndexedComponentContainer<>();
-    private boolean useFastUtil;
+public class FeedbackContainerFactory<T, C extends Component> {
     private int expectedSize;
     private final Event<? extends ComponentCallback<T, C>>[] componentEvents;
 
@@ -50,16 +49,18 @@ public final class FeedbackContainerFactory<T, C extends Component> {
      */
     public ComponentContainer<C> create(T obj) {
         ComponentContainer<C> components;
-        if (this.useFastUtil) {
-            components = new FastComponentContainer<>(this.expectedSize);
-        } else {
-            components = IndexedComponentContainer.withSettingsFrom(model);
-        }
+        components = createContainer(obj);
         for (Event<? extends ComponentCallback<T, C>> event : this.componentEvents) {
             event.invoker().initComponents(obj, components);
         }
         this.adjustFrom(components);
         return components;
+    }
+
+    @SuppressWarnings({"WeakerAccess", "unused"})   // overridden by generated classes
+    @Nonnull
+    protected ComponentContainer<C> createContainer(T obj) {
+        return new FastComponentContainer<>(this.expectedSize);
     }
 
     /**
@@ -68,18 +69,6 @@ public final class FeedbackContainerFactory<T, C extends Component> {
      * {@link #create created} by this factory.
      */
     private void adjustFrom(ComponentContainer<C> initialized) {
-        if (initialized instanceof IndexedComponentContainer) {
-            IndexedComponentContainer<C> icc = ((IndexedComponentContainer<C>) initialized);
-            // If the container was created by this factory, its value range can only be equal or higher to the model.
-            // As such, a lower minimum index will always translate to a higher universe size.
-            if (model.getUniverseSize() < icc.getUniverseSize()) {
-                // Threshold at which the fastutil map becomes more memory efficient
-                if (icc.getUniverseSize() > 4 * icc.size()) {
-                    this.useFastUtil = true;
-                }
-                this.model = IndexedComponentContainer.withSettingsFrom(icc);
-            }
-        }
         this.expectedSize = initialized.size();
     }
 }
