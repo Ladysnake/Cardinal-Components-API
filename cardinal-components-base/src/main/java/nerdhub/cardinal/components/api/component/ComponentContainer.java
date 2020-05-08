@@ -87,6 +87,7 @@ public interface ComponentContainer<C extends Component> extends Map<ComponentTy
      * @throws NullPointerException          if the specified key or value is null
      * @throws UnsupportedOperationException if the <tt>put</tt> operation
      *                                       is not supported by this container
+     * @throws IllegalStateException         if this container already contains a mapping for the given key
      * @throws IllegalArgumentException      if {@code value} is not a valid instance for {@code key}
      * @implSpec Implementations that do not support modification should
      * document their immutability properties
