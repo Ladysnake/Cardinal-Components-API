@@ -151,6 +151,7 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
         Preconditions.checkNotNull(key);
         Preconditions.checkNotNull(value);
         Preconditions.checkArgument(key.getComponentClass().isInstance(value), value + " is not of type " + key);
+        Preconditions.checkState(!this.containsKey(key), "Cannot register 2 components for " + key);
         Component[] vals = this.vals;
         final int rawId = key.getRawId();
         int index = rawId - this.minIndex;

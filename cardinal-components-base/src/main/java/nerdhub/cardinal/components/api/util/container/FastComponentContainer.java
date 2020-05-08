@@ -102,6 +102,7 @@ public final class FastComponentContainer<C extends Component> extends AbstractC
         Preconditions.checkNotNull(key);
         Preconditions.checkNotNull(value);
         Preconditions.checkArgument(key.getComponentClass().isInstance(value), value + " is not of type " + key);
+        Preconditions.checkState(!this.containsKey(key), "Cannot register 2 components for " + key);
         return this.vals.put(key.getRawId(), value);
     }
 
