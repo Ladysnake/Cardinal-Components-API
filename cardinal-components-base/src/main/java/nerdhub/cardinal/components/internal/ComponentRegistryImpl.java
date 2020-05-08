@@ -28,6 +28,7 @@ import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.ComponentRegisteredCallback;
+import nerdhub.cardinal.components.api.util.LazyComponentType;
 import net.minecraft.util.Identifier;
 
 import java.util.LinkedHashMap;
@@ -69,6 +70,11 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
     @Override
     public ComponentType<?> get(Identifier id) {
         return registry.get(id);
+    }
+
+    @Override
+    public LazyComponentType getLazy(Identifier id) {
+        return LazyComponentType.create(id);
     }
 
     @Override
