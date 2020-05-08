@@ -31,6 +31,7 @@ import nerdhub.cardinal.components.api.event.ComponentRegisteredCallback;
 import nerdhub.cardinal.components.api.util.LazyComponentType;
 import net.minecraft.util.Identifier;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -58,12 +59,27 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
                 }
                 return existing;
             } else {
-                ComponentType<T> registered = access.create(componentId, componentClass, nextRawId++);
+                ComponentType<T> registered;
+                Class<? extends ComponentType<?>> generated = CcaBootstrap.INSTANCE.getGeneratedComponentTypeClass(componentId.toString());
+                if (generated != null) {
+                    registered = instantiateStaticType(generated, componentId, componentClass, nextRawId++);
+                } else {
+                    registered = access.create(componentId, componentClass, nextRawId++);
+                }
                 registry.put(componentId, registered);
                 SharedComponentSecrets.registeredComponents.set(this.registry.values().toArray(new ComponentType[0]));
                 ComponentRegisteredCallback.EVENT.invoker().onComponentRegistered(componentId, componentClass, registered);
                 return registered;
             }
+        }
+    }
+
+    private <T extends Component> ComponentType<T> instantiateStaticType(Class<? extends ComponentType<?>> generated, Identifier componentId, Class<T> componentClass, int rawId) {
+        try {
+            @SuppressWarnings("unchecked") ComponentType<T> ret = (ComponentType<T>) generated.getConstructor(Identifier.class, Class.class, int.class).newInstance(componentId, componentClass, rawId);
+            return ret;
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new IllegalStateException("Failed to create statically declared component type", e);
         }
     }
 

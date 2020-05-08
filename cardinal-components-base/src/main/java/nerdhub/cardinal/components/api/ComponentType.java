@@ -29,6 +29,7 @@ import nerdhub.cardinal.components.api.util.ObjectPath;
 import nerdhub.cardinal.components.internal.ComponentsInternals;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.NoSuchElementException;
@@ -40,7 +41,8 @@ import java.util.function.Function;
  *
  * @see ComponentRegistry
  */
-public final class ComponentType<T extends Component> {
+@ApiStatus.NonExtendable
+public class ComponentType<T extends Component> {
 
     private final Class<T> componentClass;
     private final Identifier id;
@@ -53,11 +55,16 @@ public final class ComponentType<T extends Component> {
      *
      * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
      */
-    /* package-private */
-    ComponentType(Identifier id, Class<T> componentClass, int rawId) {
+    protected ComponentType(Identifier id, Class<T> componentClass, int rawId) {
         this.componentClass = componentClass;
         this.id = id;
         this.rawId = rawId;
+    }
+
+    @SuppressWarnings("WeakerAccess")   // overridden by generated types
+    @Nullable
+    protected T get0(ComponentProvider provider) {
+        return provider.getComponent(this);
     }
 
     /* ------------- public methods -------------- */
@@ -66,6 +73,7 @@ public final class ComponentType<T extends Component> {
         return this.id;
     }
 
+    @ApiStatus.Internal
     public int getRawId() {
         return this.rawId;
     }
@@ -87,7 +95,7 @@ public final class ComponentType<T extends Component> {
      * @see #maybeGet(Object)
      */
     public <V> T get(V provider) {
-        T component = (((ComponentProvider) provider)).getComponent(this);
+        T component = get0((ComponentProvider) provider);
         assert component == null || this.getComponentClass().isInstance(component);
         if (component == null) {
             throw new NoSuchElementException(provider + " provides no component of type " + this.id);
@@ -105,7 +113,7 @@ public final class ComponentType<T extends Component> {
      */
     public <V> Optional<T> maybeGet(@Nullable V provider) {
         if (provider instanceof ComponentProvider) {
-            return Optional.ofNullable(((ComponentProvider) provider).getComponent(this));
+            return Optional.ofNullable(get0((ComponentProvider) provider));
         }
         return Optional.empty();
     }

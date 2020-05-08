@@ -29,6 +29,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.level.LevelProperties;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -99,4 +100,14 @@ public interface ComponentProvider {
      * @return an unmodifiable view of the component types
      */
     Set<ComponentType<?>> getComponentTypes();
+
+    /**
+     * @return a runtime-generated component container storing statically declared components,
+     * or {@code null} if this container does not support static components.
+     */
+    @Nullable
+    @ApiStatus.OverrideOnly
+    default Object getStaticComponentContainer() {
+        return null;
+    }
 }
