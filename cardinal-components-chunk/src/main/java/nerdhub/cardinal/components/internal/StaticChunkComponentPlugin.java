@@ -58,7 +58,7 @@ public final class StaticChunkComponentPlugin implements StaticComponentPlugin {
     public String scan(FactoryClassScanner.AsmFactoryData data, MethodNode method) {
         NamedMethodDescriptor factoryDescriptor = data.getFactoryDescriptor();
         if (factoryDescriptor.args.length > 1) {
-            throw new StaticComponentLoadingException("Too many arguments in methods " + factoryDescriptor + ". Should be either no-args or a single " + chunkClass + " argument.");
+            throw new StaticComponentLoadingException("Too many arguments in method " + factoryDescriptor + ". Should be either no-args or a single " + chunkClass + " argument.");
         }
         String value = (String) data.get("value");
         componentFactories.put(value, factoryDescriptor);
