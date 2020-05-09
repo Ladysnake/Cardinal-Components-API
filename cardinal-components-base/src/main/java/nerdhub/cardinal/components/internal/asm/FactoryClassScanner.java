@@ -28,11 +28,13 @@ import org.objectweb.asm.tree.MethodNode;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Scans classes to find factory methods
  */
 public class FactoryClassScanner extends ClassVisitor {
+    private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("([a-z0-9_.-]+:)?[a-z0-9/._-]+");
 
     private final Map<String, StaticComponentPlugin> staticProviderAnnotations;
     private final Set<String> staticComponentTypes;
@@ -122,7 +124,9 @@ public class FactoryClassScanner extends ClassVisitor {
             super.visitEnd();
             if (this.factoryData != null) {
                 for (AsmFactoryData data : this.factoryData) {
-                    staticComponentTypes.add(data.plugin.scan(data, (MethodNode) this.mv));
+                    String scanned = data.plugin.scan(data, (MethodNode) this.mv);
+                    if (!IDENTIFIER_PATTERN.matcher(scanned).matches()) throw new StaticComponentLoadingException(scanned + "(returned by " + data.plugin.getClass().getTypeName() + "#scan) is not a valid identifier");
+                    staticComponentTypes.add(scanned);
                 }
             }
         }
