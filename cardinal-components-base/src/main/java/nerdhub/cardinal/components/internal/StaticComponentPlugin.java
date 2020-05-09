@@ -38,7 +38,7 @@ public interface StaticComponentPlugin {
      *
      * @param data ASM data about the method being processed
      * @param method the method node being processed
-     * @return an identifier for a recognized component type, or {@code null}
+     * @return a valid identifier string for a recognized component type
      */
     String scan(FactoryClassScanner.AsmFactoryData data, MethodNode method);
 

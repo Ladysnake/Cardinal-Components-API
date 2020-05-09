@@ -23,7 +23,6 @@
 package nerdhub.cardinal.components.internal.asm;
 
 import net.fabricmc.loader.api.FabricLoader;
-import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Opcodes;
 
 import javax.annotation.Nonnull;
@@ -59,7 +58,7 @@ public final class CcaAsmConstants {
         return identifier.replace(':', '$');
     }
 
-    @NotNull
+    @Nonnull
     public static String getTypeConstantName(String identifier) {
         return getJavaIdentifierName(identifier).toUpperCase(Locale.ROOT);
     }
