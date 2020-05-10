@@ -33,6 +33,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 /**
  * used to access an object's components.
@@ -100,6 +101,12 @@ public interface ComponentProvider {
      * @return an unmodifiable view of the component types
      */
     Set<ComponentType<?>> getComponentTypes();
+
+    default void forEachComponent(BiConsumer<ComponentType<?>, Component> op) {
+        for (ComponentType<?> type : this.getComponentTypes()) {
+            op.accept(type, this.getComponent(type));
+        }
+    }
 
     /**
      * @return a runtime-generated component container storing statically declared components,

@@ -23,13 +23,44 @@
 package nerdhub.cardinal.componentstest;
 
 import nerdhub.cardinal.components.api.ChunkComponentFactory;
+import nerdhub.cardinal.components.api.ComponentRegistry;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.EntityComponentFactory;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.componentstest.vita.ChunkVita;
+import nerdhub.cardinal.components.api.event.ItemComponentCallback;
+import nerdhub.cardinal.components.api.event.LevelComponentCallback;
+import nerdhub.cardinal.components.api.event.WorldComponentCallback;
+import nerdhub.cardinal.componentstest.vita.*;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.chunk.Chunk;
 
 public final class CcaTestFactory {
-    @ChunkComponentFactory("componenttest:vita")
-    public static Component create(Chunk c) {
-        return new ChunkVita(c);
+    public static final String VITA_ID = "componenttest:vita";
+    public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(VITA_ID), Vita.class)
+        // the following will make all items unstackable, terrible for playing, great for testing
+        .attach(ItemComponentCallback.event(null), stack -> stack.getItem() == CardinalComponentsTest.VITALITY_STICK ? new BaseVita() : new BaseVita((int) (Math.random() * 50)))
+        .attach(WorldComponentCallback.EVENT, AmbientVita.WorldVita::new)
+        .attach(LevelComponentCallback.EVENT, props -> new AmbientVita.LevelVita());
+
+    @ChunkComponentFactory(VITA_ID)
+    public static Component createForChunk(Chunk chunk) {
+        return new ChunkVita(chunk);
+    }
+
+    @EntityComponentFactory(VITA_ID)
+    public static Component createForEntity(PlayerEntity player) {
+        return new PlayerVita(player);
+    }
+
+    @EntityComponentFactory(VITA_ID)
+    public static Component createForEntity(VitalityZombieEntity zombie) {
+        return zombie.createVitaComponent();
+    }
+
+    @EntityComponentFactory(value = VITA_ID, targets = LivingEntity.class)
+    public static Component createForEntity() {
+        return new BaseVita((int)(Math.random() * 10));
     }
 }

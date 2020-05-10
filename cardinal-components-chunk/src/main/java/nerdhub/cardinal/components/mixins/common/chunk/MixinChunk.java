@@ -22,49 +22,29 @@
  */
 package nerdhub.cardinal.components.mixins.common.chunk;
 
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import nerdhub.cardinal.components.internal.ChunkAccessor;
-import nerdhub.cardinal.components.internal.ChunkComponentInternals;
+import nerdhub.cardinal.components.internal.CardinalChunkInternals;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
+import nerdhub.cardinal.components.internal.InternalComponentProvider;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
+import javax.annotation.Nonnull;
 
 @Mixin({ProtoChunk.class, WorldChunk.class})
-public abstract class MixinChunk implements Chunk, ComponentProvider, ChunkAccessor {
+public abstract class MixinChunk implements Chunk, InternalComponentProvider {
     @Unique
-    private static final FeedbackContainerFactory<Chunk, CopyableComponent<?>> componentsContainerFactory = ChunkComponentInternals.componentContainerFactory;
+    private static final FeedbackContainerFactory<Chunk, CopyableComponent<?>> componentsContainerFactory = CardinalChunkInternals.componentContainerFactory;
     @Unique
     private final ComponentContainer<CopyableComponent<?>> components = componentsContainerFactory.create(this);
 
+    @Nonnull
     @Override
-    public ComponentContainer<CopyableComponent<?>> cardinal_getComponentContainer() {
-        return this.components;
-    }
-
-    @Override
-    public boolean hasComponent(ComponentType<?> type) {
-        return this.components.containsKey(type);
-    }
-
-    @Nullable
-    @Override
-    public <C extends Component> C getComponent(ComponentType<C> type) {
-        return this.components.get(type);
-    }
-
-    @Override
-    public Set<ComponentType<?>> getComponentTypes() {
-        return Collections.unmodifiableSet(this.components.keySet());
+    public Object getStaticComponentContainer() {
+        return components;
     }
 }

@@ -24,7 +24,7 @@ package nerdhub.cardinal.componentstest.vita;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import nerdhub.cardinal.componentstest.CardinalComponentsTest;
+import nerdhub.cardinal.componentstest.CcaTestFactory;
 import net.minecraft.nbt.CompoundTag;
 
 public class BaseVita implements Vita, CopyableComponent<Vita> {
@@ -62,7 +62,7 @@ public class BaseVita implements Vita, CopyableComponent<Vita> {
     @Override
     public ComponentType<Vita> getComponentType() {
         // Hardcoded but could be passed in the constructor
-        return CardinalComponentsTest.VITA;
+        return CcaTestFactory.VITA;
     }
 
     @Override

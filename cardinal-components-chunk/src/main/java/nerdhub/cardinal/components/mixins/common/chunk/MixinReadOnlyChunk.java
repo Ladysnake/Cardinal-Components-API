@@ -22,12 +22,7 @@
  */
 package nerdhub.cardinal.components.mixins.common.chunk;
 
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import nerdhub.cardinal.components.internal.ChunkAccessor;
+import nerdhub.cardinal.components.internal.InternalComponentProvider;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.ReadOnlyChunk;
@@ -37,35 +32,20 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import javax.annotation.Nullable;
-import java.util.Set;
+import javax.annotation.Nonnull;
 
 @Mixin(ReadOnlyChunk.class)
-public abstract class MixinReadOnlyChunk extends ProtoChunk implements ComponentProvider, ChunkAccessor {
+public abstract class MixinReadOnlyChunk extends ProtoChunk implements InternalComponentProvider {
     @Shadow @Final private WorldChunk wrapped;
 
     public MixinReadOnlyChunk(ChunkPos pos, UpgradeData data) {
         super(pos, data);
     }
 
+    @Nonnull
     @Override
-    public boolean hasComponent(ComponentType<?> type) {
-        return ((ComponentProvider) this.wrapped).hasComponent(type);
+    public Object getStaticComponentContainer() {
+        return ((InternalComponentProvider)this.wrapped).getStaticComponentContainer();
     }
 
-    @Nullable
-    @Override
-    public <C extends Component> C getComponent(ComponentType<C> type) {
-        return ((ComponentProvider) this.wrapped).getComponent(type);
-    }
-
-    @Override
-    public Set<ComponentType<?>> getComponentTypes() {
-        return ((ComponentProvider) this.wrapped).getComponentTypes();
-    }
-
-    @Override
-    public ComponentContainer<CopyableComponent<?>> cardinal_getComponentContainer() {
-        return ((ChunkAccessor) this.wrapped).cardinal_getComponentContainer();
-    }
 }
