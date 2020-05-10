@@ -49,7 +49,7 @@ public class CardinalComponentsTest {
             new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().lightLevel(5).ticksRandomly()));
 
     public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(Registry.ENTITY_TYPE, "componenttest:vita_zombie",
-            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, VitalityZombieEntity::new).build());
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, VitalityZombieEntity::new).dimensions(EntityType.ZOMBIE.getDimensions()).build());
 
     public static void init() {
         LOGGER.info("Hello, Components!");

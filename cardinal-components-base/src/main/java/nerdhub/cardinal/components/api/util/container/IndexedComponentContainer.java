@@ -51,7 +51,9 @@ import java.util.function.BiConsumer;
  * @implNote The implementation is based on {@link java.util.EnumMap} and offers constant time
  * execution for all read operations. They may be faster than their {@link FastComponentContainer}
  * counterparts.
+ * @deprecated if you want speed, use static ASM-generated component containers
  */
+@Deprecated
 public final class IndexedComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
     /**
      * All of the component types that can be stored in this container.
