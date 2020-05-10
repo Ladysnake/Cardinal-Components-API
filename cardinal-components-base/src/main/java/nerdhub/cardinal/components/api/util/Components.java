@@ -73,9 +73,7 @@ public final class Components {
      * mapping.
      */
     public static void forEach(ComponentProvider provider, BiConsumer<ComponentType<?>, Component> op) {
-        for (ComponentType<?> type : provider.getComponentTypes()) {
-            op.accept(type, type.get(provider));
-        }
+        provider.forEachComponent(op);
     }
 
 }

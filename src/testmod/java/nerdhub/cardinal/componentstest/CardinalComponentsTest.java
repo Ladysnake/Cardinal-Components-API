@@ -22,26 +22,17 @@
  */
 package nerdhub.cardinal.componentstest;
 
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.event.EntityComponentCallback;
-import nerdhub.cardinal.components.api.event.ItemComponentCallback;
-import nerdhub.cardinal.components.api.event.LevelComponentCallback;
-import nerdhub.cardinal.components.api.event.WorldComponentCallback;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
-import nerdhub.cardinal.componentstest.vita.AmbientVita;
-import nerdhub.cardinal.componentstest.vita.BaseVita;
-import nerdhub.cardinal.componentstest.vita.PlayerVita;
-import nerdhub.cardinal.componentstest.vita.Vita;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Material;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,20 +49,12 @@ public class CardinalComponentsTest {
             new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().lightLevel(5).ticksRandomly()));
 
     public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(Registry.ENTITY_TYPE, "componenttest:vita_zombie",
-            EntityType.Builder.create(VitalityZombieEntity::new, SpawnGroup.MONSTER).build("zombie"));
-
-    public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("componenttest:vita"), Vita.class)
-        .attach(EntityComponentCallback.event(PlayerEntity.class), PlayerVita::new)
-        // the following will make all items unstackable, terrible for playing, great for testing
-        .attach(ItemComponentCallback.event(null), stack -> stack.getItem() == VITALITY_STICK ? new BaseVita() : new BaseVita((int) (Math.random() * 50)))
-        .attach(WorldComponentCallback.EVENT, AmbientVita.WorldVita::new)
-        .attach(LevelComponentCallback.EVENT, props -> new AmbientVita.LevelVita());
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, VitalityZombieEntity::new).build());
 
     public static void init() {
         LOGGER.info("Hello, Components!");
-        // Method reference on instance method, allows override by subclasses + access to protected variables
-        EntityComponentCallback.event(VitalityZombieEntity.class).register(VitalityZombieEntity::initComponents);
-        EntityComponents.setRespawnCopyStrategy(VITA, RespawnCopyStrategy.ALWAYS_COPY);
+        FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
+        EntityComponents.setRespawnCopyStrategy(CcaTestFactory.VITA, RespawnCopyStrategy.ALWAYS_COPY);
     }
 
 }

@@ -26,12 +26,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.Entity;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +42,7 @@ import java.util.Map;
 public final class CardinalEntityInternals {
     private CardinalEntityInternals() { throw new AssertionError(); }
 
-    private static final Map<Class<? extends Entity>, Event> ENTITY_EVENTS = new HashMap<>();
+    private static final Map<Class<? extends Entity>, Event<?>> ENTITY_EVENTS = new HashMap<>();
     private static final Map<Class<? extends Entity>, FeedbackContainerFactory<Entity, Component>> ENTITY_CONTAINER_FACTORIES = new HashMap<>();
     private static final Map<ComponentType<?>, RespawnCopyStrategy<?>> RESPAWN_COPY_STRATEGIES = new HashMap<>();
 
@@ -54,7 +56,7 @@ public final class CardinalEntityInternals {
         //noinspection RedundantCast
         return (Event<EntityComponentCallback<T>>) ENTITY_EVENTS.computeIfAbsent(clazz, c ->
                 EventFactory.createArrayBacked(EntityComponentCallback.class, callbacks -> (EntityComponentCallback<Entity>) (entity, components) -> {
-                    for (EntityComponentCallback callback : callbacks) {
+                    for (EntityComponentCallback<Entity> callback : callbacks) {
                         callback.initComponents(entity, components);
                     }
                 })
@@ -67,16 +69,29 @@ public final class CardinalEntityInternals {
      * and every superclass, in order from least specific (Entity) to most specific ({@code clazz}).
      */
     @SuppressWarnings("unchecked")
-    public static FeedbackContainerFactory<Entity, Component> getEntityContainerFactory(Class<? extends Entity> clazz) {
-        return ENTITY_CONTAINER_FACTORIES.computeIfAbsent(clazz, cl -> {
-            List<Event<EntityComponentCallback<? extends Entity>>> events = new ArrayList<>();
-            Class c = clazz;
+    public static ComponentContainer<?> createEntityComponentContainer(Entity entity) {
+        Class<? extends Entity> entityClass = entity.getClass();
+        return ENTITY_CONTAINER_FACTORIES.computeIfAbsent(entityClass, cl -> {
+            List<Event<?>> events = new ArrayList<>();
+            Class<? extends Entity> c = cl;
+            Class<? extends FeedbackContainerFactory<?, ?>> factoryClass = null;
             while (Entity.class.isAssignableFrom(c)) {
                 events.add(EntityComponentCallback.event(c));
-                c = c.getSuperclass();
+                if (factoryClass == null) {   // try to find a specialized ASM factory
+                    factoryClass = StaticEntityComponentPlugin.INSTANCE.getFactoryClass(c);
+                }
+                c = (Class<? extends Entity>) c.getSuperclass();
             }
-            return new FeedbackContainerFactory<>(Lists.reverse(events).toArray(new Event[0]));
-        });
+            Event<? extends EntityComponentCallback<Entity>>[] componentEvents = Lists.reverse(events).toArray(new Event[0]);
+            if (factoryClass == null) {
+                return new FeedbackContainerFactory<>(componentEvents);
+            }
+            try {
+                return (FeedbackContainerFactory<Entity, Component>) factoryClass.getConstructor(Event[].class).newInstance((Object) componentEvents);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw new RuntimeException("Failed to instantiate generated component factory", e);
+            }
+        }).create(entity);
     }
 
     public static <C extends Component> void registerRespawnCopyStrat(ComponentType<C> type, RespawnCopyStrategy<? super C> strategy) {

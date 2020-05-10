@@ -30,7 +30,7 @@ import net.minecraft.world.chunk.Chunk;
 import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
 
-public final class ChunkComponentInternals {
+public final class CardinalChunkInternals {
     public static final FeedbackContainerFactory<Chunk, CopyableComponent<?>> componentContainerFactory = createFactory();
 
     @Nonnull

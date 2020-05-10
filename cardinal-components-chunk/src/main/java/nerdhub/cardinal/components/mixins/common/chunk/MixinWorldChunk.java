@@ -24,9 +24,8 @@ package nerdhub.cardinal.components.mixins.common.chunk;
 
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import nerdhub.cardinal.components.internal.ChunkAccessor;
+import nerdhub.cardinal.components.internal.InternalComponentProvider;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
@@ -37,12 +36,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WorldChunk.class)
-public abstract class MixinWorldChunk implements Chunk, ComponentProvider, ChunkAccessor {
+public abstract class MixinWorldChunk implements Chunk, InternalComponentProvider {
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/world/chunk/ProtoChunk;)V", at = @At("RETURN"))
     private void copyFromProto(World world, ProtoChunk proto, CallbackInfo ci) {
-        ComponentContainer<CopyableComponent<?>> ourComponents = this.cardinal_getComponentContainer();
-        ComponentContainer<CopyableComponent<?>> theirComponents = ((ChunkAccessor)proto).cardinal_getComponentContainer();
+        ComponentContainer<?> ourComponents = this.getComponentContainer();
+        ComponentContainer<?> theirComponents = ((InternalComponentProvider)proto).getComponentContainer();
         theirComponents.forEach((type, component) -> {
             Component other = ourComponents.get(type);
             if (other != null) {

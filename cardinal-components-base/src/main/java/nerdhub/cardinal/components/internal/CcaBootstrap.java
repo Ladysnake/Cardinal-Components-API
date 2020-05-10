@@ -30,7 +30,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.fabricmc.loader.api.metadata.CustomValue;
-import net.fabricmc.loader.launch.common.FabricLauncherBase;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -67,7 +66,11 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
 
     private void generateSpecializedContainers(List<StaticComponentPlugin> staticProviders) {
         for (StaticComponentPlugin staticProvider : staticProviders) {
-            staticProvider.generate();
+            try {
+                staticProvider.generate();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -85,8 +88,7 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
     }
 
     private void process(String className, Map<String, StaticComponentPlugin> staticProviderAnnotations, Set<String> staticComponentTypes) throws IOException {
-        final byte[] classBytes = FabricLauncherBase.getLauncher().getClassByteArray(className.replace('.', '/'));
-        ClassReader reader = new ClassReader(classBytes);
+        ClassReader reader = CcaAsmHelper.getClassReader(Type.getObjectType(className.replace('.', '/')));
         ClassVisitor adapter = new FactoryClassScanner(CcaAsmConstants.ASM_VERSION, null, staticProviderAnnotations, staticComponentTypes);
         reader.accept(adapter, 0);
     }

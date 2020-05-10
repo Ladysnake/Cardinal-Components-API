@@ -27,14 +27,14 @@ import org.objectweb.asm.*;
 import org.objectweb.asm.tree.MethodNode;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Scans classes to find factory methods
  */
-public class FactoryClassScanner extends ClassVisitor {
-    private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("([a-z0-9_.-]+:)?[a-z0-9/._-]+");
+public final class FactoryClassScanner extends ClassVisitor {
 
     private final Map<String, StaticComponentPlugin> staticProviderAnnotations;
     private final Set<String> staticComponentTypes;
@@ -55,10 +55,10 @@ public class FactoryClassScanner extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodNode node = new MethodNode(access, name, desc, signature, exceptions);
-        return new FactoryMethodScanner(this.api, node, access, new NamedMethodDescriptor(this.factoryOwnerType, name, Type.getMethodType(desc)));
+        return new FactoryMethodScanner(this.api, node, access, new NamedMethodDescriptor(this.factoryOwnerType, name, access, Type.getMethodType(desc)));
     }
 
-    public static class AsmFactoryData {
+    public static final class AsmFactoryData {
         final Map<String, Object> annotationData = new HashMap<>();
         final StaticComponentPlugin plugin;
         final NamedMethodDescriptor factory;
@@ -80,9 +80,14 @@ public class FactoryClassScanner extends ClassVisitor {
          * value can also be an array of byte, boolean, short, char, int, long, float or double values.
          */
         public Object get(String valueName) {
-            Object value = annotationData.get(valueName);
+            Object value = this.getOrNull(valueName);
             if (value == null) throw new NoSuchElementException("Unrecognized annotation key " + valueName);
             return value;
+        }
+
+        @Nullable
+        public Object getOrNull(String annotationParameter) {
+            return annotationData.get(annotationParameter);
         }
     }
 
@@ -108,8 +113,12 @@ public class FactoryClassScanner extends ClassVisitor {
                 if ((access & Opcodes.ACC_STATIC) == 0) {
                     throw new StaticComponentLoadingException("Factory method " + factoryDescriptor + " annotated with " + descriptor + " must be static");
                 }
-                if (factoryDescriptor.descriptor.getReturnType().getDescriptor().equals(CcaAsmConstants.COMPONENT)) {
-                    throw new StaticComponentLoadingException("Factory method " + factoryDescriptor + " must return " + CcaAsmConstants.COMPONENT.replace('/', '.'));
+                try {
+                    if (!CcaAsmHelper.isAssignableFrom(Type.getObjectType(CcaAsmConstants.COMPONENT), factoryDescriptor.descriptor.getReturnType())) {
+                        throw new StaticComponentLoadingException("Factory method " + factoryDescriptor + " must return " + CcaAsmConstants.COMPONENT.replace('/', '.') + " or a subclass.");
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
                 }
                 if (factoryData == null) factoryData = new ArrayList<>();
                 AsmFactoryData data = new AsmFactoryData(plugin, this.factoryDescriptor);
@@ -124,9 +133,13 @@ public class FactoryClassScanner extends ClassVisitor {
             super.visitEnd();
             if (this.factoryData != null) {
                 for (AsmFactoryData data : this.factoryData) {
-                    String scanned = data.plugin.scan(data, (MethodNode) this.mv);
-                    if (!IDENTIFIER_PATTERN.matcher(scanned).matches()) throw new StaticComponentLoadingException(scanned + "(returned by " + data.plugin.getClass().getTypeName() + "#scan) is not a valid identifier");
-                    staticComponentTypes.add(scanned);
+                    try {
+                        String scanned = data.plugin.scan(data, (MethodNode) this.mv);
+                        if (!StaticComponentPlugin.IDENTIFIER_PATTERN.matcher(scanned).matches()) throw new StaticComponentLoadingException(scanned + "(returned by " + data.plugin.getClass().getTypeName() + "#scan) is not a valid identifier");
+                        staticComponentTypes.add(scanned);
+                    } catch (IOException e) {
+                        throw new StaticComponentLoadingException("Failed to gather static component information from " + data.getFactoryDescriptor(), e);
+                    }
                 }
             }
         }

@@ -22,6 +22,24 @@
  */
 package nerdhub.cardinal.components.api;
 
+import net.minecraft.util.Identifier;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface ChunkComponentFactory {
+    /**
+     * The id of the {@link ComponentType} which this factory makes components for.
+     *
+     * <p> The returned string must be a valid {@link net.minecraft.util.Identifier}.
+     * A {@link ComponentType} with the same id must be registered during mod initialization
+     * using {@link ComponentRegistry#registerIfAbsent(Identifier, Class)}.
+     *
+     * @return a string representing the id of a component type
+     */
     String value();
 }

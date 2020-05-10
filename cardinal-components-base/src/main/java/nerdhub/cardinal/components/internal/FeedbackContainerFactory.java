@@ -35,7 +35,7 @@ import javax.annotation.Nonnull;
  * future container instantiations.
  */
 public class FeedbackContainerFactory<T, C extends Component> {
-    private int expectedSize;
+    private int expectedSize = 0;
     private final Event<? extends ComponentCallback<T, C>>[] componentEvents;
 
     @SafeVarargs
@@ -49,7 +49,7 @@ public class FeedbackContainerFactory<T, C extends Component> {
      */
     public ComponentContainer<C> create(T obj) {
         ComponentContainer<C> components;
-        components = createContainer(obj);
+        components = createContainer(this.expectedSize, obj);
         for (Event<? extends ComponentCallback<T, C>> event : this.componentEvents) {
             event.invoker().initComponents(obj, components);
         }
@@ -59,8 +59,8 @@ public class FeedbackContainerFactory<T, C extends Component> {
 
     @SuppressWarnings({"WeakerAccess", "unused"})   // overridden by generated classes
     @Nonnull
-    protected ComponentContainer<C> createContainer(T obj) {
-        return new FastComponentContainer<>(this.expectedSize);
+    protected ComponentContainer<C> createContainer(int expectedSize, T obj) {
+        return new FastComponentContainer<>(expectedSize);
     }
 
     /**

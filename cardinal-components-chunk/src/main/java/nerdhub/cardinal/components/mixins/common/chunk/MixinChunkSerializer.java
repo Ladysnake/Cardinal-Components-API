@@ -22,7 +22,7 @@
  */
 package nerdhub.cardinal.components.mixins.common.chunk;
 
-import nerdhub.cardinal.components.internal.ChunkAccessor;
+import nerdhub.cardinal.components.internal.InternalComponentProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureManager;
@@ -44,13 +44,13 @@ public abstract class MixinChunkSerializer {
         ProtoChunk ret = cir.getReturnValue();
         Chunk chunk = ret instanceof ReadOnlyChunk ? ((ReadOnlyChunk) ret).getWrappedChunk() : ret;
         CompoundTag levelData = tag.getCompound("Level");
-        ((ChunkAccessor)chunk).cardinal_getComponentContainer().fromTag(levelData);
+        ((InternalComponentProvider)chunk).getComponentContainer().fromTag(levelData);
     }
 
     @Inject(method = "serialize", at = @At("RETURN"))
     private static void serialize(ServerWorld world, Chunk chunk, CallbackInfoReturnable<CompoundTag> cir) {
         CompoundTag ret = cir.getReturnValue();
         CompoundTag levelData = ret.getCompound("Level");
-        ((ChunkAccessor)chunk).cardinal_getComponentContainer().toTag(levelData);
+        ((InternalComponentProvider)chunk).getComponentContainer().toTag(levelData);
     }
 }

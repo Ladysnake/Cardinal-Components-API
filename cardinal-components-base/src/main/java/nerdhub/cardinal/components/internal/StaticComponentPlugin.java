@@ -25,9 +25,16 @@ package nerdhub.cardinal.components.internal;
 import nerdhub.cardinal.components.internal.asm.FactoryClassScanner;
 import org.objectweb.asm.tree.MethodNode;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.regex.Pattern;
 
 public interface StaticComponentPlugin {
+    /**
+     * A pattern that should be used to check that component type ids are valid
+     */
+    Pattern IDENTIFIER_PATTERN = Pattern.compile("([a-z0-9_.-]+:)?[a-z0-9/._-]+");
+
     /**
      * @return the annotation used by this plugin
      */
@@ -40,7 +47,7 @@ public interface StaticComponentPlugin {
      * @param method the method node being processed
      * @return a valid identifier string for a recognized component type
      */
-    String scan(FactoryClassScanner.AsmFactoryData data, MethodNode method);
+    String scan(FactoryClassScanner.AsmFactoryData data, MethodNode method) throws IOException;
 
-    void generate();
+    void generate() throws IOException;
 }

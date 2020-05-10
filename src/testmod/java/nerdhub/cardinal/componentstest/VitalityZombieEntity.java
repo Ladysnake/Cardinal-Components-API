@@ -22,13 +22,13 @@
  */
 package nerdhub.cardinal.componentstest;
 
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.componentstest.vita.EntityVita;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class VitalityZombieEntity extends ZombieEntity {
     public VitalityZombieEntity(EntityType<? extends ZombieEntity> type, World world) {
@@ -43,7 +43,8 @@ public class VitalityZombieEntity extends ZombieEntity {
         }
     }
 
-    protected void initComponents(ComponentContainer<Component> components) {
-        components.put(CardinalComponentsTest.VITA, new EntityVita(this, 20));
+    @Nonnull
+    public EntityVita createVitaComponent() {
+        return new EntityVita(this, 20);
     }
 }

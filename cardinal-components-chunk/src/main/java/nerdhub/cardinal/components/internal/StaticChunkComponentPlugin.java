@@ -69,6 +69,6 @@ public final class StaticChunkComponentPlugin implements StaticComponentPlugin {
     public void generate() {
         Type chunkType = Type.getObjectType(chunkClass.replace('.', '/'));
         Class<? extends ComponentContainer<?>> containerCls = CcaAsmHelper.defineContainer(this.componentFactories, CHUNK_IMPL_SUFFIX, chunkType);
-        this.factoryClass = CcaAsmHelper.createSingleArgFactory(CHUNK_IMPL_SUFFIX, Type.getType(containerCls), chunkType);
+        this.factoryClass = CcaAsmHelper.defineSingleArgFactory(CHUNK_IMPL_SUFFIX, Type.getType(containerCls), chunkType);
     }
 }
