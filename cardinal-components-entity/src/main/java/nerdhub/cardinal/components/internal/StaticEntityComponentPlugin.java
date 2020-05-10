@@ -53,7 +53,7 @@ public final class StaticEntityComponentPlugin implements StaticComponentPlugin 
     private final Map<Type, Class<? extends FeedbackContainerFactory<?, ?>>> factoryClasses = new HashMap<>();
 
     public Class<? extends FeedbackContainerFactory<?, ?>> getFactoryClass(Class<? extends Entity> entityClass) {
-        return factoryClasses.get(Type.getType(entityClass));
+        return this.factoryClasses.get(Type.getType(entityClass));
     }
 
     @Override
@@ -66,7 +66,7 @@ public final class StaticEntityComponentPlugin implements StaticComponentPlugin 
         NamedMethodDescriptor factoryDescriptor = data.getFactoryDescriptor();
         Type[] factoryArgs = factoryDescriptor.args;
         if (factoryArgs.length > 1) {
-            throw new StaticComponentLoadingException("Too many arguments in method " + factoryDescriptor + ". Should be either no-args or a single " + entityClass + " argument.");
+            throw new StaticComponentLoadingException("Too many arguments in method " + factoryDescriptor + ". Should be either no-args or a single " + this.entityClass + " argument.");
         }
         Type targets;
         Type annotationTargets = (Type) data.getOrNull("targets");
@@ -83,13 +83,13 @@ public final class StaticEntityComponentPlugin implements StaticComponentPlugin 
             }
         }
         String value = (String) data.get("value");
-        componentFactories.computeIfAbsent(targets, t -> new HashMap<>()).put(value, factoryDescriptor);
+        this.componentFactories.computeIfAbsent(targets, t -> new HashMap<>()).put(value, factoryDescriptor);
         return value;
     }
 
     @Override
     public void generate() throws IOException {
-        Type entityType = Type.getObjectType(entityClass.replace('.', '/'));
+        Type entityType = Type.getObjectType(this.entityClass.replace('.', '/'));
         for (Map.Entry<Type, Map<String, NamedMethodDescriptor>> entry : this.componentFactories.entrySet()) {
             Map<String, NamedMethodDescriptor> compiled = new HashMap<>(entry.getValue());
             Type type = entry.getKey();

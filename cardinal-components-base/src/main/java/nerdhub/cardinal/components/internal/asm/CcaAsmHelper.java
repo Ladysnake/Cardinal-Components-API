@@ -38,6 +38,12 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 public final class CcaAsmHelper {
+    /**
+     * If {@code true}, any class generated through {@link #generateClass(ClassWriter, String)} will
+     * be checked and written to disk. Highly recommended when editing methods in this class.
+     */
+    public static final boolean DEBUG_CLASSES = Boolean.getBoolean("cca.debug.asm");
+
     private static final Map<Type, TypeData> typeCache = new HashMap<>();
 
     private static TypeData getTypeData(Type type) throws IOException {
@@ -215,10 +221,12 @@ public final class CcaAsmHelper {
     public static Class<?> generateClass(ClassWriter classWriter, String name) {
         try {
             byte[] bytes = classWriter.toByteArray();
-            new ClassReader(bytes).accept(new CheckClassAdapter(null), 0);
-            Path path = Paths.get(name + ".class");
-            Files.createDirectories(path.getParent());
-            Files.write(path, bytes);
+            if (DEBUG_CLASSES) {
+                new ClassReader(bytes).accept(new CheckClassAdapter(null), 0);
+                Path path = Paths.get(name + ".class");
+                Files.createDirectories(path.getParent());
+                Files.write(path, bytes);
+            }
             return CcaClassLoader.INSTANCE.define(name.replace('/', '.'), bytes);
         } catch (IOException | IllegalArgumentException | IllegalStateException e) {
             throw new StaticComponentLoadingException("Failed to generate class " + name, e);
