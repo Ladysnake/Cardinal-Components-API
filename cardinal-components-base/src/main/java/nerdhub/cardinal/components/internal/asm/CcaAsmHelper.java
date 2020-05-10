@@ -30,7 +30,9 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -52,7 +54,9 @@ public final class CcaAsmHelper {
             return t;
         }
         String className = type.getInternalName();
-        ClassReader reader = new ClassReader(FabricLauncherBase.getLauncher().getClassByteArray(className.replace('.', '/')));
+        byte[] rawClass = FabricLauncherBase.getLauncher().getClassByteArray(className.replace('.', '/'));
+        if (rawClass == null) throw new NoSuchFileException(className);
+        ClassReader reader = new ClassReader(rawClass);
         TypeData newValue = new TypeData(type, Type.getObjectType(reader.getSuperName()), reader);
         typeCache.put(type, newValue);
         return newValue;
@@ -65,11 +69,24 @@ public final class CcaAsmHelper {
     public static boolean isAssignableFrom(Type tSuper, Type tSub) throws IOException {
         if (tSuper.equals(tSub)) return true;
         if (tSub.equals(Type.getType(Object.class))) return false;
-        return isAssignableFrom(tSuper, getSuperclass(tSub));
+        TypeData tSuperData = getTypeData(tSuper);
+        TypeData tSubData = getTypeData(tSub);
+        if (Modifier.isInterface(tSuperData.getReader().getAccess())) {
+            for (String itf : tSubData.getReader().getInterfaces()) {
+                if (isAssignableFrom(tSuper, Type.getObjectType(itf))) {
+                    return true;
+                }
+            }
+        }
+        return isAssignableFrom(tSuper, tSubData.getSupertype());
     }
 
     public static ClassReader getClassReader(Type type) throws IOException {
         return getTypeData(type).getReader();
+    }
+
+    public static ClassNode getClassNode(Type type) throws IOException {
+        return getTypeData(type).getNode();
     }
 
     public static Class<? extends ComponentContainer<?>> defineContainer(Map<String, NamedMethodDescriptor> componentFactories, String implNameSuffix, Type... ctorArgs) {
@@ -111,9 +128,10 @@ public final class CcaAsmHelper {
             init.visitVarInsn(Opcodes.ALOAD, 0);
             init.visitInsn(Opcodes.DUP);
             // stack: <this>
-            for (int i = 0; i < ctorArgs.length && i < factory.args.length; i++) {
+            Type[] factoryArgs = factory.descriptor.getArgumentTypes();
+            for (int i = 0; i < ctorArgs.length && i < factoryArgs.length; i++) {
                 init.visitVarInsn(Opcodes.ALOAD, i + 2);    // first 2 args are for the container itself
-                init.visitTypeInsn(Opcodes.CHECKCAST, factory.args[i].getInternalName());
+                init.visitTypeInsn(Opcodes.CHECKCAST, factoryArgs[i].getInternalName());
             }
             // stack: <this> ctorArgs...
             // initialize the component by calling the factory
@@ -231,5 +249,9 @@ public final class CcaAsmHelper {
         } catch (IOException | IllegalArgumentException | IllegalStateException e) {
             throw new StaticComponentLoadingException("Failed to generate class " + name, e);
         }
+    }
+
+    public static void clearCache() {
+        typeCache.clear();
     }
 }

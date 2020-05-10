@@ -24,12 +24,16 @@ package nerdhub.cardinal.components.internal.asm;
 
 import nerdhub.cardinal.components.internal.StaticComponentPlugin;
 import org.objectweb.asm.*;
+import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Scans classes to find factory methods
@@ -59,35 +63,18 @@ public final class FactoryClassScanner extends ClassVisitor {
     }
 
     public static final class AsmFactoryData {
-        final Map<String, Object> annotationData = new HashMap<>();
+        final AnnotationNode annotation;
         final StaticComponentPlugin plugin;
         final NamedMethodDescriptor factory;
 
-        public AsmFactoryData(StaticComponentPlugin plugin, NamedMethodDescriptor factory) {
+        public AsmFactoryData(AnnotationNode annotation, StaticComponentPlugin plugin, NamedMethodDescriptor factory) {
+            this.annotation = annotation;
             this.plugin = plugin;
             this.factory = factory;
         }
 
         public NamedMethodDescriptor getFactoryDescriptor() {
-            return factory;
-        }
-
-        /**
-         * @param valueName the value name
-         * @return the actual value, whose type must be {@link Byte}, {@link Boolean}, {@link
-         * Character}, {@link Short}, {@link Integer} , {@link Long}, {@link Float}, {@link Double},
-         * {@link String} or {@link Type} of {@link Type#OBJECT} or {@link Type#ARRAY} sort. This
-         * value can also be an array of byte, boolean, short, char, int, long, float or double values.
-         */
-        public Object get(String valueName) {
-            Object value = this.getOrNull(valueName);
-            if (value == null) throw new NoSuchElementException("Unrecognized annotation key " + valueName);
-            return value;
-        }
-
-        @Nullable
-        public Object getOrNull(String annotationParameter) {
-            return annotationData.get(annotationParameter);
+            return this.factory;
         }
     }
 
@@ -107,25 +94,24 @@ public final class FactoryClassScanner extends ClassVisitor {
 
         @Override
         public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-            AnnotationVisitor base = super.visitAnnotation(descriptor, visible);
-            StaticComponentPlugin plugin = staticProviderAnnotations.get(descriptor);
+            AnnotationNode ret = (AnnotationNode) super.visitAnnotation(descriptor, visible);
+            StaticComponentPlugin plugin = FactoryClassScanner.this.staticProviderAnnotations.get(descriptor);
             if (plugin != null) {
-                if ((access & Opcodes.ACC_STATIC) == 0) {
-                    throw new StaticComponentLoadingException("Factory method " + factoryDescriptor + " annotated with " + descriptor + " must be static");
+                if ((this.access & Opcodes.ACC_STATIC) == 0) {
+                    throw new StaticComponentLoadingException("Factory method " + this.factoryDescriptor + " annotated with " + descriptor + " must be static");
                 }
                 try {
-                    if (!CcaAsmHelper.isAssignableFrom(Type.getObjectType(CcaAsmConstants.COMPONENT), factoryDescriptor.descriptor.getReturnType())) {
-                        throw new StaticComponentLoadingException("Factory method " + factoryDescriptor + " must return " + CcaAsmConstants.COMPONENT.replace('/', '.') + " or a subclass.");
+                    if (!CcaAsmHelper.isAssignableFrom(Type.getObjectType(CcaAsmConstants.COMPONENT), this.factoryDescriptor.descriptor.getReturnType())) {
+                        throw new StaticComponentLoadingException("Factory method " + this.factoryDescriptor + " must return " + CcaAsmConstants.COMPONENT.replace('/', '.') + " or a subclass.");
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
-                if (factoryData == null) factoryData = new ArrayList<>();
-                AsmFactoryData data = new AsmFactoryData(plugin, this.factoryDescriptor);
-                factoryData.add(data);
-                return new FactoryMethodScanner.FactoryAnnotationScanner(this.api, base, data);
+                if (this.factoryData == null) this.factoryData = new ArrayList<>();
+                AsmFactoryData data = new AsmFactoryData(ret, plugin, this.factoryDescriptor);
+                this.factoryData.add(data);
             }
-            return base;
+            return ret;
         }
 
         @Override
@@ -134,28 +120,13 @@ public final class FactoryClassScanner extends ClassVisitor {
             if (this.factoryData != null) {
                 for (AsmFactoryData data : this.factoryData) {
                     try {
-                        String scanned = data.plugin.scan(data, (MethodNode) this.mv);
+                        String scanned = data.plugin.scan(data.getFactoryDescriptor(), AnnotationData.create(data.annotation), (MethodNode) this.mv);
                         if (!StaticComponentPlugin.IDENTIFIER_PATTERN.matcher(scanned).matches()) throw new StaticComponentLoadingException(scanned + "(returned by " + data.plugin.getClass().getTypeName() + "#scan) is not a valid identifier");
-                        staticComponentTypes.add(scanned);
+                        FactoryClassScanner.this.staticComponentTypes.add(scanned);
                     } catch (IOException e) {
                         throw new StaticComponentLoadingException("Failed to gather static component information from " + data.getFactoryDescriptor(), e);
                     }
                 }
-            }
-        }
-
-        private class FactoryAnnotationScanner extends AnnotationVisitor {
-            private final AsmFactoryData data;
-
-            public FactoryAnnotationScanner(int api, @Nullable AnnotationVisitor annotationVisitor, AsmFactoryData data) {
-                super(api, annotationVisitor);
-                this.data = data;
-            }
-
-            @Override
-            public void visit(String name, Object value) {
-                super.visit(name, value);
-                this.data.annotationData.put(name, value);
             }
         }
     }

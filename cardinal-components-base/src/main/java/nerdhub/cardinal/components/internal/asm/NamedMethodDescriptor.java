@@ -32,20 +32,21 @@ import java.util.stream.Collectors;
 public final class NamedMethodDescriptor {
     public final Type ownerType;
     public final String name;
-    private final int access;
+    public final int access;
     public final Type descriptor;
-    public final Type[] args;
 
     public NamedMethodDescriptor(Type ownerType, String name, int access, Type descriptor) {
         this.ownerType = ownerType;
         this.name = name;
         this.access = access;
         this.descriptor = descriptor;
-        this.args = descriptor.getArgumentTypes();
     }
 
     @Override
     public String toString() {
-        return Modifier.toString(access) + " " + descriptor.getReturnType().getClassName() + " " + ownerType.getClassName() + "." + name + "(" + Arrays.stream(args).map(Type::getClassName).collect(Collectors.joining(", ")) + ")";
+        return Modifier.toString(this.access) + " "
+            + this.descriptor.getReturnType().getClassName() + " "
+            + this.ownerType.getClassName() + "." + this.name +
+            "(" + Arrays.stream(this.descriptor.getArgumentTypes()).map(Type::getClassName).collect(Collectors.joining(", ")) + ")";
     }
 }

@@ -16,7 +16,7 @@
     },
     "custom": {
         "cardinal-components-api:static-factories": [
-            "nerdhub.cardinal.componentstest.CcaTestFactory"
+            "nerdhub.cardinal.componentstest.CardinalTestComponents"
         ]
     },
     "depends": {

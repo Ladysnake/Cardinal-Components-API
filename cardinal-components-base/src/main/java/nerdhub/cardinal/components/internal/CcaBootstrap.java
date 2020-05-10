@@ -26,6 +26,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.internal.asm.CcaAsmConstants;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
 import nerdhub.cardinal.components.internal.asm.FactoryClassScanner;
+import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
@@ -36,6 +37,7 @@ import org.objectweb.asm.tree.ClassNode;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 
 public final class CcaBootstrap implements PreLaunchEntrypoint {
@@ -48,7 +50,7 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
 
     @Nullable
     public Class<? extends ComponentType<?>> getGeneratedComponentTypeClass(String componentId) {
-        return generatedComponentTypes.get(componentId);
+        return this.generatedComponentTypes.get(componentId);
     }
 
     @Override
@@ -59,8 +61,10 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
             Set<String> staticComponentTypes = this.process(staticProviderAnnotations);
             this.generatedComponentTypes.putAll(this.defineStaticComponentContainer(staticComponentTypes));
             this.generateSpecializedContainers(staticProviders);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | UncheckedIOException e) {
+            throw new StaticComponentLoadingException("Failed to load statically defined components", e);
+        } finally {
+            CcaAsmHelper.clearCache();
         }
     }
 
@@ -81,7 +85,7 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
             CustomValue factories = mod.getMetadata().getCustomValue("cardinal-components-api:static-factories");
             if (factories == null) continue;
             for (CustomValue factory : factories.getAsArray()) {
-                process(factory.getAsString(), staticProviderAnnotations, staticComponentTypes);
+                this.process(factory.getAsString(), staticProviderAnnotations, staticComponentTypes);
             }
         }
         return staticComponentTypes;
@@ -147,14 +151,14 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
             get.visitInsn(Opcodes.DUP);
             // stack: object object
             Label label = new Label();
-            get.visitJumpInsn(Opcodes.IFNULL, label);   // TODO remove condition when everything supports static components
+            get.visitJumpInsn(Opcodes.IFNULL, label);
             // stack: object
             get.visitTypeInsn(Opcodes.CHECKCAST, CcaAsmConstants.STATIC_COMPONENT_CONTAINER);
             // stack: generatedComponentContainer
             get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmConstants.STATIC_COMPONENT_CONTAINER, CcaAsmConstants.getStaticStorageGetterName(identifier), CcaAsmConstants.STATIC_CONTAINER_GETTER_DESC, true);
             // stack: component
             get.visitInsn(Opcodes.ARETURN);
-            // if the native component container is null, we use the runtime way
+            // if the native component container is null, we use the classic runtime way
             get.visitLabel(label);
             // stack: object(null)
             get.visitInsn(Opcodes.POP); // pop the useless duplicated null

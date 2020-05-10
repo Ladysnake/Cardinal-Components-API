@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * Applied to a method to declare it as a component factory for entities.
+ * Applied to a method to declare it as a component factory for {@linkplain Entity entities}.
  *
  * <p>The annotated method must take either no arguments, or 1 argument of type {@link Entity}
  * or one of its subclasses (eg. {@code PlayerEntity}). It must return a non-null {@link Component}.
@@ -52,5 +52,5 @@ public @interface EntityComponentFactory {
      *
      * @return The class object representing the desired entity type
      */
-    Class<? extends Entity> targets() default Entity.class;
+    Class<? extends Entity> target() default Entity.class;
 }

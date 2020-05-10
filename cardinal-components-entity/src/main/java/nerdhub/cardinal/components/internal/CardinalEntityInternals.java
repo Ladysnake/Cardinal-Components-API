@@ -29,6 +29,7 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
+import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.Entity;
@@ -89,7 +90,7 @@ public final class CardinalEntityInternals {
             try {
                 return (FeedbackContainerFactory<Entity, Component>) factoryClass.getConstructor(Event[].class).newInstance((Object) componentEvents);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new RuntimeException("Failed to instantiate generated component factory", e);
+                throw new StaticComponentLoadingException("Failed to instantiate generated component factory", e);
             }
         }).create(entity);
     }
