@@ -24,8 +24,8 @@ package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.EntityComponentFactory;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.internal.asm.AnnotationData;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
-import nerdhub.cardinal.components.internal.asm.FactoryClassScanner;
 import nerdhub.cardinal.components.internal.asm.NamedMethodDescriptor;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.loader.api.FabricLoader;
@@ -62,28 +62,32 @@ public final class StaticEntityComponentPlugin implements StaticComponentPlugin 
     }
 
     @Override
-    public String scan(FactoryClassScanner.AsmFactoryData data, MethodNode method) throws IOException {
-        NamedMethodDescriptor factoryDescriptor = data.getFactoryDescriptor();
-        Type[] factoryArgs = factoryDescriptor.args;
+    public String scan(NamedMethodDescriptor factoryDescriptor, AnnotationData data, MethodNode method) throws IOException {
+        Type[] factoryArgs = factoryDescriptor.descriptor.getArgumentTypes();
         if (factoryArgs.length > 1) {
             throw new StaticComponentLoadingException("Too many arguments in method " + factoryDescriptor + ". Should be either no-args or a single " + this.entityClass + " argument.");
         }
-        Type targets;
-        Type annotationTargets = (Type) data.getOrNull("targets");
-        if (annotationTargets != null) {
-            if (factoryArgs.length != 0 && !CcaAsmHelper.isAssignableFrom(factoryArgs[0], annotationTargets)) {
-                throw new IllegalStateException("Argument " + factoryArgs[0] + " in method " + factoryDescriptor + " is not assignable from declared target entity class " + annotationTargets);
+        Type target;
+        Type annotationTarget = data.getIfDeclared("target", Type.class);
+        if (annotationTarget != null) {
+            if (factoryArgs.length != 0 && !CcaAsmHelper.isAssignableFrom(factoryArgs[0], annotationTarget)) {
+                throw new IllegalStateException("Argument " + factoryArgs[0] + " in method " + factoryDescriptor + " is not assignable from declared target entity class " + annotationTarget);
             }
-            targets = annotationTargets;
+            target = annotationTarget;
         } else {
             if (factoryArgs.length == 0) {
                 throw new StaticComponentLoadingException("Cannot determine target entity class in method '" + factoryDescriptor + "'. Either specify an entity parameter of the target class, or explicitly specify the EntityComponentFactory#targets property.");
             } else {
-                targets = factoryArgs[0];
+                target = factoryArgs[0];
             }
         }
-        String value = (String) data.get("value");
-        this.componentFactories.computeIfAbsent(targets, t -> new HashMap<>()).put(value, factoryDescriptor);
+        String value = data.get("value", String.class);
+        Map<String, NamedMethodDescriptor> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
+        NamedMethodDescriptor previousFactory = specializedMap.get(value);
+        if (previousFactory != null) {
+            throw new StaticComponentLoadingException("Duplicate factory declarations for " + value + " on entity type " + target.getClassName() + ": " + factoryDescriptor + " and " + previousFactory);
+        }
+        specializedMap.put(value, factoryDescriptor);
         return value;
     }
 

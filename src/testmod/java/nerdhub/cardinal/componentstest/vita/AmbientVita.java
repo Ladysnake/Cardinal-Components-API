@@ -25,7 +25,7 @@ package nerdhub.cardinal.componentstest.vita;
 import nerdhub.cardinal.components.api.util.sync.BaseSyncedComponent;
 import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
 import nerdhub.cardinal.components.api.util.sync.WorldSyncedComponent;
-import nerdhub.cardinal.componentstest.CcaTestFactory;
+import nerdhub.cardinal.componentstest.CardinalTestComponents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.network.PacketByteBuf;
@@ -53,8 +53,8 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
         );
         Text worldVita = new TranslatableText(
                 "componenttest:title.world_vitality",
-                CcaTestFactory.VITA.get(world).getVitality(),
-                CcaTestFactory.VITA.get(world.getLevelProperties()).getVitality()
+                CardinalTestComponents.VITA.get(world).getVitality(),
+                CardinalTestComponents.VITA.get(world.getLevelProperties()).getVitality()
         );
         InGameHud inGameHud = MinecraftClient.getInstance().inGameHud;
         inGameHud.setTitles(null, worldVita, -1, -1, -1);

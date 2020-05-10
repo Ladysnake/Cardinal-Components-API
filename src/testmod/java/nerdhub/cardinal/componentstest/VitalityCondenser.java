@@ -57,8 +57,8 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
     @ApiStatus.OverrideOnly
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
-        CcaTestFactory.VITA.get(world).transferTo(
-                Objects.requireNonNull(this.getComponent(world, pos, CcaTestFactory.VITA, null)),
+        CardinalTestComponents.VITA.get(world).transferTo(
+                Objects.requireNonNull(this.getComponent(world, pos, CardinalTestComponents.VITA, null)),
                 1
         );
     }
@@ -70,7 +70,7 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
         // only on client side, to confirm that sync works
         if (world.isClient) {
             player.sendMessage(new TranslatableText("componenttest:action.chunk_vitality",
-                    CcaTestFactory.VITA.get(this.getChunkProvider(world, pos)).getVitality()), true);
+                    CardinalTestComponents.VITA.get(this.getChunkProvider(world, pos)).getVitality()), true);
         }
         return ActionResult.SUCCESS;
     }
