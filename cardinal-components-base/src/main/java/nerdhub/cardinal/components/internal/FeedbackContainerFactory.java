@@ -48,8 +48,8 @@ public class FeedbackContainerFactory<T, C extends Component> {
      * The returned container will be pre-sized based on previous {@link #adjustFrom adjustments}.
      */
     public ComponentContainer<C> create(T obj) {
-        ComponentContainer<C> components;
-        components = createContainer(this.expectedSize, obj);
+        FastComponentContainer<C> components;
+        components = this.createContainer(this.expectedSize, obj);
         for (Event<? extends ComponentCallback<T, C>> event : this.componentEvents) {
             event.invoker().initComponents(obj, components);
         }
@@ -59,7 +59,7 @@ public class FeedbackContainerFactory<T, C extends Component> {
 
     @SuppressWarnings({"WeakerAccess", "unused"})   // overridden by generated classes
     @Nonnull
-    protected ComponentContainer<C> createContainer(int expectedSize, T obj) {
+    protected FastComponentContainer<C> createContainer(int expectedSize, T obj) {
         return new FastComponentContainer<>(expectedSize);
     }
 
@@ -68,7 +68,7 @@ public class FeedbackContainerFactory<T, C extends Component> {
      * value. This method must <strong>NOT</strong> be called with a value that was not
      * {@link #create created} by this factory.
      */
-    private void adjustFrom(ComponentContainer<C> initialized) {
-        this.expectedSize = initialized.size();
+    private void adjustFrom(FastComponentContainer<C> initialized) {
+        this.expectedSize = initialized.dynamicSize();
     }
 }

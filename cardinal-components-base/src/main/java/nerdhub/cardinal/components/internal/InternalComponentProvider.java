@@ -30,7 +30,7 @@ public interface InternalComponentProvider extends ComponentProvider {
 
     @Nonnull
     default ComponentContainer<?> getComponentContainer() {
-        return ((ComponentContainer<?>) getStaticComponentContainer());
+        return ((ComponentContainer<?>) this.getStaticComponentContainer());
     }
 
     @Override
