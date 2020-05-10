@@ -6,6 +6,11 @@
     "description": "dynamically exposing components",
     "version": "${version}",
     "side": "universal",
+    "entrypoints": {
+        "cardinal-components-api:static-provider": [
+            "nerdhub.cardinal.components.internal.StaticItemComponentPlugin::INSTANCE"
+        ]
+    },
     "custom": {
         "modmenu:api": true,
         "modmenu:parent": "cardinal-components"

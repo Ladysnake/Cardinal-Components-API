@@ -41,8 +41,9 @@ public class CardinalComponentsTest {
 
     public static final Logger LOGGER = LogManager.getLogger("Component Test");
 
+    public static final String VITA_STICK_ID = "componenttest:vita_stick";
     // inline self component callback registration
-    public static final VitalityStickItem VITALITY_STICK = Registry.register(Registry.ITEM, "componenttest:vita_stick",
+    public static final VitalityStickItem VITALITY_STICK = Registry.register(Registry.ITEM, VITA_STICK_ID,
             new VitalityStickItem(new Item.Settings().group(ItemGroup.COMBAT)));
 
     public static final VitalityCondenser VITALITY_CONDENSER = Registry.register(Registry.BLOCK, "componenttest:vita_condenser",
@@ -54,7 +55,7 @@ public class CardinalComponentsTest {
     public static void init() {
         LOGGER.info("Hello, Components!");
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
-        EntityComponents.setRespawnCopyStrategy(CcaTestFactory.VITA, RespawnCopyStrategy.ALWAYS_COPY);
+        EntityComponents.setRespawnCopyStrategy(CardinalTestComponents.VITA, RespawnCopyStrategy.ALWAYS_COPY);
     }
 
 }

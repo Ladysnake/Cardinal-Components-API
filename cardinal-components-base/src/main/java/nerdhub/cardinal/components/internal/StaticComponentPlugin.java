@@ -22,7 +22,8 @@
  */
 package nerdhub.cardinal.components.internal;
 
-import nerdhub.cardinal.components.internal.asm.FactoryClassScanner;
+import nerdhub.cardinal.components.internal.asm.AnnotationData;
+import nerdhub.cardinal.components.internal.asm.NamedMethodDescriptor;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.io.IOException;
@@ -41,13 +42,12 @@ public interface StaticComponentPlugin {
     Class<? extends Annotation> annotationType();
 
     /**
-     *
-     *
-     * @param data ASM data about the method being processed
+     * @param factoryDescriptor descriptor of the annotated method
+     * @param data ASM data about the annotation being processed
      * @param method the method node being processed
      * @return a valid identifier string for a recognized component type
      */
-    String scan(FactoryClassScanner.AsmFactoryData data, MethodNode method) throws IOException;
+    String scan(NamedMethodDescriptor factoryDescriptor, AnnotationData data, MethodNode method) throws IOException;
 
     void generate() throws IOException;
 }

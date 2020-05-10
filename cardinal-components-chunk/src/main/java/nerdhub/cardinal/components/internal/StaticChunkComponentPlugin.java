@@ -24,8 +24,8 @@ package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.ChunkComponentFactory;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.internal.asm.AnnotationData;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
-import nerdhub.cardinal.components.internal.asm.FactoryClassScanner;
 import nerdhub.cardinal.components.internal.asm.NamedMethodDescriptor;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.loader.api.FabricLoader;
@@ -55,19 +55,18 @@ public final class StaticChunkComponentPlugin implements StaticComponentPlugin {
     }
 
     @Override
-    public String scan(FactoryClassScanner.AsmFactoryData data, MethodNode method) {
-        NamedMethodDescriptor factoryDescriptor = data.getFactoryDescriptor();
-        if (factoryDescriptor.args.length > 1) {
-            throw new StaticComponentLoadingException("Too many arguments in method " + factoryDescriptor + ". Should be either no-args or a single " + chunkClass + " argument.");
+    public String scan(NamedMethodDescriptor factoryDescriptor, AnnotationData data, MethodNode method) {
+        if (factoryDescriptor.descriptor.getArgumentTypes().length > 1) {
+            throw new StaticComponentLoadingException("Too many arguments in method " + factoryDescriptor + ". Should be either no-args or a single " + this.chunkClass + " argument.");
         }
-        String value = (String) data.get("value");
-        componentFactories.put(value, factoryDescriptor);
+        String value = data.get("value", String.class);
+        this.componentFactories.put(value, factoryDescriptor);
         return value;
     }
 
     @Override
     public void generate() {
-        Type chunkType = Type.getObjectType(chunkClass.replace('.', '/'));
+        Type chunkType = Type.getObjectType(this.chunkClass.replace('.', '/'));
         Class<? extends ComponentContainer<?>> containerCls = CcaAsmHelper.defineContainer(this.componentFactories, CHUNK_IMPL_SUFFIX, chunkType);
         this.factoryClass = CcaAsmHelper.defineSingleArgFactory(CHUNK_IMPL_SUFFIX, Type.getType(containerCls), chunkType);
     }
