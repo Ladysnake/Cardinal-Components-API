@@ -52,10 +52,10 @@ import java.util.function.BiConsumer;
  */
 public class FastComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
     /**
-     * All of the component types that can be stored in this container.
+     * All of the component types that can be stored in containers.
      * (Cached for performance.)
      */
-    private final AtomicReference<ComponentType<?>[]> keyUniverse = SharedComponentSecrets.getRegisteredComponents();
+    private static final AtomicReference<ComponentType<?>[]> keyUniverse = SharedComponentSecrets.getRegisteredComponents();
 
     private final Int2ObjectOpenHashMap<C> vals;
 
@@ -109,7 +109,7 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
     @Override
     public void forEach(BiConsumer<? super ComponentType<?>, ? super C> action) {
         this.vals.int2ObjectEntrySet().fastForEach((e) ->
-            action.accept(this.keyUniverse.get()[e.getIntKey()], e.getValue()));
+            action.accept(keyUniverse.get()[e.getIntKey()], e.getValue()));
     }
 
     // Views
@@ -229,7 +229,7 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
     }
 
     private class ValueIterator implements Iterator<C> {
-        ObjectIterator<C> it = vals.values().iterator();
+        ObjectIterator<C> it = vals.values().iterator();    // TODO support asm-added components
 
         @Override
         public boolean hasNext() {
@@ -243,7 +243,7 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
     }
 
     private class KeyIterator implements Iterator<ComponentType<?>> {
-        IntIterator it = vals.keySet().iterator();
+        IntIterator it = vals.keySet().iterator();  // TODO support asm-added components
 
         @Override
         public boolean hasNext() {
@@ -257,6 +257,7 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
     }
 
     private class EntryIterator implements Iterator<Entry<ComponentType<?>, C>> {
+        // TODO support asm-added components
         ObjectIterator<Int2ObjectMap.Entry<C>> it = vals.int2ObjectEntrySet().fastIterator();
         public Entry next() {
             Int2ObjectMap.Entry<C> entry = it.next();

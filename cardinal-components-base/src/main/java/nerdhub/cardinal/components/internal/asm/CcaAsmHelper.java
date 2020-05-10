@@ -24,21 +24,53 @@ package nerdhub.cardinal.components.internal.asm;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
+import net.fabricmc.loader.launch.common.FabricLauncherBase;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class CcaAsmHelper {
+    private static final Map<Type, TypeData> typeCache = new HashMap<>();
+
+    private static TypeData getTypeData(Type type) throws IOException {
+        TypeData t = typeCache.get(type);
+        if (t != null) {
+            return t;
+        }
+        String className = type.getInternalName();
+        ClassReader reader = new ClassReader(FabricLauncherBase.getLauncher().getClassByteArray(className.replace('.', '/')));
+        TypeData newValue = new TypeData(type, Type.getObjectType(reader.getSuperName()), reader);
+        typeCache.put(type, newValue);
+        return newValue;
+    }
+
+    public static Type getSuperclass(Type type) throws IOException {
+        return getTypeData(type).getSupertype();
+    }
+
+    public static boolean isAssignableFrom(Type tSuper, Type tSub) throws IOException {
+        if (tSuper.equals(tSub)) return true;
+        if (tSub.equals(Type.getType(Object.class))) return false;
+        return isAssignableFrom(tSuper, getSuperclass(tSub));
+    }
+
+    public static ClassReader getClassReader(Type type) throws IOException {
+        return getTypeData(type).getReader();
+    }
 
     public static Class<? extends ComponentContainer<?>> defineContainer(Map<String, NamedMethodDescriptor> componentFactories, String implNameSuffix, Type... ctorArgs) {
         String containerImplName = CcaAsmConstants.STATIC_COMPONENT_CONTAINER + '_' + implNameSuffix;
-        String ctorDesc = Type.getMethodDescriptor(Type.VOID_TYPE, ctorArgs);
+        Type[] actualCtorArgs = new Type[ctorArgs.length + 1];
+        actualCtorArgs[0] = Type.INT_TYPE;
+        System.arraycopy(ctorArgs, 0, actualCtorArgs, 1, ctorArgs.length);
+        String ctorDesc = Type.getMethodDescriptor(Type.VOID_TYPE, actualCtorArgs);
         ClassNode classNode = new ClassNode(CcaAsmConstants.ASM_VERSION);
         classNode.visit(
             Opcodes.V1_8,
@@ -50,7 +82,9 @@ public final class CcaAsmHelper {
         MethodVisitor init = classNode.visitMethod(Opcodes.ACC_PUBLIC, "<init>", ctorDesc, null, null);
         init.visitCode();
         init.visitVarInsn(Opcodes.ALOAD, 0);
-        init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmConstants.DYNAMIC_COMPONENT_CONTAINER_IMPL, "<init>", "()V", false);
+        init.visitVarInsn(Opcodes.ILOAD, 1);
+        init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmConstants.DYNAMIC_COMPONENT_CONTAINER_IMPL, "<init>", "(I)V", false);
+        // TODO redefine containsKey (|| chain), get (if chain), and forEach using unrolled field access
         for (Map.Entry<String, NamedMethodDescriptor> entry : componentFactories.entrySet()) {
             String identifier = entry.getKey();
             NamedMethodDescriptor factory = entry.getValue();
@@ -68,7 +102,8 @@ public final class CcaAsmHelper {
             init.visitVarInsn(Opcodes.ALOAD, 0);
             // stack: <this>
             for (int i = 0; i < ctorArgs.length && i < factory.args.length; i++) {
-                init.visitVarInsn(Opcodes.ALOAD, i + 1);
+                init.visitVarInsn(Opcodes.ALOAD, i + 2);    // first 2 args are for the container itself
+                init.visitTypeInsn(Opcodes.CHECKCAST, factory.args[i].getInternalName());
             }
             // stack: <this> ctorArgs...
             // initialize the component by calling the factory
@@ -91,6 +126,7 @@ public final class CcaAsmHelper {
             // stack: <this> component componentType
             init.visitInsn(Opcodes.SWAP);
             // stack: <this> componentType component
+            // TODO remove dynamic put when static components are properly supported
             init.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmConstants.DYNAMIC_COMPONENT_CONTAINER_IMPL, "put", CcaAsmConstants.DYNAMIC_COMPONENT_CONTAINER_PUT_DESC, false);
             // <empty stack>
 
@@ -113,7 +149,7 @@ public final class CcaAsmHelper {
         return ret;
     }
 
-    public static Class<? extends FeedbackContainerFactory<?, ?>> createSingleArgFactory(String implNameSuffix, Type containerImpl, Type factoryArg) {
+    public static Class<? extends FeedbackContainerFactory<?, ?>> defineSingleArgFactory(String implNameSuffix, Type containerImpl, Type factoryArg) {
         String containerImplName = containerImpl.getInternalName();
         ClassNode containerFactoryWriter = new ClassNode(CcaAsmConstants.ASM_VERSION);
         String factoryImplName = CcaAsmConstants.STATIC_CONTAINER_FACTORY + '_' + implNameSuffix;
@@ -125,12 +161,13 @@ public final class CcaAsmHelper {
         init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmConstants.CONTAINER_FACTORY_IMPL, "<init>", ctorDesc, false);
         init.visitInsn(Opcodes.RETURN);
         init.visitEnd();
-        MethodVisitor createContainer = containerFactoryWriter.visitMethod(Opcodes.ACC_PROTECTED, "createContainer", "(Ljava/lang/Object;)L" + CcaAsmConstants.COMPONENT_CONTAINER + ";", null, null);
+        MethodVisitor createContainer = containerFactoryWriter.visitMethod(Opcodes.ACC_PROTECTED, "createContainer", "(ILjava/lang/Object;)L" + CcaAsmConstants.COMPONENT_CONTAINER + ";", null, null);
         createContainer.visitTypeInsn(Opcodes.NEW, containerImplName);
         createContainer.visitInsn(Opcodes.DUP);
-        createContainer.visitVarInsn(Opcodes.ALOAD, 1);
+        createContainer.visitVarInsn(Opcodes.ILOAD, 1);
+        createContainer.visitVarInsn(Opcodes.ALOAD, 2);
         createContainer.visitTypeInsn(Opcodes.CHECKCAST, factoryArg.getInternalName());
-        createContainer.visitMethodInsn(Opcodes.INVOKESPECIAL, containerImplName, "<init>", "(" + factoryArg.getDescriptor() + ")V", false);
+        createContainer.visitMethodInsn(Opcodes.INVOKESPECIAL, containerImplName, "<init>", "(I" + factoryArg.getDescriptor() + ")V", false);
         createContainer.visitInsn(Opcodes.ARETURN);
         createContainer.visitEnd();
         containerFactoryWriter.visitEnd();
@@ -148,10 +185,12 @@ public final class CcaAsmHelper {
         try {
             byte[] bytes = classWriter.toByteArray();
             new ClassReader(bytes).accept(new CheckClassAdapter(null), 0);
-            Files.write(Paths.get(name.replace('/', '_') + ".class"), bytes);
+            Path path = Paths.get(name + ".class");
+            Files.createDirectories(path.getParent());
+            Files.write(path, bytes);
             return CcaClassLoader.INSTANCE.define(name.replace('/', '.'), bytes);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+        } catch (IOException | IllegalArgumentException | IllegalStateException e) {
+            throw new StaticComponentLoadingException("Failed to generate class " + name, e);
         }
     }
 }

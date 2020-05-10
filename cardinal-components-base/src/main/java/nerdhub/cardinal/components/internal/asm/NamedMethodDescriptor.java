@@ -25,21 +25,27 @@ package nerdhub.cardinal.components.internal.asm;
 
 import org.objectweb.asm.Type;
 
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public final class NamedMethodDescriptor {
     public final Type ownerType;
     public final String name;
+    private final int access;
     public final Type descriptor;
     public final Type[] args;
 
-    public NamedMethodDescriptor(Type ownerType, String name, Type descriptor) {
+    public NamedMethodDescriptor(Type ownerType, String name, int access, Type descriptor) {
         this.ownerType = ownerType;
         this.name = name;
+        this.access = access;
         this.descriptor = descriptor;
         this.args = descriptor.getArgumentTypes();
     }
 
     @Override
     public String toString() {
-        return ownerType + ";" + name + descriptor;
+        return Modifier.toString(access) + " " + descriptor.getReturnType().getClassName() + " " + ownerType.getClassName() + "." + name + "(" + Arrays.stream(args).map(Type::getClassName).collect(Collectors.joining(", ")) + ")";
     }
 }

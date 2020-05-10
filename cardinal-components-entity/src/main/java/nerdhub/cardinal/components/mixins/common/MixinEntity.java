@@ -22,11 +22,9 @@
  */
 package nerdhub.cardinal.components.mixins.common;
 
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.internal.CardinalEntityInternals;
+import nerdhub.cardinal.components.internal.InternalComponentProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundTag;
@@ -38,22 +36,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
+import javax.annotation.Nonnull;
 
 @Mixin(Entity.class)
-public abstract class MixinEntity implements ComponentProvider {
+public abstract class MixinEntity implements InternalComponentProvider {
     @Unique
     private ComponentContainer<?> components;
 
     @Shadow
     public abstract EntityType<?> getType();
 
-    @SuppressWarnings("unchecked")
-    @Inject(method = "<init>", at = @At("RETURN"))
+    @Inject(method = "<init>*", at = @At("RETURN"))
     private void initDataTracker(CallbackInfo ci) {
-        this.components = CardinalEntityInternals.getEntityContainerFactory((Class) this.getClass()).create(this);
+        this.components = CardinalEntityInternals.createEntityComponentContainer((Entity) (Object) this);
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))
@@ -66,19 +61,9 @@ public abstract class MixinEntity implements ComponentProvider {
         this.components.fromTag(tag);
     }
 
+    @Nonnull
     @Override
-    public boolean hasComponent(ComponentType<?> type) {
-        return this.components.containsKey(type);
-    }
-
-    @Nullable
-    @Override
-    public <C extends Component> C getComponent(ComponentType<C> type) {
-        return this.components.get(type);
-    }
-
-    @Override
-    public Set<ComponentType<?>> getComponentTypes() {
-        return Collections.unmodifiableSet(this.components.keySet());
+    public Object getStaticComponentContainer() {
+        return this.components;
     }
 }
