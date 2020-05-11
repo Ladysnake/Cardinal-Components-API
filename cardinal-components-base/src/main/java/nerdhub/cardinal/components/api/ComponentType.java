@@ -69,20 +69,20 @@ public class ComponentType<T extends Component> {
 
     /* ------------- public methods -------------- */
 
-    public Identifier getId() {
+    public final Identifier getId() {
         return this.id;
     }
 
     @ApiStatus.Internal
-    public int getRawId() {
+    public final int getRawId() {
         return this.rawId;
     }
 
-    public Class<T> getComponentClass() {
-        return componentClass;
+    public final Class<T> getComponentClass() {
+        return this.componentClass;
     }
 
-    public ObjectPath<ComponentProvider, T> asComponentPath() {
+    public final ObjectPath<ComponentProvider, T> asComponentPath() {
         return c -> c.getComponent(this);
     }
 
@@ -94,8 +94,8 @@ public class ComponentType<T extends Component> {
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      * @see #maybeGet(Object)
      */
-    public <V> T get(V provider) {
-        T component = get0((ComponentProvider) provider);
+    public final <V> T get(V provider) {
+        T component = this.get0((ComponentProvider) provider);
         assert component == null || this.getComponentClass().isInstance(component);
         if (component == null) {
             throw new NoSuchElementException(provider + " provides no component of type " + this.id);
@@ -111,9 +111,9 @@ public class ComponentType<T extends Component> {
      * {@code Optional} if {@code provider} does not have such a component.
      * @see #get(Object)
      */
-    public <V> Optional<T> maybeGet(@Nullable V provider) {
+    public final <V> Optional<T> maybeGet(@Nullable V provider) {
         if (provider instanceof ComponentProvider) {
-            return Optional.ofNullable(get0((ComponentProvider) provider));
+            return Optional.ofNullable(this.get0((ComponentProvider) provider));
         }
         return Optional.empty();
     }
@@ -132,13 +132,13 @@ public class ComponentType<T extends Component> {
      * @return {@code this}
      * @throws IllegalArgumentException if {@code event} is not a valid component event
      */
-    public <P, C extends T, E extends ComponentCallback<P, ? super C>> ComponentType<T> attach(Event<E> event, Function<P, C> factory) {
+    public final <P, C extends T, E extends ComponentCallback<P, ? super C>> ComponentType<T> attach(Event<E> event, Function<P, C> factory) {
         event.register(ComponentsInternals.createCallback(event, this, factory));
         return this;
     }
 
     @Override
     public String toString() {
-        return "ComponentType[\"" + id + "\"]";
+        return this.getClass().getSimpleName() + "[\"" + this.id + "\"]";
     }
 }

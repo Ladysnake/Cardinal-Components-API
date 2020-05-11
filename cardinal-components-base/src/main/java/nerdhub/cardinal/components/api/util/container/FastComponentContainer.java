@@ -113,9 +113,14 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
         Preconditions.checkNotNull(key);
         Preconditions.checkNotNull(value);
         Preconditions.checkArgument(key.getComponentClass().isInstance(value), value + " is not of type " + key);
-        Preconditions.checkState(!this.containsKey(key), "Cannot register 2 components for " + key);
+        Preconditions.checkState(this.canBeAssigned(key), "Component type " + key + " was already defined with value " + this.get(key) + ", cannot replace with " + value);
         this.containedTypes.set(key.getRawId());
         return this.vals.put(key.getRawId(), value);
+    }
+
+    @SuppressWarnings("WeakerAccess")   // overridden by generated subclasses
+    protected boolean canBeAssigned(ComponentType<?> key) {
+        return !this.containsKey(key);
     }
 
     @Override   // overridden by generated subclasses
