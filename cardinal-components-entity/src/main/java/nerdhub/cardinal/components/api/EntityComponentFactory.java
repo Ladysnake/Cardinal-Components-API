@@ -1,11 +1,10 @@
 package nerdhub.cardinal.components.api;
 
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
-import javax.annotation.Nonnull;
-import javax.annotation.meta.TypeQualifierDefault;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -16,10 +15,13 @@ import java.lang.annotation.Target;
  * Applied to a method to declare it as a component factory for {@linkplain Entity entities}.
  *
  * <p>The annotated method must take either no arguments, or 1 argument of type {@link Entity}
- * or one of its subclasses (eg. {@code PlayerEntity}). It must return a non-null {@link Component}.
+ * or one of its subclasses (eg. {@code PlayerEntity}). The return type must be either {@link Component}
+ * or a subclass.
+ *
+ * <p>When invoked, the factory can return either a {@link Component} of the right type, or {@code null}.
+ * If the factory method returns {@code null}, the entity will not support that type of component
+ * (cf. {@link ComponentProvider#hasComponent(ComponentType)}).
  */
-@Nonnull    // annotated methods must not return null
-@TypeQualifierDefault(ElementType.METHOD)
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EntityComponentFactory {

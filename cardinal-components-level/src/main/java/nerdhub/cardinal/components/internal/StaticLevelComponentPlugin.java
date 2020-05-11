@@ -22,16 +22,16 @@
  */
 package nerdhub.cardinal.components.internal;
 
-import nerdhub.cardinal.components.api.ChunkComponentFactory;
+import nerdhub.cardinal.components.api.LevelComponentFactory;
 import net.fabricmc.loader.api.FabricLoader;
 
-public final class StaticChunkComponentPlugin extends SimpleStaticComponentPlugin {
-    public static final String CHUNK_IMPL_SUFFIX = "ChunkImpl";
-    public static final String CHUNK_CLASS = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2791");
+public final class StaticLevelComponentPlugin extends SimpleStaticComponentPlugin {
+    public static final String LEVEL_IMPL_SUFFIX = "LevelImpl";
+    public static final String WORLD_PROPERTIES_CLASS = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_5217");
 
-    public static final StaticChunkComponentPlugin INSTANCE = new StaticChunkComponentPlugin();
+    public static final StaticLevelComponentPlugin INSTANCE = new StaticLevelComponentPlugin();
 
-    private StaticChunkComponentPlugin() {
-        super(CHUNK_CLASS, CHUNK_IMPL_SUFFIX, ChunkComponentFactory.class);
+    private StaticLevelComponentPlugin() {
+        super(WORLD_PROPERTIES_CLASS, LEVEL_IMPL_SUFFIX, LevelComponentFactory.class);
     }
 }

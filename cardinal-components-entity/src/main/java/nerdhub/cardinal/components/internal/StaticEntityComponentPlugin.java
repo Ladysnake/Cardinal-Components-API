@@ -57,7 +57,7 @@ public final class StaticEntityComponentPlugin implements StaticComponentPlugin 
     }
 
     @Override
-    public Class<? extends Annotation> annotationType() {
+    public Class<? extends Annotation> getAnnotationType() {
         return EntityComponentFactory.class;
     }
 
@@ -76,7 +76,7 @@ public final class StaticEntityComponentPlugin implements StaticComponentPlugin 
             target = annotationTarget;
         } else {
             if (factoryArgs.length == 0) {
-                throw new StaticComponentLoadingException("Cannot determine target entity class in method '" + factoryDescriptor + "'. Either specify an entity parameter of the target class, or explicitly specify the EntityComponentFactory#targets property.");
+                throw new StaticComponentLoadingException("Cannot determine target entity class in method '" + factoryDescriptor + "'. Either specify an entity parameter of the target class, or explicitly specify the EntityComponentFactory#target property.");
             } else {
                 target = factoryArgs[0];
             }

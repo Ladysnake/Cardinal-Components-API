@@ -12,6 +12,9 @@
         ],
         "client": [
             "nerdhub.cardinal.components.ComponentsWorldNetworking::initClient"
+        ],
+        "cardinal-components-api:static-provider": [
+            "nerdhub.cardinal.components.internal.world.StaticWorldComponentPlugin::INSTANCE"
         ]
     },
     "custom": {

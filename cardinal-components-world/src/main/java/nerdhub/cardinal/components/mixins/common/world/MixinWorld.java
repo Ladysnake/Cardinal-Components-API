@@ -22,12 +22,12 @@
  */
 package nerdhub.cardinal.components.mixins.common.world;
 
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.WorldComponentCallback;
+import nerdhub.cardinal.components.internal.ComponentsInternals;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
+import nerdhub.cardinal.components.internal.InternalComponentProvider;
+import nerdhub.cardinal.components.internal.world.StaticWorldComponentPlugin;
 import net.minecraft.class_5269;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
@@ -40,16 +40,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
+import javax.annotation.Nonnull;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 @Mixin(World.class)
-public abstract class MixinWorld implements ComponentProvider {
+public abstract class MixinWorld implements InternalComponentProvider {
     @Unique
-    private static final FeedbackContainerFactory<World, ?> componentContainerFactory = new FeedbackContainerFactory<>(WorldComponentCallback.EVENT);
+    private static final FeedbackContainerFactory<World, ?> componentContainerFactory
+        = ComponentsInternals.createFactory(StaticWorldComponentPlugin.INSTANCE.getFactoryClass(), WorldComponentCallback.EVENT);
+
     @Unique
     protected ComponentContainer<?> components;
 
@@ -58,19 +58,9 @@ public abstract class MixinWorld implements ComponentProvider {
         this.components = componentContainerFactory.create((World) (Object) this);
     }
 
+    @Nonnull
     @Override
-    public boolean hasComponent(ComponentType<?> type) {
-        return this.components.containsKey(type);
-    }
-
-    @Nullable
-    @Override
-    public <C extends Component> C getComponent(ComponentType<C> type) {
-        return components.get(type);
-    }
-
-    @Override
-    public Set<ComponentType<?>> getComponentTypes() {
-        return Collections.unmodifiableSet(this.components.keySet());
+    public Object getStaticComponentContainer() {
+        return this.components;
     }
 }

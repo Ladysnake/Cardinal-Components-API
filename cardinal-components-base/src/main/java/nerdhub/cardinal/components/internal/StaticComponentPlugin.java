@@ -22,14 +22,17 @@
  */
 package nerdhub.cardinal.components.internal;
 
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.internal.asm.AnnotationData;
 import nerdhub.cardinal.components.internal.asm.NamedMethodDescriptor;
+import org.jetbrains.annotations.ApiStatus;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.regex.Pattern;
 
+@ApiStatus.OverrideOnly
 public interface StaticComponentPlugin {
     /**
      * A pattern that should be used to check that component type ids are valid
@@ -37,11 +40,15 @@ public interface StaticComponentPlugin {
     Pattern IDENTIFIER_PATTERN = Pattern.compile("([a-z0-9_.-]+:)?[a-z0-9/._-]+");
 
     /**
-     * @return the annotation used by this plugin
+     * @return the annotation processed by this plugin
      */
-    Class<? extends Annotation> annotationType();
+    Class<? extends Annotation> getAnnotationType();
 
     /**
+     * Scans an annotated component factory method.
+     *
+     * <p>Implementations should store processed data so that it can be used in {@link #generate()}.
+     * <strong>Classes should not be generated in this method!</strong>
      * @param factoryDescriptor descriptor of the annotated method
      * @param data ASM data about the annotation being processed
      * @param method the method node being processed
@@ -49,5 +56,11 @@ public interface StaticComponentPlugin {
      */
     String scan(NamedMethodDescriptor factoryDescriptor, AnnotationData data, MethodNode method) throws IOException;
 
+    /**
+     * Generates classes dynamically based on previously scanned information.
+     *
+     * <p>Implementations of this method commonly generate one or more {@link ComponentContainer} implementations,
+     * as well as matching {@link FeedbackContainerFactory factories}.
+     */
     void generate() throws IOException;
 }

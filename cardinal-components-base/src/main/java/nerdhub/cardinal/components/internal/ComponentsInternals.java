@@ -28,8 +28,11 @@ import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
 import net.fabricmc.fabric.api.event.Event;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.invoke.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -63,7 +66,7 @@ public final class ComponentsInternals {
         }
     }
 
-    private static <E extends ComponentCallback<P, ? super C>, T extends Component, P, C extends T> void initComponents(ComponentType<T> type, Function<P, C> factory, P provider, ComponentContainer<C> components) {
+    private static <T extends Component, P, C extends T> void initComponents(ComponentType<T> type, Function<P, C> factory, P provider, ComponentContainer<C> components) {
         components.put(type, factory.apply(provider));
     }
 
@@ -98,5 +101,22 @@ public final class ComponentsInternals {
             throw new RuntimeException(e);
         }
         throw new RuntimeException(callbackClass + " is not a functional interface!");
+    }
+
+    @SafeVarargs
+    @SuppressWarnings("varargs")
+    @Nonnull
+    public static <T, C extends Component> FeedbackContainerFactory<T, C> createFactory(@Nullable Class<?> factoryClass, Event<? extends ComponentCallback<T, C>>... events) {
+        if (factoryClass == null) {
+            return new FeedbackContainerFactory<>(events);
+        }
+        try {
+            if (!FeedbackContainerFactory.class.isAssignableFrom(factoryClass)) throw new IllegalArgumentException(factoryClass + " does not inherit from " + FeedbackContainerFactory.class);
+            @SuppressWarnings("unchecked") FeedbackContainerFactory<T, C> ret =
+                (FeedbackContainerFactory<T, C>) factoryClass.getConstructor(Event[].class).newInstance((Object) events);
+            return ret;
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Failed to instantiate generated component factory", e);
+        }
     }
 }
