@@ -112,6 +112,9 @@ public final class CcaAsmHelper {
         init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmConstants.DYNAMIC_COMPONENT_CONTAINER_IMPL, "<init>", "(I)V", false);
         MethodVisitor get = classNode.visitMethod(Opcodes.ACC_PUBLIC, "get", "(L" + CcaAsmConstants.COMPONENT_TYPE + ";)L" + CcaAsmConstants.COMPONENT + ";", null, null);
         MethodVisitor forEach = classNode.visitMethod(Opcodes.ACC_PUBLIC, "forEach", "(Ljava/util/function/BiConsumer;)V", null, null);
+        String canBeAssignedDesc = "(L" + CcaAsmConstants.COMPONENT_TYPE + ";)Z";
+        MethodVisitor canBeAssigned = classNode.visitMethod(Opcodes.ACC_PROTECTED, "canBeAssigned", canBeAssignedDesc, null, null);
+        Label canBeAssignedFalse = new Label();
         for (Map.Entry<String, NamedMethodDescriptor> entry : componentFactories.entrySet()) {
             String identifier = entry.getKey();
             NamedMethodDescriptor factory = entry.getValue();
@@ -175,6 +178,14 @@ public final class CcaAsmHelper {
             // stack: biConsumer componentType component
             forEach.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(BiConsumer.class), "accept", "(Ljava/lang/Object;Ljava/lang/Object;)V", true);
 
+            /* canBeAssigned implementation */
+            canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
+            // stack: componentType
+            stackStaticComponentType(canBeAssigned, identifier);
+            // stack: componentType componentType2
+            canBeAssigned.visitJumpInsn(Opcodes.IF_ACMPEQ, canBeAssignedFalse);
+            // <empty stack>
+
             /* getter implementation */
             MethodVisitor getter = classNode.visitMethod(
                 Opcodes.ACC_PUBLIC,
@@ -199,6 +210,18 @@ public final class CcaAsmHelper {
         forEach.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmConstants.DYNAMIC_COMPONENT_CONTAINER_IMPL, "forEach", "(L" + Type.getInternalName(BiConsumer.class) + ";)V", false);
         forEach.visitInsn(Opcodes.RETURN);
         forEach.visitEnd();
+        canBeAssigned.visitVarInsn(Opcodes.ALOAD, 0);
+        canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
+        canBeAssigned.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmConstants.DYNAMIC_COMPONENT_CONTAINER_IMPL, "canBeAssigned", canBeAssignedDesc, false);
+        canBeAssigned.visitJumpInsn(Opcodes.IFEQ, canBeAssignedFalse);
+        Label canBeAssignedEnd = new Label();
+        canBeAssigned.visitInsn(Opcodes.ICONST_1);
+        canBeAssigned.visitJumpInsn(Opcodes.GOTO, canBeAssignedEnd);
+        canBeAssigned.visitLabel(canBeAssignedFalse);
+        canBeAssigned.visitInsn(Opcodes.ICONST_0);
+        canBeAssigned.visitLabel(canBeAssignedEnd);
+        canBeAssigned.visitInsn(Opcodes.IRETURN);
+        canBeAssigned.visitEnd();
         @SuppressWarnings("unchecked") Class<? extends ComponentContainer<?>> ret = (Class<? extends ComponentContainer<?>>) generateClass(classNode, containerImplName);
         return ret;
     }
