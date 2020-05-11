@@ -24,22 +24,32 @@ package nerdhub.cardinal.componentstest;
 
 import nerdhub.cardinal.components.api.*;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.event.LevelComponentCallback;
-import nerdhub.cardinal.components.api.event.WorldComponentCallback;
 import nerdhub.cardinal.componentstest.vita.*;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.PhantomEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+
+import javax.annotation.Nullable;
 
 public final class CardinalTestComponents {
     public static final String VITA_ID = "componenttest:vita";
-    public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(VITA_ID), Vita.class)
-        // the following will make all items unstackable, terrible for playing, great for testing
-        .attach(WorldComponentCallback.EVENT, AmbientVita.WorldVita::new)
-        .attach(LevelComponentCallback.EVENT, props -> new AmbientVita.LevelVita());
+    public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(VITA_ID), Vita.class);
 
+    @LevelComponentFactory(VITA_ID)
+    public static Component createForSave() {
+        return new AmbientVita.LevelVita();
+    }
+
+    @WorldComponentFactory(VITA_ID)
+    public static Component createForWorld(World world) {
+        return new AmbientVita.WorldVita(world);
+    }
+
+    // the following will make all items unstackable, terrible for playing, great for testing
     @ItemComponentFactory(VITA_ID)
     public static Vita createForStack(ItemStack stack) {
         return new BaseVita(stack.getCount());
@@ -68,5 +78,11 @@ public final class CardinalTestComponents {
     @EntityComponentFactory(value = VITA_ID, target = LivingEntity.class)
     public static Vita createForEntity() {
         return new BaseVita((int)(Math.random() * 10));
+    }
+
+    @Nullable
+    @EntityComponentFactory(value = VITA_ID, target = PhantomEntity.class)
+    public static Vita createForPhantom() {
+        return null; // fuck phantoms
     }
 }

@@ -101,7 +101,7 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
     private Map<String, StaticComponentPlugin> collectAnnotations(List<StaticComponentPlugin> staticProviders) {
         Map</*Class<? extends Annotation>*/ String, StaticComponentPlugin> staticProviderAnnotations = new HashMap<>();
         for (StaticComponentPlugin staticProvider : staticProviders) {
-            staticProviderAnnotations.put(Type.getDescriptor(staticProvider.annotationType()), staticProvider);
+            staticProviderAnnotations.put(Type.getDescriptor(staticProvider.getAnnotationType()), staticProvider);
         }
         return staticProviderAnnotations;
     }

@@ -61,7 +61,7 @@ public final class StaticItemComponentPlugin implements StaticComponentPlugin {
     }
 
     @Override
-    public Class<? extends Annotation> annotationType() {
+    public Class<? extends Annotation> getAnnotationType() {
         return ItemComponentFactory.class;
     }
 
