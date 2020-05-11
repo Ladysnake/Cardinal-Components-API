@@ -35,6 +35,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 @Mixin(EmptyChunk.class)
 public abstract class MixinEmptyChunk extends WorldChunk implements ComponentProvider {
@@ -56,5 +57,16 @@ public abstract class MixinEmptyChunk extends WorldChunk implements ComponentPro
     @Override
     public Set<ComponentType<?>> getComponentTypes() {
         return Collections.emptySet();
+    }
+
+    @Override
+    public void forEachComponent(BiConsumer<ComponentType<?>, Component> op) {
+        // NO-OP
+    }
+
+    @Nullable
+    @Override
+    public Object getStaticComponentContainer() {
+        return null;
     }
 }

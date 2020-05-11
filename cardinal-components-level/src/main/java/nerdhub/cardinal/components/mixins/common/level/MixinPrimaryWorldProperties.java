@@ -23,12 +23,12 @@
 package nerdhub.cardinal.components.mixins.common.level;
 
 import com.mojang.datafixers.DataFixer;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.LevelComponentCallback;
+import nerdhub.cardinal.components.internal.ComponentsInternals;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
+import nerdhub.cardinal.components.internal.InternalComponentProvider;
+import nerdhub.cardinal.components.internal.StaticLevelComponentPlugin;
 import net.minecraft.class_5217;
 import net.minecraft.class_5268;
 import net.minecraft.nbt.CompoundTag;
@@ -39,40 +39,29 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
+import javax.annotation.Nonnull;
 
 @Mixin(LevelProperties.class)
-public abstract class MixinPrimaryWorldProperties implements class_5268, ComponentProvider {
+public abstract class MixinPrimaryWorldProperties implements class_5268, InternalComponentProvider {
     @Unique
-    private static final FeedbackContainerFactory<class_5217, ?> componentContainerFactory = new FeedbackContainerFactory<>(LevelComponentCallback.EVENT);
+    private static final FeedbackContainerFactory<class_5217, ?> componentContainerFactory
+        = ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getFactoryClass(), LevelComponentCallback.EVENT);
     @Unique
     protected ComponentContainer<?> components = componentContainerFactory.create((LevelProperties) (Object) this);
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;Lcom/mojang/datafixers/DataFixer;ILnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void readComponents(CompoundTag data, DataFixer fixer, int version, CompoundTag player, CallbackInfo ci) {
-        components.fromTag(data);
+        this.components.fromTag(data);
     }
 
     @Inject(method = "updateProperties", at = @At("RETURN"))
     private void writeComponents(CompoundTag data, CompoundTag player, CallbackInfo ci) {
-        components.toTag(data);
+        this.components.toTag(data);
     }
 
+    @Nonnull
     @Override
-    public boolean hasComponent(ComponentType<?> type) {
-        return this.components.containsKey(type);
-    }
-
-    @Nullable
-    @Override
-    public <C extends Component> C getComponent(ComponentType<C> type) {
-        return components.get(type);
-    }
-
-    @Override
-    public Set<ComponentType<?>> getComponentTypes() {
-        return Collections.unmodifiableSet(this.components.keySet());
+    public Object getStaticComponentContainer() {
+        return this.components;
     }
 }

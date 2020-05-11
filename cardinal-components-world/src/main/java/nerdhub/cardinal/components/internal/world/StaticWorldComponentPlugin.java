@@ -20,18 +20,19 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.internal;
+package nerdhub.cardinal.components.internal.world;
 
-import nerdhub.cardinal.components.api.ChunkComponentFactory;
+import nerdhub.cardinal.components.api.WorldComponentFactory;
+import nerdhub.cardinal.components.internal.SimpleStaticComponentPlugin;
 import net.fabricmc.loader.api.FabricLoader;
 
-public final class StaticChunkComponentPlugin extends SimpleStaticComponentPlugin {
-    public static final String CHUNK_IMPL_SUFFIX = "ChunkImpl";
-    public static final String CHUNK_CLASS = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2791");
+public final class StaticWorldComponentPlugin extends SimpleStaticComponentPlugin {
+    public static final String WORLD_IMPL_SUFFIX = "WorldImpl";
+    public static final String WORLD_CLASS = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_1937");
 
-    public static final StaticChunkComponentPlugin INSTANCE = new StaticChunkComponentPlugin();
+    public static final StaticWorldComponentPlugin INSTANCE = new StaticWorldComponentPlugin();
 
-    private StaticChunkComponentPlugin() {
-        super(CHUNK_CLASS, CHUNK_IMPL_SUFFIX, ChunkComponentFactory.class);
+    private StaticWorldComponentPlugin() {
+        super(WORLD_CLASS, WORLD_IMPL_SUFFIX, WorldComponentFactory.class);
     }
 }

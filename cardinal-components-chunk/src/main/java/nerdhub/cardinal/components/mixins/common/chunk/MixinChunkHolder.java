@@ -35,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ChunkHolder.class)
 public abstract class MixinChunkHolder {
     /**
-     * Synchronizes components whenever a {@link net.minecraft.client.network.packet.ChunkDataS2CPacket} is sent
+     * Synchronizes components whenever a {@link net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket} is sent
      */
     @Inject(
             method = "flushUpdates",

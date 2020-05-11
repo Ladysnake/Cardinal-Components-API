@@ -25,7 +25,7 @@ package nerdhub.cardinal.components.api;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.World;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -33,22 +33,22 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Applied to a method to declare it as a component factory for {@linkplain Chunk chunks}.
+ * Applied to a method to declare it as a component factory for {@linkplain World worlds}.
  *
- * <p>The annotated method must take either no arguments, or 1 argument of type {@link Chunk}.
+ * <p>The annotated method must take either no arguments, or 1 argument of type {@link World}.
  * The return type must be either {@link Component} or a subclass.
  *
  * <p>When invoked, the factory can return either a {@link Component} of the right type, or {@code null}.
- * If the factory method returns {@code null}, the chunk will not support that type of component
+ * If the factory method returns {@code null}, the world object will not support that type of component
  * (cf. {@link ComponentProvider#hasComponent(ComponentType)}).
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ChunkComponentFactory {
+public @interface WorldComponentFactory {
     /**
      * The id of the {@link ComponentType} which this factory makes components for.
      *
-     * <p> The returned string must be a valid {@link net.minecraft.util.Identifier}.
+     * <p> The returned string must be a valid {@link Identifier}.
      * A {@link ComponentType} with the same id must be registered during mod initialization
      * using {@link ComponentRegistry#registerIfAbsent(Identifier, Class)}.
      *

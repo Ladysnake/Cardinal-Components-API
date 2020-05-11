@@ -95,6 +95,7 @@ public final class CcaAsmHelper {
         actualCtorArgs[0] = Type.INT_TYPE;
         System.arraycopy(ctorArgs, 0, actualCtorArgs, 1, ctorArgs.length);
         String ctorDesc = Type.getMethodDescriptor(Type.VOID_TYPE, actualCtorArgs);
+        int ctorFirstAvailableVar = actualCtorArgs.length + 1;  // explicit args + <this>
         ClassNode classNode = new ClassNode(CcaAsmConstants.ASM_VERSION);
         classNode.visit(
             Opcodes.V1_8,
@@ -125,18 +126,27 @@ public final class CcaAsmHelper {
                 null
             ).visitEnd();
             /* constructor initialization */
-            init.visitVarInsn(Opcodes.ALOAD, 0);
-            init.visitInsn(Opcodes.DUP);
-            // stack: <this>
             Type[] factoryArgs = factory.descriptor.getArgumentTypes();
             for (int i = 0; i < ctorArgs.length && i < factoryArgs.length; i++) {
                 init.visitVarInsn(Opcodes.ALOAD, i + 2);    // first 2 args are for the container itself
                 init.visitTypeInsn(Opcodes.CHECKCAST, factoryArgs[i].getInternalName());
             }
-            // stack: <this> ctorArgs...
+            // stack: ctorArgs...
             // initialize the component by calling the factory
             init.visitMethodInsn(Opcodes.INVOKESTATIC, factory.ownerType.getInternalName(), factory.name, factory.descriptor.toString(), false);
-            // stack: <this> component
+            // stack: component
+            init.visitInsn(Opcodes.DUP);
+            // stack: component component
+            init.visitVarInsn(Opcodes.ASTORE, ctorFirstAvailableVar);
+            // stack: component
+            // if the factory method returned null, we just ignore it
+            Label nextInit = new Label();
+            init.visitJumpInsn(Opcodes.IFNULL, nextInit);
+            // <empty stack>
+            init.visitVarInsn(Opcodes.ALOAD, 0);
+            init.visitInsn(Opcodes.DUP);
+            init.visitVarInsn(Opcodes.ALOAD, ctorFirstAvailableVar);
+            // stack: <this> <this> component
             // store in the field
             init.visitFieldInsn(Opcodes.PUTFIELD, containerImplName, fieldName, fieldDescriptor);
             // stack: <this>
@@ -144,6 +154,7 @@ public final class CcaAsmHelper {
             // stack: <this> componentType
             init.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmConstants.DYNAMIC_COMPONENT_CONTAINER_IMPL, "addContainedType", "(L" + CcaAsmConstants.COMPONENT_TYPE + ";)V", false);
             // <empty stack>
+            init.visitLabel(nextInit);
 
             /* get implementation */
             // note: this implementation is O(n). For best results, we could make a big lookup table based on
@@ -197,7 +208,7 @@ public final class CcaAsmHelper {
         method.visitFieldInsn(Opcodes.GETFIELD, containerImplName, fieldName, fieldDescriptor);
     }
 
-    public static void stackStaticComponentType(MethodVisitor method, String componentId) {
+    private static void stackStaticComponentType(MethodVisitor method, String componentId) {
         // get the generated lazy component type constant
         method.visitFieldInsn(Opcodes.GETSTATIC, CcaAsmConstants.STATIC_COMPONENT_TYPES, CcaAsmConstants.getTypeConstantName(componentId), "L" + CcaAsmConstants.LAZY_COMPONENT_TYPE + ";");
         // stack: <this> component lazyComponentType

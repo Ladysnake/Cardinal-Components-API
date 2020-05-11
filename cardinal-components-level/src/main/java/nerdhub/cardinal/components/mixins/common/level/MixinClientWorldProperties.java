@@ -27,7 +27,9 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.LevelComponentCallback;
+import nerdhub.cardinal.components.internal.ComponentsInternals;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
+import nerdhub.cardinal.components.internal.StaticLevelComponentPlugin;
 import net.minecraft.class_5217;
 import net.minecraft.class_5269;
 import net.minecraft.client.world.ClientWorld;
@@ -41,7 +43,8 @@ import java.util.Set;
 @Mixin(ClientWorld.class_5271.class)
 public abstract class MixinClientWorldProperties implements class_5269, ComponentProvider {
     @Unique
-    private static final FeedbackContainerFactory<class_5217, ?> componentContainerFactory = new FeedbackContainerFactory<>(LevelComponentCallback.EVENT);
+    private static final FeedbackContainerFactory<class_5217, ?> componentContainerFactory
+        = ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getFactoryClass(), LevelComponentCallback.EVENT);
     @Unique
     protected ComponentContainer<?> components = componentContainerFactory.create(this);
 
