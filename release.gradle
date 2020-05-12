@@ -17,23 +17,23 @@ task checkGitStatus() {
         if (!grgit.status().isClean()) {
             throw new RuntimeException("Git repository not ready for release (${grgit.status()})")
         }
-        def currentBranch = grgit.branch.current().trackingBranch.getName() // allow a fork's master
-        if (currentBranch != 'master' && !currentBranch.matches(/\d\.\d{2}/)) {
-            throw new RuntimeException("Need to be on master or a dedicated version branch to release (currently on ${currentBranch})")
+        def currentTrackedBranch = grgit.branch.current().trackingBranch.getName().replaceAll(/.*\//, '')
+        if (currentTrackedBranch != 'master' && !currentTrackedBranch.matches(/\d\.\d{2}/)) {
+            throw new RuntimeException("Need to be on master or a dedicated version branch to release (currently on ${currentTrackedBranch})")
         }
         grgit.fetch(tagMode: 'all')
         grgit.fetch(remote: MASTER_REPO, tagMode: 'all')
         if (grgit.tag.list().any { it.name == project.version }) {
             throw new RuntimeException("A tag already exists for ${project.version}")
         }
-        def status = grgit.branch.status(name: currentBranch)
+        def status = grgit.branch.status(name: grgit.branch.current().getName())
         if (status.aheadCount != 0) {
             throw new RuntimeException('Some commits have not been pushed')
         }
         if (status.behindCount != 0) {
             throw new RuntimeException('Some commits have not been pulled')
         }
-        grgit.pull(remote: MASTER_REPO, branch: currentBranch, rebase: true)
+        grgit.pull(remote: MASTER_REPO, branch: currentTrackedBranch, rebase: true)
     }
 }
 
