@@ -7,6 +7,9 @@ plugins {
     id "fabric-loom" version "0.4.3" apply false
     id "net.minecrell.licenser" version "0.2.1"
     id "com.matthewprenger.cursegradle" version "1.2.0"
+    id "com.jfrog.bintray" version '1.8.4'
+    id 'org.ajoberstar.grgit' version '3.1.1'
+    id 'com.github.breadmoirai.github-release' version '2.2.9'
     id "maven-publish"
     id "java-library"
 }
@@ -163,3 +166,5 @@ publishing {
     }
 }
 tasks.publish.dependsOn build //stupid fix for maven/loom not publishing the main artifact
+
+apply from: 'release.gradle'
