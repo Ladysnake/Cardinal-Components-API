@@ -33,7 +33,7 @@ task checkGitStatus() {
         if (status.behindCount != 0) {
             throw new RuntimeException('Some commits have not been pulled')
         }
-        grgit.pull(remote: MASTER_REPO, branch: 'master', rebase: true)
+        grgit.pull(remote: MASTER_REPO, branch: currentBranch, rebase: true)
     }
 }
 
@@ -47,7 +47,7 @@ def configureGithubRelease(task, String repoOwner) {
     task.with {
         owner = repoOwner
         tagName = project.version
-        targetCommitish = { 'master' }
+        targetCommitish = { grgit.branch.current().trackingBranch.name() }
         body = { project.getChangelogText() }
 
         FilenameFilter filter = { dir, filename -> filename.contains(project.version) && !filename.contains('-dev.jar') }
