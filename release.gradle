@@ -27,6 +27,7 @@ task checkGitStatus() {
         }
         grgit.fetch(tagMode: 'all')
         grgit.fetch(remote: masterRemote, tagMode: 'all')
+        grgit.pull(remote: masterRemote, branch: currentTrackedBranch, rebase: true)
         if (grgit.tag.list().any { it.name == project.version }) {
             throw new RuntimeException("A tag already exists for ${project.version}")
         }
@@ -37,7 +38,6 @@ task checkGitStatus() {
         if (status.behindCount != 0) {
             throw new RuntimeException('Some commits have not been pulled')
         }
-        grgit.pull(remote: masterRemote, branch: currentTrackedBranch, rebase: true)
     }
 }
 
@@ -86,11 +86,7 @@ bintrayUpload.dependsOn build
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            // add all the jars that should be included when publishing to maven
-            artifact(remapJar) {
-                classifier ''
-                builtBy remapJar
-            }
+            // Note: the main jar is already taken care of by the base builscript
             artifact(sourcesJar) {
                 builtBy remapSourcesJar
             }
