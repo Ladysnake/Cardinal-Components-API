@@ -17,12 +17,16 @@ task checkGitStatus() {
         if (!grgit.status().isClean()) {
             throw new RuntimeException("Git repository not ready for release (${grgit.status()})")
         }
+        def masterRemote = (grgit.remote.list().find { it.url == MASTER_REPO } ?: grgit.remote.add {
+            name = 'onyxstudios'
+            url = MASTER_REPO
+        }).name
         def currentTrackedBranch = grgit.branch.current().trackingBranch.getName().replaceAll(/.*\//, '')
         if (currentTrackedBranch != 'master' && !currentTrackedBranch.matches(/\d\.\d{2}/)) {
             throw new RuntimeException("Need to be on master or a dedicated version branch to release (currently on ${currentTrackedBranch})")
         }
         grgit.fetch(tagMode: 'all')
-        grgit.fetch(remote: MASTER_REPO, tagMode: 'all')
+        grgit.fetch(remote: masterRemote, tagMode: 'all')
         if (grgit.tag.list().any { it.name == project.version }) {
             throw new RuntimeException("A tag already exists for ${project.version}")
         }
@@ -33,7 +37,7 @@ task checkGitStatus() {
         if (status.behindCount != 0) {
             throw new RuntimeException('Some commits have not been pulled')
         }
-        grgit.pull(remote: MASTER_REPO, branch: currentTrackedBranch, rebase: true)
+        grgit.pull(remote: masterRemote, branch: currentTrackedBranch, rebase: true)
     }
 }
 
