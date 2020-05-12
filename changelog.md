@@ -1,4 +1,9 @@
 ------------------------------------------------------
+Version 2.3.5-alt
+------------------------------------------------------
+- This release is available on the [Ladysnake bintray](https://bintray.com/beta/#/ladysnake/libs/Cardinal-Components-API?tab=overview)
+
+------------------------------------------------------
 Version 2.3.5
 ------------------------------------------------------
 - Fixed thrown items with different components being able to merge
