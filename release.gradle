@@ -68,7 +68,7 @@ bintray {
     publications = ['mavenJava']
     publish = true //[Default: false] Whether version should be auto published after an upload
     pkg {
-        repo = 'mods'
+        repo = 'libs'
         name = project.name
         userOrg = 'ladysnake'
         version {
