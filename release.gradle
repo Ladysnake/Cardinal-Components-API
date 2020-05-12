@@ -64,25 +64,27 @@ def configureGithubRelease(task, String repoOwner) {
 configureGithubRelease(project.tasks.githubRelease, 'OnyxStudios')
 configureGithubRelease(project.tasks.ladysnakeGithubRelease, 'Ladysnake')
 
-bintray {
-    user = project.findProperty('bintray_user')
-    key = project.findProperty('bintray_api_key')
-    publications = ['mavenJava']
-    publish = true //[Default: false] Whether version should be auto published after an upload
-    pkg {
-        repo = 'libs'
-        name = project.name
-        userOrg = 'ladysnake'
-        version {
-            name = project.version
-            vcsTag = project.version
-            released  = new Date()
+allprojects {
+    bintray {
+        user = rootProject.findProperty('bintray_user')
+        key = rootProject.findProperty('bintray_api_key')
+        publications = ['mavenJava']
+        publish = true //[Default: false] Whether version should be auto published after an upload
+        pkg {
+            repo = 'libs'
+            name = rootProject.name
+            userOrg = 'ladysnake'
+            version {
+                name = rootProject.version
+                vcsTag = rootProject.version
+                released  = new Date()
+            }
         }
     }
-}
 
-bintrayUpload.dependsOn(checkGitStatus)
-bintrayUpload.dependsOn build
+    bintrayUpload.dependsOn(rootProject.tasks.checkGitStatus)
+    bintrayUpload.dependsOn build
+}
 
 curseforge {
     apiKey = project.findProperty('curse_key') ?: ""
