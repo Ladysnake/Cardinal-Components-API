@@ -21,6 +21,7 @@ subprojects {
     apply plugin: 'fabric-loom'
     apply plugin: 'org.cadixdev.licenser'
     apply plugin: 'com.matthewprenger.cursegradle'
+    apply plugin: 'com.jfrog.bintray'
     apply plugin: 'maven-publish'
     apply plugin: 'java-library'
 
