@@ -1,14 +1,6 @@
 apply from: 'https://raw.githubusercontent.com/OnyxStudios/Gradle-Scripts/master/scripts/fabric/publish/changelog.gradle'
 def MASTER_REPO = 'https://github.com/OnyxStudios/Cardinal-Components-API.git'
 
-// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-// if it is present.
-// If you remove this task, sources will not be generated.
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier = "sources"
-    from sourceSets.main.allSource
-}
-
 task checkGitStatus() {
     group = 'publishing'
     description = 'Checks that the git repository is in a state suitable for release'
@@ -22,9 +14,6 @@ task checkGitStatus() {
             url = MASTER_REPO
         }).name
         def currentTrackedBranch = grgit.branch.current().trackingBranch.getName().replaceAll(/.*\//, '')
-        if (currentTrackedBranch != 'master' && !currentTrackedBranch.matches(/\d\.\d{2}/)) {
-            throw new RuntimeException("Need to be on master or a dedicated version branch to release (currently on ${currentTrackedBranch})")
-        }
         grgit.fetch(tagMode: 'all')
         grgit.fetch(remote: masterRemote, tagMode: 'all')
         grgit.pull(remote: masterRemote, branch: currentTrackedBranch, rebase: true)
@@ -43,19 +32,32 @@ task checkGitStatus() {
 
 githubRelease {
     token "${findProperty('github_releases_token')}"
+    tagName = project.version
+    targetCommitish = { grgit.branch.current().trackingBranch.name.replaceAll(/.*\//, '') }
+    body = { project.getChangelogText() }
+
+    FilenameFilter filter = { dir, filename -> filename.contains(project.version) && !filename.contains('-dev.jar') }
+    releaseAssets = { jar.destinationDirectory.asFile.get().listFiles filter }
 }
 
 task ladysnakeGithubRelease(type: project.tasks.githubRelease.getClass())
 
 def configureGithubRelease(task, String repoOwner) {
+    def ext = project.extensions.githubRelease
     task.with {
-        owner = repoOwner
-        tagName = project.version
-        targetCommitish = { grgit.branch.current().trackingBranch.name() }
-        body = { project.getChangelogText() }
-
-        FilenameFilter filter = { dir, filename -> filename.contains(project.version) && !filename.contains('-dev.jar') }
-        releaseAssets = { jar.destinationDirectory.asFile.get().listFiles filter }
+        setAuthorization ext.authorizationProvider
+        setOwner repoOwner
+        setRepo ext.repoProvider
+        setTagName ext.tagNameProvider
+        setTargetCommitish ext.targetCommitishProvider
+        setReleaseName ext.releaseNameProvider
+        setBody ext.bodyProvider
+        setDraft ext.draftProvider
+        setPrerelease ext.prereleaseProvider
+        setReleaseAssets ext.releaseAssets
+        setOverwrite ext.overwriteProvider
+        setAllowUploadToExisting ext.allowUploadToExistingProvider
+        setApiEndpoint ext.apiEndpointProvider
     }
     task.dependsOn(checkGitStatus)
 }
@@ -81,23 +83,6 @@ bintray {
 
 bintrayUpload.dependsOn(checkGitStatus)
 bintrayUpload.dependsOn build
-
-// configure the maven publication
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            // Note: the main jar is already taken care of by the base builscript
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
-        }
-    }
-
-    // select the repositories you want to publish to
-    repositories {
-        mavenLocal()
-    }
-}
 
 curseforge {
     apiKey = project.findProperty('curse_key') ?: ""
