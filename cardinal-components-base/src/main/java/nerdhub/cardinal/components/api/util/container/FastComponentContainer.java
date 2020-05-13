@@ -63,7 +63,7 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
     }
 
     /**
-     * @param expected the expected number of elements in the container
+     * @param expected the expected number of <em>dynamically added</em> elements in the container
      */
     public FastComponentContainer(int expected) {
         this.containedTypes = new BitSet(keyUniverse.get().length);

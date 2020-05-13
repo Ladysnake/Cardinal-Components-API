@@ -101,8 +101,8 @@ public final class FactoryClassScanner extends ClassVisitor {
                     throw new StaticComponentLoadingException("Factory method " + this.factoryDescriptor + " annotated with " + descriptor + " must be static");
                 }
                 try {
-                    if (!CcaAsmHelper.isAssignableFrom(Type.getObjectType(CcaAsmConstants.COMPONENT), this.factoryDescriptor.descriptor.getReturnType())) {
-                        throw new StaticComponentLoadingException("Factory method " + this.factoryDescriptor + " must return " + CcaAsmConstants.COMPONENT.replace('/', '.') + " or a subclass.");
+                    if (!CcaAsmHelper.isAssignableFrom(Type.getObjectType(CcaAsmHelper.COMPONENT), this.factoryDescriptor.descriptor.getReturnType())) {
+                        throw new StaticComponentLoadingException("Factory method " + this.factoryDescriptor + " must return " + CcaAsmHelper.COMPONENT.replace('/', '.') + " or a subclass.");
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);

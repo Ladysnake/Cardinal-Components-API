@@ -29,12 +29,10 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
-import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.Entity;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,15 +81,7 @@ public final class CardinalEntityInternals {
                 }
                 c = (Class<? extends Entity>) c.getSuperclass();
             }
-            Event<? extends EntityComponentCallback<Entity>>[] componentEvents = Lists.reverse(events).toArray(new Event[0]);
-            if (factoryClass == null) {
-                return new FeedbackContainerFactory<>(componentEvents);
-            }
-            try {
-                return (FeedbackContainerFactory<Entity, Component>) factoryClass.getConstructor(Event[].class).newInstance((Object) componentEvents);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new StaticComponentLoadingException("Failed to instantiate generated component factory", e);
-            }
+            return ComponentsInternals.createFactory(factoryClass, Lists.reverse(events).toArray(new Event[0]));
         }).create(entity);
     }
 

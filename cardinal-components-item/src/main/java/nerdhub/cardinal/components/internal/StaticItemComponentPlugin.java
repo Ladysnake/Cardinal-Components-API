@@ -25,13 +25,13 @@ package nerdhub.cardinal.components.internal;
 import nerdhub.cardinal.components.api.ItemComponentFactory;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.internal.asm.AnnotationData;
-import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
 import nerdhub.cardinal.components.internal.asm.MethodData;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.Type;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -95,15 +95,15 @@ public final class StaticItemComponentPlugin implements StaticComponentPlugin {
     }
 
     @Override
-    public void generate() {
+    public void generate() throws IOException {
         Type itemType = Type.getObjectType(this.itemStackClass.replace('.', '/'));
         Map<String, MethodData> wildcardMap = this.componentFactories.getOrDefault(ItemComponentFactory.WILDCARD, Collections.emptyMap());
         for (Map.Entry</*Identifier*/String, Map</*ComponentType*/String, MethodData>> entry : this.componentFactories.entrySet()) {
             Map<String, MethodData> compiled = new HashMap<>(entry.getValue());
             wildcardMap.forEach(compiled::putIfAbsent);
             String implSuffix = getSuffix(entry.getKey());
-            Class<? extends ComponentContainer<?>> containerCls = CcaAsmHelper.defineContainer(compiled, implSuffix, itemType);
-            this.factoryClasses.put(entry.getKey(), CcaAsmHelper.defineSingleArgFactory(implSuffix, Type.getType(containerCls), itemType));
+            Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.defineContainer(compiled, implSuffix, itemType);
+            this.factoryClasses.put(entry.getKey(), StaticComponentPluginBase.defineSingleArgFactory(implSuffix, Type.getType(containerCls), itemType));
         }
     }
 }

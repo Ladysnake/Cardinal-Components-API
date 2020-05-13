@@ -25,7 +25,7 @@ package nerdhub.cardinal.components.internal;
 import nerdhub.cardinal.components.api.LevelComponentFactory;
 import net.fabricmc.loader.api.FabricLoader;
 
-public final class StaticLevelComponentPlugin extends SimpleStaticComponentPlugin {
+public final class StaticLevelComponentPlugin extends StaticComponentPluginBase {
     public static final String LEVEL_IMPL_SUFFIX = "LevelImpl";
     public static final String WORLD_PROPERTIES_CLASS = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_5217");
 
