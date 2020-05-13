@@ -31,7 +31,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
-import nerdhub.cardinal.components.api.util.container.IndexedComponentContainer;
+import nerdhub.cardinal.components.util.container.IndexedComponentContainer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import org.junit.jupiter.api.Assertions;
@@ -119,8 +119,8 @@ class ComponentContainerTest {
     static class CustomArgumentProvider implements ArgumentsProvider {
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
-            List<Supplier<ComponentContainer>> vals = ImmutableList.of(IndexedComponentContainer::new, FastComponentContainer::new);
-            ImmutableSet<Supplier<ComponentContainer>> types = ImmutableSet.of(IndexedComponentContainer::new, FastComponentContainer::new);
+            List<Supplier<ComponentContainer<?>>> vals = ImmutableList.of(IndexedComponentContainer::new, FastComponentContainer::new);
+            ImmutableSet<Supplier<ComponentContainer<?>>> types = ImmutableSet.of(IndexedComponentContainer::new, FastComponentContainer::new);
             return Stream.of(types)
                     .flatMap(s -> Sets.cartesianProduct(s, s).stream())
                     .map(l -> l.stream().map(Supplier::get).toArray())

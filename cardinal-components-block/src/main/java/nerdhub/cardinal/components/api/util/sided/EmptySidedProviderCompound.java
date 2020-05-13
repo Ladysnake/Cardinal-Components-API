@@ -23,7 +23,7 @@
 package nerdhub.cardinal.components.api.util.sided;
 
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.api.util.provider.EmptyComponentProvider;
+import nerdhub.cardinal.components.util.provider.EmptyComponentProvider;
 import net.minecraft.util.math.Direction;
 
 import javax.annotation.Nullable;

@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util;
+package nerdhub.cardinal.components.util;
 
 import javax.annotation.Nullable;
 import java.util.NoSuchElementException;
@@ -243,5 +243,9 @@ public interface ObjectPath<T, R> extends Function<T, R> {
             R r = this.apply(obj);
             return clazz.isInstance(r) ? (V) r : null;
         };
+    }
+
+    static <T, R> ObjectPath<T, R> fromFunction(Function<T, R> f) {
+        return f::apply;
     }
 }

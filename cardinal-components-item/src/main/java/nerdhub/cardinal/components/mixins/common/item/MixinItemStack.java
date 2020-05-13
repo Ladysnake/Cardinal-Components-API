@@ -25,12 +25,10 @@ package nerdhub.cardinal.components.mixins.common.item;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import nerdhub.cardinal.components.api.util.Components;
 import nerdhub.cardinal.components.internal.CardinalItemInternals;
+import nerdhub.cardinal.components.internal.InternalComponentProvider;
 import nerdhub.cardinal.components.internal.ItemCaller;
-import nerdhub.cardinal.components.internal.ItemStackAccessor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -45,19 +43,21 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 @Mixin(value = ItemStack.class, priority = 900)
-public abstract class MixinItemStack implements ComponentProvider, ItemStackAccessor {
+public abstract class MixinItemStack implements InternalComponentProvider {
 
     private ComponentContainer<CopyableComponent<?>> components;
 
     @Inject(method = "areTagsEqual", at = @At("RETURN"), cancellable = true)
     private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
         // If the tags are equal, either both stacks are empty or neither is.
-        if(cir.getReturnValueZ() && !Components.areComponentsEqual(stack1, stack2)) {
+        if(cir.getReturnValueZ() && CardinalItemInternals.areComponentsIncompatible(stack1, stack2)) {
             cir.setReturnValue(false);
         }
     }
@@ -65,7 +65,7 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
     @Inject(method = "isEqual", at = @At("RETURN"), cancellable = true)
     private void isEqual(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         // If the tags are equal, either both stacks are empty or neither is.
-        if(cir.getReturnValueZ() && !Components.areComponentsEqual((ItemStack) (Object) this, stack)) {
+        if(cir.getReturnValueZ() && CardinalItemInternals.areComponentsIncompatible((ItemStack) (Object) this, stack)) {
             cir.setReturnValue(false);
         }
     }
@@ -135,7 +135,15 @@ public abstract class MixinItemStack implements ComponentProvider, ItemStackAcce
     }
 
     @Override
-    public ComponentContainer<CopyableComponent<?>> cardinal_getComponentContainer() {
+    public void forEachComponent(BiConsumer<ComponentType<?>, Component> op) {
+        if (!this.isEmpty()) {
+            this.components.forEach(op);
+        }
+    }
+
+    @Nonnull
+    @Override
+    public Object getStaticComponentContainer() {
         return this.components;
     }
 }

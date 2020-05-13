@@ -149,7 +149,7 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
             init.visitInsn(Opcodes.RETURN);
             init.visitEnd();
 
-            MethodVisitor get = componentTypeWriter.visitMethod(Opcodes.ACC_PROTECTED, "get0", COMPONENT_TYPE_GET0_DESC, null, null);
+            MethodVisitor get = componentTypeWriter.visitMethod(Opcodes.ACC_PROTECTED, "getNullable", COMPONENT_TYPE_GET0_DESC, null, null);
             get.visitCode();
             get.visitVarInsn(Opcodes.ALOAD, 1);
             // stack: componentProvider

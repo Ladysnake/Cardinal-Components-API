@@ -28,7 +28,6 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.WorldSyncCallback;
-import nerdhub.cardinal.components.api.util.Components;
 import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
@@ -41,11 +40,11 @@ public final class ComponentsLevelNetworking {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             if (FabricLoader.getInstance().isModLoaded("cardinal-components-world")) {
                 WorldSyncCallback.EVENT.register((player, world) -> {
-                    Components.forEach(ComponentProvider.fromLevel(world.getLevelProperties()), (componentType, component) -> {
-                        if (component instanceof SyncedComponent) {
-                            ((SyncedComponent) component).syncWith(player);
-                        }
-                    });
+                    ComponentProvider.fromLevel(world.getLevelProperties()).forEachComponent((componentType, component) -> {
+                                    if (component instanceof SyncedComponent) {
+                                        ((SyncedComponent) component).syncWith(player);
+                                    }
+                                });
                 });
             }
         }

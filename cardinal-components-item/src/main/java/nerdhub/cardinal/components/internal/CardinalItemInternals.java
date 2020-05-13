@@ -22,7 +22,10 @@
  */
 package nerdhub.cardinal.components.internal;
 
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import net.fabricmc.fabric.api.event.Event;
@@ -31,6 +34,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+
+import javax.annotation.Nullable;
+import java.util.Map;
 
 public final class CardinalItemInternals {
     public static final Event<ItemComponentCallback> WILDCARD_ITEM_EVENT = createItemComponentsEvent();
@@ -58,8 +64,8 @@ public final class CardinalItemInternals {
 
     @SuppressWarnings({"ConstantConditions", "unchecked", "rawtypes"})
     public static void copyComponents(ItemStack original, ItemStack copy) {
-        ComponentContainer<CopyableComponent<?>> other = ((ItemStackAccessor) (Object) copy).cardinal_getComponentContainer();
-        ((ItemStackAccessor) (Object) original).cardinal_getComponentContainer().forEach((type, component) -> {
+        ComponentContainer<CopyableComponent<?>> other = (ComponentContainer<CopyableComponent<?>>) ((InternalComponentProvider) (Object) copy).getComponentContainer();
+        ((InternalComponentProvider) (Object) original).getComponentContainer().forEach((type, component) -> {
                 CopyableComponent ccp = (CopyableComponent) other.get(type);
                 if (ccp != null) {
                     ccp.copyFrom(component);
@@ -67,4 +73,24 @@ public final class CardinalItemInternals {
             }
         );
     }
+
+    public static boolean areComponentsIncompatible(ItemStack stack1, ItemStack stack2) {
+        if (stack1.isEmpty() || stack2.isEmpty()) {
+            return stack1.isEmpty() != stack2.isEmpty();
+        }
+        InternalComponentProvider accessor = (InternalComponentProvider) ComponentProvider.fromItemStack(stack1);
+        InternalComponentProvider other = (InternalComponentProvider) ComponentProvider.fromItemStack(stack2);
+        ComponentContainer<?> types = accessor.getComponentContainer();
+        if (types.size() != other.getComponentContainer().size()) {
+            return true;
+        }
+        for(Map.Entry<ComponentType<?>, ? extends Component> entry : types.entrySet()) {
+            @Nullable Component otherComponent = other.getComponent(entry.getKey());
+            if(otherComponent == null || !entry.getValue().isComponentEqual(otherComponent)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

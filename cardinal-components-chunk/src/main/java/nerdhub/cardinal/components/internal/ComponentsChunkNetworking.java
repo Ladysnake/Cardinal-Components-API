@@ -27,26 +27,21 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.ChunkSyncCallback;
-import nerdhub.cardinal.components.api.util.Components;
 import nerdhub.cardinal.components.api.util.sync.ChunkSyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.chunk.Chunk;
-
-import java.util.function.Consumer;
 
 public final class ComponentsChunkNetworking {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            ChunkSyncCallback.EVENT.register((player, tracked) -> {
-                Components.forEach(ComponentProvider.fromChunk(tracked), (componentType, component) -> {
+            ChunkSyncCallback.EVENT.register((player, tracked) -> ComponentProvider.fromChunk(tracked)
+                .forEachComponent((componentType, component) -> {
                     if (component instanceof SyncedComponent) {
                         ((SyncedComponent) component).syncWith(player);
                     }
-                });
-            });
+                }));
         }
     }
 
@@ -62,15 +57,12 @@ public final class ComponentsChunkNetworking {
                     return;
                 }
                 PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-                Consumer<Chunk> chunkSync = componentType.asComponentPath()
-                        .compose(ComponentProvider::fromChunk)
-                        .thenCastTo(SyncedComponent.class)
-                        .andThenDo(component -> component.processPacket(context, copy));
                 context.getTaskQueue().execute(() -> {
                     try {
-                        // On the client, unloaded chunks return EmptyChunk
-                        Chunk chunk = context.getPlayer().world.getChunk(chunkX, chunkZ);
-                        chunkSync.accept(chunk);
+                        // Note: on the client, unloaded chunks return EmptyChunk
+                        componentType.maybeGet(context.getPlayer().world.getChunk(chunkX, chunkZ))
+                            .filter(c -> c instanceof SyncedComponent)
+                            .ifPresent(c -> ((SyncedComponent) c).processPacket(context, copy));
                     } finally {
                         copy.release();
                     }

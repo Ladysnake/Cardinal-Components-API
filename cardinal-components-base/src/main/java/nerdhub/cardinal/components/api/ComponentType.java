@@ -25,13 +25,12 @@ package nerdhub.cardinal.components.api;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
-import nerdhub.cardinal.components.api.util.ObjectPath;
 import nerdhub.cardinal.components.internal.ComponentsInternals;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
@@ -63,7 +62,7 @@ public class ComponentType<T extends Component> {
 
     @SuppressWarnings("WeakerAccess")   // overridden by generated types
     @Nullable
-    protected T get0(ComponentProvider provider) {
+    protected T getNullable(ComponentProvider provider) {
         return provider.getComponent(this);
     }
 
@@ -82,8 +81,16 @@ public class ComponentType<T extends Component> {
         return this.componentClass;
     }
 
-    public final ObjectPath<ComponentProvider, T> asComponentPath() {
-        return this::get0;
+    /**
+     * @deprecated use {@code ObjectPath.fromFunction(}{@link #asRawGetter() this.asRawGetter()}{@code }}
+     */
+    @Deprecated
+    public final Function<ComponentProvider, T> asComponentPath() {
+        return this::getNullable;
+    }
+
+    public final Function<ComponentProvider, @Nullable T> asRawGetter() {
+        return this::getNullable;
     }
 
     /**
@@ -95,7 +102,7 @@ public class ComponentType<T extends Component> {
      * @see #maybeGet(Object)
      */
     public final <V> T get(V provider) {
-        T component = this.get0((ComponentProvider) provider);
+        T component = this.getNullable((ComponentProvider) provider);
         assert component == null || this.getComponentClass().isInstance(component);
         if (component == null) {
             throw new NoSuchElementException(provider + " provides no component of type " + this.id);
@@ -113,7 +120,7 @@ public class ComponentType<T extends Component> {
      */
     public final <V> Optional<T> maybeGet(@Nullable V provider) {
         if (provider instanceof ComponentProvider) {
-            return Optional.ofNullable(this.get0((ComponentProvider) provider));
+            return Optional.ofNullable(this.getNullable((ComponentProvider) provider));
         }
         return Optional.empty();
     }

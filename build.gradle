@@ -113,11 +113,12 @@ dependencies {
     modRuntime("net.fabricmc.fabric-api:fabric-mining-levels-v0:${fabric_mining_levels_version}")
     modRuntime("net.fabricmc.fabric-api:fabric-tag-extensions-v0:${fabric_tag_extensions_version}")
     modRuntime("net.fabricmc.fabric-api:fabric-tool-attribute-api-v1:${fabric_tool_attribute_version}")
+    testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
 
     include "net.fabricmc.fabric-api:fabric-api-base:${fabric_base_version}"
     afterEvaluate {
         subprojects.each {
-            compile it
+            api it
             include it
         }
     }

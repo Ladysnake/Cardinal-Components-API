@@ -20,25 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.provider;
+package nerdhub.cardinal.components.util.provider;
 
+import com.google.common.collect.Sets;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.Set;
 
 /**
- * A component provider backed by a container.
+ * A ComponentProvider that falls back onto another when it is missing a component.
  */
-public class SimpleComponentProvider implements ComponentProvider {
-    protected ComponentContainer<?> backing;
+public class FallBackComponentProvider implements ComponentProvider {
+    protected ComponentProvider main;
+    protected ComponentProvider fallback;
 
-    public SimpleComponentProvider(ComponentContainer<?> backing) {
-        this.backing = backing;
+    public FallBackComponentProvider(ComponentProvider main, ComponentProvider fallback) {
+        this.main = main;
+        this.fallback = fallback;
     }
 
     /**
@@ -46,7 +47,7 @@ public class SimpleComponentProvider implements ComponentProvider {
      */
     @Override
     public boolean hasComponent(ComponentType<?> type) {
-        return backing.containsKey(type);
+        return main.hasComponent(type) || fallback.hasComponent(type);
     }
 
     /**
@@ -60,15 +61,24 @@ public class SimpleComponentProvider implements ComponentProvider {
     @Nullable
     @Override
     public <C extends Component> C getComponent(ComponentType<C> type) {
-        return backing.get(type);
+        C c = main.getComponent(type);
+        return c != null ? c : fallback.getComponent(type);
     }
 
     /**
-     * @return an unmodifiable view of the component types
+     * Returns an unmodifiable view of the union of the two component providers
+     * backing this {@code FallBackComponentProvider}. The returned set contains
+     * all component types that are contained in either backing set.
+     * Iterating over the returned set iterates first over all the component types of
+     * the main provider, then over each component type of the fallback provider,
+     * in order, that is not contained in the main one.
+     *
+     * @return an unmodifiable view of the component types of both backing providers
      */
     @Override
     public Set<ComponentType<?>> getComponentTypes() {
-        return Collections.unmodifiableSet(backing.keySet());
+        return Sets.union(main.getComponentTypes(), fallback.getComponentTypes());
     }
 }
+
 
