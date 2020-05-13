@@ -24,9 +24,8 @@ package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.internal.asm.AnnotationData;
-import nerdhub.cardinal.components.internal.asm.NamedMethodDescriptor;
+import nerdhub.cardinal.components.internal.asm.MethodData;
 import org.jetbrains.annotations.ApiStatus;
-import org.objectweb.asm.tree.MethodNode;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -49,12 +48,11 @@ public interface StaticComponentPlugin {
      *
      * <p>Implementations should store processed data so that it can be used in {@link #generate()}.
      * <strong>Classes should not be generated in this method!</strong>
-     * @param factoryDescriptor descriptor of the annotated method
-     * @param data ASM data about the annotation being processed
-     * @param method the method node being processed
+     * @param factory descriptor of the annotated method
+     * @param annotation ASM data about the annotation being processed
      * @return a valid identifier string for a recognized component type
      */
-    String scan(NamedMethodDescriptor factoryDescriptor, AnnotationData data, MethodNode method) throws IOException;
+    String scan(MethodData factory, AnnotationData annotation) throws IOException;
 
     /**
      * Generates classes dynamically based on previously scanned information.
