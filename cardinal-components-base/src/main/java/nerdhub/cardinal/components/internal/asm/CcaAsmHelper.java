@@ -89,7 +89,7 @@ public final class CcaAsmHelper {
         return getTypeData(type).getNode();
     }
 
-    public static Class<? extends ComponentContainer<?>> defineContainer(Map<String, NamedMethodDescriptor> componentFactories, String implNameSuffix, Type... ctorArgs) {
+    public static Class<? extends ComponentContainer<?>> defineContainer(Map<String, MethodData> componentFactories, String implNameSuffix, Type... ctorArgs) {
         String containerImplName = CcaAsmConstants.STATIC_COMPONENT_CONTAINER + '_' + implNameSuffix;
         Type[] actualCtorArgs = new Type[ctorArgs.length + 1];
         actualCtorArgs[0] = Type.INT_TYPE;
@@ -115,9 +115,9 @@ public final class CcaAsmHelper {
         String canBeAssignedDesc = "(L" + CcaAsmConstants.COMPONENT_TYPE + ";)Z";
         MethodVisitor canBeAssigned = classNode.visitMethod(Opcodes.ACC_PROTECTED, "canBeAssigned", canBeAssignedDesc, null, null);
         Label canBeAssignedFalse = new Label();
-        for (Map.Entry<String, NamedMethodDescriptor> entry : componentFactories.entrySet()) {
+        for (Map.Entry<String, MethodData> entry : componentFactories.entrySet()) {
             String identifier = entry.getKey();
-            NamedMethodDescriptor factory = entry.getValue();
+            MethodData factory = entry.getValue();
             String fieldName = CcaAsmConstants.getJavaIdentifierName(identifier);
             String fieldDescriptor = "L" + CcaAsmConstants.COMPONENT + ";";
             /* field declaration */
