@@ -71,7 +71,8 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
      * @param implNameSuffix a unique suffix for the generated class
      * @param ctorArgs arguments taken by the generated class' constructor, forwarded to each factory.
      *                 If a factory takes {@code n} arguments where {@code n < ctorArgs.length}, only the first {@code n}
-     *                 arguments will be passed to it.
+     *                 arguments will be passed to it. <em>It is the responsibility of the caller to ensure the factories'
+     *                 arguments are valid.</em>
      * @return the generated container class
      */
     public static Class<? extends ComponentContainer<?>> defineContainer(Map<String, MethodData> componentFactories, String implNameSuffix, Type... ctorArgs) throws IOException {
@@ -117,9 +118,6 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
             /* constructor initialization */
             Type[] factoryArgs = factory.descriptor.getArgumentTypes();
             for (int i = 0; i < ctorArgs.length && i < factoryArgs.length; i++) {
-                if (!CcaAsmHelper.isAssignableFrom(factoryArgs[i], ctorArgs[i])) {
-                    throw new StaticComponentLoadingException("Invalid static component factory " + factory + ": " + factoryArgs[i] + " is not assignable from " + ctorArgs[i]);
-                }
                 init.visitVarInsn(Opcodes.ALOAD, i + 2);    // first 2 args are for the container itself
                 init.visitTypeInsn(Opcodes.CHECKCAST, factoryArgs[i].getInternalName());
             }
