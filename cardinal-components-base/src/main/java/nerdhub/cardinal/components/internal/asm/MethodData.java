@@ -24,22 +24,25 @@ package nerdhub.cardinal.components.internal.asm;
 
 
 import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.MethodNode;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public final class NamedMethodDescriptor {
+public final class MethodData {
     public final Type ownerType;
     public final String name;
     public final int access;
     public final Type descriptor;
+    public final MethodNode node;
 
-    public NamedMethodDescriptor(Type ownerType, String name, int access, Type descriptor) {
+    public MethodData(Type ownerType, MethodNode node) {
         this.ownerType = ownerType;
-        this.name = name;
-        this.access = access;
-        this.descriptor = descriptor;
+        this.name = node.name;
+        this.access = node.access;
+        this.descriptor = Type.getMethodType(node.desc);
+        this.node = node;
     }
 
     @Override

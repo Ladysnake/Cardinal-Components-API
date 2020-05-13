@@ -25,11 +25,10 @@ package nerdhub.cardinal.components.internal;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.internal.asm.AnnotationData;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
-import nerdhub.cardinal.components.internal.asm.NamedMethodDescriptor;
+import nerdhub.cardinal.components.internal.asm.MethodData;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import org.jetbrains.annotations.ApiStatus;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.MethodNode;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -37,7 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public abstract class SimpleStaticComponentPlugin implements StaticComponentPlugin {
-    private final Map<String, NamedMethodDescriptor> componentFactories = new HashMap<>();
+    private final Map<String, MethodData> componentFactories = new HashMap<>();
     private final String providerClass;
     private final String implSuffix;
     private final Class<? extends Annotation> annotationType;
@@ -60,12 +59,12 @@ public abstract class SimpleStaticComponentPlugin implements StaticComponentPlug
 
     @ApiStatus.OverrideOnly
     @Override
-    public String scan(NamedMethodDescriptor factoryDescriptor, AnnotationData data, MethodNode method) {
-        if (factoryDescriptor.descriptor.getArgumentTypes().length > 1) {
-            throw new StaticComponentLoadingException("Too many arguments in method " + factoryDescriptor + ". Should be either no-args or a single " + this.providerClass + " argument.");
+    public String scan(MethodData factory, AnnotationData annotation) {
+        if (factory.descriptor.getArgumentTypes().length > 1) {
+            throw new StaticComponentLoadingException("Too many arguments in method " + factory + ". Should be either no-args or a single " + this.providerClass + " argument.");
         }
-        String value = data.get("value", String.class);
-        this.componentFactories.put(value, factoryDescriptor);
+        String value = annotation.get("value", String.class);
+        this.componentFactories.put(value, factory);
         return value;
     }
 

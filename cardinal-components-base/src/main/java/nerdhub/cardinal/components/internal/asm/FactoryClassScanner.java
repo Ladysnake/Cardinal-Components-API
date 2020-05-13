@@ -59,21 +59,21 @@ public final class FactoryClassScanner extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodNode node = new MethodNode(access, name, desc, signature, exceptions);
-        return new FactoryMethodScanner(this.api, node, access, new NamedMethodDescriptor(this.factoryOwnerType, name, access, Type.getMethodType(desc)));
+        return new FactoryMethodScanner(this.api, node, access, new MethodData(this.factoryOwnerType, node));
     }
 
     public static final class AsmFactoryData {
         final AnnotationNode annotation;
         final StaticComponentPlugin plugin;
-        final NamedMethodDescriptor factory;
+        final MethodData factory;
 
-        public AsmFactoryData(AnnotationNode annotation, StaticComponentPlugin plugin, NamedMethodDescriptor factory) {
+        public AsmFactoryData(AnnotationNode annotation, StaticComponentPlugin plugin, MethodData factory) {
             this.annotation = annotation;
             this.plugin = plugin;
             this.factory = factory;
         }
 
-        public NamedMethodDescriptor getFactoryDescriptor() {
+        public MethodData getFactoryDescriptor() {
             return this.factory;
         }
     }
@@ -83,10 +83,10 @@ public final class FactoryClassScanner extends ClassVisitor {
      */
     private class FactoryMethodScanner extends MethodVisitor {
         private final int access;
-        private final NamedMethodDescriptor factoryDescriptor;
+        private final MethodData factoryDescriptor;
         private List<AsmFactoryData> factoryData;
 
-        public FactoryMethodScanner(int api, @Nullable MethodVisitor mv, int access, NamedMethodDescriptor descriptor) {
+        public FactoryMethodScanner(int api, @Nullable MethodVisitor mv, int access, MethodData descriptor) {
             super(api, mv);
             this.access = access;
             this.factoryDescriptor = descriptor;
@@ -120,7 +120,7 @@ public final class FactoryClassScanner extends ClassVisitor {
             if (this.factoryData != null) {
                 for (AsmFactoryData data : this.factoryData) {
                     try {
-                        String scanned = data.plugin.scan(data.getFactoryDescriptor(), AnnotationData.create(data.annotation), (MethodNode) this.mv);
+                        String scanned = data.plugin.scan(data.getFactoryDescriptor(), AnnotationData.create(data.annotation));
                         if (!StaticComponentPlugin.IDENTIFIER_PATTERN.matcher(scanned).matches()) throw new StaticComponentLoadingException(scanned + "(returned by " + data.plugin.getClass().getTypeName() + "#scan) is not a valid identifier");
                         FactoryClassScanner.this.staticComponentTypes.add(scanned);
                     } catch (IOException e) {
