@@ -52,7 +52,7 @@ public final class TypeData {
 
     public ClassNode getNode() {
         if (this.node == null) {
-            this.node = new ClassNode(CcaAsmConstants.ASM_VERSION);
+            this.node = new ClassNode(CcaAsmHelper.ASM_VERSION);
             this.reader.accept(this.node, 0);
         }
         return this.node;

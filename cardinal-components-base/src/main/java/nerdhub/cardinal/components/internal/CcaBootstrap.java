@@ -23,7 +23,6 @@
 package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.internal.asm.CcaAsmConstants;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
 import nerdhub.cardinal.components.internal.asm.FactoryClassScanner;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
@@ -43,8 +42,8 @@ import java.util.*;
 public final class CcaBootstrap implements PreLaunchEntrypoint {
 
     public static final CcaBootstrap INSTANCE = new CcaBootstrap();
-    public static final String COMPONENT_TYPE_INIT_DESC = Type.getMethodDescriptor(Type.VOID_TYPE, Type.getObjectType(CcaAsmConstants.IDENTIFIER), Type.getType(Class.class), Type.INT_TYPE);
-    public static final String COMPONENT_TYPE_GET0_DESC = "(L" + CcaAsmConstants.COMPONENT_PROVIDER + ";)L" + CcaAsmConstants.COMPONENT + ";";
+    public static final String COMPONENT_TYPE_INIT_DESC = Type.getMethodDescriptor(Type.VOID_TYPE, Type.getObjectType(CcaAsmHelper.IDENTIFIER), Type.getType(Class.class), Type.INT_TYPE);
+    public static final String COMPONENT_TYPE_GET0_DESC = "(L" + CcaAsmHelper.COMPONENT_PROVIDER + ";)L" + CcaAsmHelper.COMPONENT + ";";
 
     private final Map</*Identifier*/ String, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>();
 
@@ -59,7 +58,7 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
             List<StaticComponentPlugin> staticProviders = FabricLoader.getInstance().getEntrypoints("cardinal-components-api:static-provider", StaticComponentPlugin.class);
             Map<String, StaticComponentPlugin> staticProviderAnnotations = this.collectAnnotations(staticProviders);
             Set<String> staticComponentTypes = this.process(staticProviderAnnotations);
-            this.generatedComponentTypes.putAll(this.defineStaticComponentContainer(staticComponentTypes));
+            this.generatedComponentTypes.putAll(this.defineStaticComponentTypes(staticComponentTypes));
             this.generateSpecializedContainers(staticProviders);
         } catch (IOException | UncheckedIOException e) {
             throw new StaticComponentLoadingException("Failed to load statically defined components", e);
@@ -93,7 +92,7 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
 
     private void process(String className, Map<String, StaticComponentPlugin> staticProviderAnnotations, Set<String> staticComponentTypes) throws IOException {
         ClassReader reader = CcaAsmHelper.getClassReader(Type.getObjectType(className.replace('.', '/')));
-        ClassVisitor adapter = new FactoryClassScanner(CcaAsmConstants.ASM_VERSION, null, staticProviderAnnotations, staticComponentTypes);
+        ClassVisitor adapter = new FactoryClassScanner(CcaAsmHelper.ASM_VERSION, null, staticProviderAnnotations, staticComponentTypes);
         reader.accept(adapter, 0);
     }
 
@@ -106,9 +105,17 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
         return staticProviderAnnotations;
     }
 
-    private Map<String, Class<? extends ComponentType<?>>> defineStaticComponentContainer(Set<String> staticComponentTypes) {
-        ClassNode staticContainerWriter = new ClassNode(CcaAsmConstants.ASM_VERSION);
-        ClassNode staticComponentTypesNode = new ClassNode(CcaAsmConstants.ASM_VERSION);
+    /**
+     * Defines a {@link ComponentType} subclass for every statically declared component, as well as
+     * a global {@link nerdhub.cardinal.components.api.component.ComponentProvider} specialized interface
+     * that declares a direct getter for every {@link ComponentType} that has been scanned by plugins.
+     *
+     * @param staticComponentTypes the set of all statically declared {@link ComponentType} ids
+     * @return a map of {@link ComponentType} ids to specialized implementations
+     */
+    private Map<String, Class<? extends ComponentType<?>>> defineStaticComponentTypes(Set<String> staticComponentTypes) throws IOException {
+        ClassNode staticContainerWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
+        ClassNode staticComponentTypesNode = new ClassNode(CcaAsmHelper.ASM_VERSION);
         class ComponentTypeWriter {
             private final ClassNode node;
             private final String identifier;
@@ -121,16 +128,16 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
             }
         }
         List<ComponentTypeWriter> componentTypeWriters = new ArrayList<>(staticComponentTypes.size());
-        staticContainerWriter.visit(Opcodes.V1_8, Opcodes.ACC_ABSTRACT | Opcodes.ACC_PUBLIC | Opcodes.ACC_INTERFACE, CcaAsmConstants.STATIC_COMPONENT_CONTAINER, null, "java/lang/Object", new String[]{CcaAsmConstants.COMPONENT_CONTAINER});
-        staticComponentTypesNode.visit(Opcodes.V1_8, Opcodes.ACC_FINAL | Opcodes.ACC_PUBLIC, CcaAsmConstants.STATIC_COMPONENT_TYPES, null, "java/lang/Object", null);
+        staticContainerWriter.visit(Opcodes.V1_8, Opcodes.ACC_ABSTRACT | Opcodes.ACC_PUBLIC | Opcodes.ACC_INTERFACE, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, null, "java/lang/Object", new String[]{CcaAsmHelper.COMPONENT_CONTAINER});
+        staticComponentTypesNode.visit(Opcodes.V1_8, Opcodes.ACC_FINAL | Opcodes.ACC_PUBLIC, CcaAsmHelper.STATIC_COMPONENT_TYPES, null, "java/lang/Object", null);
         MethodVisitor componentTypesInit = staticComponentTypesNode.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
         for (String identifier : staticComponentTypes) {
             /* generate the component type class */
 
-            ClassNode componentTypeWriter = new ClassNode(CcaAsmConstants.ASM_VERSION);
-            String componentTypeName = CcaAsmConstants.getComponentTypeName(identifier);
+            ClassNode componentTypeWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
+            String componentTypeName = CcaAsmHelper.getComponentTypeName(identifier);
             componentTypeWriters.add(new ComponentTypeWriter(componentTypeWriter, identifier, componentTypeName));
-            componentTypeWriter.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, componentTypeName, null, CcaAsmConstants.COMPONENT_TYPE, null);
+            componentTypeWriter.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, componentTypeName, null, CcaAsmHelper.COMPONENT_TYPE, null);
 
             MethodVisitor init = componentTypeWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", COMPONENT_TYPE_INIT_DESC, null, null);
             init.visitCode();
@@ -138,7 +145,7 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
             init.visitVarInsn(Opcodes.ALOAD, 1);
             init.visitVarInsn(Opcodes.ALOAD, 2);
             init.visitVarInsn(Opcodes.ILOAD, 3);
-            init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmConstants.COMPONENT_TYPE, "<init>", COMPONENT_TYPE_INIT_DESC, false);
+            init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.COMPONENT_TYPE, "<init>", COMPONENT_TYPE_INIT_DESC, false);
             init.visitInsn(Opcodes.RETURN);
             init.visitEnd();
 
@@ -146,16 +153,16 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
             get.visitCode();
             get.visitVarInsn(Opcodes.ALOAD, 1);
             // stack: componentProvider
-            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmConstants.COMPONENT_PROVIDER, "getStaticComponentContainer", "()Ljava/lang/Object;", true);
+            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_PROVIDER, "getStaticComponentContainer", "()Ljava/lang/Object;", true);
             // stack: object
             get.visitInsn(Opcodes.DUP);
             // stack: object object
             Label label = new Label();
             get.visitJumpInsn(Opcodes.IFNULL, label);
             // stack: object
-            get.visitTypeInsn(Opcodes.CHECKCAST, CcaAsmConstants.STATIC_COMPONENT_CONTAINER);
+            get.visitTypeInsn(Opcodes.CHECKCAST, CcaAsmHelper.STATIC_COMPONENT_CONTAINER);
             // stack: generatedComponentContainer
-            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmConstants.STATIC_COMPONENT_CONTAINER, CcaAsmConstants.getStaticStorageGetterName(identifier), CcaAsmConstants.STATIC_CONTAINER_GETTER_DESC, true);
+            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, CcaAsmHelper.getStaticStorageGetterName(identifier), CcaAsmHelper.STATIC_CONTAINER_GETTER_DESC, true);
             // stack: component
             get.visitInsn(Opcodes.ARETURN);
             // if the native component container is null, we use the classic runtime way
@@ -167,36 +174,36 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
             // stack: componentProvider
             get.visitVarInsn(Opcodes.ALOAD, 0);
             // stack: componentProvider <this>
-            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmConstants.COMPONENT_PROVIDER, "getComponent", "(L" + CcaAsmConstants.COMPONENT_TYPE + ";)L" + CcaAsmConstants.COMPONENT +";", true);
+            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_PROVIDER, "getComponent", "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)L" + CcaAsmHelper.COMPONENT +";", true);
             // stack: component
             get.visitInsn(Opcodes.ARETURN);
             get.visitEnd();
 
             /* generate a Lazy field in StaticComponentTypes */
 
-            String typeConstantName = CcaAsmConstants.getTypeConstantName(identifier);
-            staticComponentTypesNode.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, typeConstantName, "L" + CcaAsmConstants.LAZY_COMPONENT_TYPE + ";", null, null);
+            String typeConstantName = CcaAsmHelper.getTypeConstantName(identifier);
+            staticComponentTypesNode.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, typeConstantName, "L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";", null, null);
             componentTypesInit.visitLdcInsn(identifier);
-            componentTypesInit.visitMethodInsn(Opcodes.INVOKESTATIC, CcaAsmConstants.LAZY_COMPONENT_TYPE, "create", "(Ljava/lang/String;)L" + CcaAsmConstants.LAZY_COMPONENT_TYPE + ";", false);
-            componentTypesInit.visitFieldInsn(Opcodes.PUTSTATIC, CcaAsmConstants.STATIC_COMPONENT_TYPES, typeConstantName, "L" + CcaAsmConstants.LAZY_COMPONENT_TYPE + ";");
+            componentTypesInit.visitMethodInsn(Opcodes.INVOKESTATIC, CcaAsmHelper.LAZY_COMPONENT_TYPE, "create", "(Ljava/lang/String;)L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";", false);
+            componentTypesInit.visitFieldInsn(Opcodes.PUTSTATIC, CcaAsmHelper.STATIC_COMPONENT_TYPES, typeConstantName, "L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";");
 
             /* generate the component container getter */
 
-            MethodVisitor methodWriter = staticContainerWriter.visitMethod(Opcodes.ACC_PUBLIC, CcaAsmConstants.getStaticStorageGetterName(identifier), CcaAsmConstants.STATIC_CONTAINER_GETTER_DESC, null, null);
+            MethodVisitor methodWriter = staticContainerWriter.visitMethod(Opcodes.ACC_PUBLIC, CcaAsmHelper.getStaticStorageGetterName(identifier), CcaAsmHelper.STATIC_CONTAINER_GETTER_DESC, null, null);
             methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
             // stack: <this>
             // get the generated lazy component type constant
-            methodWriter.visitFieldInsn(Opcodes.GETSTATIC, CcaAsmConstants.STATIC_COMPONENT_TYPES, CcaAsmConstants.getTypeConstantName(identifier), "L" + CcaAsmConstants.LAZY_COMPONENT_TYPE + ";");
+            methodWriter.visitFieldInsn(Opcodes.GETSTATIC, CcaAsmHelper.STATIC_COMPONENT_TYPES, CcaAsmHelper.getTypeConstantName(identifier), "L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";");
             // stack: <this> lazyComponentType
-            methodWriter.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmConstants.LAZY_COMPONENT_TYPE, "get", "()L" + CcaAsmConstants.COMPONENT_TYPE + ";", false);
+            methodWriter.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.LAZY_COMPONENT_TYPE, "get", "()L" + CcaAsmHelper.COMPONENT_TYPE + ";", false);
             // stack: <this> componentType
-            methodWriter.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmConstants.COMPONENT_CONTAINER, "get", "(L" + CcaAsmConstants.COMPONENT_TYPE + ";)L" + CcaAsmConstants.COMPONENT + ";", true);
+            methodWriter.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_CONTAINER, "get", "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)L" + CcaAsmHelper.COMPONENT + ";", true);
             // stack: component
             methodWriter.visitInsn(Opcodes.ARETURN);
             methodWriter.visitEnd();
         }
         staticContainerWriter.visitEnd();
-        CcaAsmHelper.generateClass(staticContainerWriter, CcaAsmConstants.STATIC_COMPONENT_CONTAINER);
+        CcaAsmHelper.generateClass(staticContainerWriter, CcaAsmHelper.STATIC_COMPONENT_CONTAINER);
         componentTypesInit.visitInsn(Opcodes.RETURN);
         componentTypesInit.visitEnd();
         Map<String, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>(componentTypeWriters.size());
@@ -204,7 +211,7 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
             @SuppressWarnings("unchecked") Class<? extends ComponentType<?>> ct = (Class<? extends ComponentType<?>>) CcaAsmHelper.generateClass(componentTypeWriter.node, componentTypeWriter.name);
             generatedComponentTypes.put(componentTypeWriter.identifier, ct);
         }
-        CcaAsmHelper.generateClass(staticComponentTypesNode, CcaAsmConstants.STATIC_COMPONENT_TYPES);
+        CcaAsmHelper.generateClass(staticComponentTypesNode, CcaAsmHelper.STATIC_COMPONENT_TYPES);
         return generatedComponentTypes;
     }
 

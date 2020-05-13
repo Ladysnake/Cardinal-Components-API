@@ -83,7 +83,7 @@ public class ComponentType<T extends Component> {
     }
 
     public final ObjectPath<ComponentProvider, T> asComponentPath() {
-        return c -> c.getComponent(this);
+        return this::get0;
     }
 
     /**

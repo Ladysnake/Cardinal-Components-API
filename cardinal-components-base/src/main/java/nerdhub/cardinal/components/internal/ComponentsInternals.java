@@ -26,6 +26,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
+import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.fabric.api.event.Event;
 
 import javax.annotation.Nonnull;
@@ -116,7 +117,7 @@ public final class ComponentsInternals {
                 (FeedbackContainerFactory<T, C>) factoryClass.getConstructor(Event[].class).newInstance((Object) events);
             return ret;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException("Failed to instantiate generated component factory", e);
+            throw new StaticComponentLoadingException("Failed to instantiate generated component factory", e);
         }
     }
 }
