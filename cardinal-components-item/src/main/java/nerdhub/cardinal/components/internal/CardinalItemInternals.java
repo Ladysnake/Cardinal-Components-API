@@ -25,15 +25,12 @@ package nerdhub.cardinal.components.internal;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
-import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-
-import java.lang.reflect.InvocationTargetException;
 
 public final class CardinalItemInternals {
     public static final Event<ItemComponentCallback> WILDCARD_ITEM_EVENT = createItemComponentsEvent();
@@ -56,16 +53,7 @@ public final class CardinalItemInternals {
     public static FeedbackContainerFactory<ItemStack, CopyableComponent<?>> createItemStackContainerFactory(Item item) {
         Identifier itemId = Registry.ITEM.getId(item);
         Class<?> factoryClass = StaticItemComponentPlugin.INSTANCE.getFactoryClass(itemId.toString());
-        @SuppressWarnings("unchecked") Event<ItemComponentCallback>[] componentEvents = new Event[] {WILDCARD_ITEM_EVENT, ((ItemCaller) item).cardinal_getItemComponentEvent()};
-        if (factoryClass == null) {
-            return new FeedbackContainerFactory<>(componentEvents);
-        }
-        try {
-            @SuppressWarnings("unchecked") FeedbackContainerFactory<ItemStack, CopyableComponent<?>> ret = (FeedbackContainerFactory<ItemStack, CopyableComponent<?>>) factoryClass.getConstructor(Event[].class).newInstance((Object) componentEvents);
-            return ret;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new StaticComponentLoadingException("Failed to instantiate generated component factory", e);
-        }
+        return ComponentsInternals.createFactory(factoryClass, WILDCARD_ITEM_EVENT, ((ItemCaller) item).cardinal_getItemComponentEvent());
     }
 
     @SuppressWarnings({"ConstantConditions", "unchecked", "rawtypes"})

@@ -23,10 +23,10 @@
 package nerdhub.cardinal.components.internal.world;
 
 import nerdhub.cardinal.components.api.WorldComponentFactory;
-import nerdhub.cardinal.components.internal.SimpleStaticComponentPlugin;
+import nerdhub.cardinal.components.internal.StaticComponentPluginBase;
 import net.fabricmc.loader.api.FabricLoader;
 
-public final class StaticWorldComponentPlugin extends SimpleStaticComponentPlugin {
+public final class StaticWorldComponentPlugin extends StaticComponentPluginBase {
     public static final String WORLD_IMPL_SUFFIX = "WorldImpl";
     public static final String WORLD_CLASS = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_1937");
 

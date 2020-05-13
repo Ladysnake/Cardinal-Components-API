@@ -101,8 +101,8 @@ public final class StaticEntityComponentPlugin implements StaticComponentPlugin 
                 this.componentFactories.getOrDefault(type, Collections.emptyMap()).forEach(compiled::putIfAbsent);
             }
             String implSuffix = getSuffix(entry.getKey());
-            Class<? extends ComponentContainer<?>> containerCls = CcaAsmHelper.defineContainer(compiled, implSuffix, entityType);
-            this.factoryClasses.put(entry.getKey(), CcaAsmHelper.defineSingleArgFactory(implSuffix, Type.getType(containerCls), entityType));
+            Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.defineContainer(compiled, implSuffix, entityType);
+            this.factoryClasses.put(entry.getKey(), StaticComponentPluginBase.defineSingleArgFactory(implSuffix, Type.getType(containerCls), entityType));
         }
     }
 }
