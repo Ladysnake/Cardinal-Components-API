@@ -20,11 +20,13 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.container;
+package nerdhub.cardinal.components.util.container;
 
 import com.google.common.base.Preconditions;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.util.container.AbstractComponentContainer;
+import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
 import nerdhub.cardinal.components.internal.SharedComponentSecrets;
 
 import javax.annotation.Nullable;
@@ -40,7 +42,7 @@ import java.util.function.BiConsumer;
  * in a sparse collection with a higher memory requirement than
  * other implementations like {@link FastComponentContainer}.
  *
- * <p> <b>Note that this implementation is not synchronized./b>
+ * <p> <b>Note that this implementation is not synchronized.</b>
  * If multiple threads access an indexed container concurrently, and at least one of the threads
  * modifies the container structurally, it must be synchronized externally.
  * (A structural modification is any operation that adds one or more mappings;
@@ -51,9 +53,7 @@ import java.util.function.BiConsumer;
  * @implNote The implementation is based on {@link java.util.EnumMap} and offers constant time
  * execution for all read operations. They may be faster than their {@link FastComponentContainer}
  * counterparts.
- * @deprecated if you want speed, use static ASM-generated component containers
  */
-@Deprecated
 public final class IndexedComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
     /**
      * All of the component types that can be stored in this container.

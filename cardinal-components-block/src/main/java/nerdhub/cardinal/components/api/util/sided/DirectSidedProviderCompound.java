@@ -23,8 +23,8 @@
 package nerdhub.cardinal.components.api.util.sided;
 
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.api.util.provider.FallBackComponentProvider;
-import nerdhub.cardinal.components.api.util.provider.SimpleComponentProvider;
+import nerdhub.cardinal.components.util.provider.FallBackComponentProvider;
+import nerdhub.cardinal.components.util.provider.SimpleComponentProvider;
 import net.minecraft.util.math.Direction;
 
 import javax.annotation.Nullable;

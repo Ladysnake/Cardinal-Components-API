@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util;
+package nerdhub.cardinal.components.util;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
@@ -56,7 +56,7 @@ public final class Components {
      * the corresponding component values are equal according to {@link Component#isComponentEqual}.
      */
     public static boolean areComponentsEqual(ComponentProvider accessor, ComponentProvider other) {
-        Set<ComponentType<? extends Component>> types = accessor.getComponentTypes();
+        Set<ComponentType<?>> types = accessor.getComponentTypes();
         if(types.size() == other.getComponentTypes().size()) {
             for(ComponentType<? extends Component> type : types) {
                 if(!other.hasComponent(type) || !type.get(accessor).isComponentEqual(type.get(other))) {
@@ -71,7 +71,9 @@ public final class Components {
     /**
      * Iterates over every component provided by {@code provider} and applies {@code op} to each
      * mapping.
+     * @deprecated use {@link ComponentProvider#forEachComponent(BiConsumer)}
      */
+    @Deprecated
     public static void forEach(ComponentProvider provider, BiConsumer<ComponentType<?>, Component> op) {
         provider.forEachComponent(op);
     }

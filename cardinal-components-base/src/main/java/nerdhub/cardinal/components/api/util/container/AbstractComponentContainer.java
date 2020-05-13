@@ -49,7 +49,6 @@ import java.util.AbstractMap;
  *
  * @see AbstractMap
  * @see FastComponentContainer
- * @see IndexedComponentContainer
  */
 public abstract class AbstractComponentContainer<C extends Component> extends AbstractMap<ComponentType<?>, C> implements ComponentContainer<C> {
 

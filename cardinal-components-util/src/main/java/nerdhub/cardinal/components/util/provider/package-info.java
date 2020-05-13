@@ -20,30 +20,13 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.mixins.common.item;
+/**
+ * This package includes several implementations of component providers, for use by custom API implementations
+ */
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package nerdhub.cardinal.components.util.provider;
 
-import nerdhub.cardinal.components.internal.CardinalItemInternals;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-@Mixin(ItemEntity.class)
-public abstract class MixinItemEntity {
-    @Shadow
-    public abstract ItemStack getStack();
-
-    @Inject(
-        method = "tryMerge(Lnet/minecraft/entity/ItemEntity;)V",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/ItemEntity;merge(Lnet/minecraft/entity/ItemEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/ItemEntity;Lnet/minecraft/item/ItemStack;)V"),
-        cancellable = true
-    )
-    private void stopDifferentComponentsMerging(ItemEntity other, CallbackInfo ci) {
-        if (CardinalItemInternals.areComponentsIncompatible(this.getStack(), other.getStack())) {
-            ci.cancel();
-        }
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;
