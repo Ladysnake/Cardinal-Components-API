@@ -26,6 +26,7 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.chunk.Chunk;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -42,6 +43,7 @@ import java.lang.annotation.Target;
  * If the factory method returns {@code null}, the chunk will not support that type of component
  * (cf. {@link ComponentProvider#hasComponent(ComponentType)}).
  */
+@ApiStatus.Experimental
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ChunkComponentFactory {
