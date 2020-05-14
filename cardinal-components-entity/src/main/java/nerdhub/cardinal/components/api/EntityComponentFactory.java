@@ -26,6 +26,7 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -44,6 +45,7 @@ import java.lang.annotation.Target;
  * If the factory method returns {@code null}, the entity will not support that type of component
  * (cf. {@link ComponentProvider#hasComponent(ComponentType)}).
  */
+@ApiStatus.Experimental
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EntityComponentFactory {

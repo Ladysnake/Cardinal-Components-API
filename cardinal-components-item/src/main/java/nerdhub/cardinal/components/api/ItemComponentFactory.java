@@ -23,12 +23,12 @@
 package nerdhub.cardinal.components.api;
 
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
-import javax.annotation.Nonnull;
-import javax.annotation.meta.TypeQualifierDefault;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -39,10 +39,13 @@ import java.lang.annotation.Target;
  * Applied to a method to declare it as a component factory for {@linkplain ItemStack item stacks}.
  *
  * <p>The annotated method must take either no arguments, or 1 argument of type {@link ItemStack}.
- * It must return a non-null {@link Component}.
+ * The return type must be either {@link Component} or a subclass.
+ *
+ * <p>When invoked, the factory can return either a {@link Component} of the right type, or {@code null}.
+ * If the factory method returns {@code null}, the stack will not support that type of component
+ * (cf. {@link ComponentProvider#hasComponent(ComponentType)}).
  */
-@Nonnull    // annotated methods must not return null
-@TypeQualifierDefault({ElementType.METHOD, ElementType.TYPE})
+@ApiStatus.Experimental
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ItemComponentFactory {
