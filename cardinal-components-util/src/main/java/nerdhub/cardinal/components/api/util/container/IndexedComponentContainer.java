@@ -20,13 +20,11 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.util.container;
+package nerdhub.cardinal.components.api.util.container;
 
 import com.google.common.base.Preconditions;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.util.container.AbstractComponentContainer;
-import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
 import nerdhub.cardinal.components.internal.SharedComponentSecrets;
 
 import javax.annotation.Nullable;

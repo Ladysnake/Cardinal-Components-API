@@ -31,7 +31,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
-import nerdhub.cardinal.components.util.container.IndexedComponentContainer;
+import nerdhub.cardinal.components.api.util.container.IndexedComponentContainer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import org.junit.jupiter.api.Assertions;
