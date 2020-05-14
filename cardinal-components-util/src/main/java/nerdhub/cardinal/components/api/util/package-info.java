@@ -22,8 +22,6 @@
  */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.api.util.component;
-
-import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
+package nerdhub.cardinal.components.api.util;
 
 import javax.annotation.ParametersAreNonnullByDefault;

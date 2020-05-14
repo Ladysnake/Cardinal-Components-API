@@ -20,13 +20,8 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/**
- * This package includes several implementations of component providers, for use by custom API implementations
- */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.util.provider;
-
-import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
+package nerdhub.cardinal.components.api.util;
 
 import javax.annotation.ParametersAreNonnullByDefault;

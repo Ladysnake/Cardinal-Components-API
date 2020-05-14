@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.util;
+package nerdhub.cardinal.components.api.util;
 
 import javax.annotation.Nullable;
 import java.util.NoSuchElementException;

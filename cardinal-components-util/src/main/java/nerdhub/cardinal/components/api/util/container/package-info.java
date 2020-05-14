@@ -22,7 +22,7 @@
  */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.util.container;
+package nerdhub.cardinal.components.api.util.container;
 
 import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
