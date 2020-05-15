@@ -22,7 +22,7 @@
  */
 package nerdhub.cardinal.components.internal;
 
-import nerdhub.cardinal.components.api.LevelComponentFactory;
+import nerdhub.cardinal.components.api.component.LevelComponentFactory;
 import net.fabricmc.loader.api.FabricLoader;
 
 public final class StaticLevelComponentPlugin extends StaticComponentPluginBase {

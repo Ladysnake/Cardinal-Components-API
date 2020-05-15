@@ -22,8 +22,8 @@
  */
 package nerdhub.cardinal.components.internal;
 
-import nerdhub.cardinal.components.api.ItemComponentFactory;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ItemComponentFactory;
 import nerdhub.cardinal.components.internal.asm.AnnotationData;
 import nerdhub.cardinal.components.internal.asm.MethodData;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;

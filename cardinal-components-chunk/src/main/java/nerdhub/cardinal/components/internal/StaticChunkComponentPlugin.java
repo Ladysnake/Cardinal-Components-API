@@ -22,7 +22,7 @@
  */
 package nerdhub.cardinal.components.internal;
 
-import nerdhub.cardinal.components.api.ChunkComponentFactory;
+import nerdhub.cardinal.components.api.component.ChunkComponentFactory;
 import net.fabricmc.loader.api.FabricLoader;
 
 public final class StaticChunkComponentPlugin extends StaticComponentPluginBase {
