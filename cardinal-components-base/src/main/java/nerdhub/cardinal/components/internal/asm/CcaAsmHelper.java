@@ -33,16 +33,20 @@ import org.objectweb.asm.util.CheckClassAdapter;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.ProtectionDomain;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public final class CcaAsmHelper {
+    private static final sun.misc.Unsafe UNSAFE;
+
     /**
      * If {@code true}, any class generated through {@link #generateClass(ClassWriter, String)} will
      * be checked and written to disk. Highly recommended when editing methods in this class.
@@ -67,6 +71,8 @@ public final class CcaAsmHelper {
     public static final String STATIC_CONTAINER_FACTORY = "nerdhub/cardinal/components/_generated_/GeneratedContainerFactory";
 
     private static final Map<Type, TypeData> typeCache = new HashMap<>();
+    private static final ClassLoader CLASSLOADER = CcaAsmHelper.class.getClassLoader();
+    private static final ProtectionDomain PROTECTION_DOMAIN = CcaAsmHelper.class.getProtectionDomain();
 
     private static TypeData getTypeData(Type type) throws IOException {
         TypeData t = typeCache.get(type);
@@ -109,25 +115,26 @@ public final class CcaAsmHelper {
         return getTypeData(type).getNode();
     }
 
-    public static Class<?> generateClass(ClassNode classNode, String name) throws IOException {
+    public static Class<?> generateClass(ClassNode classNode) throws IOException {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         classNode.accept(writer);
-        return generateClass(writer, name);
+        return generateClass(writer, classNode.name);
     }
 
-    private static Class<?> generateClass(ClassWriter classWriter, String name) throws IOException {
+    private static Class<?> generateClass(ClassWriter classWriter, String className) throws IOException {
         try {
             byte[] bytes = classWriter.toByteArray();
             if (DEBUG_CLASSES) {
-                new ClassReader(bytes).accept(new CheckClassAdapter(null), 0);
-                Path path = Paths.get(name + ".class");
+                ClassReader classReader = new ClassReader(bytes);
+                classReader.accept(new CheckClassAdapter(null), 0);
+                Path path = Paths.get(classReader.getClassName() + ".class");
                 Files.createDirectories(path.getParent());
                 Files.write(path, bytes);
             }
-            return CcaClassLoader.INSTANCE.define(name.replace('/', '.'), bytes);
+            return UNSAFE.defineClass(className.replace('/', '.'), bytes, 0, bytes.length, CLASSLOADER, PROTECTION_DOMAIN);
         } catch (IOException | IllegalArgumentException | IllegalStateException e) {
             // IllegalStateException and IllegalArgumentException can be thrown by CheckClassAdapter
-            throw new IOException("Failed to generate class " + name, e);
+            throw new IOException("Failed to generate class " + className, e);
         }
     }
 
@@ -152,5 +159,15 @@ public final class CcaAsmHelper {
     @Nonnull
     public static String getStaticStorageGetterName(String identifier) {
         return "get$" + getJavaIdentifierName(identifier);
+    }
+
+    static {
+        try {
+            Field theUnsafe = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+            theUnsafe.setAccessible(true);
+            UNSAFE = (sun.misc.Unsafe) theUnsafe.get(null);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            throw new StaticComponentLoadingException("Failed to retrieve Unsafe", e);
+        }
     }
 }

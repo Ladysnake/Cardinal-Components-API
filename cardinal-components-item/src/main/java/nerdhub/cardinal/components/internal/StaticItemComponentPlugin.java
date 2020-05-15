@@ -102,8 +102,8 @@ public final class StaticItemComponentPlugin implements StaticComponentPlugin {
             Map<String, MethodData> compiled = new HashMap<>(entry.getValue());
             wildcardMap.forEach(compiled::putIfAbsent);
             String implSuffix = getSuffix(entry.getKey());
-            Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.defineContainer(compiled, implSuffix, itemType);
-            this.factoryClasses.put(entry.getKey(), StaticComponentPluginBase.defineSingleArgFactory(implSuffix, Type.getType(containerCls), itemType));
+            Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.spinComponentContainer(compiled, implSuffix, itemType);
+            this.factoryClasses.put(entry.getKey(), StaticComponentPluginBase.spinSingleArgFactory(implSuffix, Type.getType(containerCls), itemType));
         }
     }
 }

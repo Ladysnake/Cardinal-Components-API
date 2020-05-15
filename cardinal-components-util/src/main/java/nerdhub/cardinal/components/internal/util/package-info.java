@@ -20,19 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.internal.asm;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package nerdhub.cardinal.components.internal.util;
 
-/**
- * A class loader allowing the creation of any class from its bytecode, as well as its injection into the classpath
- */
-public class CcaClassLoader extends ClassLoader {
-    public static final CcaClassLoader INSTANCE = new CcaClassLoader();
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-    private CcaClassLoader() {
-        super(CcaClassLoader.class.getClassLoader());
-    }
-
-    public Class<?> define(String name, byte[] data) {
-        return defineClass(name, data, 0, data.length);
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;
