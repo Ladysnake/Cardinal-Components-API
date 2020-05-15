@@ -203,15 +203,15 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
             methodWriter.visitEnd();
         }
         staticContainerWriter.visitEnd();
-        CcaAsmHelper.generateClass(staticContainerWriter, CcaAsmHelper.STATIC_COMPONENT_CONTAINER);
+        CcaAsmHelper.generateClass(staticContainerWriter);
         componentTypesInit.visitInsn(Opcodes.RETURN);
         componentTypesInit.visitEnd();
         Map<String, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>(componentTypeWriters.size());
         for (ComponentTypeWriter componentTypeWriter : componentTypeWriters) {
-            @SuppressWarnings("unchecked") Class<? extends ComponentType<?>> ct = (Class<? extends ComponentType<?>>) CcaAsmHelper.generateClass(componentTypeWriter.node, componentTypeWriter.name);
+            @SuppressWarnings("unchecked") Class<? extends ComponentType<?>> ct = (Class<? extends ComponentType<?>>) CcaAsmHelper.generateClass(componentTypeWriter.node);
             generatedComponentTypes.put(componentTypeWriter.identifier, ct);
         }
-        CcaAsmHelper.generateClass(staticComponentTypesNode, CcaAsmHelper.STATIC_COMPONENT_TYPES);
+        CcaAsmHelper.generateClass(staticComponentTypesNode);
         return generatedComponentTypes;
     }
 

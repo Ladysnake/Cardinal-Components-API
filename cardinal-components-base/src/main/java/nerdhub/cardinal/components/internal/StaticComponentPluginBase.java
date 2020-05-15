@@ -75,7 +75,7 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
      *                 arguments are valid.</em>
      * @return the generated container class
      */
-    public static Class<? extends ComponentContainer<?>> defineContainer(Map<String, MethodData> componentFactories, String implNameSuffix, Type... ctorArgs) throws IOException {
+    public static Class<? extends ComponentContainer<?>> spinComponentContainer(Map<String, MethodData> componentFactories, String implNameSuffix, Type... ctorArgs) throws IOException {
         checkValidJavaIdentifier(implNameSuffix);
         String containerImplName = CcaAsmHelper.STATIC_COMPONENT_CONTAINER + '_' + implNameSuffix;
         Type[] actualCtorArgs = new Type[ctorArgs.length + 1];
@@ -209,7 +209,7 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
         canBeAssigned.visitLabel(canBeAssignedEnd);
         canBeAssigned.visitInsn(Opcodes.IRETURN);
         canBeAssigned.visitEnd();
-        @SuppressWarnings("unchecked") Class<? extends ComponentContainer<?>> ret = (Class<? extends ComponentContainer<?>>) CcaAsmHelper.generateClass(classNode, containerImplName);
+        @SuppressWarnings("unchecked") Class<? extends ComponentContainer<?>> ret = (Class<? extends ComponentContainer<?>>) CcaAsmHelper.generateClass(classNode);
         return ret;
     }
 
@@ -223,7 +223,7 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
      * @param containerImpl  the implementation type of containers that is to be instantiated by the generated factories
      * @param factoryArg     the type of the single argument taken by the {@link ComponentContainer} constructor
      */
-    public static Class<? extends FeedbackContainerFactory<?, ?>> defineSingleArgFactory(String implNameSuffix, Type containerImpl, Type factoryArg) throws IOException {
+    public static Class<? extends FeedbackContainerFactory<?, ?>> spinSingleArgFactory(String implNameSuffix, Type containerImpl, Type factoryArg) throws IOException {
         checkValidJavaIdentifier(implNameSuffix);
         String containerImplName = containerImpl.getInternalName();
         ClassNode containerFactoryWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
@@ -246,7 +246,7 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
         createContainer.visitInsn(Opcodes.ARETURN);
         createContainer.visitEnd();
         containerFactoryWriter.visitEnd();
-        @SuppressWarnings("unchecked") Class<? extends FeedbackContainerFactory<?, ?>> ret = (Class<? extends FeedbackContainerFactory<?, ?>>) CcaAsmHelper.generateClass(containerFactoryWriter, factoryImplName);
+        @SuppressWarnings("unchecked") Class<? extends FeedbackContainerFactory<?, ?>> ret = (Class<? extends FeedbackContainerFactory<?, ?>>) CcaAsmHelper.generateClass(containerFactoryWriter);
         return ret;
     }
 
@@ -294,7 +294,7 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
     @Override
     public void generate() throws IOException {
         Type levelType = Type.getObjectType(this.providerClass.replace('.', '/'));
-        Class<? extends ComponentContainer<?>> containerCls = defineContainer(this.componentFactories, this.implSuffix, levelType);
-        this.factoryClass = defineSingleArgFactory(this.implSuffix, Type.getType(containerCls), levelType);
+        Class<? extends ComponentContainer<?>> containerCls = spinComponentContainer(this.componentFactories, this.implSuffix, levelType);
+        this.factoryClass = spinSingleArgFactory(this.implSuffix, Type.getType(containerCls), levelType);
     }
 }

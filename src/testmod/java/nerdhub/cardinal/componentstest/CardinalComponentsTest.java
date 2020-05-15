@@ -22,8 +22,13 @@
  */
 package nerdhub.cardinal.componentstest;
 
+import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ComponentContainerMetafactory;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
+import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -31,11 +36,17 @@ import net.minecraft.block.Material;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import javax.annotation.Nullable;
+import java.util.UUID;
+import java.util.function.Function;
 
 public class CardinalComponentsTest {
 
@@ -56,7 +67,41 @@ public class CardinalComponentsTest {
         LOGGER.info("Hello, Components!");
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
         EntityComponents.setRespawnCopyStrategy(CardinalTestComponents.VITA, RespawnCopyStrategy.ALWAYS_COPY);
+        LOGGER.info(ComponentContainerMetafactory.staticMetafactory(
+            new Identifier(CardinalTestComponents.CUSTOM_PROVIDER_1),
+            TestContainerFactory.class
+        ).create(UUID.randomUUID(), null));
+        try {
+            LOGGER.info(ComponentContainerMetafactory.staticMetafactory(
+                new Identifier(CardinalTestComponents.CUSTOM_PROVIDER_1),
+                TestContainerFactory.class
+            ).create(UUID.randomUUID(), null));
+            assert false : "Only one factory should be created for any given provider type";
+        } catch (StaticComponentLoadingException ignored) { }
+        try {
+            LOGGER.info(ComponentContainerMetafactory.<Function<UUID, ComponentContainer<SyncedComponent>>>staticMetafactory(
+                new Identifier(CardinalTestComponents.CUSTOM_PROVIDER_2),
+                Function.class,
+                SyncedComponent.class,
+                UUID.class
+            ).apply(UUID.randomUUID()));
+            assert false : "Registered factory does not return " + SyncedComponent.class;
+        } catch (StaticComponentLoadingException ignored) { }
+        LOGGER.info(ComponentContainerMetafactory.<Function<UUID, ComponentContainer<CopyableComponent<?>>>>staticMetafactory(
+            new Identifier(CardinalTestComponents.CUSTOM_PROVIDER_2),
+            Function.class,
+            CopyableComponent.class,
+            UUID.class
+        ).apply(UUID.randomUUID()));
+        LOGGER.info(ComponentContainerMetafactory.dynamicMetafactory(
+            new Identifier(CardinalTestComponents.CUSTOM_PROVIDER_3),
+            CopyableComponent.class,
+            UUID.class
+        ).apply(UUID.randomUUID()));
     }
 
+    public interface TestContainerFactory {
+        ComponentContainer<?> create(UUID u, @Nullable PlayerEntity p);
+    }
 }
 

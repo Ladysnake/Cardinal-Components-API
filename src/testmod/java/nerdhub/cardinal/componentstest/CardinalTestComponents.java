@@ -24,6 +24,7 @@ package nerdhub.cardinal.componentstest;
 
 import nerdhub.cardinal.components.api.*;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.GenericComponentFactory;
 import nerdhub.cardinal.componentstest.vita.*;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.PhantomEntity;
@@ -38,6 +39,14 @@ import javax.annotation.Nullable;
 public final class CardinalTestComponents {
     public static final String VITA_ID = "componenttest:vita";
     public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(VITA_ID), Vita.class);
+    public static final String CUSTOM_PROVIDER_1 = "componenttest:custom/1";
+    public static final String CUSTOM_PROVIDER_2 = "componenttest:custom/2";
+    public static final String CUSTOM_PROVIDER_3 = "componenttest:custom/3";
+
+    @GenericComponentFactory(value = VITA_ID, targets = {CUSTOM_PROVIDER_1, CUSTOM_PROVIDER_2, CUSTOM_PROVIDER_3})
+    public static BaseVita createForThirdParty() {
+        return new BaseVita();
+    }
 
     @LevelComponentFactory(VITA_ID)
     public static Component createForSave() {
