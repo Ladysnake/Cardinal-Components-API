@@ -22,7 +22,7 @@
  */
 package nerdhub.cardinal.components.internal.world;
 
-import nerdhub.cardinal.components.api.WorldComponentFactory;
+import nerdhub.cardinal.components.api.component.WorldComponentFactory;
 import nerdhub.cardinal.components.internal.StaticComponentPluginBase;
 import net.fabricmc.loader.api.FabricLoader;
 

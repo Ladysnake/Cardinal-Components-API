@@ -22,9 +22,9 @@
  */
 package nerdhub.cardinal.componentstest;
 
-import nerdhub.cardinal.components.api.*;
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.GenericComponentFactory;
+import nerdhub.cardinal.components.api.ComponentRegistry;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.*;
 import nerdhub.cardinal.componentstest.vita.*;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.PhantomEntity;
