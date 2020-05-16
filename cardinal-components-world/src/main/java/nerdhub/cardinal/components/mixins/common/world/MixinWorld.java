@@ -31,8 +31,6 @@ import nerdhub.cardinal.components.internal.world.StaticWorldComponentPlugin;
 import net.minecraft.class_5269;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkManager;
-import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -41,7 +39,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nonnull;
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 @Mixin(World.class)
@@ -54,7 +51,7 @@ public abstract class MixinWorld implements InternalComponentProvider {
     protected ComponentContainer<?> components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void initComponents(class_5269 levelProperties, DimensionType dimensionType, BiFunction<World, Dimension, ChunkManager> chunkManagerProvider, Supplier<Profiler> profiler, boolean isClient, CallbackInfo ci) {
+    private void initComponents(class_5269 arg, DimensionType dimensionType, Supplier<Profiler> supplier, boolean bl, boolean bl2, long l, CallbackInfo ci) {
         this.components = componentContainerFactory.create((World) (Object) this);
     }
 

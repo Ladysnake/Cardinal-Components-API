@@ -29,6 +29,7 @@ import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -47,7 +48,7 @@ public abstract class MixinServerWorld extends MixinWorld {
     private static final String PERSISTENT_STATE_KEY = "cardinal_world_components";
 
     @Inject(at = @At("RETURN"), method = "<init>")
-    private void constructor(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, class_5268 properties, DimensionType dimensionType, WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci) {
+    private void constructor(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, class_5268 properties, DimensionType dimensionType, WorldGenerationProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean bl, long l, CallbackInfo ci) {
         PersistentStateManager persistentStateManager = this.getPersistentStateManager();
         persistentStateManager.getOrCreate(() -> new ComponentPersistentState(PERSISTENT_STATE_KEY, this.components), PERSISTENT_STATE_KEY);
     }
