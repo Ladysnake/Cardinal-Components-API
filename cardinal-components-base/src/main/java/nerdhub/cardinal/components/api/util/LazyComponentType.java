@@ -26,8 +26,8 @@ import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.util.Identifier;
-
-import java.util.Objects;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 public final class LazyComponentType {
     public static LazyComponentType create(String id) {
@@ -45,12 +45,12 @@ public final class LazyComponentType {
         this.componentId = componentId;
     }
 
-    public ComponentType<?> get() {
-        if (this.value == null) {
-            this.value = Objects.requireNonNull(ComponentRegistry.INSTANCE.get(this.componentId), "The component type for '" + this.componentId  +"'  was not registered");
-        }
+    public boolean isRegistered() {
+        return this.tryGet(false) != null;
+    }
 
-        return this.value;
+    public ComponentType<?> get() {
+        return this.tryGet(true);
     }
 
     public <T extends Component> ComponentType<T> get(Class<T> type) {
@@ -59,5 +59,20 @@ public final class LazyComponentType {
             throw new IllegalStateException("Queried type " + type + " mismatches with registered type " +ret.getComponentClass());
         }
         return ret;
+    }
+
+    @Nullable
+    @Contract("true -> !null")
+    private ComponentType<?> tryGet(boolean enforceInitialized) {
+        ComponentType<?> value = this.value;
+        if (value == null) {
+            ComponentType<?> newValue = ComponentRegistry.INSTANCE.get(this.componentId);
+            if (enforceInitialized && newValue == null) {
+                throw new IllegalStateException("The component type for '" + this.componentId  +"'  was not registered");
+            }
+            this.value = newValue;
+            return newValue;
+        }
+        return value;
     }
 }
