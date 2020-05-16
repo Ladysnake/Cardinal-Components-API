@@ -1,5 +1,5 @@
 # Cardinal-Components-API
-A components API for Fabric that is easy, modular, and fast.  
+A components API for Fabric that is easy, modular, and extremely fast.  
 *Cardinal Components API is a library for Minecraft mods to create data
 components that can be attached to various providers. Those components
 provide a standardized interface for mods to interact with otherwise opaque
@@ -8,12 +8,13 @@ objects and behaviours, thereby helping both mod creation and compatibility.*
 
 **TL;DR: It allows you to attach data to things**
 
-## Adding the API to your buildscript (loom 0.2.6):
+## Adding the API to your buildscript (loom 0.2.6+):
+Latest versions of Cardinal Components API are available on Bintray:
 ```gradle
 repositories {
     maven {
-        name = "Jitpack"
-        url = "https://jitpack.io"
+        name = "Ladysnake Libs"
+        url = 'https://dl.bintray.com/ladysnake/libs'
     }
 }
 
@@ -28,7 +29,7 @@ dependencies {
 You can find the current version of the API in the [releases](https://github.com/OnyxStudios/Cardinal-Components-API/releases) tab of the repository on Github.
 
 Cardinal Components API is split into several modules. To depend on the all-encompassing master jar, use the dependency string
-`io.github.OnyxStudios.Cardinal-Components-API:Cardinal-Components-API:<VERSION>`. That artifact bundles every module, but often all are not required for a project. Individual module names can be found [below](#modules).
+`io.github.OnyxStudios.Cardinal-Components-API:<VERSION>`. That artifact bundles every module, but you often do not need all of them for a project. Individual module names can be found [below](#modules).
 
 Example:
 ```gradle
@@ -88,6 +89,20 @@ public static final ComponentType<IntComponent> MAGIK =
 
 ## Modules
 
+### Base
+
+This module defines the component framework, with the base common API and implementation. *Any application that uses Cardinal Components depends on this module*.
+
+**module ref:** `cardinal-components-base`
+
+### Util
+
+This module contains some utilities for more advanced component interaction. It can be notably use to create your own providers.
+
+**module ref:** `cardinal-components-util`
+
+------
+
 Cardinal Components API offers component provider implementations for a few vanilla types, each in its own module:
 
 ### Entities
@@ -109,7 +124,7 @@ EntityComponentCallback.event(PlayerEntity.class).register((player, components) 
 EntityComponents.setRespawnCopyStrat(MAGIK, RespawnCopyStrategy.INVENTORY);
 ```
 
-*module: cardinal-components-entity*
+**module ref:**  `cardinal-components-entity`
 
 ### Item Stacks
 
@@ -128,7 +143,7 @@ If you have issues when attaching components to item stacks, it usually means yo
 ItemComponentCallback.event(Items.DIAMOND_HOE).register((stack, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
 
-*module: cardinal-components-item*
+**module ref:** `cardinal-components-item`
 
 ### Worlds
 
@@ -143,7 +158,7 @@ and [`WorldSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-
 WorldComponentCallback.EVENT.register((world, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
 
-*module: cardinal-components-world*
+**module ref:** `cardinal-components-world`
 
 ### Levels
 
@@ -159,7 +174,7 @@ and [`LevelSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-
 LevelComponentCallback.EVENT.register((levelProperties, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
 
-*module: cardinal-components-level*
+**module ref:** `cardinal-components-level`
 
 ### Chunks
 
@@ -169,6 +184,7 @@ help of the [`SyncedComponent`](https://github.com/OnyxStudios/Cardinal-Componen
 and [`ChunkSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-chunk/src/main/java/nerdhub/cardinal/components/api/util/sync/ChunkSyncedComponent.java) interfaces.
 
 **Notes:**
+
 - `EmptyChunk`: empty chunks never expose any components, no matter what was originally attached to them.
 As such, when chunk components are queried on the client, one should make sure the chunk is loaded, or use
 `ComponentType#maybeGet` to retrieve a component.
@@ -179,7 +195,7 @@ As such, when chunk components are queried on the client, one should make sure t
 ChunkComponentCallback.EVENT.register((chunk, components) -> components.put(MAGIK, new RandomIntComponent()));
 ```
 
-*module: cardinal-components-chunk*
+**module ref:** `cardinal-components-chunk`
 
 ### Blocks
 
@@ -194,7 +210,7 @@ Components are entirely compatible with [LibBlockAttributes](https://github.com/
 Since `Component` is an interface, any attribute instance can easily implement it. Conversely, making an `Attribute`
 for an existing `Component` is as simple as calling `Attributes.create(MyComponent.class)`.
 
-*module: cardinal-components-block*
+**module ref:** `cardinal-components-block`
 
 
 ## Test Mod
