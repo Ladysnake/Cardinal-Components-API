@@ -23,10 +23,12 @@
 /**
  * Internal classes. Should never be referenced from other projects.
  */
+@ApiStatus.Internal
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.ParametersAreNonnullByDefault;

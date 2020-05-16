@@ -27,9 +27,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.PersistentState;
 
 public class ComponentPersistentState extends PersistentState {
-    private final ComponentContainer components;
+    private final ComponentContainer<?> components;
 
-    public ComponentPersistentState(String id, ComponentContainer components) {
+    public ComponentPersistentState(String id, ComponentContainer<?> components) {
         super(id);
         this.components = components;
     }

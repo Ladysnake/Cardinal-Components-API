@@ -98,6 +98,10 @@ public class CardinalComponentsTest {
             CopyableComponent.class,
             UUID.class
         ).apply(UUID.randomUUID()));
+        LOGGER.info(ComponentContainerMetafactory.staticMetafactory(
+            new Identifier("componenttest:no_factory"),
+            TestContainerFactory.class
+        ).create(UUID.randomUUID(), null));
     }
 
     public interface TestContainerFactory {

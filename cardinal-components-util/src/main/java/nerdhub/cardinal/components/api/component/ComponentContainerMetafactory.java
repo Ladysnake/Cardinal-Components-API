@@ -5,9 +5,11 @@ import nerdhub.cardinal.components.api.event.ComponentCallback;
 import nerdhub.cardinal.components.internal.util.ComponentContainerMetafactoryImpl;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Function;
 
+@ApiStatus.Experimental
 public final class ComponentContainerMetafactory {
     /**
      * Creates a {@link ComponentContainer} factory implementing a functional interface.

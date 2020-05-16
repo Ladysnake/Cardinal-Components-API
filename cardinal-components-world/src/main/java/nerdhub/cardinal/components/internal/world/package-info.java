@@ -23,7 +23,7 @@
 @ApiStatus.Internal
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.internal.util;
+package nerdhub.cardinal.components.internal.world;
 
 import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.ApiStatus;
