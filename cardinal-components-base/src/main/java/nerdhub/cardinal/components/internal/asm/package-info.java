@@ -20,10 +20,13 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+/**
+ * Internal classes. Should never be referenced from other projects.
+ */
 @ApiStatus.Internal
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.internal.util;
+package nerdhub.cardinal.components.internal.asm;
 
 import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.ApiStatus;

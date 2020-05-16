@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.internal.asm;
 
+import org.jetbrains.annotations.Contract;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -89,8 +90,10 @@ public final class AnnotationData {
         return castUnsafe(type, this.annotationData.get(key));
     }
 
+    @Nullable
+    @Contract("_, null -> null")
     @SuppressWarnings("unchecked")
-    private static <T> T castUnsafe(Class<? super T> type, Object ret) {
+    private static <T> T castUnsafe(Class<? super T> type, @Nullable Object ret) {
         return (T) type.cast(ret);
     }
 
