@@ -1,4 +1,17 @@
 ------------------------------------------------------
+Version 2.4.0
+------------------------------------------------------
+**Backwards-compatibility note: while this release is compatible with older applications, some classes have been moved to a new module called `cardinal-components-util`. If you are missing some types, or if you use the `cardinal-components-block` module, you need to add a dependency on that module.**
+
+- Updated world and level modules to MC 1.16
+- Added statically declared components (**experimental feature !**)
+  - Developers can use `-Dcca.debug.asm=true` to their VM options to help debug CCA's issues with static component generation
+- Added a new module - `cardinal-components-util`
+  - Most classes that were not essential to CCA working got moved from `cardinal-components-base` to that module
+- Added `LazyComponentType`, allowing mods to retrieve a `ComponentType` handle before it is registered
+- It is no longer possible for a `ComponentCallback` to override an existing component
+
+------------------------------------------------------
 Version 2.3.5
 ------------------------------------------------------
 - Fixed thrown items with different components being able to merge
