@@ -42,6 +42,7 @@ import java.lang.annotation.Target;
  * <p>When invoked, the factory can return either a {@link Component} of the right type, or {@code null}.
  * If the factory method returns {@code null}, the world object will not support that type of component
  * (cf. {@link ComponentProvider#hasComponent(ComponentType)}).
+ * @since 2.4.0
  */
 @ApiStatus.Experimental
 @Target(ElementType.METHOD)
