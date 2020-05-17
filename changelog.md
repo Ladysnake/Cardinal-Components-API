@@ -1,7 +1,10 @@
 ------------------------------------------------------
 Version 2.4.0
 ------------------------------------------------------
-**Backwards-compatibility note: while this release is compatible with older applications, some classes have been moved to a new module called `cardinal-components-util`. If you are missing some types, or if you use the `cardinal-components-block` module, you need to add a dependency on that module.**
+**Backwards-compatibility note: while this release is compatible with older applications, 
+some classes have been moved to a new module called `cardinal-components-util`. 
+If you are missing some types, or if you use the `cardinal-components-block` module, 
+you need to add a dependency on that module.**
 
 - Updated world and level modules to MC 1.16
 - Added statically declared components (**experimental feature !**)
