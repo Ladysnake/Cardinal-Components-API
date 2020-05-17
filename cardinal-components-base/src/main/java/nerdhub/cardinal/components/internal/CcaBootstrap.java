@@ -28,7 +28,6 @@ import nerdhub.cardinal.components.internal.asm.FactoryClassScanner;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.fabricmc.loader.api.metadata.CustomValue;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
@@ -39,31 +38,44 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
 
-public final class CcaBootstrap implements PreLaunchEntrypoint {
+public final class CcaBootstrap {
 
     public static final CcaBootstrap INSTANCE = new CcaBootstrap();
     public static final String COMPONENT_TYPE_INIT_DESC = Type.getMethodDescriptor(Type.VOID_TYPE, Type.getObjectType(CcaAsmHelper.IDENTIFIER), Type.getType(Class.class), Type.INT_TYPE);
     public static final String COMPONENT_TYPE_GET0_DESC = "(L" + CcaAsmHelper.COMPONENT_PROVIDER + ";)L" + CcaAsmHelper.COMPONENT + ";";
 
-    private final Map</*Identifier*/ String, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>();
+    @Nullable private Map</*Identifier*/ String, Class<? extends ComponentType<?>>> generatedComponentTypes = null;
+    private boolean loading = false;
 
     @Nullable
     public Class<? extends ComponentType<?>> getGeneratedComponentTypeClass(String componentId) {
+        this.ensureInitialized();
+        assert this.generatedComponentTypes != null;
         return this.generatedComponentTypes.get(componentId);
     }
 
-    @Override
-    public void onPreLaunch() {
+    public void ensureInitialized() {
+        if (this.generatedComponentTypes == null) {
+            this.onPreLaunch();
+        }
+    }
+
+    private void onPreLaunch() {
+        if (this.loading) {
+            throw new IllegalStateException("Circular loading issue, a mod is probably referencing a ComponentType in the wrong place");
+        }
+        this.loading = true;
         try {
             List<StaticComponentPlugin> staticProviders = FabricLoader.getInstance().getEntrypoints("cardinal-components-api:static-provider", StaticComponentPlugin.class);
             Map<String, StaticComponentPlugin> staticProviderAnnotations = this.collectAnnotations(staticProviders);
             Set<String> staticComponentTypes = this.process(staticProviderAnnotations);
-            this.generatedComponentTypes.putAll(this.defineStaticComponentTypes(staticComponentTypes));
+            this.generatedComponentTypes = this.spinStaticComponentTypes(staticComponentTypes);
             this.generateSpecializedContainers(staticProviders);
         } catch (IOException | UncheckedIOException e) {
             throw new StaticComponentLoadingException("Failed to load statically defined components", e);
         } finally {
             CcaAsmHelper.clearCache();
+            this.loading = false;
         }
     }
 
@@ -113,18 +125,16 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
      * @param staticComponentTypes the set of all statically declared {@link ComponentType} ids
      * @return a map of {@link ComponentType} ids to specialized implementations
      */
-    private Map<String, Class<? extends ComponentType<?>>> defineStaticComponentTypes(Set<String> staticComponentTypes) throws IOException {
+    private Map<String, Class<? extends ComponentType<?>>> spinStaticComponentTypes(Set<String> staticComponentTypes) throws IOException {
         ClassNode staticContainerWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
         ClassNode staticComponentTypesNode = new ClassNode(CcaAsmHelper.ASM_VERSION);
         class ComponentTypeWriter {
             private final ClassNode node;
             private final String identifier;
-            private final String name;
 
-            private ComponentTypeWriter(ClassNode node, String identifier, String name) {
+            private ComponentTypeWriter(ClassNode node, String identifier) {
                 this.node = node;
                 this.identifier = identifier;
-                this.name = name;
             }
         }
         List<ComponentTypeWriter> componentTypeWriters = new ArrayList<>(staticComponentTypes.size());
@@ -136,7 +146,7 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
 
             ClassNode componentTypeWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
             String componentTypeName = CcaAsmHelper.getComponentTypeName(identifier);
-            componentTypeWriters.add(new ComponentTypeWriter(componentTypeWriter, identifier, componentTypeName));
+            componentTypeWriters.add(new ComponentTypeWriter(componentTypeWriter, identifier));
             componentTypeWriter.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, componentTypeName, null, CcaAsmHelper.COMPONENT_TYPE, null);
 
             MethodVisitor init = componentTypeWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", COMPONENT_TYPE_INIT_DESC, null, null);

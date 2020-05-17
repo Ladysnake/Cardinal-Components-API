@@ -25,6 +25,7 @@ package nerdhub.cardinal.components.internal.util;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.GenericComponentFactory;
+import nerdhub.cardinal.components.internal.CcaBootstrap;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
 import nerdhub.cardinal.components.internal.StaticComponentPlugin;
 import nerdhub.cardinal.components.internal.StaticComponentPluginBase;
@@ -50,6 +51,7 @@ public final class StaticGenericComponentPlugin implements StaticComponentPlugin
     private final Set<String> claimedFactories = new LinkedHashSet<>();
 
     Class<? extends ComponentContainer<?>> spinComponentContainer(String genericTypeId, Class<? extends Component> expectedComponentClass, Class<?>... argClasses) throws IOException {
+        CcaBootstrap.INSTANCE.ensureInitialized();
         Type rType = Type.getType(expectedComponentClass);
         Type[] args = new Type[argClasses.length];
         for (int i = 0; i < argClasses.length; i++) {

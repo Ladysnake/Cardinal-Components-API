@@ -52,6 +52,7 @@ public final class StaticEntityComponentPlugin implements StaticComponentPlugin 
     private final Map<Type, Class<? extends FeedbackContainerFactory<?, ?>>> factoryClasses = new HashMap<>();
 
     public Class<? extends FeedbackContainerFactory<?, ?>> getFactoryClass(Class<? extends Entity> entityClass) {
+        CcaBootstrap.INSTANCE.ensureInitialized();
         return this.factoryClasses.get(Type.getType(entityClass));
     }
 
