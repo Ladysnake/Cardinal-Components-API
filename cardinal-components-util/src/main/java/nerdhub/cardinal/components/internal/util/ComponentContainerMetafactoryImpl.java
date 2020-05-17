@@ -77,7 +77,7 @@ public final class ComponentContainerMetafactoryImpl {
 
     private static <I> I createStaticContainerFactory(Identifier genericTypeId, Class<? super I> interfaceType, Method sam, Class<? extends Component> containedType, Class<?>[] argumentTypes) {
         try {
-            Class<? extends ComponentContainer<?>> containerClass = StaticGenericComponentPlugin.INSTANCE.spinComponentContainer(genericTypeId.toString(), containedType, argumentTypes);
+            Class<? extends ComponentContainer<?>> containerClass = StaticGenericComponentPlugin.INSTANCE.spinComponentContainer(genericTypeId, containedType, argumentTypes);
             MethodType ctorType = MethodType.methodType(void.class, int.class).appendParameterTypes(argumentTypes);
             MethodType samType = MethodType.methodType(sam.getReturnType(), sam.getParameterTypes());
             MethodType instantiatedSamType = MethodType.methodType(sam.getReturnType(), argumentTypes);
@@ -92,7 +92,7 @@ public final class ComponentContainerMetafactoryImpl {
 
     public static <T, C extends Component> Function<T, ComponentContainer<C>> dynamicMetafactory(Identifier genericTypeId, Class<T> argClass, Class<C> componentClass, Event<? extends ComponentCallback<T, C>>[] callbacks) {
         try {
-            @SuppressWarnings("unchecked") Class<? extends FeedbackContainerFactory<T, C>> containerFactoryClass = (Class<? extends FeedbackContainerFactory<T, C>>) StaticGenericComponentPlugin.INSTANCE.spinSingleArgContainerFactory(genericTypeId.toString(), componentClass, argClass);
+            @SuppressWarnings("unchecked") Class<? extends FeedbackContainerFactory<T, C>> containerFactoryClass = (Class<? extends FeedbackContainerFactory<T, C>>) StaticGenericComponentPlugin.INSTANCE.spinSingleArgContainerFactory(genericTypeId, componentClass, argClass);
             return ComponentsInternals.createFactory(containerFactoryClass, callbacks)::create;
         } catch (StaticComponentLoadingException | IOException e) {
             throw new ContainerGenerationException("Failed to generate metafactory for " + genericTypeId, e);

@@ -30,6 +30,7 @@ import nerdhub.cardinal.components.internal.asm.AnnotationData;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
 import nerdhub.cardinal.components.internal.asm.MethodData;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -45,7 +46,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 
 public abstract class StaticComponentPluginBase implements StaticComponentPlugin {
-    private final Map<String, MethodData> componentFactories = new HashMap<>();
+    private final Map<Identifier, MethodData> componentFactories = new HashMap<>();
     private final String providerClass;
     private final String implSuffix;
     private final Class<? extends Annotation> annotationType;
@@ -75,7 +76,7 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
      *                 arguments are valid.</em>
      * @return the generated container class
      */
-    public static Class<? extends ComponentContainer<?>> spinComponentContainer(Map<String, MethodData> componentFactories, String implNameSuffix, Type... ctorArgs) throws IOException {
+    public static Class<? extends ComponentContainer<?>> spinComponentContainer(Map<Identifier, MethodData> componentFactories, String implNameSuffix, Type... ctorArgs) throws IOException {
         checkValidJavaIdentifier(implNameSuffix);
         String containerImplName = CcaAsmHelper.STATIC_COMPONENT_CONTAINER + '_' + implNameSuffix;
         Type[] actualCtorArgs = new Type[ctorArgs.length + 1];
@@ -102,8 +103,8 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
         String canBeAssignedDesc = "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)Z";
         MethodVisitor canBeAssigned = classNode.visitMethod(Opcodes.ACC_PROTECTED, "canBeAssigned", canBeAssignedDesc, null, null);
         Label canBeAssignedFalse = new Label();
-        for (Map.Entry<String, MethodData> entry : componentFactories.entrySet()) {
-            String identifier = entry.getKey();
+        for (Map.Entry<Identifier, MethodData> entry : componentFactories.entrySet()) {
+            Identifier identifier = entry.getKey();
             MethodData factory = entry.getValue();
             String fieldName = CcaAsmHelper.getJavaIdentifierName(identifier);
             String fieldDescriptor = "L" + CcaAsmHelper.COMPONENT + ";";
@@ -263,7 +264,7 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
         method.visitFieldInsn(Opcodes.GETFIELD, containerImplName, fieldName, fieldDescriptor);
     }
 
-    private static void stackStaticComponentType(MethodVisitor method, String componentId) {
+    private static void stackStaticComponentType(MethodVisitor method, Identifier componentId) {
         // get the generated lazy component type constant
         method.visitFieldInsn(Opcodes.GETSTATIC, CcaAsmHelper.STATIC_COMPONENT_TYPES, CcaAsmHelper.getTypeConstantName(componentId), "L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";");
         // stack: <this> component lazyComponentType
@@ -282,11 +283,11 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
 
     @ApiStatus.OverrideOnly
     @Override
-    public String scan(MethodData factory, AnnotationData annotation) {
+    public Identifier scan(MethodData factory, AnnotationData annotation) {
         if (factory.descriptor.getArgumentTypes().length > 1) {
             throw new StaticComponentLoadingException("Too many arguments in method " + factory + ". Should be either no-args or a single " + this.providerClass + " argument.");
         }
-        String value = annotation.get("value", String.class);
+        Identifier value = new Identifier(annotation.get("value", String.class));
         this.componentFactories.put(value, factory);
         return value;
     }

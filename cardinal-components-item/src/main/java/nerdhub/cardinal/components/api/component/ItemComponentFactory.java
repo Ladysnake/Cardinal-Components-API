@@ -53,7 +53,7 @@ public @interface ItemComponentFactory {
     /**
      * A magic string replacing an item id, representing every item
      */
-    String WILDCARD = "*";
+    String WILDCARD = "cardinal-components-item:wildcard";
 
     /**
      * The id of the {@link ComponentType} which this factory makes components for.

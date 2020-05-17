@@ -60,7 +60,7 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
                 return existing;
             } else {
                 ComponentType<T> registered;
-                Class<? extends ComponentType<?>> generated = CcaBootstrap.INSTANCE.getGeneratedComponentTypeClass(componentId.toString());
+                Class<? extends ComponentType<?>> generated = CcaBootstrap.INSTANCE.getGeneratedComponentTypeClass(componentId);
                 if (generated != null) {
                     registered = this.instantiateStaticType(generated, componentId, componentClass, this.nextRawId++);
                 } else {

@@ -58,7 +58,7 @@ public final class CardinalItemInternals {
      */
     public static FeedbackContainerFactory<ItemStack, CopyableComponent<?>> createItemStackContainerFactory(Item item) {
         Identifier itemId = Registry.ITEM.getId(item);
-        Class<?> factoryClass = StaticItemComponentPlugin.INSTANCE.getFactoryClass(itemId.toString());
+        Class<?> factoryClass = StaticItemComponentPlugin.INSTANCE.getFactoryClass(itemId);
         return ComponentsInternals.createFactory(factoryClass, WILDCARD_ITEM_EVENT, ((ItemCaller) item).cardinal_getItemComponentEvent());
     }
 
