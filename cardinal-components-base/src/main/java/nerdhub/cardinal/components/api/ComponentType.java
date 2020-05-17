@@ -89,6 +89,7 @@ public class ComponentType<T extends Component> {
         return this::getNullable;
     }
 
+    @ApiStatus.Experimental
     public final Function<ComponentProvider, @Nullable T> asRawGetter() {
         return this::getNullable;
     }
