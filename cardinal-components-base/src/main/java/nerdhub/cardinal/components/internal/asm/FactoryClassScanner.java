@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.internal.asm;
 
 import nerdhub.cardinal.components.internal.StaticComponentPlugin;
+import net.minecraft.util.Identifier;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -41,10 +42,10 @@ import java.util.Set;
 public final class FactoryClassScanner extends ClassVisitor {
 
     private final Map<String, StaticComponentPlugin> staticProviderAnnotations;
-    private final Set<String> staticComponentTypes;
+    private final Set<Identifier> staticComponentTypes;
     private Type factoryOwnerType;
 
-    public FactoryClassScanner(int api, @Nullable ClassVisitor cv, Map<String, StaticComponentPlugin> staticProviderAnnotations, Set<String> staticComponentTypes) {
+    public FactoryClassScanner(int api, @Nullable ClassVisitor cv, Map<String, StaticComponentPlugin> staticProviderAnnotations, Set<Identifier> staticComponentTypes) {
         super(api, cv);
         this.staticProviderAnnotations = staticProviderAnnotations;
         this.staticComponentTypes = staticComponentTypes;
@@ -120,9 +121,7 @@ public final class FactoryClassScanner extends ClassVisitor {
             if (this.factoryData != null) {
                 for (AsmFactoryData data : this.factoryData) {
                     try {
-                        String scanned = data.plugin.scan(data.getFactoryDescriptor(), AnnotationData.create(data.annotation));
-                        if (!StaticComponentPlugin.IDENTIFIER_PATTERN.matcher(scanned).matches()) throw new StaticComponentLoadingException(scanned + "(returned by " + data.plugin.getClass().getTypeName() + "#scan) is not a valid identifier");
-                        FactoryClassScanner.this.staticComponentTypes.add(scanned);
+                        FactoryClassScanner.this.staticComponentTypes.add(data.plugin.scan(data.getFactoryDescriptor(), AnnotationData.create(data.annotation)));
                     } catch (IOException e) {
                         throw new StaticComponentLoadingException("Failed to gather static component information from " + data.getFactoryDescriptor(), e);
                     }

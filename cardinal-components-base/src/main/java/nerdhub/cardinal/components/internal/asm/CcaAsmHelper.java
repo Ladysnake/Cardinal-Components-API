@@ -24,6 +24,7 @@ package nerdhub.cardinal.components.internal.asm;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.launch.common.FabricLauncherBase;
+import net.minecraft.util.Identifier;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -142,22 +143,22 @@ public final class CcaAsmHelper {
         typeCache.clear();
     }
 
-    public static String getComponentTypeName(String identifier) {
+    public static String getComponentTypeName(Identifier identifier) {
         return STATIC_COMPONENT_TYPE + "$" + getJavaIdentifierName(identifier);
     }
 
     @Nonnull
-    public static String getJavaIdentifierName(String identifier) {
-        return identifier.replace(':', '$');
+    public static String getJavaIdentifierName(Identifier identifier) {
+        return identifier.toString().replace(':', '$').replace('/', '$');
     }
 
     @Nonnull
-    public static String getTypeConstantName(String identifier) {
+    public static String getTypeConstantName(Identifier identifier) {
         return getJavaIdentifierName(identifier).toUpperCase(Locale.ROOT);
     }
 
     @Nonnull
-    public static String getStaticStorageGetterName(String identifier) {
+    public static String getStaticStorageGetterName(Identifier identifier) {
         return "get$" + getJavaIdentifierName(identifier);
     }
 

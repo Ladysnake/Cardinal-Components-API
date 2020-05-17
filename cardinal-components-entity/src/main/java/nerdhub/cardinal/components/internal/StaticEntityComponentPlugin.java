@@ -30,6 +30,7 @@ import nerdhub.cardinal.components.internal.asm.MethodData;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.Identifier;
 import org.objectweb.asm.Type;
 
 import java.io.IOException;
@@ -47,7 +48,7 @@ public final class StaticEntityComponentPlugin implements StaticComponentPlugin 
         return String.format("EntityImpl_%s_%d", simpleName, Integer.toUnsignedLong(internalName.hashCode()));
     }
 
-    private final Map<Type, Map</*Identifier*/String, MethodData>> componentFactories = new HashMap<>();
+    private final Map<Type, Map</*ComponentType*/Identifier, MethodData>> componentFactories = new HashMap<>();
     private final String entityClass = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_1297");
     private final Map<Type, Class<? extends FeedbackContainerFactory<?, ?>>> factoryClasses = new HashMap<>();
 
@@ -62,7 +63,7 @@ public final class StaticEntityComponentPlugin implements StaticComponentPlugin 
     }
 
     @Override
-    public String scan(MethodData factory, AnnotationData annotation) throws IOException {
+    public Identifier scan(MethodData factory, AnnotationData annotation) throws IOException {
         Type[] factoryArgs = factory.descriptor.getArgumentTypes();
         if (factoryArgs.length > 1) {
             throw new StaticComponentLoadingException("Too many arguments in method " + factory + ". Should be either no-args or a single " + this.entityClass + " argument.");
@@ -81,8 +82,8 @@ public final class StaticEntityComponentPlugin implements StaticComponentPlugin 
                 target = factoryArgs[0];
             }
         }
-        String value = annotation.get("value", String.class);
-        Map<String, MethodData> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
+        Identifier value = new Identifier(annotation.get("value", String.class));
+        Map<Identifier, MethodData> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
         MethodData previousFactory = specializedMap.get(value);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + value + " on entity type " + target.getClassName() + ": " + factory + " and " + previousFactory);
@@ -94,8 +95,8 @@ public final class StaticEntityComponentPlugin implements StaticComponentPlugin 
     @Override
     public void generate() throws IOException {
         Type entityType = Type.getObjectType(this.entityClass.replace('.', '/'));
-        for (Map.Entry<Type, Map<String, MethodData>> entry : this.componentFactories.entrySet()) {
-            Map<String, MethodData> compiled = new HashMap<>(entry.getValue());
+        for (Map.Entry<Type, Map<Identifier, MethodData>> entry : this.componentFactories.entrySet()) {
+            Map<Identifier, MethodData> compiled = new HashMap<>(entry.getValue());
             Type type = entry.getKey();
             while (!type.equals(entityType)) {
                 type = CcaAsmHelper.getSuperclass(type);
