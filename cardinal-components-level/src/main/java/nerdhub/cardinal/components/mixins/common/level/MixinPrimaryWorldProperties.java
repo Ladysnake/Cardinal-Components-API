@@ -32,6 +32,7 @@ import nerdhub.cardinal.components.internal.StaticLevelComponentPlugin;
 import net.minecraft.class_5217;
 import net.minecraft.class_5268;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Lazy;
 import net.minecraft.world.level.LevelProperties;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -44,10 +45,10 @@ import javax.annotation.Nonnull;
 @Mixin(LevelProperties.class)
 public abstract class MixinPrimaryWorldProperties implements class_5268, InternalComponentProvider {
     @Unique
-    private static final FeedbackContainerFactory<class_5217, ?> componentContainerFactory
-        = ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getFactoryClass(), LevelComponentCallback.EVENT);
+    private static final Lazy<FeedbackContainerFactory<class_5217, ?>> componentContainerFactory
+        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getFactoryClass(), LevelComponentCallback.EVENT));
     @Unique
-    protected ComponentContainer<?> components = componentContainerFactory.create((LevelProperties) (Object) this);
+    protected ComponentContainer<?> components = componentContainerFactory.get().create(this);
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;Lcom/mojang/datafixers/DataFixer;ILnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void readComponents(CompoundTag data, DataFixer fixer, int version, CompoundTag player, CallbackInfo ci) {

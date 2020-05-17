@@ -29,6 +29,7 @@ import nerdhub.cardinal.components.internal.ComponentsInternals;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
 import nerdhub.cardinal.components.internal.InternalComponentProvider;
 import nerdhub.cardinal.components.internal.StaticChunkComponentPlugin;
+import net.minecraft.util.Lazy;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.WorldChunk;
@@ -40,13 +41,14 @@ import javax.annotation.Nonnull;
 @Mixin({ProtoChunk.class, WorldChunk.class})
 public abstract class MixinChunk implements Chunk, InternalComponentProvider {
     @Unique
-    private static final FeedbackContainerFactory<Chunk, CopyableComponent<?>> componentsContainerFactory = ComponentsInternals.createFactory(StaticChunkComponentPlugin.INSTANCE.getFactoryClass(), ChunkComponentCallback.EVENT);
+    private static final Lazy<FeedbackContainerFactory<Chunk, CopyableComponent<?>>> componentsContainerFactory
+        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticChunkComponentPlugin.INSTANCE.getFactoryClass(), ChunkComponentCallback.EVENT));
     @Unique
-    private final ComponentContainer<CopyableComponent<?>> components = componentsContainerFactory.create(this);
+    private final ComponentContainer<CopyableComponent<?>> components = componentsContainerFactory.get().create(this);
 
     @Nonnull
     @Override
     public Object getStaticComponentContainer() {
-        return components;
+        return this.components;
     }
 }

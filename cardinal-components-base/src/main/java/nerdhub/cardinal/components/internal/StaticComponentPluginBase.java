@@ -271,6 +271,7 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
     }
 
     public Class<? extends FeedbackContainerFactory<?, ?>> getFactoryClass() {
+        CcaBootstrap.INSTANCE.ensureInitialized();
         return Objects.requireNonNull(this.factoryClass, "PreLaunch not fired ?!");
     }
 

@@ -52,6 +52,7 @@ public final class StaticItemComponentPlugin implements StaticComponentPlugin {
 
     @Nullable
     public Class<? extends FeedbackContainerFactory<?, ?>> getFactoryClass(String itemId) {
+        CcaBootstrap.INSTANCE.ensureInitialized();
         Class<? extends FeedbackContainerFactory<?, ?>> specificFactory = this.factoryClasses.get(itemId);
         if (specificFactory != null) {
             return specificFactory;

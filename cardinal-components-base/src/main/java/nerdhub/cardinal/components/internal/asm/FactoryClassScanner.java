@@ -44,7 +44,7 @@ public final class FactoryClassScanner extends ClassVisitor {
     private final Set<String> staticComponentTypes;
     private Type factoryOwnerType;
 
-    public FactoryClassScanner(int api, ClassVisitor cv, Map<String, StaticComponentPlugin> staticProviderAnnotations, Set<String> staticComponentTypes) {
+    public FactoryClassScanner(int api, @Nullable ClassVisitor cv, Map<String, StaticComponentPlugin> staticProviderAnnotations, Set<String> staticComponentTypes) {
         super(api, cv);
         this.staticProviderAnnotations = staticProviderAnnotations;
         this.staticComponentTypes = staticComponentTypes;
