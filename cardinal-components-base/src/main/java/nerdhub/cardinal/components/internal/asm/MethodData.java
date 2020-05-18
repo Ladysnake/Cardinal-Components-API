@@ -26,6 +26,7 @@ package nerdhub.cardinal.components.internal.asm;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.MethodNode;
 
+import java.lang.invoke.MethodHandleInfo;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -35,14 +36,25 @@ public final class MethodData {
     public final String name;
     public final int access;
     public final Type descriptor;
-    public final MethodNode node;
+
+    public MethodData(MethodHandleInfo factoryInfo) {
+        this(
+            Type.getType(factoryInfo.getDeclaringClass()),
+            factoryInfo.getName(),
+            factoryInfo.getModifiers(),
+            Type.getMethodType(Type.getType(factoryInfo.getMethodType().returnType()), factoryInfo.getMethodType().parameterList().stream().map(Type::getType).toArray(Type[]::new))
+        );
+    }
 
     public MethodData(Type ownerType, MethodNode node) {
+        this(ownerType, node.name, node.access, Type.getMethodType(node.desc));
+    }
+
+    public MethodData(Type ownerType, String name, int access, Type descriptor) {
         this.ownerType = ownerType;
-        this.name = node.name;
-        this.access = node.access;
-        this.descriptor = Type.getMethodType(node.desc);
-        this.node = node;
+        this.name = name;
+        this.access = access;
+        this.descriptor = descriptor;
     }
 
     @Override

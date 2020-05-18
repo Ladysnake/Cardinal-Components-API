@@ -22,17 +22,22 @@
  */
 package nerdhub.cardinal.components.internal.world;
 
-import nerdhub.cardinal.components.api.component.WorldComponentFactory;
+import nerdhub.cardinal.components.api.component.StaticWorldComponentInitializer;
+import nerdhub.cardinal.components.api.component.WorldComponentFactoryRegistry;
 import nerdhub.cardinal.components.internal.StaticComponentPluginBase;
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.world.World;
 
-public final class StaticWorldComponentPlugin extends StaticComponentPluginBase {
+public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<StaticWorldComponentInitializer> implements WorldComponentFactoryRegistry {
     public static final String WORLD_IMPL_SUFFIX = "WorldImpl";
-    public static final String WORLD_CLASS = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_1937");
 
     public static final StaticWorldComponentPlugin INSTANCE = new StaticWorldComponentPlugin();
 
     private StaticWorldComponentPlugin() {
-        super(WORLD_CLASS, WORLD_IMPL_SUFFIX, WorldComponentFactory.class);
+        super(World.class, WORLD_IMPL_SUFFIX, StaticWorldComponentInitializer.class);
+    }
+
+    @Override
+    protected void dispatchRegistration(StaticWorldComponentInitializer entrypoint) throws ReflectiveOperationException {
+        entrypoint.registerWorldComponentFactories(this, this.lookup);
     }
 }

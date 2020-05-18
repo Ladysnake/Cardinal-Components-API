@@ -121,7 +121,9 @@ public final class FactoryClassScanner extends ClassVisitor {
             if (this.factoryData != null) {
                 for (AsmFactoryData data : this.factoryData) {
                     try {
-                        FactoryClassScanner.this.staticComponentTypes.add(data.plugin.scan(data.getFactoryDescriptor(), AnnotationData.create(data.annotation)));
+                        AnnotationData annotationData = AnnotationData.create(data.annotation);
+                        FactoryClassScanner.this.staticComponentTypes.add(new Identifier(annotationData.get("value", String.class)));
+                        data.plugin.scan(data.getFactoryDescriptor(), annotationData);
                     } catch (IOException e) {
                         throw new StaticComponentLoadingException("Failed to gather static component information from " + data.getFactoryDescriptor(), e);
                     }

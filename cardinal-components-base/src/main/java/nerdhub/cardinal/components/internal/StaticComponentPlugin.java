@@ -25,19 +25,13 @@ package nerdhub.cardinal.components.internal;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.internal.asm.AnnotationData;
 import nerdhub.cardinal.components.internal.asm.MethodData;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.util.regex.Pattern;
 
 @ApiStatus.OverrideOnly
 public interface StaticComponentPlugin {
-    /**
-     * A pattern that should be used to check that component type ids are valid
-     */
-    Pattern IDENTIFIER_PATTERN = Pattern.compile("([a-z0-9_.-]+:)?[a-z0-9/._-]+");
 
     /**
      * @return the annotation processed by this plugin
@@ -51,9 +45,8 @@ public interface StaticComponentPlugin {
      * <strong>Classes should not be generated in this method!</strong>
      * @param factory descriptor of the annotated method
      * @param annotation ASM data about the annotation being processed
-     * @return a valid identifier string for a recognized component type
      */
-    Identifier scan(MethodData factory, AnnotationData annotation) throws IOException;
+    void scan(MethodData factory, AnnotationData annotation) throws IOException;
 
     /**
      * Generates classes dynamically based on previously scanned information.

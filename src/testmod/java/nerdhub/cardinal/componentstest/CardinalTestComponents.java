@@ -69,7 +69,6 @@ public final class CardinalTestComponents {
         return new BaseVita();
     }
 
-    @ChunkComponentFactory(VITA_ID)
     public static Component createForChunk(Chunk chunk) {
         return new ChunkVita(chunk);
     }

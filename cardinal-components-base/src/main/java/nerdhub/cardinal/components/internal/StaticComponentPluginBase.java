@@ -25,13 +25,12 @@ package nerdhub.cardinal.components.internal;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
+import nerdhub.cardinal.components.api.component.StaticComponentInitializer;
 import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
-import nerdhub.cardinal.components.internal.asm.AnnotationData;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
 import nerdhub.cardinal.components.internal.asm.MethodData;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -39,23 +38,26 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandleInfo;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 
-public abstract class StaticComponentPluginBase implements StaticComponentPlugin {
+public abstract class StaticComponentPluginBase<T extends StaticComponentInitializer> extends StatefulLazy {
     private final Map<Identifier, MethodData> componentFactories = new HashMap<>();
-    private final String providerClass;
+    private final Class<?> providerClass;
     private final String implSuffix;
-    private final Class<? extends Annotation> annotationType;
+    private final Class<T> initializerType;
+    protected final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
     private Class<? extends FeedbackContainerFactory<?, ?>> factoryClass;
 
-    protected StaticComponentPluginBase(String className, String implSuffix, Class<? extends Annotation> annotationType) {
-        this.providerClass = className;
+    protected StaticComponentPluginBase(Class<?> providerClass, String implSuffix, Class<T> initializerType) {
+        this.providerClass = providerClass;
         this.implSuffix = implSuffix;
-        this.annotationType = annotationType;
+        this.initializerType = initializerType;
     }
 
     /**
@@ -272,31 +274,32 @@ public abstract class StaticComponentPluginBase implements StaticComponentPlugin
     }
 
     public Class<? extends FeedbackContainerFactory<?, ?>> getFactoryClass() {
-        CcaBootstrap.INSTANCE.ensureInitialized();
-        return Objects.requireNonNull(this.factoryClass, "PreLaunch not fired ?!");
+        this.ensureInitialized();
+
+        return this.factoryClass;
     }
 
     @Override
-    public Class<? extends Annotation> getAnnotationType() {
-        return this.annotationType;
-    }
+    protected void init() {
+        CcaBootstrap.INSTANCE.processSpecializedInitializers(this.initializerType, this::dispatchRegistration);
 
-    @ApiStatus.OverrideOnly
-    @Override
-    public Identifier scan(MethodData factory, AnnotationData annotation) {
-        if (factory.descriptor.getArgumentTypes().length > 1) {
-            throw new StaticComponentLoadingException("Too many arguments in method " + factory + ". Should be either no-args or a single " + this.providerClass + " argument.");
+        try {
+            Type levelType = Type.getType(this.providerClass);
+            Class<? extends ComponentContainer<?>> containerCls = spinComponentContainer(this.componentFactories, this.implSuffix, levelType);
+            this.factoryClass = spinSingleArgFactory(this.implSuffix, Type.getType(containerCls), levelType);
+        } catch (IOException e) {
+            throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + this.providerClass, e);
         }
-        Identifier value = new Identifier(annotation.get("value", String.class));
-        this.componentFactories.put(value, factory);
-        return value;
     }
 
-    @ApiStatus.OverrideOnly
-    @Override
-    public void generate() throws IOException {
-        Type levelType = Type.getObjectType(this.providerClass.replace('.', '/'));
-        Class<? extends ComponentContainer<?>> containerCls = spinComponentContainer(this.componentFactories, this.implSuffix, levelType);
-        this.factoryClass = spinSingleArgFactory(this.implSuffix, Type.getType(containerCls), levelType);
+    protected abstract void dispatchRegistration(T entrypoint) throws ReflectiveOperationException;
+
+    public void register(Identifier componentId, MethodHandle factory) {
+        MethodHandleInfo factoryInfo = this.lookup.revealDirect(factory);
+        MethodType factoryType = factoryInfo.getMethodType();
+        if (factoryType.parameterCount() > 1 || factoryType.parameterCount() == 1 && factoryType.parameterType(0) != this.providerClass) {
+            throw new StaticComponentLoadingException("Invalid factory signature " + factory + ". Should be either no-args or a single " + this.providerClass.getTypeName() + " argument.");
+        }
+        this.componentFactories.put(componentId, new MethodData(factoryInfo));
     }
 }

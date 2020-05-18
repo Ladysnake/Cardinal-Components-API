@@ -74,13 +74,15 @@ public final class CardinalEntityInternals {
             List<Event<?>> events = new ArrayList<>();
             Class<? extends Entity> c = cl;
             Class<? extends FeedbackContainerFactory<?, ?>> factoryClass = null;
+
             while (Entity.class.isAssignableFrom(c)) {
                 events.add(EntityComponentCallback.event(c));
                 if (factoryClass == null) {   // try to find a specialized ASM factory
-                    factoryClass = StaticEntityComponentPlugin.INSTANCE.getFactoryClass(c);
+                    factoryClass = StaticEntityComponentPlugin.INSTANCE.spinDedicatedFactory(c);
                 }
                 c = (Class<? extends Entity>) c.getSuperclass();
             }
+
             return ComponentsInternals.createFactory(factoryClass, Lists.reverse(events).toArray(new Event[0]));
         }).create(entity);
     }
