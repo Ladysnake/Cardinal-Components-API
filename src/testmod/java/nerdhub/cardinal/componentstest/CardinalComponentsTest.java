@@ -22,6 +22,8 @@
  */
 package nerdhub.cardinal.componentstest;
 
+import nerdhub.cardinal.components.api.ComponentRegistry;
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentContainerMetafactory;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
@@ -29,6 +31,7 @@ import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
+import nerdhub.cardinal.componentstest.vita.Vita;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -51,6 +54,7 @@ import java.util.function.Function;
 public class CardinalComponentsTest {
 
     public static final Logger LOGGER = LogManager.getLogger("Component Test");
+    public static final ComponentType<Vita> ALT_VITA = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
 
     public static final String VITA_STICK_ID = "componenttest:vita_stick";
     // inline self component callback registration
@@ -108,4 +112,3 @@ public class CardinalComponentsTest {
         ComponentContainer<?> create(UUID u, @Nullable PlayerEntity p);
     }
 }
-

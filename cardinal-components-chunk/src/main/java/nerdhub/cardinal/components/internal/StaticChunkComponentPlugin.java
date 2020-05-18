@@ -22,16 +22,21 @@
  */
 package nerdhub.cardinal.components.internal;
 
-import nerdhub.cardinal.components.api.component.ChunkComponentFactory;
-import net.fabricmc.loader.api.FabricLoader;
+import nerdhub.cardinal.components.api.component.ChunkComponentFactoryRegistry;
+import nerdhub.cardinal.components.api.component.StaticChunkComponentInitializer;
+import net.minecraft.world.chunk.Chunk;
 
-public final class StaticChunkComponentPlugin extends StaticComponentPluginBase {
+public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<StaticChunkComponentInitializer> implements ChunkComponentFactoryRegistry {
     public static final String CHUNK_IMPL_SUFFIX = "ChunkImpl";
-    public static final String CHUNK_CLASS = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2791");
 
     public static final StaticChunkComponentPlugin INSTANCE = new StaticChunkComponentPlugin();
 
     private StaticChunkComponentPlugin() {
-        super(CHUNK_CLASS, CHUNK_IMPL_SUFFIX, ChunkComponentFactory.class);
+        super(Chunk.class, CHUNK_IMPL_SUFFIX, StaticChunkComponentInitializer.class);
+    }
+
+    @Override
+    protected void dispatchRegistration(StaticChunkComponentInitializer entrypoint) throws ReflectiveOperationException {
+        entrypoint.registerChunkComponentFactories(this, this.lookup);
     }
 }
