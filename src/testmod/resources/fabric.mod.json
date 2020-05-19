@@ -13,7 +13,7 @@
         "client": [
             "nerdhub.cardinal.componentstest.CCATestClient::clientInit"
         ],
-        "cardinal-components-api:static-init": [
+        "cardinal-components:static-init": [
             "nerdhub.cardinal.componentstest.TestStaticComponentInitializer"
         ]
     },

@@ -23,27 +23,21 @@
 package nerdhub.cardinal.components.internal.asm;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.launch.common.FabricLauncherBase;
 import net.minecraft.util.Identifier;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.ProtectionDomain;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 public final class CcaAsmHelper {
     private static final sun.misc.Unsafe UNSAFE;
@@ -71,50 +65,8 @@ public final class CcaAsmHelper {
     public static final String STATIC_COMPONENT_TYPES = "nerdhub/cardinal/components/_generated_/StaticComponentTypes";
     public static final String STATIC_CONTAINER_FACTORY = "nerdhub/cardinal/components/_generated_/GeneratedContainerFactory";
 
-    private static final Map<Type, TypeData> typeCache = new HashMap<>();
     private static final ClassLoader CLASSLOADER = CcaAsmHelper.class.getClassLoader();
     private static final ProtectionDomain PROTECTION_DOMAIN = CcaAsmHelper.class.getProtectionDomain();
-
-    private static TypeData getTypeData(Type type) throws IOException {
-        TypeData t = typeCache.get(type);
-        if (t != null) {
-            return t;
-        }
-        String className = type.getInternalName();
-        byte[] rawClass = FabricLauncherBase.getLauncher().getClassByteArray(className.replace('.', '/'));
-        if (rawClass == null) throw new NoSuchFileException(className);
-        ClassReader reader = new ClassReader(rawClass);
-        TypeData newValue = new TypeData(type, Type.getObjectType(reader.getSuperName()), reader);
-        typeCache.put(type, newValue);
-        return newValue;
-    }
-
-    public static Type getSuperclass(Type type) throws IOException {
-        return getTypeData(type).getSupertype();
-    }
-
-    public static boolean isAssignableFrom(Type tSuper, Type tSub) throws IOException {
-        if (tSuper.equals(tSub)) return true;
-        if (tSub.equals(Type.getType(Object.class))) return false;
-        TypeData tSuperData = getTypeData(tSuper);
-        TypeData tSubData = getTypeData(tSub);
-        if (Modifier.isInterface(tSuperData.getReader().getAccess())) {
-            for (String itf : tSubData.getReader().getInterfaces()) {
-                if (isAssignableFrom(tSuper, Type.getObjectType(itf))) {
-                    return true;
-                }
-            }
-        }
-        return isAssignableFrom(tSuper, tSubData.getSupertype());
-    }
-
-    public static ClassReader getClassReader(Type type) throws IOException {
-        return getTypeData(type).getReader();
-    }
-
-    public static ClassNode getClassNode(Type type) throws IOException {
-        return getTypeData(type).getNode();
-    }
 
     public static Class<?> generateClass(ClassNode classNode) throws IOException {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -137,10 +89,6 @@ public final class CcaAsmHelper {
             // IllegalStateException and IllegalArgumentException can be thrown by CheckClassAdapter
             throw new IOException("Failed to generate class " + className, e);
         }
-    }
-
-    public static void clearCache() {
-        typeCache.clear();
     }
 
     public static String getComponentTypeName(Identifier identifier) {
