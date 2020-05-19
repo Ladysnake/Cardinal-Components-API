@@ -43,7 +43,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class StaticItemComponentPlugin extends StatefulLazy implements ItemComponentFactoryRegistry {
+public final class StaticItemComponentPlugin extends DispatchingLazy implements ItemComponentFactoryRegistry {
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
     private final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
 

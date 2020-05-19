@@ -2,7 +2,7 @@ package nerdhub.cardinal.components.internal;
 
 import org.jetbrains.annotations.ApiStatus;
 
-public abstract class StatefulLazy {
+public abstract class DispatchingLazy {
     private boolean requiresInitialization = true;
     private boolean loading = false;
 

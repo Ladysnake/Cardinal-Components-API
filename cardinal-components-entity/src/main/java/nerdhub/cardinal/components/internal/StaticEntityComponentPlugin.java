@@ -41,7 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class StaticEntityComponentPlugin extends StatefulLazy implements EntityComponentFactoryRegistry {
+public final class StaticEntityComponentPlugin extends DispatchingLazy implements EntityComponentFactoryRegistry {
     public static final StaticEntityComponentPlugin INSTANCE = new StaticEntityComponentPlugin();
 
     private static String getSuffix(Class<?> entityClass) {

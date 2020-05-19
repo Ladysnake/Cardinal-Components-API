@@ -46,7 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-public abstract class StaticComponentPluginBase<T extends StaticComponentInitializer> extends StatefulLazy {
+public abstract class StaticComponentPluginBase<T extends StaticComponentInitializer> extends DispatchingLazy {
     private final Map<Identifier, MethodData> componentFactories = new HashMap<>();
     private final Class<?> providerClass;
     private final String implSuffix;
@@ -65,7 +65,6 @@ public abstract class StaticComponentPluginBase<T extends StaticComponentInitial
      *
      * <p>Instances of the returned class can be returned by {@link ComponentProvider#getStaticComponentContainer()}.
      * <strong>This method must not be called before the static component container interface has been defined!</strong>
-     * It is normally called in {@link StaticComponentPlugin#generate()}.
      *
      * <p>Generated component container classes will take an additional {@code int} as first argument to their
      * constructors. That number corresponds to the expected dynamic size of the container (see {@link FastComponentContainer}).
