@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.StaticComponentInitializer;
@@ -31,6 +32,7 @@ import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
 import nerdhub.cardinal.components.internal.asm.MethodData;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -42,12 +44,32 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandleInfo;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.HashMap;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class StaticComponentPluginBase<T extends StaticComponentInitializer> extends DispatchingLazy {
-    private final Map<Identifier, MethodData> componentFactories = new HashMap<>();
+    private static final String FOR_EACH_DESC;
+    private static final String FAST_COMPONENT_CONTAINER_CTOR_DESC;
+    private static final String GET_DESC;
+    private static final String CAN_BE_ASSIGNED_DESC;
+
+    static {
+        try {
+            FOR_EACH_DESC = Type.getMethodDescriptor(ComponentContainer.class.getMethod("forEach", BiConsumer.class));
+            FAST_COMPONENT_CONTAINER_CTOR_DESC = Type.getConstructorDescriptor(FastComponentContainer.class.getConstructor(int.class));
+            GET_DESC = Type.getMethodDescriptor(ComponentContainer.class.getMethod("get", ComponentType.class));
+            CAN_BE_ASSIGNED_DESC = Type.getMethodDescriptor(FastComponentContainer.class.getDeclaredMethod("canBeAssigned", ComponentType.class));
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException("Failed to find one or more method descriptors", e);
+        }
+    }
+
+    private final Map<Identifier, MethodData> componentFactories = new LinkedHashMap<>();
     private final Class<?> providerClass;
     private final String implSuffix;
     private final Class<T> initializerType;
@@ -78,11 +100,42 @@ public abstract class StaticComponentPluginBase<T extends StaticComponentInitial
      * @return the generated container class
      */
     public static Class<? extends ComponentContainer<?>> spinComponentContainer(Map<Identifier, MethodData> componentFactories, String implNameSuffix, Type... ctorArgs) throws IOException {
+        return spinComponentContainer(Function.class, componentFactories.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> t -> {
+            try {
+                return e.getValue().factory.invoke(t);
+            } catch (Throwable throwable) {
+                throw new RuntimeException(throwable);
+            }
+        })), implNameSuffix);
+    }
+
+    /**
+     * Defines an implementation of {@link ComponentContainer} that supports direct component access.
+     *
+     * <p>Instances of the returned class can be returned by {@link ComponentProvider#getStaticComponentContainer()}.
+     * <strong>This method must not be called before the static component container interface has been defined!</strong>
+     *
+     * <p>Generated component container classes will take an additional {@code int} as first argument to their
+     * constructors. That number corresponds to the expected dynamic size of the container (see {@link FastComponentContainer}).
+     *
+     *
+     * @param componentFactoryType the interface implemented by the component factories used to initialize this container
+     * @param componentFactories a map of {@link ComponentType} ids to factories for components of that type
+     * @param implNameSuffix a unique suffix for the generated class
+     * @return the generated container class
+     */
+    public static <I> Class<? extends ComponentContainer<?>> spinComponentContainer(Class<? super I> componentFactoryType, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
         checkValidJavaIdentifier(implNameSuffix);
         String containerImplName = CcaAsmHelper.STATIC_COMPONENT_CONTAINER + '_' + implNameSuffix;
-        Type[] actualCtorArgs = new Type[ctorArgs.length + 1];
+        String componentFactoryName = Type.getInternalName(componentFactoryType);
+        Method sam = CcaAsmHelper.findSam(componentFactoryType);
+        String samDescriptor = Type.getMethodDescriptor(sam);
+        Class<?>[] factoryArgs = sam.getParameterTypes();
+        Type[] actualCtorArgs = new Type[factoryArgs.length + 1];
         actualCtorArgs[0] = Type.INT_TYPE;
-        System.arraycopy(ctorArgs, 0, actualCtorArgs, 1, ctorArgs.length);
+        for (int i = 0; i < factoryArgs.length; i++) {
+            actualCtorArgs[i+1] = Type.getType(factoryArgs[i]);
+        }
         String ctorDesc = Type.getMethodDescriptor(Type.VOID_TYPE, actualCtorArgs);
         int ctorFirstAvailableVar = actualCtorArgs.length + 1;  // explicit args + <this>
         ClassNode classNode = new ClassNode(CcaAsmHelper.ASM_VERSION);
@@ -98,18 +151,24 @@ public abstract class StaticComponentPluginBase<T extends StaticComponentInitial
         init.visitCode();
         init.visitVarInsn(Opcodes.ALOAD, 0);
         init.visitVarInsn(Opcodes.ILOAD, 1);
-        init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "<init>", "(I)V", false);
-        MethodVisitor get = classNode.visitMethod(Opcodes.ACC_PUBLIC, "get", "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)L" + CcaAsmHelper.COMPONENT + ";", null, null);
-        MethodVisitor forEach = classNode.visitMethod(Opcodes.ACC_PUBLIC, "forEach", "(Ljava/util/function/BiConsumer;)V", null, null);
-        String canBeAssignedDesc = "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)Z";
-        MethodVisitor canBeAssigned = classNode.visitMethod(Opcodes.ACC_PROTECTED, "canBeAssigned", canBeAssignedDesc, null, null);
+        init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "<init>", FAST_COMPONENT_CONTAINER_CTOR_DESC, false);
+        MethodVisitor get = classNode.visitMethod(Opcodes.ACC_PUBLIC, "get", GET_DESC, null, null);
+        MethodVisitor forEach = classNode.visitMethod(Opcodes.ACC_PUBLIC, "forEach", FOR_EACH_DESC, null, null);
+        MethodVisitor canBeAssigned = classNode.visitMethod(Opcodes.ACC_PROTECTED, "canBeAssigned", CAN_BE_ASSIGNED_DESC, null, null);
         Label canBeAssignedFalse = new Label();
-        for (Map.Entry<Identifier, MethodData> entry : componentFactories.entrySet()) {
-            Identifier identifier = entry.getKey();
-            MethodData factory = entry.getValue();
+        for (Identifier identifier : componentFactories.keySet()) {
             String fieldName = CcaAsmHelper.getJavaIdentifierName(identifier);
-            String fieldDescriptor = "L" + CcaAsmHelper.COMPONENT + ";";
+            String factoryFieldName = getFactoryFieldName(identifier);
+            String fieldDescriptor = Type.getDescriptor(Component.class);
+            String factoryFieldDescriptor = Type.getDescriptor(componentFactoryType);
             /* field declaration */
+            classNode.visitField(
+                Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC,
+                factoryFieldName,
+                factoryFieldDescriptor,
+                null,
+                null
+            ).visitEnd();
             classNode.visitField(
                 Opcodes.ACC_PRIVATE | Opcodes.ACC_FINAL,
                 fieldName,
@@ -118,14 +177,14 @@ public abstract class StaticComponentPluginBase<T extends StaticComponentInitial
                 null
             ).visitEnd();
             /* constructor initialization */
-            Type[] factoryArgs = factory.descriptor.getArgumentTypes();
-            for (int i = 0; i < ctorArgs.length && i < factoryArgs.length; i++) {
+            init.visitFieldInsn(Opcodes.GETSTATIC, containerImplName, factoryFieldName, factoryFieldDescriptor);
+            // stack: factory
+            for (int i = 0; i < factoryArgs.length; i++) {
                 init.visitVarInsn(Opcodes.ALOAD, i + 2);    // first 2 args are for the container itself
-                init.visitTypeInsn(Opcodes.CHECKCAST, factoryArgs[i].getInternalName());
             }
-            // stack: ctorArgs...
+            // stack: factory factoryArgs...
             // initialize the component by calling the factory
-            init.visitMethodInsn(Opcodes.INVOKESTATIC, factory.ownerType.getInternalName(), factory.name, factory.descriptor.toString(), false);
+            init.visitMethodInsn(Opcodes.INVOKEINTERFACE, componentFactoryName, sam.getName(), samDescriptor, true);
             // stack: component
             init.visitInsn(Opcodes.DUP);
             // stack: component component
@@ -191,7 +250,7 @@ public abstract class StaticComponentPluginBase<T extends StaticComponentInitial
         init.visitEnd();
         get.visitVarInsn(Opcodes.ALOAD, 0);
         get.visitVarInsn(Opcodes.ALOAD, 1);
-        get.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "get", "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)L" + CcaAsmHelper.COMPONENT + ";", false);
+        get.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "get", GET_DESC, false);
         get.visitInsn(Opcodes.ARETURN);
         get.visitEnd();
         forEach.visitVarInsn(Opcodes.ALOAD, 0);
@@ -201,7 +260,7 @@ public abstract class StaticComponentPluginBase<T extends StaticComponentInitial
         forEach.visitEnd();
         canBeAssigned.visitVarInsn(Opcodes.ALOAD, 0);
         canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
-        canBeAssigned.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "canBeAssigned", canBeAssignedDesc, false);
+        canBeAssigned.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "canBeAssigned", CAN_BE_ASSIGNED_DESC, false);
         canBeAssigned.visitJumpInsn(Opcodes.IFEQ, canBeAssignedFalse);
         Label canBeAssignedEnd = new Label();
         canBeAssigned.visitInsn(Opcodes.ICONST_1);
@@ -212,7 +271,21 @@ public abstract class StaticComponentPluginBase<T extends StaticComponentInitial
         canBeAssigned.visitInsn(Opcodes.IRETURN);
         canBeAssigned.visitEnd();
         @SuppressWarnings("unchecked") Class<? extends ComponentContainer<?>> ret = (Class<? extends ComponentContainer<?>>) CcaAsmHelper.generateClass(classNode);
+        for (Map.Entry<Identifier, I> entry : componentFactories.entrySet()) {
+            try {
+                Field factoryField = ret.getDeclaredField(getFactoryFieldName(entry.getKey()));
+                factoryField.setAccessible(true);
+                factoryField.set(null, entry.getValue());
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new StaticComponentLoadingException("Failed to initialize factory field for component type " + entry.getKey(), e);
+            }
+        }
         return ret;
+    }
+
+    @NotNull
+    private static String getFactoryFieldName(Identifier identifier) {
+        return CcaAsmHelper.getJavaIdentifierName(identifier) + "$factory";
     }
 
     /**
@@ -280,7 +353,7 @@ public abstract class StaticComponentPluginBase<T extends StaticComponentInitial
 
     @Override
     protected void init() {
-        CcaBootstrap.INSTANCE.processSpecializedInitializers(this.initializerType, this::dispatchRegistration);
+        CcaBootstrap.INSTANCE.processSpecializedInitializers(this.initializerType, (entrypoint, provider) -> this.dispatchRegistration(entrypoint));
 
         try {
             Type levelType = Type.getType(this.providerClass);
@@ -299,6 +372,6 @@ public abstract class StaticComponentPluginBase<T extends StaticComponentInitial
         if (factoryType.parameterCount() > 1 || factoryType.parameterCount() == 1 && factoryType.parameterType(0) != this.providerClass) {
             throw new StaticComponentLoadingException("Invalid factory signature " + factory + ". Should be either no-args or a single " + this.providerClass.getTypeName() + " argument.");
         }
-        this.componentFactories.put(componentId, new MethodData(factoryInfo));
+        this.componentFactories.put(componentId, new MethodData(factoryInfo, factory));
     }
 }

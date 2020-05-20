@@ -33,6 +33,8 @@ import org.objectweb.asm.util.CheckClassAdapter;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -118,5 +120,21 @@ public final class CcaAsmHelper {
         } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new StaticComponentLoadingException("Failed to retrieve Unsafe", e);
         }
+    }
+
+    public static Method findSam(Class<?> callbackClass) {
+        Method ret = null;
+        for (Method m : callbackClass.getMethods()) {
+            if (Modifier.isAbstract(m.getModifiers())) {
+                if (ret != null) {
+                    throw new IllegalArgumentException(callbackClass + " is not a functional interface!");
+                }
+                ret = m;
+            }
+        }
+        if (ret == null) {
+            throw new IllegalArgumentException(callbackClass + " is not a functional interface!");
+        }
+        return ret;
     }
 }

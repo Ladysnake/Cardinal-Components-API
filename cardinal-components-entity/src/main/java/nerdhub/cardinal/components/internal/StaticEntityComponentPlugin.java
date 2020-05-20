@@ -39,6 +39,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class StaticEntityComponentPlugin extends DispatchingLazy implements EntityComponentFactoryRegistry {
@@ -64,7 +65,7 @@ public final class StaticEntityComponentPlugin extends DispatchingLazy implement
 
         // we need a cache as this method is called for a given class each time one of its subclasses is loaded.
         return this.factoryClasses.computeIfAbsent(cl, entityClass -> {
-            Map<Identifier, MethodData> compiled = new HashMap<>(this.componentFactories.get(entityClass));
+            Map<Identifier, MethodData> compiled = new LinkedHashMap<>(this.componentFactories.get(entityClass));
             Class<?> type = entityClass;
 
             while (type != Entity.class) {
@@ -87,7 +88,7 @@ public final class StaticEntityComponentPlugin extends DispatchingLazy implement
     @Override
     protected void init() {
         CcaBootstrap.INSTANCE.processSpecializedInitializers(StaticEntityComponentInitializer.class,
-            entrypoint -> entrypoint.registerEntityComponentFactories(this, this.lookup));
+            (entrypoint, provider) -> entrypoint.registerEntityComponentFactories(this, this.lookup));
     }
 
     @Override
@@ -105,6 +106,6 @@ public final class StaticEntityComponentPlugin extends DispatchingLazy implement
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + componentId + " on " + target + ": " + factory + " and " + previousFactory);
         }
-        specializedMap.put(componentId, new MethodData(factoryInfo));
+        specializedMap.put(componentId, new MethodData(factoryInfo, factory));
     }
 }

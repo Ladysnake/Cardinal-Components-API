@@ -27,6 +27,7 @@ import nerdhub.cardinal.components.api.component.StaticComponentInitializer;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.Identifier;
@@ -66,7 +67,7 @@ public final class CcaBootstrap extends DispatchingLazy {
             if (initializerType.isInstance(staticInitializer.getEntrypoint())) {
                 @SuppressWarnings("unchecked") EntrypointContainer<T> t = (EntrypointContainer<T>) staticInitializer;
                 try {
-                    action.accept(t.getEntrypoint());
+                    action.accept(t.getEntrypoint(), staticInitializer.getProvider());
                 } catch (Exception e) {
                     ModMetadata metadata = staticInitializer.getProvider().getMetadata();
                     throw new StaticComponentLoadingException(String.format("Exception while registering static component factories for %s (%s)", metadata.getName(), metadata.getId()), e);
@@ -77,7 +78,7 @@ public final class CcaBootstrap extends DispatchingLazy {
 
     @FunctionalInterface
     public interface StaticInitializerConsumer<T> {
-        void accept(T initializer) throws ReflectiveOperationException;
+        void accept(T initializer, ModContainer provider) throws ReflectiveOperationException;
     }
 
     @Override

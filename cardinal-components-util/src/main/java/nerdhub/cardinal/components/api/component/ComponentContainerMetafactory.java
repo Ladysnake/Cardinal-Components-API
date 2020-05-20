@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.api.component;
 
+import com.google.common.reflect.TypeToken;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
 import nerdhub.cardinal.components.internal.util.ComponentContainerMetafactoryImpl;
@@ -49,8 +50,8 @@ public final class ComponentContainerMetafactory {
      *                                      or if its single abstract method's return type is not {@link ComponentContainer},
      *                                      or if the factory generation fails
      */
-    public static <I> I staticMetafactory(Identifier genericTypeId, Class<I> interfaceType) {
-        return ComponentContainerMetafactoryImpl.staticMetafactory(genericTypeId, interfaceType);
+    public static <I> I staticMetafactory(Identifier genericTypeId, Class<I> interfaceType, TypeToken<?> componentFactoryType) {
+        return ComponentContainerMetafactoryImpl.staticMetafactory(genericTypeId, interfaceType, componentFactoryType);
     }
 
     /**
@@ -62,9 +63,7 @@ public final class ComponentContainerMetafactory {
      *
      * @param genericTypeId       the id of the provider type for which components will be created,
      *                            as declared in {@link GenericComponentFactory#targets()}
-     * @param interfaceType       a class object representing a {@link FunctionalInterface}.
-     * @param containedType       the type of components held by this container.
-     *                            For example, some providers require all components to be {@link CopyableComponent}
+     * @param containerFactoryType       a class object representing a {@link FunctionalInterface}.
      * @param actualArgumentTypes eg. if {@code argClass} is {@code BiFunction.class}, {@code actualArgumentTypes} may be
      *                            {@code (PlayerEntity.class, UUID.class)}.
      *                            If left empty, the SAM's declared argument types will be used.
@@ -75,8 +74,8 @@ public final class ComponentContainerMetafactory {
      *                                  {@linkplain Class#isAssignableFrom(Class) assignable from} {@link ComponentContainer},
      *                                  or if {@code actualArgumentTypes} are not compatible with the SAM's declared arguments.
      */
-    public static <I> I staticMetafactory(Identifier genericTypeId, Class<? super I> interfaceType, Class<? extends Component> containedType, Class<?>... actualArgumentTypes) {
-        return ComponentContainerMetafactoryImpl.staticMetafactory(genericTypeId, interfaceType, containedType, actualArgumentTypes);
+    public static <I> I staticMetafactory(Identifier genericTypeId, Class<? super I> containerFactoryType, TypeToken<?> componentFactoryType, Class<?>... actualArgumentTypes) {
+        return ComponentContainerMetafactoryImpl.staticMetafactory(genericTypeId, containerFactoryType, componentFactoryType, actualArgumentTypes);
     }
 
     /**

@@ -35,6 +35,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public final class CardinalTestComponents {
     public static final String VITA_ID = "componenttest:vita";
@@ -44,7 +45,7 @@ public final class CardinalTestComponents {
     public static final String CUSTOM_PROVIDER_3 = "componenttest:custom/3";
 
     @GenericComponentFactory(value = VITA_ID, targets = {CUSTOM_PROVIDER_1, CUSTOM_PROVIDER_2, CUSTOM_PROVIDER_3})
-    public static BaseVita createForThirdParty() {
+    public static BaseVita createForThirdParty(UUID uuid) {
         return new BaseVita();
     }
 
