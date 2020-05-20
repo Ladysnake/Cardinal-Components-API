@@ -1,5 +1,6 @@
 package nerdhub.cardinal.componentstest;
 
+import com.google.common.reflect.TypeToken;
 import nerdhub.cardinal.components.api.component.*;
 import nerdhub.cardinal.componentstest.vita.BaseVita;
 import nerdhub.cardinal.componentstest.vita.PlayerVita;
@@ -18,6 +19,8 @@ import java.lang.invoke.MethodType;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
 
 public final class TestStaticComponentInitializer implements StaticEntityComponentInitializer, StaticChunkComponentInitializer, StaticLevelComponentInitializer, StaticWorldComponentInitializer, StaticGenericComponentInitializer, StaticItemComponentInitializer {
     public static final Identifier VITA_ID = new Identifier(CardinalTestComponents.VITA_ID);
@@ -25,6 +28,7 @@ public final class TestStaticComponentInitializer implements StaticEntityCompone
     public static final Identifier CUSTOM_PROVIDER_1 = new Identifier("componenttest:custom/1");
     public static final Identifier CUSTOM_PROVIDER_2 = new Identifier("componenttest:custom/2");
     public static final Identifier CUSTOM_PROVIDER_3 = new Identifier("componenttest:custom/3");
+    public static final TypeToken<Function<UUID, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<Function<UUID, BaseVita>>() {};
 
     @Override
     public Set<Identifier> getSupportedComponentTypes() {
@@ -56,10 +60,10 @@ public final class TestStaticComponentInitializer implements StaticEntityCompone
     }
 
     @Override
-    public void registerGenericComponentFactories(GenericComponentFactoryRegistry registry, MethodHandles.Lookup lookup) throws ReflectiveOperationException {
-        registry.register(VITA_ID, CUSTOM_PROVIDER_1, lookup.findStatic(CardinalTestComponents.class, "createForThirdParty", MethodType.methodType(BaseVita.class)));
-        registry.register(VITA_ID, CUSTOM_PROVIDER_2, lookup.findStatic(CardinalTestComponents.class, "createForThirdParty", MethodType.methodType(BaseVita.class)));
-        registry.register(VITA_ID, CUSTOM_PROVIDER_3, lookup.findStatic(CardinalTestComponents.class, "createForThirdParty", MethodType.methodType(BaseVita.class)));
+    public void registerGenericComponentFactories(GenericComponentFactoryRegistry registry) {
+        registry.register(VITA_ID, CUSTOM_PROVIDER_1, CUSTOM_FACTORY_TYPE, CardinalTestComponents::createForThirdParty);
+        registry.register(VITA_ID, CUSTOM_PROVIDER_2, CUSTOM_FACTORY_TYPE,CardinalTestComponents::createForThirdParty);
+        registry.register(VITA_ID, CUSTOM_PROVIDER_3, CUSTOM_FACTORY_TYPE,CardinalTestComponents::createForThirdParty);
     }
 
     @Override

@@ -47,8 +47,12 @@ public class FeedbackContainerFactory<T, C extends Component> {
      * Creates a new {@code IndexedComponentContainer}.
      * The returned container will be pre-sized based on previous {@link #adjustFrom adjustments}.
      */
-    public ComponentContainer<C> create(T obj) {
+    public final ComponentContainer<C> create(T obj) {
         FastComponentContainer<C> components = this.createContainer(this.expectedSize, obj);
+        return this.initContainer(obj, components);
+    }
+
+    protected final ComponentContainer<C> initContainer(T obj, FastComponentContainer<C> components) {
         for (Event<? extends ComponentCallback<T, C>> event : this.componentEvents) {
             event.invoker().initComponents(obj, components);
         }

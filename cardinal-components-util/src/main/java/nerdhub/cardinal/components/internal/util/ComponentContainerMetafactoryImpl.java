@@ -22,12 +22,14 @@
  */
 package nerdhub.cardinal.components.internal.util;
 
+import com.google.common.reflect.TypeToken;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ContainerGenerationException;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
 import nerdhub.cardinal.components.internal.ComponentsInternals;
 import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
+import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
@@ -35,7 +37,6 @@ import net.minecraft.util.Identifier;
 import java.io.IOException;
 import java.lang.invoke.*;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -43,23 +44,20 @@ public final class ComponentContainerMetafactoryImpl {
 
     public static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
 
-    public static <I> I staticMetafactory(Identifier genericTypeId, Class<I> interfaceType) {
+    public static <I> I staticMetafactory(Identifier genericTypeId, Class<I> interfaceType, TypeToken<?> componentFactoryType) {
         if (!interfaceType.isInterface()) {
             throw new IllegalArgumentException(interfaceType + " is not an interface");
         }
-        Method sam = findSam(interfaceType);
+        Method sam = CcaAsmHelper.findSam(interfaceType);
         Class<?>[] declaredArgumentTypes = sam.getParameterTypes();
         if (sam.getReturnType() != ComponentContainer.class) {
             throw new ContainerGenerationException("Return type of SAM " + sam + " is not " + ComponentContainer.class.getSimpleName());
         }
-        return createStaticContainerFactory(genericTypeId, interfaceType, sam, Component.class, declaredArgumentTypes);
+        return createStaticContainerFactory(genericTypeId, interfaceType, sam, componentFactoryType, declaredArgumentTypes);
     }
 
-    public static <I> I staticMetafactory(Identifier genericTypeId, Class<? super I> interfaceType, Class<? extends Component> expectedComponentClass, Class<?>[] actualArgumentTypes) {
-        if (!Component.class.isAssignableFrom(expectedComponentClass)) {
-            throw new IllegalArgumentException(expectedComponentClass + " is not assignable from Component");
-        }
-        Method sam = findSam(interfaceType);
+    public static <I> I staticMetafactory(Identifier genericTypeId, Class<? super I> interfaceType, TypeToken<?> componentFactoryType, Class<?>[] actualArgumentTypes) {
+        Method sam = CcaAsmHelper.findSam(interfaceType);
         Class<?>[] declaredArgumentTypes = sam.getParameterTypes();
         if (!sam.getReturnType().isAssignableFrom(ComponentContainer.class)) {
             throw new ContainerGenerationException("Declared return type of SAM " + sam + " is not " + ComponentContainer.class.getSimpleName() + " or a superclass");
@@ -72,13 +70,13 @@ public final class ComponentContainerMetafactoryImpl {
                 throw new ContainerGenerationException(actualArgumentTypes[i] + " is not a valid specialization of declared argument " + declaredArgumentTypes[i].getTypeName());
             }
         }
-        return createStaticContainerFactory(genericTypeId, interfaceType, sam, expectedComponentClass, actualArgumentTypes);
+        return createStaticContainerFactory(genericTypeId, interfaceType, sam, componentFactoryType, actualArgumentTypes);
     }
 
-    private static <I> I createStaticContainerFactory(Identifier genericTypeId, Class<? super I> interfaceType, Method sam, Class<? extends Component> containedType, Class<?>[] argumentTypes) {
+    private static <I> I createStaticContainerFactory(Identifier genericTypeId, Class<? super I> interfaceType, Method sam, TypeToken<?> componentFactoryType, Class<?>[] argumentTypes) {
         try {
-            Class<? extends ComponentContainer<?>> containerClass = StaticGenericComponentPlugin.INSTANCE.spinComponentContainer(genericTypeId, containedType, argumentTypes);
-            MethodType ctorType = MethodType.methodType(void.class, int.class).appendParameterTypes(argumentTypes);
+            Class<? extends ComponentContainer<?>> containerClass = StaticGenericComponentPlugin.INSTANCE.spinComponentContainer(componentFactoryType, genericTypeId);
+            MethodType ctorType = MethodType.methodType(void.class, int.class).appendParameterTypes(sam.getParameterTypes());
             MethodType samType = MethodType.methodType(sam.getReturnType(), sam.getParameterTypes());
             MethodType instantiatedSamType = MethodType.methodType(sam.getReturnType(), argumentTypes);
             MethodHandle mh = LOOKUP.findConstructor(containerClass, ctorType);
@@ -92,19 +90,10 @@ public final class ComponentContainerMetafactoryImpl {
 
     public static <T, C extends Component> Function<T, ComponentContainer<C>> dynamicMetafactory(Identifier genericTypeId, Class<T> argClass, Class<C> componentClass, Event<? extends ComponentCallback<T, C>>[] callbacks) {
         try {
-            @SuppressWarnings("unchecked") Class<? extends FeedbackContainerFactory<T, C>> containerFactoryClass = (Class<? extends FeedbackContainerFactory<T, C>>) StaticGenericComponentPlugin.INSTANCE.spinSingleArgContainerFactory(genericTypeId, componentClass, argClass);
+            @SuppressWarnings("unchecked") Class<? extends FeedbackContainerFactory<T, C>> containerFactoryClass = (Class<? extends FeedbackContainerFactory<T, C>>) StaticGenericComponentPlugin.INSTANCE.spinSingleArgContainerFactory(TypeToken.of(Function.class), genericTypeId, componentClass, argClass);
             return ComponentsInternals.createFactory(containerFactoryClass, callbacks)::create;
         } catch (StaticComponentLoadingException | IOException e) {
             throw new ContainerGenerationException("Failed to generate metafactory for " + genericTypeId, e);
         }
-    }
-
-    private static Method findSam(Class<?> callbackClass) {
-        for (Method m : callbackClass.getMethods()) {
-            if (Modifier.isAbstract(m.getModifiers())) {
-                return m;
-            }
-        }
-        throw new ContainerGenerationException(callbackClass + " is not a functional interface!");
     }
 }

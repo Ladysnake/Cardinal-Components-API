@@ -80,13 +80,13 @@ public final class StaticItemComponentPlugin extends DispatchingLazy implements 
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + componentId + " on " + (itemId == null ? "every item" : "item '" + itemId + "'") + ": " + factory + " and " + previousFactory);
         }
-        specializedMap.put(componentId, new MethodData(factoryInfo));
+        specializedMap.put(componentId, new MethodData(factoryInfo, factory));
     }
 
     @Override
     protected void init() {
         CcaBootstrap.INSTANCE.processSpecializedInitializers(StaticItemComponentInitializer.class,
-            initializer -> initializer.registerItemComponentFactories(this, this.lookup));
+            (initializer, provider) -> initializer.registerItemComponentFactories(this, this.lookup));
         Type itemType = Type.getObjectType(this.itemStackClass.replace('.', '/'));
         Map<Identifier, MethodData> wildcardMap = this.componentFactories.getOrDefault(null, Collections.emptyMap());
         for (Map.Entry<Identifier, Map<Identifier, MethodData>> entry : this.componentFactories.entrySet()) {
