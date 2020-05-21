@@ -56,10 +56,10 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
-        Vita vita = CardinalTestComponents.VITA.get(stack);
+        Vita vita = CardinalComponentsTest.VITA.get(stack);
         if (vita.getVitality() > 0 && !world.isClient) {
             if (player.isSneaking()) {
-                AmbientVita worldVita = (AmbientVita) CardinalTestComponents.VITA.get(
+                AmbientVita worldVita = (AmbientVita) CardinalComponentsTest.VITA.get(
                         world.random.nextInt(10) == 0
                                 ? world.getLevelProperties()
                                 : world
@@ -67,7 +67,7 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
                 vita.transferTo(worldVita, 1);
                 worldVita.syncWithAll(((ServerWorld)world).getServer());
             } else {
-                vita.transferTo(CardinalTestComponents.VITA.get(player), vita.getVitality());
+                vita.transferTo(CardinalComponentsTest.VITA.get(player), vita.getVitality());
             }
         }
         return TypedActionResult.pass(stack);
@@ -76,8 +76,8 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     @Override
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity holder) {
         // The entity may not have the component, but the stack always does.
-        CardinalTestComponents.VITA.maybeGet(target)
-                .ifPresent(v -> v.transferTo(CardinalTestComponents.VITA.get(stack), 1));
+        CardinalComponentsTest.VITA.maybeGet(target)
+                .ifPresent(v -> v.transferTo(CardinalComponentsTest.VITA.get(stack), 1));
         return true;
     }
 
@@ -85,10 +85,10 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> lines, TooltipContext ctx) {
         super.appendTooltip(stack, world, lines, ctx);
-        lines.add(new TranslatableText("componenttest:tooltip.vitality", CardinalTestComponents.VITA.get(stack).getVitality()));
+        lines.add(new TranslatableText("componenttest:tooltip.vitality", CardinalComponentsTest.VITA.get(stack).getVitality()));
         PlayerEntity holder = MinecraftClient.getInstance().player;
         if (holder != null) {
-            lines.add(new TranslatableText("componenttest:tooltip.self_vitality", CardinalTestComponents.VITA.get(holder).getVitality()));
+            lines.add(new TranslatableText("componenttest:tooltip.self_vitality", CardinalComponentsTest.VITA.get(holder).getVitality()));
         }
     }
 
@@ -99,6 +99,6 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
 
     @Override
     public void initComponents(ItemStack stack, ComponentContainer<CopyableComponent<?>> components) {
-        components.put(CardinalTestComponents.VITA, new BaseVita());
+        components.put(CardinalComponentsTest.VITA, new BaseVita());
     }
 }

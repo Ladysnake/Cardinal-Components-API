@@ -50,9 +50,9 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
     public <T extends Component> ComponentType<T> registerIfAbsent(Identifier componentId, Class<T> componentClass) {
         Preconditions.checkArgument(Component.class.isAssignableFrom(componentClass), "Component interface must extend " + Component.class.getCanonicalName());
         // make sure 2+ components cannot get registered at the same time
-        synchronized (registry) {
+        synchronized (this.registry) {
             @SuppressWarnings("unchecked")
-            ComponentType<T> existing = (ComponentType<T>) registry.get(componentId);
+            ComponentType<T> existing = (ComponentType<T>) this.registry.get(componentId);
             if (existing != null) {
                 if (existing.getComponentClass() != componentClass) {
                     throw new IllegalStateException("Registered component " + componentId + " twice with 2 different classes: " + existing.getComponentClass() + ", " + componentClass);
@@ -60,13 +60,13 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
                 return existing;
             } else {
                 ComponentType<T> registered;
-                Class<? extends ComponentType<?>> generated = CcaBootstrap.INSTANCE.getGeneratedComponentTypeClass(componentId.toString());
+                Class<? extends ComponentType<?>> generated = CcaBootstrap.INSTANCE.getGeneratedComponentTypeClass(componentId);
                 if (generated != null) {
-                    registered = instantiateStaticType(generated, componentId, componentClass, nextRawId++);
+                    registered = this.instantiateStaticType(generated, componentId, componentClass, this.nextRawId++);
                 } else {
-                    registered = access.create(componentId, componentClass, nextRawId++);
+                    registered = this.access.create(componentId, componentClass, this.nextRawId++);
                 }
-                registry.put(componentId, registered);
+                this.registry.put(componentId, registered);
                 SharedComponentSecrets.registeredComponents.set(this.registry.values().toArray(new ComponentType[0]));
                 ComponentRegisteredCallback.EVENT.invoker().onComponentRegistered(componentId, componentClass, registered);
                 return registered;
@@ -85,7 +85,7 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
 
     @Override
     public ComponentType<?> get(Identifier id) {
-        return registry.get(id);
+        return this.registry.get(id);
     }
 
     @Override
@@ -95,7 +95,7 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
 
     @Override
     public Stream<ComponentType<?>> stream() {
-        return registry.values().stream();
+        return this.registry.values().stream();
     }
 
     @VisibleForTesting

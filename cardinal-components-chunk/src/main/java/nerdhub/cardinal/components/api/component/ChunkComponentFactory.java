@@ -22,40 +22,23 @@
  */
 package nerdhub.cardinal.components.api.component;
 
-import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
-import net.minecraft.util.Identifier;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.world.chunk.Chunk;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Applied to a method to declare it as a component factory for {@linkplain Chunk chunks}.
- *
- * <p>The annotated method must take either no arguments, or 1 argument of type {@link Chunk}.
- * The return type must be either {@link Component} or a subclass.
+ * A component factory for {@linkplain Chunk chunks}.
  *
  * <p>When invoked, the factory can return either a {@link Component} of the right type, or {@code null}.
  * If the factory method returns {@code null}, the chunk will not support that type of component
  * (cf. {@link ComponentProvider#hasComponent(ComponentType)}).
+ *
  * @since 2.4.0
  */
 @ApiStatus.Experimental
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ChunkComponentFactory {
-    /**
-     * The id of the {@link ComponentType} which this factory makes components for.
-     *
-     * <p> The returned string must be a valid {@link net.minecraft.util.Identifier}.
-     * A {@link ComponentType} with the same id must be registered during mod initialization
-     * using {@link ComponentRegistry#registerIfAbsent(Identifier, Class)}.
-     *
-     * @return a string representing the id of a component type
-     */
-    String value();
+@FunctionalInterface
+public interface ChunkComponentFactory<C extends CopyableComponent<?>> {
+    @Nullable C createForChunk(Chunk chunk);
 }

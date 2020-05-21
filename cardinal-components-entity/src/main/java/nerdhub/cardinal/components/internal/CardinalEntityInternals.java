@@ -42,7 +42,7 @@ public final class CardinalEntityInternals {
     private CardinalEntityInternals() { throw new AssertionError(); }
 
     private static final Map<Class<? extends Entity>, Event<?>> ENTITY_EVENTS = new HashMap<>();
-    private static final Map<Class<? extends Entity>, FeedbackContainerFactory<Entity, Component>> ENTITY_CONTAINER_FACTORIES = new HashMap<>();
+    private static final Map<Class<? extends Entity>, DynamicContainerFactory<Entity, Component>> entityContainerFactories = new HashMap<>();
     private static final Map<ComponentType<?>, RespawnCopyStrategy<?>> RESPAWN_COPY_STRATEGIES = new HashMap<>();
 
     @SuppressWarnings("unchecked")
@@ -70,17 +70,21 @@ public final class CardinalEntityInternals {
     @SuppressWarnings("unchecked")
     public static ComponentContainer<?> createEntityComponentContainer(Entity entity) {
         Class<? extends Entity> entityClass = entity.getClass();
-        return ENTITY_CONTAINER_FACTORIES.computeIfAbsent(entityClass, cl -> {
+        return entityContainerFactories.computeIfAbsent(entityClass, cl -> {
             List<Event<?>> events = new ArrayList<>();
             Class<? extends Entity> c = cl;
-            Class<? extends FeedbackContainerFactory<?, ?>> factoryClass = null;
+            Class<? extends Entity> parentWithStaticComponents = null;
+
             while (Entity.class.isAssignableFrom(c)) {
                 events.add(EntityComponentCallback.event(c));
-                if (factoryClass == null) {   // try to find a specialized ASM factory
-                    factoryClass = StaticEntityComponentPlugin.INSTANCE.getFactoryClass(c);
+                if (parentWithStaticComponents == null && StaticEntityComponentPlugin.INSTANCE.requiresStaticFactory(c)) {   // try to find a specialized ASM factory
+                    parentWithStaticComponents = c;
                 }
                 c = (Class<? extends Entity>) c.getSuperclass();
             }
+            assert parentWithStaticComponents != null;
+            Class<? extends DynamicContainerFactory<Entity,Component>> factoryClass = (Class<? extends DynamicContainerFactory<Entity, Component>>) StaticEntityComponentPlugin.INSTANCE.spinDedicatedFactory(new StaticEntityComponentPlugin.Key(events.size(), parentWithStaticComponents));
+
             return ComponentsInternals.createFactory(factoryClass, Lists.reverse(events).toArray(new Event[0]));
         }).create(entity);
     }

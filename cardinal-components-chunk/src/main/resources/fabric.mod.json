@@ -12,9 +12,6 @@
         ],
         "client": [
             "nerdhub.cardinal.components.internal.ComponentsChunkNetworking::initClient"
-        ],
-        "cardinal-components-api:static-provider": [
-            "nerdhub.cardinal.components.internal.StaticChunkComponentPlugin::INSTANCE"
         ]
     },
     "custom": {

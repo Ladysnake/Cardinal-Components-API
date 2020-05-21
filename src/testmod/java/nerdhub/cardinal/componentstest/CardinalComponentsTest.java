@@ -22,6 +22,10 @@
  */
 package nerdhub.cardinal.componentstest;
 
+import com.google.common.reflect.TypeToken;
+import nerdhub.cardinal.components.api.ComponentRegistry;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentContainerMetafactory;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
@@ -29,6 +33,9 @@ import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
+import nerdhub.cardinal.componentstest.vita.Vita;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -46,11 +53,13 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 public class CardinalComponentsTest {
 
     public static final Logger LOGGER = LogManager.getLogger("Component Test");
+    public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.VITA_ID, Vita.class);
+    public static final ComponentType<Vita> ALT_VITA = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
 
     public static final String VITA_STICK_ID = "componenttest:vita_stick";
     // inline self component callback registration
@@ -66,46 +75,58 @@ public class CardinalComponentsTest {
     public static void init() {
         LOGGER.info("Hello, Components!");
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
-        EntityComponents.setRespawnCopyStrategy(CardinalTestComponents.VITA, RespawnCopyStrategy.ALWAYS_COPY);
-        LOGGER.info(ComponentContainerMetafactory.staticMetafactory(
-            new Identifier(CardinalTestComponents.CUSTOM_PROVIDER_1),
-            TestContainerFactory.class
+        EntityComponents.setRespawnCopyStrategy(VITA, RespawnCopyStrategy.ALWAYS_COPY);
+        LOGGER.info(ComponentContainerMetafactory.metafactory(
+            TestStaticComponentInitializer.CUSTOM_PROVIDER_1,
+            TypeToken.of(TestContainerFactory.class),
+            new TypeToken<BiFunction<UUID, PlayerEntity, ? extends Component>>() {}
         ).create(UUID.randomUUID(), null));
         try {
-            LOGGER.info(ComponentContainerMetafactory.staticMetafactory(
-                new Identifier(CardinalTestComponents.CUSTOM_PROVIDER_1),
-                TestContainerFactory.class
+            LOGGER.info(ComponentContainerMetafactory.metafactory(
+                TestStaticComponentInitializer.CUSTOM_PROVIDER_1,
+                TypeToken.of(TestContainerFactory.class),
+                new TypeToken<BiFunction<UUID, PlayerEntity, ? extends Component>>() {}
             ).create(UUID.randomUUID(), null));
             assert false : "Only one factory should be created for any given provider type";
-        } catch (StaticComponentLoadingException ignored) { }
+        } catch (IllegalStateException ignored) { }
         try {
-            LOGGER.info(ComponentContainerMetafactory.<Function<UUID, ComponentContainer<SyncedComponent>>>staticMetafactory(
-                new Identifier(CardinalTestComponents.CUSTOM_PROVIDER_2),
-                Function.class,
-                SyncedComponent.class,
-                UUID.class
-            ).apply(UUID.randomUUID()));
+            LOGGER.info(ComponentContainerMetafactory.metafactory(
+                TestStaticComponentInitializer.CUSTOM_PROVIDER_2,
+                new TypeToken<BiFunction<UUID, PlayerEntity, ? extends ComponentContainer<?>>>() {},
+                new TypeToken<BiFunction<UUID, PlayerEntity, ? extends SyncedComponent>>() {}
+            ).apply(UUID.randomUUID(), null));
             assert false : "Registered factory does not return " + SyncedComponent.class;
         } catch (StaticComponentLoadingException ignored) { }
-        LOGGER.info(ComponentContainerMetafactory.<Function<UUID, ComponentContainer<CopyableComponent<?>>>>staticMetafactory(
-            new Identifier(CardinalTestComponents.CUSTOM_PROVIDER_2),
-            Function.class,
-            CopyableComponent.class,
-            UUID.class
-        ).apply(UUID.randomUUID()));
-        LOGGER.info(ComponentContainerMetafactory.dynamicMetafactory(
-            new Identifier(CardinalTestComponents.CUSTOM_PROVIDER_3),
-            CopyableComponent.class,
-            UUID.class
-        ).apply(UUID.randomUUID()));
-        LOGGER.info(ComponentContainerMetafactory.staticMetafactory(
+        LOGGER.info(ComponentContainerMetafactory.metafactory(
+            TestStaticComponentInitializer.CUSTOM_PROVIDER_2,
+            new TypeToken<BiFunction<UUID, PlayerEntity, ComponentContainer<? extends CopyableComponent<?>>>>() {},
+            new TypeToken<BiFunction<UUID, PlayerEntity, ? extends CopyableComponent<?>>>() {}
+        ).apply(UUID.randomUUID(), null));
+        LOGGER.info(ComponentContainerMetafactory.metafactory(
+            TestStaticComponentInitializer.CUSTOM_PROVIDER_3,
+            TypeToken.of(TestContainerFactory.class),
+            TestStaticComponentInitializer.CUSTOM_FACTORY_TYPE,
+            TestCallback.class,
+            TestCallback.EVENT
+        ).create(UUID.randomUUID(), null));
+        LOGGER.info(ComponentContainerMetafactory.metafactory(
             new Identifier("componenttest:no_factory"),
-            TestContainerFactory.class
+            TypeToken.of(TestContainerFactory.class),
+            new TypeToken<BiFunction<UUID, PlayerEntity, ? extends Component>>() {}
         ).create(UUID.randomUUID(), null));
     }
 
     public interface TestContainerFactory {
         ComponentContainer<?> create(UUID u, @Nullable PlayerEntity p);
     }
-}
 
+    public interface TestCallback {
+        Event<TestCallback> EVENT = EventFactory.createArrayBacked(TestCallback.class, callbacks -> (uuid, p, c) -> {
+            for (TestCallback callback : callbacks) {
+                callback.initComponents(uuid, p, c);
+            }
+        });
+
+        void initComponents(UUID uuid, @Nullable PlayerEntity p, ComponentContainer<Component> components);
+    }
+}

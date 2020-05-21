@@ -12,9 +12,6 @@
         ],
         "client": [
             "nerdhub.cardinal.components.CardinalComponentsEntity::initClient"
-        ],
-        "cardinal-components-api:static-provider": [
-            "nerdhub.cardinal.components.internal.StaticEntityComponentPlugin::INSTANCE"
         ]
     },
     "custom": {

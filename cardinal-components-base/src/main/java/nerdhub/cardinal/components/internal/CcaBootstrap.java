@@ -23,86 +23,89 @@
 package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.StaticComponentInitializer;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
-import nerdhub.cardinal.components.internal.asm.FactoryClassScanner;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
-import net.fabricmc.loader.api.metadata.CustomValue;
-import org.objectweb.asm.*;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.minecraft.util.Identifier;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
+import java.util.function.BiConsumer;
 
-public final class CcaBootstrap implements PreLaunchEntrypoint {
+public final class CcaBootstrap extends DispatchingLazy {
 
-    public static final CcaBootstrap INSTANCE = new CcaBootstrap();
     public static final String COMPONENT_TYPE_INIT_DESC = Type.getMethodDescriptor(Type.VOID_TYPE, Type.getObjectType(CcaAsmHelper.IDENTIFIER), Type.getType(Class.class), Type.INT_TYPE);
     public static final String COMPONENT_TYPE_GET0_DESC = "(L" + CcaAsmHelper.COMPONENT_PROVIDER + ";)L" + CcaAsmHelper.COMPONENT + ";";
+    public static final String STATIC_INIT_ENTRYPOINT = "cardinal-components:static-init";
+    public static final CcaBootstrap INSTANCE = new CcaBootstrap();
 
-    private final Map</*Identifier*/ String, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>();
+    private final List<EntrypointContainer<StaticComponentInitializer>> staticComponentInitializers = FabricLoader.getInstance().getEntrypointContainers(STATIC_INIT_ENTRYPOINT, StaticComponentInitializer.class);
+
+    private Map<Identifier, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>();
+
+    public CcaBootstrap() {
+        super("registering a ComponentType");
+    }
 
     @Nullable
-    public Class<? extends ComponentType<?>> getGeneratedComponentTypeClass(String componentId) {
+    public Class<? extends ComponentType<?>> getGeneratedComponentTypeClass(Identifier componentId) {
+        this.ensureInitialized();
+        assert this.generatedComponentTypes != null;
         return this.generatedComponentTypes.get(componentId);
     }
 
+    public <T extends StaticComponentInitializer> void processSpecializedInitializers(Class<T> initializerType, BiConsumer<T, ModContainer> action) {
+        this.ensureInitialized();
+
+        for (EntrypointContainer<StaticComponentInitializer> staticInitializer : this.staticComponentInitializers) {
+            if (initializerType.isInstance(staticInitializer.getEntrypoint())) {
+                @SuppressWarnings("unchecked") EntrypointContainer<T> t = (EntrypointContainer<T>) staticInitializer;
+                try {
+                    action.accept(t.getEntrypoint(), staticInitializer.getProvider());
+                } catch (Throwable e) {
+                    ModMetadata metadata = staticInitializer.getProvider().getMetadata();
+                    throw new StaticComponentLoadingException(String.format("Exception while registering static component factories for %s (%s)", metadata.getName(), metadata.getId()), e);
+                }
+            }
+        }
+    }
+
     @Override
-    public void onPreLaunch() {
+    protected void init() {
         try {
-            List<StaticComponentPlugin> staticProviders = FabricLoader.getInstance().getEntrypoints("cardinal-components-api:static-provider", StaticComponentPlugin.class);
-            Map<String, StaticComponentPlugin> staticProviderAnnotations = this.collectAnnotations(staticProviders);
-            Set<String> staticComponentTypes = this.process(staticProviderAnnotations);
-            this.generatedComponentTypes.putAll(this.defineStaticComponentTypes(staticComponentTypes));
-            this.generateSpecializedContainers(staticProviders);
+            Set<Identifier> staticComponentTypes = new HashSet<>();
+
+            for (EntrypointContainer<StaticComponentInitializer> staticInitializer : this.staticComponentInitializers) {
+                try {
+                    staticComponentTypes.addAll(staticInitializer.getEntrypoint().getSupportedComponentTypes());
+                } catch (Throwable e) {
+                    ModMetadata badMod = staticInitializer.getProvider().getMetadata();
+                    throw new StaticComponentLoadingException(String.format("Exception while querying %s (%s) for supported static component types", badMod.getName(), badMod.getId()), e);
+                }
+            }
+
+            this.generatedComponentTypes = this.spinStaticComponentTypes(staticComponentTypes);
         } catch (IOException | UncheckedIOException e) {
             throw new StaticComponentLoadingException("Failed to load statically defined components", e);
-        } finally {
-            CcaAsmHelper.clearCache();
         }
     }
 
-    private void generateSpecializedContainers(List<StaticComponentPlugin> staticProviders) {
-        for (StaticComponentPlugin staticProvider : staticProviders) {
-            try {
-                staticProvider.generate();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    @Override
+    protected void postInit() {
+        for (EntrypointContainer<StaticComponentInitializer> staticInitializer : this.staticComponentInitializers) {
+            staticInitializer.getEntrypoint().finalizeStaticBootstrap();
         }
-    }
-
-    @Nonnull
-    private Set<String> process(Map<String, StaticComponentPlugin> staticProviderAnnotations) throws IOException {
-        Set</*Identifier*/ String> staticComponentTypes = new HashSet<>();
-        for (ModContainer mod : FabricLoader.getInstance().getAllMods()) {
-            CustomValue factories = mod.getMetadata().getCustomValue("cardinal-components-api:static-factories");
-            if (factories == null) continue;
-            for (CustomValue factory : factories.getAsArray()) {
-                this.process(factory.getAsString(), staticProviderAnnotations, staticComponentTypes);
-            }
-        }
-        return staticComponentTypes;
-    }
-
-    private void process(String className, Map<String, StaticComponentPlugin> staticProviderAnnotations, Set<String> staticComponentTypes) throws IOException {
-        ClassReader reader = CcaAsmHelper.getClassReader(Type.getObjectType(className.replace('.', '/')));
-        ClassVisitor adapter = new FactoryClassScanner(CcaAsmHelper.ASM_VERSION, null, staticProviderAnnotations, staticComponentTypes);
-        reader.accept(adapter, 0);
-    }
-
-    @Nonnull
-    private Map<String, StaticComponentPlugin> collectAnnotations(List<StaticComponentPlugin> staticProviders) {
-        Map</*Class<? extends Annotation>*/ String, StaticComponentPlugin> staticProviderAnnotations = new HashMap<>();
-        for (StaticComponentPlugin staticProvider : staticProviders) {
-            staticProviderAnnotations.put(Type.getDescriptor(staticProvider.getAnnotationType()), staticProvider);
-        }
-        return staticProviderAnnotations;
     }
 
     /**
@@ -113,30 +116,28 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
      * @param staticComponentTypes the set of all statically declared {@link ComponentType} ids
      * @return a map of {@link ComponentType} ids to specialized implementations
      */
-    private Map<String, Class<? extends ComponentType<?>>> defineStaticComponentTypes(Set<String> staticComponentTypes) throws IOException {
+    private Map<Identifier, Class<? extends ComponentType<?>>> spinStaticComponentTypes(Set<Identifier> staticComponentTypes) throws IOException {
         ClassNode staticContainerWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
         ClassNode staticComponentTypesNode = new ClassNode(CcaAsmHelper.ASM_VERSION);
         class ComponentTypeWriter {
             private final ClassNode node;
-            private final String identifier;
-            private final String name;
+            private final Identifier identifier;
 
-            private ComponentTypeWriter(ClassNode node, String identifier, String name) {
+            private ComponentTypeWriter(ClassNode node, Identifier identifier) {
                 this.node = node;
                 this.identifier = identifier;
-                this.name = name;
             }
         }
         List<ComponentTypeWriter> componentTypeWriters = new ArrayList<>(staticComponentTypes.size());
         staticContainerWriter.visit(Opcodes.V1_8, Opcodes.ACC_ABSTRACT | Opcodes.ACC_PUBLIC | Opcodes.ACC_INTERFACE, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, null, "java/lang/Object", new String[]{CcaAsmHelper.COMPONENT_CONTAINER});
         staticComponentTypesNode.visit(Opcodes.V1_8, Opcodes.ACC_FINAL | Opcodes.ACC_PUBLIC, CcaAsmHelper.STATIC_COMPONENT_TYPES, null, "java/lang/Object", null);
         MethodVisitor componentTypesInit = staticComponentTypesNode.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
-        for (String identifier : staticComponentTypes) {
+        for (Identifier identifier : staticComponentTypes) {
             /* generate the component type class */
 
             ClassNode componentTypeWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
             String componentTypeName = CcaAsmHelper.getComponentTypeName(identifier);
-            componentTypeWriters.add(new ComponentTypeWriter(componentTypeWriter, identifier, componentTypeName));
+            componentTypeWriters.add(new ComponentTypeWriter(componentTypeWriter, identifier));
             componentTypeWriter.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, componentTypeName, null, CcaAsmHelper.COMPONENT_TYPE, null);
 
             MethodVisitor init = componentTypeWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", COMPONENT_TYPE_INIT_DESC, null, null);
@@ -183,7 +184,7 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
 
             String typeConstantName = CcaAsmHelper.getTypeConstantName(identifier);
             staticComponentTypesNode.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, typeConstantName, "L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";", null, null);
-            componentTypesInit.visitLdcInsn(identifier);
+            componentTypesInit.visitLdcInsn(identifier.toString());
             componentTypesInit.visitMethodInsn(Opcodes.INVOKESTATIC, CcaAsmHelper.LAZY_COMPONENT_TYPE, "create", "(Ljava/lang/String;)L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";", false);
             componentTypesInit.visitFieldInsn(Opcodes.PUTSTATIC, CcaAsmHelper.STATIC_COMPONENT_TYPES, typeConstantName, "L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";");
 
@@ -206,7 +207,7 @@ public final class CcaBootstrap implements PreLaunchEntrypoint {
         CcaAsmHelper.generateClass(staticContainerWriter);
         componentTypesInit.visitInsn(Opcodes.RETURN);
         componentTypesInit.visitEnd();
-        Map<String, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>(componentTypeWriters.size());
+        Map<Identifier, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>(componentTypeWriters.size());
         for (ComponentTypeWriter componentTypeWriter : componentTypeWriters) {
             @SuppressWarnings("unchecked") Class<? extends ComponentType<?>> ct = (Class<? extends ComponentType<?>>) CcaAsmHelper.generateClass(componentTypeWriter.node);
             generatedComponentTypes.put(componentTypeWriter.identifier, ct);

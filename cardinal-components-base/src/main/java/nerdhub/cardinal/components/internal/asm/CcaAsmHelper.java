@@ -23,29 +23,23 @@
 package nerdhub.cardinal.components.internal.asm;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.launch.common.FabricLauncherBase;
+import net.minecraft.util.Identifier;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.ProtectionDomain;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 public final class CcaAsmHelper {
-    private static final sun.misc.Unsafe UNSAFE;
 
     /**
      * If {@code true}, any class generated through {@link #generateClass(ClassWriter, String)} will
@@ -58,7 +52,6 @@ public final class CcaAsmHelper {
     public static final String COMPONENT_CONTAINER = "nerdhub/cardinal/components/api/component/ComponentContainer";
     public static final String COMPONENT_TYPE = "nerdhub/cardinal/components/api/ComponentType";
     public static final String COMPONENT_PROVIDER = "nerdhub/cardinal/components/api/component/ComponentProvider";
-    public static final String CONTAINER_FACTORY_IMPL = "nerdhub/cardinal/components/internal/FeedbackContainerFactory";
     public static final String DYNAMIC_COMPONENT_CONTAINER_IMPL = "nerdhub/cardinal/components/api/util/container/FastComponentContainer";
     public static final String LAZY_COMPONENT_TYPE = "nerdhub/cardinal/components/api/util/LazyComponentType";
     public static final String IDENTIFIER = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960").replace('.', '/');
@@ -69,51 +62,6 @@ public final class CcaAsmHelper {
     public static final String STATIC_COMPONENT_TYPE = "nerdhub/cardinal/components/_generated_/ComponentType";
     public static final String STATIC_COMPONENT_TYPES = "nerdhub/cardinal/components/_generated_/StaticComponentTypes";
     public static final String STATIC_CONTAINER_FACTORY = "nerdhub/cardinal/components/_generated_/GeneratedContainerFactory";
-
-    private static final Map<Type, TypeData> typeCache = new HashMap<>();
-    private static final ClassLoader CLASSLOADER = CcaAsmHelper.class.getClassLoader();
-    private static final ProtectionDomain PROTECTION_DOMAIN = CcaAsmHelper.class.getProtectionDomain();
-
-    private static TypeData getTypeData(Type type) throws IOException {
-        TypeData t = typeCache.get(type);
-        if (t != null) {
-            return t;
-        }
-        String className = type.getInternalName();
-        byte[] rawClass = FabricLauncherBase.getLauncher().getClassByteArray(className.replace('.', '/'));
-        if (rawClass == null) throw new NoSuchFileException(className);
-        ClassReader reader = new ClassReader(rawClass);
-        TypeData newValue = new TypeData(type, Type.getObjectType(reader.getSuperName()), reader);
-        typeCache.put(type, newValue);
-        return newValue;
-    }
-
-    public static Type getSuperclass(Type type) throws IOException {
-        return getTypeData(type).getSupertype();
-    }
-
-    public static boolean isAssignableFrom(Type tSuper, Type tSub) throws IOException {
-        if (tSuper.equals(tSub)) return true;
-        if (tSub.equals(Type.getType(Object.class))) return false;
-        TypeData tSuperData = getTypeData(tSuper);
-        TypeData tSubData = getTypeData(tSub);
-        if (Modifier.isInterface(tSuperData.getReader().getAccess())) {
-            for (String itf : tSubData.getReader().getInterfaces()) {
-                if (isAssignableFrom(tSuper, Type.getObjectType(itf))) {
-                    return true;
-                }
-            }
-        }
-        return isAssignableFrom(tSuper, tSubData.getSupertype());
-    }
-
-    public static ClassReader getClassReader(Type type) throws IOException {
-        return getTypeData(type).getReader();
-    }
-
-    public static ClassNode getClassNode(Type type) throws IOException {
-        return getTypeData(type).getNode();
-    }
 
     public static Class<?> generateClass(ClassNode classNode) throws IOException {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -131,43 +79,52 @@ public final class CcaAsmHelper {
                 Files.createDirectories(path.getParent());
                 Files.write(path, bytes);
             }
-            return UNSAFE.defineClass(className.replace('/', '.'), bytes, 0, bytes.length, CLASSLOADER, PROTECTION_DOMAIN);
+            return CcaClassLoader.INSTANCE.define(className.replace('/', '.'), bytes);
         } catch (IOException | IllegalArgumentException | IllegalStateException e) {
             // IllegalStateException and IllegalArgumentException can be thrown by CheckClassAdapter
             throw new IOException("Failed to generate class " + className, e);
         }
     }
 
-    public static void clearCache() {
-        typeCache.clear();
-    }
-
-    public static String getComponentTypeName(String identifier) {
+    public static String getComponentTypeName(Identifier identifier) {
         return STATIC_COMPONENT_TYPE + "$" + getJavaIdentifierName(identifier);
     }
 
     @Nonnull
-    public static String getJavaIdentifierName(String identifier) {
-        return identifier.replace(':', '$');
+    public static String getJavaIdentifierName(Identifier identifier) {
+        return identifier.toString().replace(':', '$').replace('/', '$');
     }
 
     @Nonnull
-    public static String getTypeConstantName(String identifier) {
+    public static String getTypeConstantName(Identifier identifier) {
         return getJavaIdentifierName(identifier).toUpperCase(Locale.ROOT);
     }
 
     @Nonnull
-    public static String getStaticStorageGetterName(String identifier) {
+    public static String getStaticStorageGetterName(Identifier identifier) {
         return "get$" + getJavaIdentifierName(identifier);
     }
 
-    static {
-        try {
-            Field theUnsafe = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
-            theUnsafe.setAccessible(true);
-            UNSAFE = (sun.misc.Unsafe) theUnsafe.get(null);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            throw new StaticComponentLoadingException("Failed to retrieve Unsafe", e);
+    public static Method findSam(Class<?> callbackClass) {
+        if (!callbackClass.isInterface()) {
+            throw badFunctionalInterface(callbackClass);
         }
+        Method ret = null;
+        for (Method m : callbackClass.getMethods()) {
+            if (Modifier.isAbstract(m.getModifiers())) {
+                if (ret != null) {
+                    throw badFunctionalInterface(callbackClass);
+                }
+                ret = m;
+            }
+        }
+        if (ret == null) {
+            throw badFunctionalInterface(callbackClass);
+        }
+        return ret;
+    }
+
+    private static IllegalArgumentException badFunctionalInterface(Class<?> callbackClass) {
+        return new IllegalArgumentException(callbackClass + " is not a functional interface!");
     }
 }

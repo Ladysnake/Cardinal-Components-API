@@ -22,11 +22,14 @@
  */
 package nerdhub.cardinal.components.api.event;
 
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.EntityComponentFactory;
 import nerdhub.cardinal.components.internal.CardinalEntityInternals;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.entity.Entity;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * The callback interface for receiving component initialization events
@@ -69,6 +72,16 @@ public interface EntityComponentCallback<E extends Entity> extends ComponentCall
      */
     static <E extends Entity> Event<EntityComponentCallback<E>> event(Class<E> clazz) {
         return CardinalEntityInternals.event(clazz);
+    }
+
+    @ApiStatus.Experimental
+    static <C extends Component, E extends Entity> void register(ComponentType<C> type, Class<E> targetClass, EntityComponentFactory<C, E> factory) {
+        event(targetClass).register((entity, components) -> {
+            C c = factory.createForEntity(entity);
+            if (c != null) {
+                components.put(type, c);
+            }
+        });
     }
 
     /**
