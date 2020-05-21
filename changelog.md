@@ -13,6 +13,7 @@ you need to add a dependency on that module.**
   - Most classes that were not essential to CCA working got moved from `cardinal-components-base` to that module
 - Added `LazyComponentType`, allowing mods to retrieve a `ComponentType` handle before it is registered
 - It is no longer possible for a `ComponentCallback` to override an existing component
+- Fixed `PlayerSyncCallback` not firing when a player is teleported to another dimensions through commands
 
 ------------------------------------------------------
 Version 2.3.5
