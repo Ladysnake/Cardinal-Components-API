@@ -22,87 +22,103 @@
  */
 package nerdhub.cardinal.components.internal;
 
-import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.EntityComponentFactory;
-import nerdhub.cardinal.components.internal.asm.AnnotationData;
-import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
-import nerdhub.cardinal.components.internal.asm.MethodData;
+import nerdhub.cardinal.components.api.component.*;
+import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
-import org.objectweb.asm.Type;
+import net.minecraft.util.Identifier;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-public final class StaticEntityComponentPlugin implements StaticComponentPlugin {
+public final class StaticEntityComponentPlugin extends DispatchingLazy implements EntityComponentFactoryRegistry {
     public static final StaticEntityComponentPlugin INSTANCE = new StaticEntityComponentPlugin();
 
-    private static String getSuffix(Type entityClass) {
-        String internalName = entityClass.getInternalName();
-        String simpleName = internalName.substring(internalName.lastIndexOf('/') + 1);
-        return String.format("EntityImpl_%s_%d", simpleName, Integer.toUnsignedLong(internalName.hashCode()));
+    public StaticEntityComponentPlugin() {
+        super("instantiating an entity");
     }
 
-    private final Map<Type, Map</*Identifier*/String, MethodData>> componentFactories = new HashMap<>();
-    private final String entityClass = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_1297");
-    private final Map<Type, Class<? extends FeedbackContainerFactory<?, ?>>> factoryClasses = new HashMap<>();
-
-    public Class<? extends FeedbackContainerFactory<?, ?>> getFactoryClass(Class<? extends Entity> entityClass) {
-        return this.factoryClasses.get(Type.getType(entityClass));
+    private static String getSuffix(Class<?> entityClass) {
+        String simpleName = entityClass.getSimpleName();
+        return String.format("EntityImpl_%s_%s", simpleName, Integer.toHexString(entityClass.getName().hashCode()));
     }
 
-    @Override
-    public Class<? extends Annotation> getAnnotationType() {
-        return EntityComponentFactory.class;
+    private final Map<Class<? extends Entity>, Map</*ComponentType*/Identifier, EntityComponentFactory<?, ?>>> componentFactories = new HashMap<>();
+    private final Map<Class<? extends Entity>, Class<? extends ComponentContainer<?>>> containerClasses = new HashMap<>();
+    private final Map<Key, Class<? extends DynamicContainerFactory<?,?>>> factoryClasses = new HashMap<>();
+
+    public boolean requiresStaticFactory(Class<? extends Entity> entityClass) {
+        return entityClass == Entity.class || this.componentFactories.containsKey(entityClass);
     }
 
-    @Override
-    public String scan(MethodData factory, AnnotationData annotation) throws IOException {
-        Type[] factoryArgs = factory.descriptor.getArgumentTypes();
-        if (factoryArgs.length > 1) {
-            throw new StaticComponentLoadingException("Too many arguments in method " + factory + ". Should be either no-args or a single " + this.entityClass + " argument.");
-        }
-        Type target;
-        Type annotationTarget = annotation.getIfDeclared("target", Type.class);
-        if (annotationTarget != null) {
-            if (factoryArgs.length != 0 && !CcaAsmHelper.isAssignableFrom(factoryArgs[0], annotationTarget)) {
-                throw new IllegalStateException("Argument " + factoryArgs[0] + " in method " + factory + " is not assignable from declared target entity class " + annotationTarget);
-            }
-            target = annotationTarget;
-        } else {
-            if (factoryArgs.length == 0) {
-                throw new StaticComponentLoadingException("Cannot determine target entity class in method '" + factory + "'. Either specify an entity parameter of the target class, or explicitly specify the EntityComponentFactory#target property.");
-            } else {
-                target = factoryArgs[0];
-            }
-        }
-        String value = annotation.get("value", String.class);
-        Map<String, MethodData> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
-        MethodData previousFactory = specializedMap.get(value);
-        if (previousFactory != null) {
-            throw new StaticComponentLoadingException("Duplicate factory declarations for " + value + " on entity type " + target.getClassName() + ": " + factory + " and " + previousFactory);
-        }
-        specializedMap.put(value, factory);
-        return value;
-    }
+    public Class<? extends DynamicContainerFactory<?,? extends Component>> spinDedicatedFactory(Key key) {
+        this.ensureInitialized();
 
-    @Override
-    public void generate() throws IOException {
-        Type entityType = Type.getObjectType(this.entityClass.replace('.', '/'));
-        for (Map.Entry<Type, Map<String, MethodData>> entry : this.componentFactories.entrySet()) {
-            Map<String, MethodData> compiled = new HashMap<>(entry.getValue());
-            Type type = entry.getKey();
-            while (!type.equals(entityType)) {
-                type = CcaAsmHelper.getSuperclass(type);
+        // we need a cache as this method is called for a given class each time one of its subclasses is loaded.
+        return this.factoryClasses.computeIfAbsent(key, k -> {
+            Class<? extends Entity> entityClass = k.entityClass;
+
+            Map<Identifier, EntityComponentFactory<?, ?>> compiled = new LinkedHashMap<>(this.componentFactories.getOrDefault(entityClass, Collections.emptyMap()));
+            Class<?> type = entityClass;
+
+            while (type != Entity.class) {
+                type = type.getSuperclass();
                 this.componentFactories.getOrDefault(type, Collections.emptyMap()).forEach(compiled::putIfAbsent);
             }
-            String implSuffix = getSuffix(entry.getKey());
-            Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.spinComponentContainer(compiled, implSuffix, entityType);
-            this.factoryClasses.put(entry.getKey(), StaticComponentPluginBase.spinSingleArgFactory(implSuffix, Type.getType(containerCls), entityType));
+
+            String implSuffix = getSuffix(entityClass);
+
+            try {
+                Class<? extends ComponentContainer<?>> containerCls = this.containerClasses.get(entityClass);
+                if (containerCls == null) {
+                    containerCls = StaticComponentPluginBase.spinComponentContainer(EntityComponentFactory.class, compiled, implSuffix);
+                    this.containerClasses.put(entityClass, containerCls);
+                }
+                return StaticComponentPluginBase.spinContainerFactory(implSuffix + "_" + k.eventCount, DynamicContainerFactory.class, containerCls, EntityComponentCallback.class, k.eventCount, entityClass);
+            } catch (IOException e) {
+                throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entityClass, e);
+            }
+        });
+    }
+
+    @Override
+    protected void init() {
+        CcaBootstrap.INSTANCE.processSpecializedInitializers(StaticEntityComponentInitializer.class,
+            (entrypoint, provider) -> entrypoint.registerEntityComponentFactories(this));
+    }
+
+    @Override
+    public <E extends Entity> void register(Identifier componentId, Class<E> target, EntityComponentFactory<?, E> factory) {
+        this.checkLoading(EntityComponentFactoryRegistry.class, "register");
+        Map<Identifier, EntityComponentFactory<?, ?>> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
+        EntityComponentFactory<?, ?> previousFactory = specializedMap.get(componentId);
+        if (previousFactory != null) {
+            throw new StaticComponentLoadingException("Duplicate factory declarations for " + componentId + " on " + target + ": " + factory + " and " + previousFactory);
+        }
+        specializedMap.put(componentId, factory);
+    }
+
+    static class Key {
+        final int eventCount;
+        final Class<? extends Entity> entityClass;
+
+        public Key(int eventCount, Class<? extends Entity> entityClass) {
+            this.eventCount = eventCount;
+            this.entityClass = entityClass;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || this.getClass() != o.getClass()) return false;
+            Key key = (Key) o;
+            return this.eventCount == key.eventCount &&
+                this.entityClass.equals(key.entityClass);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.eventCount, this.entityClass);
         }
     }
 }

@@ -22,89 +22,52 @@
  */
 package nerdhub.cardinal.components.internal.util;
 
-import nerdhub.cardinal.components.api.component.Component;
+import com.google.common.reflect.Invokable;
+import com.google.common.reflect.Parameter;
+import com.google.common.reflect.TypeToken;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ContainerGenerationException;
-import nerdhub.cardinal.components.api.event.ComponentCallback;
 import nerdhub.cardinal.components.internal.ComponentsInternals;
-import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
+import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
-import java.lang.invoke.*;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public final class ComponentContainerMetafactoryImpl {
 
-    public static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+    @SuppressWarnings("unchecked")
+    private static final Event<Object>[] ZERO_EVENT = (Event<Object>[]) new Event[0];
 
-    public static <I> I staticMetafactory(Identifier genericTypeId, Class<I> interfaceType) {
-        if (!interfaceType.isInterface()) {
-            throw new IllegalArgumentException(interfaceType + " is not an interface");
-        }
-        Method sam = findSam(interfaceType);
-        Class<?>[] declaredArgumentTypes = sam.getParameterTypes();
-        if (sam.getReturnType() != ComponentContainer.class) {
-            throw new ContainerGenerationException("Return type of SAM " + sam + " is not " + ComponentContainer.class.getSimpleName());
-        }
-        return createStaticContainerFactory(genericTypeId, interfaceType, sam, Component.class, declaredArgumentTypes);
-    }
-
-    public static <I> I staticMetafactory(Identifier genericTypeId, Class<? super I> interfaceType, Class<? extends Component> expectedComponentClass, Class<?>[] actualArgumentTypes) {
-        if (!Component.class.isAssignableFrom(expectedComponentClass)) {
-            throw new IllegalArgumentException(expectedComponentClass + " is not assignable from Component");
-        }
-        Method sam = findSam(interfaceType);
-        Class<?>[] declaredArgumentTypes = sam.getParameterTypes();
-        if (!sam.getReturnType().isAssignableFrom(ComponentContainer.class)) {
-            throw new ContainerGenerationException("Declared return type of SAM " + sam + " is not " + ComponentContainer.class.getSimpleName() + " or a superclass");
+    public static <E, R, F> R metafactory(Identifier genericTypeId, TypeToken<R> containerFactoryType, TypeToken<F> componentFactoryType, @Nullable Class<? super E> callbackType, Event<E>[] events) {
+        Invokable<?, ?> containerFactorySam = containerFactoryType.method(CcaAsmHelper.findSam(containerFactoryType.getRawType()));
+        TypeToken<?>[] declaredArgumentTypes = containerFactorySam.getParameters().stream().map(Parameter::getType).toArray(TypeToken<?>[]::new);
+        Invokable<F, ?> componentFactorySam = componentFactoryType.method(CcaAsmHelper.findSam(componentFactoryType.getRawType()));
+        TypeToken<?>[] actualArgumentTypes = componentFactorySam.getParameters().stream().map(Parameter::getType).toArray(TypeToken<?>[]::new);
+        if (containerFactorySam.getReturnType().getRawType() != ComponentContainer.class) {
+            throw new ContainerGenerationException("Declared return type of SAM " + containerFactorySam + " is not " + ComponentContainer.class.getSimpleName());
         }
         if (actualArgumentTypes.length != declaredArgumentTypes.length) {
-            throw new ContainerGenerationException("Actual and declared argument type lists differ in length: " + Arrays.toString(actualArgumentTypes) + ", " + Arrays.toString(declaredArgumentTypes));
+            throw new ContainerGenerationException("Actual and declared argument type lists differ in length: " + Arrays.stream(actualArgumentTypes).map(TypeToken::getRawType).map(Class::getSimpleName).collect(Collectors.joining(", ", "[", "]")) + ", " + Arrays.stream(declaredArgumentTypes).map(TypeToken::getRawType).map(Class::getSimpleName).collect(Collectors.joining(", ", "[", "]")) + " (component factory type: " + componentFactoryType + ", container factory type: " + containerFactoryType + ")");
         }
         for (int i = 0; i < declaredArgumentTypes.length; i++) {
-            if (!declaredArgumentTypes[i].isAssignableFrom(actualArgumentTypes[i])) {
-                throw new ContainerGenerationException(actualArgumentTypes[i] + " is not a valid specialization of declared argument " + declaredArgumentTypes[i].getTypeName());
+            if (!declaredArgumentTypes[i].isSupertypeOf(actualArgumentTypes[i])) {
+                throw new ContainerGenerationException(actualArgumentTypes[i] + " is not a valid specialization of declared argument " + declaredArgumentTypes[i]);
             }
         }
-        return createStaticContainerFactory(genericTypeId, interfaceType, sam, expectedComponentClass, actualArgumentTypes);
-    }
-
-    private static <I> I createStaticContainerFactory(Identifier genericTypeId, Class<? super I> interfaceType, Method sam, Class<? extends Component> containedType, Class<?>[] argumentTypes) {
         try {
-            Class<? extends ComponentContainer<?>> containerClass = StaticGenericComponentPlugin.INSTANCE.spinComponentContainer(genericTypeId.toString(), containedType, argumentTypes);
-            MethodType ctorType = MethodType.methodType(void.class, int.class).appendParameterTypes(argumentTypes);
-            MethodType samType = MethodType.methodType(sam.getReturnType(), sam.getParameterTypes());
-            MethodType instantiatedSamType = MethodType.methodType(sam.getReturnType(), argumentTypes);
-            MethodHandle mh = LOOKUP.findConstructor(containerClass, ctorType);
-            CallSite metafactory = LambdaMetafactory.metafactory(LOOKUP, sam.getName(), MethodType.methodType(interfaceType, int.class), samType, mh, instantiatedSamType);
-            @SuppressWarnings("unchecked") I ret = (I) interfaceType.cast(metafactory.getTarget().invoke(0));
-            return ret;
-        } catch (Throwable e) {
-            throw new ContainerGenerationException("Failed to generate metafactory for " + genericTypeId, e);
-        }
-    }
-
-    public static <T, C extends Component> Function<T, ComponentContainer<C>> dynamicMetafactory(Identifier genericTypeId, Class<T> argClass, Class<C> componentClass, Event<? extends ComponentCallback<T, C>>[] callbacks) {
-        try {
-            @SuppressWarnings("unchecked") Class<? extends FeedbackContainerFactory<T, C>> containerFactoryClass = (Class<? extends FeedbackContainerFactory<T, C>>) StaticGenericComponentPlugin.INSTANCE.spinSingleArgContainerFactory(genericTypeId.toString(), componentClass, argClass);
-            return ComponentsInternals.createFactory(containerFactoryClass, callbacks)::create;
+            Class<? extends R> containerFactoryClass = StaticGenericComponentPlugin.INSTANCE.spinSingleArgContainerFactory(componentFactoryType, genericTypeId, containerFactoryType.getRawType(), callbackType, events.length, Arrays.stream(actualArgumentTypes).map(TypeToken::getRawType).toArray(Class<?>[]::new));
+            return ComponentsInternals.createFactory(containerFactoryClass, events);
         } catch (StaticComponentLoadingException | IOException e) {
             throw new ContainerGenerationException("Failed to generate metafactory for " + genericTypeId, e);
         }
     }
 
-    private static Method findSam(Class<?> callbackClass) {
-        for (Method m : callbackClass.getMethods()) {
-            if (Modifier.isAbstract(m.getModifiers())) {
-                return m;
-            }
-        }
-        throw new ContainerGenerationException(callbackClass + " is not a functional interface!");
+    public static <R, C> R metafactory(Identifier genericProviderId, TypeToken<R> containerFactoryType, TypeToken<C> componentFactoryType) {
+        return metafactory(genericProviderId, containerFactoryType, componentFactoryType, null, ZERO_EVENT);
     }
 }

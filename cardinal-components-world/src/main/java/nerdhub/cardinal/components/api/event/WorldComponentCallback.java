@@ -22,8 +22,10 @@
  */
 package nerdhub.cardinal.components.api.event;
 
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.WorldComponentFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.world.World;
@@ -47,6 +49,15 @@ public interface WorldComponentCallback extends ComponentCallback<World, Compone
                     callback.initComponents(world, components);
                 }
             });
+
+    static <C extends Component> void register(ComponentType<C> type, WorldComponentFactory<C> factory) {
+        EVENT.register((world, components) -> {
+            C c = factory.createForWorld(world);
+            if (c != null) {
+                components.put(type, c);
+            }
+        });
+    }
 
     /**
      * Initialize components for the given world.

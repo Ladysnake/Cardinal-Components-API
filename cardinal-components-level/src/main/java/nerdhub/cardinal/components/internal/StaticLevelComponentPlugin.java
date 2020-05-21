@@ -23,15 +23,28 @@
 package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.component.LevelComponentFactory;
-import net.fabricmc.loader.api.FabricLoader;
+import nerdhub.cardinal.components.api.component.LevelComponentFactoryRegistry;
+import nerdhub.cardinal.components.api.component.StaticLevelComponentInitializer;
+import net.minecraft.class_5217;
+import net.minecraft.util.Identifier;
 
-public final class StaticLevelComponentPlugin extends StaticComponentPluginBase {
+public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<class_5217, StaticLevelComponentInitializer, LevelComponentFactory<?>> implements LevelComponentFactoryRegistry {
     public static final String LEVEL_IMPL_SUFFIX = "LevelImpl";
-    public static final String WORLD_PROPERTIES_CLASS = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_5217");
 
     public static final StaticLevelComponentPlugin INSTANCE = new StaticLevelComponentPlugin();
 
     private StaticLevelComponentPlugin() {
-        super(WORLD_PROPERTIES_CLASS, LEVEL_IMPL_SUFFIX, LevelComponentFactory.class);
+        super("loading a world save", class_5217.class, LevelComponentFactory.class, StaticLevelComponentInitializer.class, LEVEL_IMPL_SUFFIX);
+    }
+
+    @Override
+    protected void dispatchRegistration(StaticLevelComponentInitializer entrypoint) {
+        entrypoint.registerLevelComponentFactories(this);
+    }
+
+    @Override
+    public void register(Identifier componentId, LevelComponentFactory<?> factory) {
+        this.checkLoading(LevelComponentFactoryRegistry.class, "register");
+        super.register(componentId, factory);
     }
 }

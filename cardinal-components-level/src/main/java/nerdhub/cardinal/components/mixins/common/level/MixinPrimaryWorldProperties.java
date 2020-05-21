@@ -26,12 +26,13 @@ import com.mojang.datafixers.DataFixer;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.LevelComponentCallback;
 import nerdhub.cardinal.components.internal.ComponentsInternals;
-import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
+import nerdhub.cardinal.components.internal.DynamicContainerFactory;
 import nerdhub.cardinal.components.internal.InternalComponentProvider;
 import nerdhub.cardinal.components.internal.StaticLevelComponentPlugin;
 import net.minecraft.class_5217;
 import net.minecraft.class_5268;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Lazy;
 import net.minecraft.world.level.LevelProperties;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -44,10 +45,10 @@ import javax.annotation.Nonnull;
 @Mixin(LevelProperties.class)
 public abstract class MixinPrimaryWorldProperties implements class_5268, InternalComponentProvider {
     @Unique
-    private static final FeedbackContainerFactory<class_5217, ?> componentContainerFactory
-        = ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getFactoryClass(), LevelComponentCallback.EVENT);
+    private static final Lazy<DynamicContainerFactory<class_5217,? extends nerdhub.cardinal.components.api.component.Component>> componentContainerFactory
+        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getContainerFactoryClass(), LevelComponentCallback.EVENT));
     @Unique
-    protected ComponentContainer<?> components = componentContainerFactory.create((LevelProperties) (Object) this);
+    protected ComponentContainer<?> components = componentContainerFactory.get().create(this);
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;Lcom/mojang/datafixers/DataFixer;ILnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void readComponents(CompoundTag data, DataFixer fixer, int version, CompoundTag player, CallbackInfo ci) {

@@ -85,7 +85,8 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
         return this.containedTypes.cardinality();
     }
 
-    public int dynamicSize() {
+    @SuppressWarnings("unused") // called by generated factories to adjust the initial size of future containers
+    public final int dynamicSize() {
         return this.vals.size();
     }
 
@@ -118,7 +119,7 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
         return this.vals.put(key.getRawId(), value);
     }
 
-    @SuppressWarnings("WeakerAccess")   // overridden by generated subclasses
+    // overridden by generated subclasses
     protected boolean canBeAssigned(ComponentType<?> key) {
         return !this.containsKey(key);
     }

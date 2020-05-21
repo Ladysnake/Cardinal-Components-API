@@ -12,11 +12,9 @@
         ],
         "client": [
             "nerdhub.cardinal.componentstest.CCATestClient::clientInit"
-        ]
-    },
-    "custom": {
-        "cardinal-components-api:static-factories": [
-            "nerdhub.cardinal.componentstest.CardinalTestComponents"
+        ],
+        "cardinal-components:static-init": [
+            "nerdhub.cardinal.componentstest.TestStaticComponentInitializer"
         ]
     },
     "depends": {

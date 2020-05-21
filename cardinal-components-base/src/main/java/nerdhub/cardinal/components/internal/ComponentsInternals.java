@@ -30,12 +30,9 @@ import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.fabric.api.event.Event;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.lang.invoke.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -104,19 +101,17 @@ public final class ComponentsInternals {
         throw new RuntimeException(callbackClass + " is not a functional interface!");
     }
 
-    @SafeVarargs
-    @SuppressWarnings("varargs")
     @Nonnull
-    public static <T, C extends Component> FeedbackContainerFactory<T, C> createFactory(@Nullable Class<?> factoryClass, Event<? extends ComponentCallback<T, C>>... events) {
-        if (factoryClass == null) {
-            return new FeedbackContainerFactory<>(events);
-        }
+    public static <R> R createFactory(Class<R> factoryClass, Event<?>... events) {
         try {
-            if (!FeedbackContainerFactory.class.isAssignableFrom(factoryClass)) throw new IllegalArgumentException(factoryClass + " does not inherit from " + FeedbackContainerFactory.class);
-            @SuppressWarnings("unchecked") FeedbackContainerFactory<T, C> ret =
-                (FeedbackContainerFactory<T, C>) factoryClass.getConstructor(Event[].class).newInstance((Object) events);
+            Constructor<?>[] constructors = factoryClass.getConstructors();
+            if (constructors.length != 1) {
+                throw new IllegalArgumentException("Expected 1 constructor declaration in " + factoryClass + ", got " + Arrays.toString(constructors));
+            }
+            @SuppressWarnings("unchecked") R ret =
+                (R) constructors[0].newInstance((Object[]) events);
             return ret;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new StaticComponentLoadingException("Failed to instantiate generated component factory", e);
         }
     }

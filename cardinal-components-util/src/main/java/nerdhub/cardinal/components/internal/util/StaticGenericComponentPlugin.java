@@ -22,98 +22,99 @@
  */
 package nerdhub.cardinal.components.internal.util;
 
-import nerdhub.cardinal.components.api.component.Component;
+import com.google.common.reflect.TypeToken;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.GenericComponentFactory;
-import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
-import nerdhub.cardinal.components.internal.StaticComponentPlugin;
+import nerdhub.cardinal.components.api.component.GenericComponentFactoryRegistry;
+import nerdhub.cardinal.components.api.component.StaticGenericComponentInitializer;
+import nerdhub.cardinal.components.internal.CcaBootstrap;
+import nerdhub.cardinal.components.internal.DispatchingLazy;
 import nerdhub.cardinal.components.internal.StaticComponentPluginBase;
-import nerdhub.cardinal.components.internal.asm.AnnotationData;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
-import nerdhub.cardinal.components.internal.asm.MethodData;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
-import org.objectweb.asm.Type;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.minecraft.util.Identifier;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.util.*;
-import java.util.stream.Collectors;
 
-public final class StaticGenericComponentPlugin implements StaticComponentPlugin {
+public final class StaticGenericComponentPlugin extends DispatchingLazy implements GenericComponentFactoryRegistry {
     public static final StaticGenericComponentPlugin INSTANCE = new StaticGenericComponentPlugin();
+    private ModContainer currentProvider;
 
-    private static String getSuffix(String itemId) {
-        return "GenericImpl_" + itemId.replace(':', '$').replace('/', '$');
+    public StaticGenericComponentPlugin() {
+        super("initializing something");
     }
 
-    private final Map</*Identifier*/String, Map</*ComponentType*/String, MethodData>> componentFactories = new HashMap<>();
-    private final Set<String> claimedFactories = new LinkedHashSet<>();
+    private static String getSuffix(Identifier itemId) {
+        return "GenericImpl_" + CcaAsmHelper.getJavaIdentifierName(itemId);
+    }
 
-    Class<? extends ComponentContainer<?>> spinComponentContainer(String genericTypeId, Class<? extends Component> expectedComponentClass, Class<?>... argClasses) throws IOException {
-        Type rType = Type.getType(expectedComponentClass);
-        Type[] args = new Type[argClasses.length];
-        for (int i = 0; i < argClasses.length; i++) {
-            args[i] = Type.getType(argClasses[i]);
-        }
+    private final Map<Identifier, Map</*ComponentType*/Identifier, OwnedObject<?>>> componentFactories = new HashMap<>();
+    private final Set<Identifier> claimedFactories = new LinkedHashSet<>();
+
+    <I> Class<? extends ComponentContainer<?>> spinComponentContainer(TypeToken<I> componentFactoryType, Identifier genericTypeId) throws IOException {
+        this.ensureInitialized();
+
         if (this.claimedFactories.contains(genericTypeId)) {
             throw new IllegalStateException("A component container factory for " + genericTypeId + " already exists.");
         }
-        Map<String, MethodData> componentFactories = this.componentFactories.getOrDefault(genericTypeId, Collections.emptyMap());
-        for (MethodData factory : componentFactories.values()) {
-            if (!CcaAsmHelper.isAssignableFrom(rType, factory.descriptor.getReturnType())) {
-                throw new StaticComponentLoadingException("Bad return type in component factory " + factory + ", expected " + expectedComponentClass + " or a subclass");
+        Map<Identifier, OwnedObject<?>> componentFactories = this.componentFactories.getOrDefault(genericTypeId, Collections.emptyMap());
+        Map<Identifier, I> resolved = new LinkedHashMap<>();
+        for (Map.Entry<Identifier, OwnedObject<?>> entry : componentFactories.entrySet()) {
+            Object object = entry.getValue().object;
+            if (!componentFactoryType.isSupertypeOf(entry.getValue().type)) {
+                ModMetadata blamed = entry.getValue().owner.getMetadata();
+                throw new StaticComponentLoadingException(String.format("Cannot cast %s registered as a component factory for %s by '%s'(%s) to %s", entry.getValue().type, entry.getKey(), blamed.getName(), blamed.getId(), componentFactoryType));
             }
-            Type[] factoryArgs = factory.descriptor.getArgumentTypes();
-            if (factoryArgs.length > args.length) {
-                throw new StaticComponentLoadingException(
-                    String.format("Too many arguments in method %s. Should be at most %d arguments with types %s.", factory, factoryArgs.length, Arrays.stream(factoryArgs).map(Type::getClassName).collect(Collectors.joining(", ", "[", "]")))
-                );
-            }
-            for (int i = 0; i < factoryArgs.length; i++) {
-                if (!Objects.equals(factoryArgs[i], args[i])) {
-                    throw new StaticComponentLoadingException("Invalid argument " + args[i].getClassName().replaceAll(".*\\.", "") + " in component factory " + factory + ", expected " + args[i].getClassName().replaceAll(".*\\.", ""));
-                }
-            }
+            @SuppressWarnings("unchecked") I i = (I) object;
+            resolved.put(entry.getKey(), i);
         }
-        Class<? extends ComponentContainer<?>> containerClass = StaticComponentPluginBase.spinComponentContainer(componentFactories, getSuffix(genericTypeId), args);
+        Class<? extends ComponentContainer<?>> containerClass = StaticComponentPluginBase.spinComponentContainer(componentFactoryType.getRawType(), resolved, getSuffix(genericTypeId));
         this.claimedFactories.add(genericTypeId);
         return containerClass;
     }
 
-    Class<? extends FeedbackContainerFactory<?, ?>> spinSingleArgContainerFactory(String genericTypeId, Class<? extends Component> componentClass, Class<?> argClass) throws IOException {
-        Class<? extends ComponentContainer<?>> containerClass = this.spinComponentContainer(genericTypeId, componentClass, argClass);
-        return StaticComponentPluginBase.spinSingleArgFactory(getSuffix(genericTypeId), Type.getType(containerClass), Type.getType(argClass));
+    <R> Class<? extends R> spinSingleArgContainerFactory(TypeToken<?> componentFactoryType, Identifier genericProviderId, Class<? super R> containerFactoryType, @Nullable Class<?> componentCallbackType, int eventCount, Class<?>[] actualFactoryArgs) throws IOException {
+        this.ensureInitialized();
+        Class<? extends ComponentContainer<?>> containerClass = this.spinComponentContainer(componentFactoryType, genericProviderId);
+        return StaticComponentPluginBase.spinContainerFactory(getSuffix(genericProviderId), containerFactoryType, containerClass, componentCallbackType, eventCount, actualFactoryArgs);
     }
 
     @Override
-    public Class<? extends Annotation> getAnnotationType() {
-        return GenericComponentFactory.class;
-    }
-
-    @Override
-    public String scan(MethodData factory, AnnotationData annotation) {
-        List<String> targets = annotation.get("targets", List.class);
-        Set<String> resolvedTargets = new HashSet<>(targets);
-        if (targets.size() != resolvedTargets.size()) {
-            throw new StaticComponentLoadingException("Component factory '" + factory + "' is trying to subscribe with duplicate ids (" + String.join(", ", targets) + ")");
+    public <F> void register(Identifier componentId, Identifier providerId, TypeToken<F> componentFactoryType, F factory) {
+        this.checkLoading(GenericComponentFactoryRegistry.class, "register");
+        Map<Identifier, OwnedObject<?>> specializedMap = this.componentFactories.computeIfAbsent(providerId, t -> new HashMap<>());
+        Object previousFactory = specializedMap.get(componentId);
+        if (previousFactory != null) {
+            throw new StaticComponentLoadingException("Duplicate factory declarations for " + componentId + " on provider '" + providerId + "': " + factory + " and " + previousFactory);
         }
-        String value = annotation.get("value", String.class);
-        for (String target : resolvedTargets) {
-            if (!IDENTIFIER_PATTERN.matcher(target).matches()) {
-                throw new StaticComponentLoadingException("Component factory '" + factory + "' is subscribing with invalid id: " + target);
-            }
-            Map<String, MethodData> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
-            MethodData previousFactory = specializedMap.get(value);
-            if (previousFactory != null) {
-                throw new StaticComponentLoadingException("Duplicate factory declarations for " + value + " on id '" + target + "': " + factory + " and " + previousFactory);
-            }
-            specializedMap.put(value, factory);
-        }
-        return value;
+        specializedMap.put(componentId, new OwnedObject<>(this.currentProvider, componentFactoryType, factory));
     }
 
     @Override
-    public void generate() {
-        // NO-OP, generation is done on demand
+    protected void init() {
+        CcaBootstrap.INSTANCE.processSpecializedInitializers(StaticGenericComponentInitializer.class,
+            (initializer, provider) -> {
+                try {
+                    this.currentProvider = provider;
+                    initializer.registerGenericComponentFactories(this);
+                } finally {
+                    this.currentProvider = null;
+                }
+            });
+    }
+
+    private static class OwnedObject<T> {
+        final ModContainer owner;
+        final T object;
+        final TypeToken<T> type;
+
+        public OwnedObject(ModContainer owner, TypeToken<T> type, T object) {
+            this.owner = owner;
+            this.type = type;
+            this.object = object;
+        }
     }
 }

@@ -12,9 +12,6 @@
         ],
         "client": [
             "nerdhub.cardinal.components.internal.ComponentsLevelNetworking::initClient"
-        ],
-        "cardinal-components-api:static-provider": [
-            "nerdhub.cardinal.components.internal.StaticLevelComponentPlugin::INSTANCE"
         ]
     },
     "custom": {

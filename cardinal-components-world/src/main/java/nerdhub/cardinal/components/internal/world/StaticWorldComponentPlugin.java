@@ -22,17 +22,30 @@
  */
 package nerdhub.cardinal.components.internal.world;
 
+import nerdhub.cardinal.components.api.component.StaticWorldComponentInitializer;
 import nerdhub.cardinal.components.api.component.WorldComponentFactory;
+import nerdhub.cardinal.components.api.component.WorldComponentFactoryRegistry;
 import nerdhub.cardinal.components.internal.StaticComponentPluginBase;
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 
-public final class StaticWorldComponentPlugin extends StaticComponentPluginBase {
+public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<World, StaticWorldComponentInitializer, WorldComponentFactory<?>> implements WorldComponentFactoryRegistry {
     public static final String WORLD_IMPL_SUFFIX = "WorldImpl";
-    public static final String WORLD_CLASS = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_1937");
 
     public static final StaticWorldComponentPlugin INSTANCE = new StaticWorldComponentPlugin();
 
     private StaticWorldComponentPlugin() {
-        super(WORLD_CLASS, WORLD_IMPL_SUFFIX, WorldComponentFactory.class);
+        super("loading a world", World.class, WorldComponentFactory.class, StaticWorldComponentInitializer.class, WORLD_IMPL_SUFFIX);
+    }
+
+    @Override
+    protected void dispatchRegistration(StaticWorldComponentInitializer entrypoint) {
+        entrypoint.registerWorldComponentFactories(this);
+    }
+
+    @Override
+    public void register(Identifier componentId, WorldComponentFactory<?> factory) {
+        this.checkLoading(WorldComponentFactoryRegistry.class, "register");
+        super.register(componentId, factory);
     }
 }
