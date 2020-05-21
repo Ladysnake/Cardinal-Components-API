@@ -54,6 +54,10 @@ public final class CcaBootstrap extends DispatchingLazy {
 
     private Map<Identifier, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>();
 
+    public CcaBootstrap() {
+        super("registering a ComponentType");
+    }
+
     @Nullable
     public Class<? extends ComponentType<?>> getGeneratedComponentTypeClass(Identifier componentId) {
         this.ensureInitialized();
@@ -69,7 +73,7 @@ public final class CcaBootstrap extends DispatchingLazy {
                 @SuppressWarnings("unchecked") EntrypointContainer<T> t = (EntrypointContainer<T>) staticInitializer;
                 try {
                     action.accept(t.getEntrypoint(), staticInitializer.getProvider());
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     ModMetadata metadata = staticInitializer.getProvider().getMetadata();
                     throw new StaticComponentLoadingException(String.format("Exception while registering static component factories for %s (%s)", metadata.getName(), metadata.getId()), e);
                 }
@@ -85,9 +89,9 @@ public final class CcaBootstrap extends DispatchingLazy {
             for (EntrypointContainer<StaticComponentInitializer> staticInitializer : this.staticComponentInitializers) {
                 try {
                     staticComponentTypes.addAll(staticInitializer.getEntrypoint().getSupportedComponentTypes());
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     ModMetadata badMod = staticInitializer.getProvider().getMetadata();
-                    throw new StaticComponentLoadingException(String.format("Exception while querying %s (%s) for supported static component types", badMod.getName(), badMod.getId()));
+                    throw new StaticComponentLoadingException(String.format("Exception while querying %s (%s) for supported static component types", badMod.getName(), badMod.getId()), e);
                 }
             }
 

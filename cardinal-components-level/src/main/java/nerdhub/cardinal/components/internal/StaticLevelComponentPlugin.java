@@ -34,7 +34,7 @@ public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<
     public static final StaticLevelComponentPlugin INSTANCE = new StaticLevelComponentPlugin();
 
     private StaticLevelComponentPlugin() {
-        super(class_5217.class, LevelComponentFactory.class, StaticLevelComponentInitializer.class, LEVEL_IMPL_SUFFIX);
+        super("loading a world save", class_5217.class, LevelComponentFactory.class, StaticLevelComponentInitializer.class, LEVEL_IMPL_SUFFIX);
     }
 
     @Override

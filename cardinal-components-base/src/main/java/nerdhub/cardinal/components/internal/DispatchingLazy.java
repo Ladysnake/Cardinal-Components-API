@@ -5,6 +5,11 @@ import org.jetbrains.annotations.ApiStatus;
 public abstract class DispatchingLazy {
     private boolean requiresInitialization = true;
     private boolean loading = false;
+    private final String likelyInitTrigger;
+
+    protected DispatchingLazy(String likelyInitTrigger) {
+        this.likelyInitTrigger = likelyInitTrigger;
+    }
 
     public void ensureInitialized() {
         if (this.requiresInitialization) {
@@ -26,7 +31,7 @@ public abstract class DispatchingLazy {
     }
 
     protected void onCircularLoading() {
-        throw new IllegalStateException("Circular loading issue, a mod is probably registering a ComponentType in the wrong place");
+        throw new IllegalStateException("Circular loading issue, a mod is probably "  + this.likelyInitTrigger + " in the wrong place");
     }
 
     @ApiStatus.OverrideOnly

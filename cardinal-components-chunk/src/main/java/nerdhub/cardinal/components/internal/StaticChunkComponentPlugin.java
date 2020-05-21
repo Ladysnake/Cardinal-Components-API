@@ -35,7 +35,7 @@ public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<
     public static final StaticChunkComponentPlugin INSTANCE = new StaticChunkComponentPlugin();
 
     private StaticChunkComponentPlugin() {
-        super(Chunk.class, ChunkComponentFactory.class, StaticChunkComponentInitializer.class, CHUNK_IMPL_SUFFIX);
+        super("loading a chunk", Chunk.class, ChunkComponentFactory.class, StaticChunkComponentInitializer.class, CHUNK_IMPL_SUFFIX);
     }
 
     @Override
