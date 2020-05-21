@@ -25,7 +25,7 @@ package nerdhub.cardinal.components.mixins.common.level;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import net.minecraft.class_5268;
+import net.minecraft.world.level.ServerWorldProperties;
 import net.minecraft.world.level.UnmodifiableLevelProperties;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,11 +33,12 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import javax.annotation.Nullable;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 @Mixin(UnmodifiableLevelProperties.class)
-public abstract class MixinDerivedWorldProperties implements ComponentProvider {
+public abstract class MixinUnmodifiableLevelProperties implements ComponentProvider {
 
-    @Shadow @Final private class_5268 properties;
+    @Shadow @Final private ServerWorldProperties properties;
 
     @Override
     public boolean hasComponent(ComponentType<?> type) {
@@ -53,5 +54,16 @@ public abstract class MixinDerivedWorldProperties implements ComponentProvider {
     @Override
     public Set<ComponentType<?>> getComponentTypes() {
         return ((ComponentProvider)this.properties).getComponentTypes();
+    }
+
+    @Override
+    public void forEachComponent(BiConsumer<ComponentType<?>, Component> op) {
+        ((ComponentProvider)this.properties).forEachComponent(op);
+    }
+
+    @Nullable
+    @Override
+    public Object getStaticComponentContainer() {
+        return ((ComponentProvider)this.properties).getStaticComponentContainer();
     }
 }

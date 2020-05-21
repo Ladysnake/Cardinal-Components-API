@@ -7,8 +7,8 @@
         "common.level.MixinClientWorldProperties"
     ],
     "mixins": [
-        "common.level.MixinDerivedWorldProperties",
         "common.level.MixinPrimaryWorldProperties",
+        "common.level.MixinUnmodifiableLevelProperties",
         "common.level.MixinWorldProperties"
     ],
     "injectors": {

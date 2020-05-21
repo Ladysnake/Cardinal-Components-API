@@ -23,13 +23,13 @@
 package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
-import net.minecraft.class_5217;
+import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 
 /**
- * A component factory for {@linkplain class_5217 world saves}.
+ * A component factory for {@linkplain WorldProperties world saves}.
  *
  * <p>When invoked, the factory can return either a {@link Component} of the right type, or {@code null}.
  * If the factory method returns {@code null}, the save properties object will not support that type of component
@@ -40,5 +40,5 @@ import javax.annotation.Nullable;
 @ApiStatus.Experimental
 public interface LevelComponentFactory<C extends Component> {
     @Nullable
-    C createForSave(class_5217 properties);
+    C createForSave(WorldProperties properties);
 }

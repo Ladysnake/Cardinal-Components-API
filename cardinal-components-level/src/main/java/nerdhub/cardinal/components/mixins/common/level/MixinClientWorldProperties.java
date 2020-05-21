@@ -30,10 +30,10 @@ import nerdhub.cardinal.components.api.event.LevelComponentCallback;
 import nerdhub.cardinal.components.internal.ComponentsInternals;
 import nerdhub.cardinal.components.internal.DynamicContainerFactory;
 import nerdhub.cardinal.components.internal.StaticLevelComponentPlugin;
-import net.minecraft.class_5217;
-import net.minecraft.class_5269;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.Lazy;
+import net.minecraft.world.MutableWorldProperties;
+import net.minecraft.world.WorldProperties;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -41,10 +41,10 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
 
-@Mixin(ClientWorld.class_5271.class)
-public abstract class MixinClientWorldProperties implements class_5269, ComponentProvider {
+@Mixin(ClientWorld.Properties.class)
+public abstract class MixinClientWorldProperties implements MutableWorldProperties, ComponentProvider {
     @Unique
-    private static final Lazy<DynamicContainerFactory<class_5217,? extends Component>> componentContainerFactory
+    private static final Lazy<DynamicContainerFactory<WorldProperties,? extends Component>> componentContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getContainerFactoryClass(), LevelComponentCallback.EVENT));
     @Unique
     protected ComponentContainer<?> components = componentContainerFactory.get().create(this);
