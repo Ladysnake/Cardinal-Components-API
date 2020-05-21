@@ -105,7 +105,7 @@ public class CardinalComponentsTest {
         LOGGER.info(ComponentContainerMetafactory.metafactory(
             TestStaticComponentInitializer.CUSTOM_PROVIDER_3,
             TypeToken.of(TestContainerFactory.class),
-            new TypeToken<BiFunction<UUID, PlayerEntity, ? extends Component>>() {},
+            TestStaticComponentInitializer.CUSTOM_FACTORY_TYPE,
             TestCallback.class,
             TestCallback.EVENT
         ).create(UUID.randomUUID(), null));
@@ -127,6 +127,6 @@ public class CardinalComponentsTest {
             }
         });
 
-        void initComponents(UUID uuid, @Nullable PlayerEntity p, ComponentContainer<?> components);
+        void initComponents(UUID uuid, @Nullable PlayerEntity p, ComponentContainer<Component> components);
     }
 }

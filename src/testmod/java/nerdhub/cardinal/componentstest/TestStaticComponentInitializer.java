@@ -86,6 +86,7 @@ public final class TestStaticComponentInitializer implements
     @Override
     public void finalizeStaticBootstrap() {
         CardinalComponentsTest.LOGGER.info("CCA Bootstrap complete!");
+        CardinalComponentsTest.TestCallback.EVENT.register((uuid, p, components) -> components.put(CardinalComponentsTest.ALT_VITA, new BaseVita()));
     }
 
 }
