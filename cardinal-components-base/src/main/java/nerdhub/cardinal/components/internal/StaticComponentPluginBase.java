@@ -404,6 +404,15 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
                 createContainer.visitMethodInsn(Opcodes.INVOKEINTERFACE, componentCallbackName, componentCallbackSam.getName(), componentCallbackDesc, true);
                 // stack: container
             }
+            createContainer.visitInsn(Opcodes.DUP);
+            // stack: container container
+            createContainer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "dynamicSize", "()I", false);
+            // stack: container container.size
+            createContainer.visitVarInsn(Opcodes.ALOAD, 0);
+            // stack: container container.size <this>
+            createContainer.visitInsn(Opcodes.SWAP);
+            // stack: container <this> container.size
+            createContainer.visitFieldInsn(Opcodes.PUTFIELD, factoryImplName, "expectedSize", "I");
         }
         createContainer.visitInsn(Opcodes.ARETURN);
         createContainer.visitEnd();
