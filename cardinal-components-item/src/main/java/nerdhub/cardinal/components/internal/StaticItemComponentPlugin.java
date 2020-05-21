@@ -34,15 +34,17 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public final class StaticItemComponentPlugin extends DispatchingLazy implements ItemComponentFactoryRegistry {
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
-    private final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
     public static final String WILDARD_IMPL_SUFFIX = "ItemStackImpl_All";
+
+    public StaticItemComponentPlugin() {
+        super("creating an ItemStack");
+    }
 
     private static String getSuffix(Identifier itemId) {
         return "ItemStackImpl_" + CcaAsmHelper.getJavaIdentifierName(itemId);

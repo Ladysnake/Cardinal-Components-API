@@ -34,6 +34,10 @@ import java.util.*;
 public final class StaticEntityComponentPlugin extends DispatchingLazy implements EntityComponentFactoryRegistry {
     public static final StaticEntityComponentPlugin INSTANCE = new StaticEntityComponentPlugin();
 
+    public StaticEntityComponentPlugin() {
+        super("instantiating an entity");
+    }
+
     private static String getSuffix(Class<?> entityClass) {
         String simpleName = entityClass.getSimpleName();
         return String.format("EntityImpl_%s_%s", simpleName, Integer.toHexString(entityClass.getName().hashCode()));

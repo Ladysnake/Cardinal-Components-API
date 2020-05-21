@@ -35,7 +35,7 @@ public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<
     public static final StaticWorldComponentPlugin INSTANCE = new StaticWorldComponentPlugin();
 
     private StaticWorldComponentPlugin() {
-        super(World.class, WorldComponentFactory.class, StaticWorldComponentInitializer.class, WORLD_IMPL_SUFFIX);
+        super("loading a world", World.class, WorldComponentFactory.class, StaticWorldComponentInitializer.class, WORLD_IMPL_SUFFIX);
     }
 
     @Override

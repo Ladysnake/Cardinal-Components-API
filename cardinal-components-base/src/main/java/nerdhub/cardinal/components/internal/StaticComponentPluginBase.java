@@ -42,7 +42,6 @@ import org.objectweb.asm.tree.ClassNode;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -78,10 +77,10 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
     private final Class<T> providerClass;
     private final String implSuffix;
     private final Class<I> initializerType;
-    protected final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
     private Class<? extends DynamicContainerFactory<T,?>> containerFactoryClass;
 
-    protected StaticComponentPluginBase(Class<T> providerClass, Class<? super F> componentFactoryType, Class<I> initializerType, String implSuffix) {
+    protected StaticComponentPluginBase(String likelyInitTrigger, Class<T> providerClass, Class<? super F> componentFactoryType, Class<I> initializerType, String implSuffix) {
+        super(likelyInitTrigger);
         this.componentFactoryType = componentFactoryType;
         this.providerClass = providerClass;
         this.implSuffix = implSuffix;
@@ -187,7 +186,8 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
             init.visitLabel(nextInit);
 
             /* get implementation */
-            // note: this implementation is O(n). For best results, we could make a big lookup table based on
+            // note: this implementation is O(n). For best results, we could make a big lookup table based on component ids
+            // (would require reserving raw ids in advance for static components)
             Label nextGet = new Label();
             get.visitVarInsn(Opcodes.ALOAD, 1);
             stackStaticComponentType(get, identifier);

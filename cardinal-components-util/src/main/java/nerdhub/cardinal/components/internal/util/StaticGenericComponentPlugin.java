@@ -43,6 +43,10 @@ public final class StaticGenericComponentPlugin extends DispatchingLazy implemen
     public static final StaticGenericComponentPlugin INSTANCE = new StaticGenericComponentPlugin();
     private ModContainer currentProvider;
 
+    public StaticGenericComponentPlugin() {
+        super("initializing something");
+    }
+
     private static String getSuffix(Identifier itemId) {
         return "GenericImpl_" + CcaAsmHelper.getJavaIdentifierName(itemId);
     }
