@@ -46,6 +46,14 @@ public abstract class MixinPlayerManager {
     }
 
     @Inject(
+        method = "sendPlayerStatus",
+        at = @At("RETURN")
+    )
+    private void sendPlayerStatus(ServerPlayerEntity player, CallbackInfo info) {
+        PlayerSyncCallback.EVENT.invoker().onPlayerSync(player);
+    }
+
+    @Inject(
             method = "respawnPlayer",
             at = @At("RETURN")
     )
