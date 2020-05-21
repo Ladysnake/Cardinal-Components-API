@@ -1,6 +1,6 @@
 package nerdhub.cardinal.components.api.component;
 
-import net.minecraft.class_5217;
+import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -8,7 +8,7 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * <p>The entrypoint, like every {@link StaticComponentInitializer}, is exposed as
  * {@code cardinal-components:static-init} in the mod json and runs for any environment.
- * It usually executes right before the first {@linkplain class_5217 save properties object} gets loaded.
+ * It usually executes right before the first {@linkplain WorldProperties save properties object} gets loaded.
  *
  * @since 2.4.0
  */

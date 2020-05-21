@@ -25,13 +25,13 @@ package nerdhub.cardinal.components.mixins.common.level;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import net.minecraft.class_5217;
+import net.minecraft.world.WorldProperties;
 import org.spongepowered.asm.mixin.Mixin;
 
 import javax.annotation.Nullable;
 import java.util.Set;
 
-@Mixin(class_5217.class)
+@Mixin(WorldProperties.class)
 public interface MixinWorldProperties extends ComponentProvider {
     @Override
     default boolean hasComponent(ComponentType<?> type) {

@@ -23,10 +23,10 @@
 package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
-import net.minecraft.class_5217;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.level.LevelProperties;
 import org.jetbrains.annotations.ApiStatus;
@@ -69,7 +69,7 @@ public interface ComponentProvider {
      * Convenience method to retrieve a ComponentProvider from given {@link LevelProperties}.
      * Requires the <tt>cardinal-components-level</tt> module.
      */
-    static ComponentProvider fromLevel(class_5217 level) {
+    static ComponentProvider fromLevel(WorldProperties level) {
         return (ComponentProvider) level;
     }
 

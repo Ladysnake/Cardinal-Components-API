@@ -23,36 +23,41 @@
 package nerdhub.cardinal.components.mixins.common.level;
 
 import com.mojang.datafixers.DataFixer;
+import com.mojang.serialization.Dynamic;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.LevelComponentCallback;
 import nerdhub.cardinal.components.internal.ComponentsInternals;
 import nerdhub.cardinal.components.internal.DynamicContainerFactory;
 import nerdhub.cardinal.components.internal.InternalComponentProvider;
 import nerdhub.cardinal.components.internal.StaticLevelComponentPlugin;
-import net.minecraft.class_5217;
-import net.minecraft.class_5268;
+import net.minecraft.class_5315;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.util.Lazy;
+import net.minecraft.world.WorldProperties;
+import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
+import net.minecraft.world.level.ServerWorldProperties;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
 
 @Mixin(LevelProperties.class)
-public abstract class MixinPrimaryWorldProperties implements class_5268, InternalComponentProvider {
+public abstract class MixinPrimaryWorldProperties implements ServerWorldProperties, InternalComponentProvider {
     @Unique
-    private static final Lazy<DynamicContainerFactory<class_5217,? extends nerdhub.cardinal.components.api.component.Component>> componentContainerFactory
+    private static final Lazy<DynamicContainerFactory<WorldProperties,?>> componentContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getContainerFactoryClass(), LevelComponentCallback.EVENT));
     @Unique
     protected ComponentContainer<?> components = componentContainerFactory.get().create(this);
 
-    @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;Lcom/mojang/datafixers/DataFixer;ILnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
-    private void readComponents(CompoundTag data, DataFixer fixer, int version, CompoundTag player, CallbackInfo ci) {
-        this.components.fromTag(data);
+    @Inject(method = "method_29029", at = @At("RETURN"))
+    private static void readComponents(Dynamic<Tag> dynamic, DataFixer dataFixer, int i, CompoundTag compoundTag, LevelInfo levelInfo, class_5315 arg, CallbackInfoReturnable<LevelProperties> cir) {
+        ((InternalComponentProvider)cir.getReturnValue()).getComponentContainer().fromDynamic(dynamic);
     }
 
     @Inject(method = "updateProperties", at = @At("RETURN"))
