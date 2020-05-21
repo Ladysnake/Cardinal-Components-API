@@ -34,12 +34,13 @@ import java.util.*;
 public final class StaticEntityComponentPlugin extends DispatchingLazy implements EntityComponentFactoryRegistry {
     public static final StaticEntityComponentPlugin INSTANCE = new StaticEntityComponentPlugin();
 
-    private static String getSuffix(Key key) {
-        String simpleName = key.entityClass.getSimpleName();
-        return String.format("EntityImpl_%s_%s_%d", simpleName, Integer.toHexString(key.entityClass.getName().hashCode()), key.eventCount);
+    private static String getSuffix(Class<?> entityClass) {
+        String simpleName = entityClass.getSimpleName();
+        return String.format("EntityImpl_%s_%s", simpleName, Integer.toHexString(entityClass.getName().hashCode()));
     }
 
     private final Map<Class<? extends Entity>, Map</*ComponentType*/Identifier, EntityComponentFactory<?, ?>>> componentFactories = new HashMap<>();
+    private final Map<Class<? extends Entity>, Class<? extends ComponentContainer<?>>> containerClasses = new HashMap<>();
     private final Map<Key, Class<? extends DynamicContainerFactory<?,?>>> factoryClasses = new HashMap<>();
 
     public boolean requiresStaticFactory(Class<? extends Entity> entityClass) {
@@ -61,11 +62,15 @@ public final class StaticEntityComponentPlugin extends DispatchingLazy implement
                 this.componentFactories.getOrDefault(type, Collections.emptyMap()).forEach(compiled::putIfAbsent);
             }
 
-            String implSuffix = getSuffix(k);
+            String implSuffix = getSuffix(entityClass);
 
             try {
-                Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.spinComponentContainer(EntityComponentFactory.class, compiled, implSuffix);
-                return StaticComponentPluginBase.spinContainerFactory(implSuffix, DynamicContainerFactory.class, containerCls, EntityComponentCallback.class, k.eventCount, entityClass);
+                Class<? extends ComponentContainer<?>> containerCls = this.containerClasses.get(entityClass);
+                if (containerCls == null) {
+                    containerCls = StaticComponentPluginBase.spinComponentContainer(EntityComponentFactory.class, compiled, implSuffix);
+                    this.containerClasses.put(entityClass, containerCls);
+                }
+                return StaticComponentPluginBase.spinContainerFactory(implSuffix + "_" + k.eventCount, DynamicContainerFactory.class, containerCls, EntityComponentCallback.class, k.eventCount, entityClass);
             } catch (IOException e) {
                 throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entityClass, e);
             }
