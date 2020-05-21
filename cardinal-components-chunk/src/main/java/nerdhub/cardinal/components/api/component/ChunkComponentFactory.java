@@ -22,16 +22,11 @@
  */
 package nerdhub.cardinal.components.api.component;
 
-import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
-import net.minecraft.util.Identifier;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.world.chunk.Chunk;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Applied to a method to declare it as a component factory for {@linkplain Chunk chunks}.
@@ -45,17 +40,6 @@ import java.lang.annotation.Target;
  * @since 2.4.0
  */
 @ApiStatus.Experimental
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ChunkComponentFactory {
-    /**
-     * The id of the {@link ComponentType} which this factory makes components for.
-     *
-     * <p> The returned string must be a valid {@link net.minecraft.util.Identifier}.
-     * A {@link ComponentType} with the same id must be registered during mod initialization
-     * using {@link ComponentRegistry#registerIfAbsent(Identifier, Class)}.
-     *
-     * @return a string representing the id of a component type
-     */
-    String value();
+public interface ChunkComponentFactory<C extends CopyableComponent<?>> {
+    @Nullable C createForChunk(Chunk chunk);
 }

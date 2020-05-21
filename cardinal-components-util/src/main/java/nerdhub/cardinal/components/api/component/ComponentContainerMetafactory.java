@@ -23,79 +23,52 @@
 package nerdhub.cardinal.components.api.component;
 
 import com.google.common.reflect.TypeToken;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import nerdhub.cardinal.components.api.event.ComponentCallback;
 import nerdhub.cardinal.components.internal.util.ComponentContainerMetafactoryImpl;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.function.Function;
-
 @ApiStatus.Experimental
 public final class ComponentContainerMetafactory {
     /**
-     * Creates a {@link ComponentContainer} factory implementing a functional interface.
+     * Creates a {@link ComponentContainer} factory that supports only statically declared components.
      *
      * <p>When the returned object's SAM is invoked, it will initialize a {@link ComponentContainer},
-     * calling every {@link GenericComponentFactory} which {@link GenericComponentFactory#targets()} array
-     * contains the {@code genericTypeId}.
+     * calling every registered factory for the given provider.
      *
-     * @param genericTypeId the id of the provider type for which components will be created,
-     *                      as declared in {@link GenericComponentFactory#targets()}
-     * @param interfaceType a class object representing a {@link FunctionalInterface}.
-     * @return a {@link ComponentContainer} factory implementing {@code interfaceType}
-     * @throws IllegalArgumentException     if {@code interfaceType} is not an interface
-     * @throws ContainerGenerationException if {@code interfaceType} is not a valid functional interface,
-     *                                      or if its single abstract method's return type is not {@link ComponentContainer},
-     *                                      or if the factory generation fails
+     * @param genericProviderId    the id of the provider type for which components will be created,
+     *                             as declared in {@link GenericComponentFactoryRegistry#register(Identifier, Identifier, TypeToken, Object)}
+     * @param containerFactoryType the interface implemented by the returned container factory.
+     *                             Must be a {@link FunctionalInterface}.
+     * @param componentFactoryType the type of the static factories called to initialize the returned container,
+     *                             as declared in {@link GenericComponentFactoryRegistry#register(Identifier, Identifier, TypeToken, Object)}.
+     *                             Must be a {@link FunctionalInterface}.
+     * @return a {@link ComponentContainer} factory
      */
-    public static <I> I staticMetafactory(Identifier genericTypeId, Class<I> interfaceType, TypeToken<?> componentFactoryType) {
-        return ComponentContainerMetafactoryImpl.staticMetafactory(genericTypeId, interfaceType, componentFactoryType);
-    }
-
-    /**
-     * Creates a {@link ComponentContainer} factory implementing a functional interface.
-     *
-     * <p>When the returned object's SAM is invoked, it will initialize a {@link ComponentContainer},
-     * calling every {@link GenericComponentFactory} which {@link GenericComponentFactory#targets()} array
-     * contains the {@code genericTypeId}.
-     *
-     * @param genericTypeId       the id of the provider type for which components will be created,
-     *                            as declared in {@link GenericComponentFactory#targets()}
-     * @param containerFactoryType       a class object representing a {@link FunctionalInterface}.
-     * @param actualArgumentTypes eg. if {@code argClass} is {@code BiFunction.class}, {@code actualArgumentTypes} may be
-     *                            {@code (PlayerEntity.class, UUID.class)}.
-     *                            If left empty, the SAM's declared argument types will be used.
-     * @param <I>                 the parameterized type of the functional interface
-     * @return a {@link ComponentContainer} factory implementing {@code interfaceType}
-     * @throws IllegalArgumentException if {@code interfaceType} is not a functional interface,
-     *                                  or if its single abstract method's return type is not
-     *                                  {@linkplain Class#isAssignableFrom(Class) assignable from} {@link ComponentContainer},
-     *                                  or if {@code actualArgumentTypes} are not compatible with the SAM's declared arguments.
-     */
-    public static <I> I staticMetafactory(Identifier genericTypeId, Class<? super I> containerFactoryType, TypeToken<?> componentFactoryType, Class<?>... actualArgumentTypes) {
-        return ComponentContainerMetafactoryImpl.staticMetafactory(genericTypeId, containerFactoryType, componentFactoryType, actualArgumentTypes);
+    public static <R, C> R metafactory(Identifier genericProviderId, TypeToken<R> containerFactoryType, TypeToken<C> componentFactoryType) {
+        return ComponentContainerMetafactoryImpl.metafactory(genericProviderId, containerFactoryType, componentFactoryType);
     }
 
     /**
      * Creates a {@link ComponentContainer} factory that supports both static and dynamic components.
      *
      * <p>When the returned object's SAM is invoked, it will initialize a {@link ComponentContainer},
-     * calling every {@link GenericComponentFactory} which {@link GenericComponentFactory#targets()} array
-     * contains the {@code genericTypeId}. It will also fire passed {@code events} to populate the container dynamically.
+     * calling every statically registered factory as well as every dynamically registered callback for the given provider.
      *
-     * @param genericTypeId the id of the provider type for which components will be created,
-     *                      as declared in {@link GenericComponentFactory#targets()}
-     * @param containedType the type of components held by this container.
-     *                      For example, some providers require all components to be {@link CopyableComponent}
-     * @param argType       the type of the argument taken by the resulting container factory and forwarded to collected component factories
-     * @param events a list of runtime events that will be fired when creating a container
+     * @param genericProviderId    the id of the provider type for which components will be created,
+     *                             as declared in {@link GenericComponentFactoryRegistry#register(Identifier, Identifier, TypeToken, Object)}
+     * @param containerFactoryType the interface implemented by the returned container factory.
+     *                             Must be a {@link FunctionalInterface}.
+     * @param componentFactoryType the type of the static factories called to initialize the returned container,
+     *                             as declared in {@link GenericComponentFactoryRegistry#register(Identifier, Identifier, TypeToken, Object)}.
+     *                             Must be a {@link FunctionalInterface}.
+     * @param callbackType         the type of the callbacks that will be fired to dynamically initialize
+     * @param events               a list of runtime events that will be fired when creating a container
      * @return a {@link ComponentContainer} factory
      */
     @SafeVarargs
     @SuppressWarnings("varargs")
-    public static <T, C extends Component> Function<T, ComponentContainer<C>> dynamicMetafactory(Identifier genericTypeId, Class<C> containedType, Class<T> argType, Event<? extends ComponentCallback<T, C>>... events) {
-        return ComponentContainerMetafactoryImpl.dynamicMetafactory(genericTypeId, argType, containedType, events);
+    public static <E, R, C> R metafactory(Identifier genericProviderId, TypeToken<R> containerFactoryType, TypeToken<C> componentFactoryType, Class<? super E> callbackType, Event<E>... events) {
+        return ComponentContainerMetafactoryImpl.metafactory(genericProviderId, containerFactoryType, componentFactoryType, callbackType, events);
     }
 }

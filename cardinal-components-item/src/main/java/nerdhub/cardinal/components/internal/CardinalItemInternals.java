@@ -56,9 +56,9 @@ public final class CardinalItemInternals {
      * <p>The container factory will populate the container by invoking the event for that item
      * as well as the {@linkplain #WILDCARD_ITEM_EVENT wildcard event}.
      */
-    public static FeedbackContainerFactory<ItemStack, CopyableComponent<?>> createItemStackContainerFactory(Item item) {
+    public static DynamicContainerFactory<ItemStack, CopyableComponent<?>> createItemStackContainerFactory(Item item) {
         Identifier itemId = Registry.ITEM.getId(item);
-        Class<?> factoryClass = StaticItemComponentPlugin.INSTANCE.getFactoryClass(itemId);
+        @SuppressWarnings("unchecked") Class<? extends DynamicContainerFactory<ItemStack, CopyableComponent<?>>> factoryClass = (Class<? extends DynamicContainerFactory<ItemStack, CopyableComponent<?>>>) StaticItemComponentPlugin.INSTANCE.getFactoryClass(itemId);
         return ComponentsInternals.createFactory(factoryClass, WILDCARD_ITEM_EVENT, ((ItemCaller) item).cardinal_getItemComponentEvent());
     }
 

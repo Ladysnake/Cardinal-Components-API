@@ -23,21 +23,29 @@
 package nerdhub.cardinal.components.internal.world;
 
 import nerdhub.cardinal.components.api.component.StaticWorldComponentInitializer;
+import nerdhub.cardinal.components.api.component.WorldComponentFactory;
 import nerdhub.cardinal.components.api.component.WorldComponentFactoryRegistry;
 import nerdhub.cardinal.components.internal.StaticComponentPluginBase;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<StaticWorldComponentInitializer> implements WorldComponentFactoryRegistry {
+public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<World, StaticWorldComponentInitializer, WorldComponentFactory<?>> implements WorldComponentFactoryRegistry {
     public static final String WORLD_IMPL_SUFFIX = "WorldImpl";
 
     public static final StaticWorldComponentPlugin INSTANCE = new StaticWorldComponentPlugin();
 
     private StaticWorldComponentPlugin() {
-        super(World.class, WORLD_IMPL_SUFFIX, StaticWorldComponentInitializer.class);
+        super(World.class, WorldComponentFactory.class, StaticWorldComponentInitializer.class, WORLD_IMPL_SUFFIX);
     }
 
     @Override
-    protected void dispatchRegistration(StaticWorldComponentInitializer entrypoint) throws ReflectiveOperationException {
-        entrypoint.registerWorldComponentFactories(this, this.lookup);
+    protected void dispatchRegistration(StaticWorldComponentInitializer entrypoint) {
+        entrypoint.registerWorldComponentFactories(this);
+    }
+
+    @Override
+    public void register(Identifier componentId, WorldComponentFactory<?> factory) {
+        this.checkLoading(WorldComponentFactoryRegistry.class, "register");
+        super.register(componentId, factory);
     }
 }

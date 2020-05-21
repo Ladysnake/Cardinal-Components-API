@@ -41,6 +41,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
+import java.util.function.BiConsumer;
 
 public final class CcaBootstrap extends DispatchingLazy {
 
@@ -60,7 +61,7 @@ public final class CcaBootstrap extends DispatchingLazy {
         return this.generatedComponentTypes.get(componentId);
     }
 
-    public <T extends StaticComponentInitializer> void processSpecializedInitializers(Class<T> initializerType, StaticInitializerConsumer<T> action) {
+    public <T extends StaticComponentInitializer> void processSpecializedInitializers(Class<T> initializerType, BiConsumer<T, ModContainer> action) {
         this.ensureInitialized();
 
         for (EntrypointContainer<StaticComponentInitializer> staticInitializer : this.staticComponentInitializers) {
@@ -74,11 +75,6 @@ public final class CcaBootstrap extends DispatchingLazy {
                 }
             }
         }
-    }
-
-    @FunctionalInterface
-    public interface StaticInitializerConsumer<T> {
-        void accept(T initializer, ModContainer provider) throws ReflectiveOperationException;
     }
 
     @Override

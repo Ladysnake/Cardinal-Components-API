@@ -22,21 +22,36 @@
  */
 package nerdhub.cardinal.components.internal;
 
+import nerdhub.cardinal.components.api.component.ChunkComponentFactory;
 import nerdhub.cardinal.components.api.component.ChunkComponentFactoryRegistry;
 import nerdhub.cardinal.components.api.component.StaticChunkComponentInitializer;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.chunk.Chunk;
 
-public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<StaticChunkComponentInitializer> implements ChunkComponentFactoryRegistry {
+public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<Chunk, StaticChunkComponentInitializer, ChunkComponentFactory<?>> implements ChunkComponentFactoryRegistry {
     public static final String CHUNK_IMPL_SUFFIX = "ChunkImpl";
 
     public static final StaticChunkComponentPlugin INSTANCE = new StaticChunkComponentPlugin();
 
     private StaticChunkComponentPlugin() {
-        super(Chunk.class, CHUNK_IMPL_SUFFIX, StaticChunkComponentInitializer.class);
+        super(Chunk.class, ChunkComponentFactory.class, StaticChunkComponentInitializer.class, CHUNK_IMPL_SUFFIX);
     }
 
     @Override
-    protected void dispatchRegistration(StaticChunkComponentInitializer entrypoint) throws ReflectiveOperationException {
-        entrypoint.registerChunkComponentFactories(this, this.lookup);
+    protected void dispatchRegistration(StaticChunkComponentInitializer entrypoint) {
+        entrypoint.registerChunkComponentFactories(this);
+    }
+
+    @Override
+    public void register(Identifier componentId, ChunkComponentFactory<?> factory) {
+        this.checkLoading(ChunkComponentFactoryRegistry.class, "register");
+        super.register(componentId, factory);
+    }
+
+    @Override
+    public Class<? extends DynamicContainerFactory<Chunk, CopyableComponent<?>>> getContainerFactoryClass() {
+        @SuppressWarnings("unchecked") Class<? extends DynamicContainerFactory<Chunk, CopyableComponent<?>>> ret = (Class<? extends DynamicContainerFactory<Chunk, CopyableComponent<?>>>) super.getContainerFactoryClass();
+        return ret;
     }
 }
