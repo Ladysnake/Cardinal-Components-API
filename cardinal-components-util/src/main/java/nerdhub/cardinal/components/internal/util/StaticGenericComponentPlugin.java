@@ -23,21 +23,19 @@
 package nerdhub.cardinal.components.internal.util;
 
 import com.google.common.reflect.TypeToken;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.GenericComponentFactoryRegistry;
 import nerdhub.cardinal.components.api.component.StaticGenericComponentInitializer;
 import nerdhub.cardinal.components.internal.CcaBootstrap;
 import nerdhub.cardinal.components.internal.DispatchingLazy;
-import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
 import nerdhub.cardinal.components.internal.StaticComponentPluginBase;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.Identifier;
-import org.objectweb.asm.Type;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
@@ -59,35 +57,36 @@ public final class StaticGenericComponentPlugin extends DispatchingLazy implemen
             throw new IllegalStateException("A component container factory for " + genericTypeId + " already exists.");
         }
         Map<Identifier, OwnedObject<?>> componentFactories = this.componentFactories.getOrDefault(genericTypeId, Collections.emptyMap());
-        Map<Identifier, I> safeComponentFactories = new LinkedHashMap<>();
+        Map<Identifier, I> resolved = new LinkedHashMap<>();
         for (Map.Entry<Identifier, OwnedObject<?>> entry : componentFactories.entrySet()) {
             Object object = entry.getValue().object;
             if (!componentFactoryType.isSupertypeOf(entry.getValue().type)) {
                 ModMetadata blamed = entry.getValue().owner.getMetadata();
-                throw new ClassCastException(String.format("Cannot cast %s registered as a component factory for %s by '%s'(%s) to %s", entry.getValue().type, entry.getKey(), blamed.getName(), blamed.getId(), componentFactoryType));
+                throw new StaticComponentLoadingException(String.format("Cannot cast %s registered as a component factory for %s by '%s'(%s) to %s", entry.getValue().type, entry.getKey(), blamed.getName(), blamed.getId(), componentFactoryType));
             }
             @SuppressWarnings("unchecked") I i = (I) object;
-            safeComponentFactories.put(entry.getKey(), i);
+            resolved.put(entry.getKey(), i);
         }
-        Class<? extends ComponentContainer<?>> containerClass = StaticComponentPluginBase.spinComponentContainer(componentFactoryType.getRawType(), safeComponentFactories, getSuffix(genericTypeId));
+        Class<? extends ComponentContainer<?>> containerClass = StaticComponentPluginBase.spinComponentContainer(componentFactoryType.getRawType(), resolved, getSuffix(genericTypeId));
         this.claimedFactories.add(genericTypeId);
         return containerClass;
     }
 
-    Class<? extends FeedbackContainerFactory<?, ?>> spinSingleArgContainerFactory(TypeToken<?> factoryType, Identifier genericTypeId, Class<? extends Component> componentClass, Class<?> argClass) throws IOException {
+    <R> Class<? extends R> spinSingleArgContainerFactory(TypeToken<?> componentFactoryType, Identifier genericProviderId, Class<? super R> containerFactoryType, @Nullable Class<?> componentCallbackType, int eventCount, Class<?>[] actualFactoryArgs) throws IOException {
         this.ensureInitialized();
-        Class<? extends ComponentContainer<?>> containerClass = this.spinComponentContainer(factoryType, genericTypeId);
-        return StaticComponentPluginBase.spinSingleArgFactory(getSuffix(genericTypeId), Type.getType(containerClass), Type.getType(argClass));
+        Class<? extends ComponentContainer<?>> containerClass = this.spinComponentContainer(componentFactoryType, genericProviderId);
+        return StaticComponentPluginBase.spinContainerFactory(getSuffix(genericProviderId), containerFactoryType, containerClass, componentCallbackType, eventCount, actualFactoryArgs);
     }
 
     @Override
-    public <F> void register(Identifier componentId, Identifier providerId, TypeToken<F> factoryType, F factory) {
+    public <F> void register(Identifier componentId, Identifier providerId, TypeToken<F> componentFactoryType, F factory) {
+        this.checkLoading(GenericComponentFactoryRegistry.class, "register");
         Map<Identifier, OwnedObject<?>> specializedMap = this.componentFactories.computeIfAbsent(providerId, t -> new HashMap<>());
         Object previousFactory = specializedMap.get(componentId);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + componentId + " on provider '" + providerId + "': " + factory + " and " + previousFactory);
         }
-        specializedMap.put(componentId, new OwnedObject<>(this.currentProvider, factoryType, factory));
+        specializedMap.put(componentId, new OwnedObject<>(this.currentProvider, componentFactoryType, factory));
     }
 
     @Override

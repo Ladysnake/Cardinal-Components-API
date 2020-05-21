@@ -22,7 +22,10 @@
  */
 package nerdhub.cardinal.components.api.event;
 
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ItemComponentFactory;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.util.ItemComponent;
 import nerdhub.cardinal.components.internal.CardinalItemInternals;
@@ -30,6 +33,7 @@ import nerdhub.cardinal.components.internal.ItemCaller;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 
@@ -69,6 +73,16 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Copy
      */
     static Event<ItemComponentCallback> event(@Nullable Item item) {
         return item == null ? CardinalItemInternals.WILDCARD_ITEM_EVENT : ((ItemCaller) item).cardinal_getItemComponentEvent();
+    }
+
+    @ApiStatus.Experimental
+    static <C extends Component> void register(ComponentType<C> type, @Nullable Item item, ItemComponentFactory<? extends C> factory) {
+        event(item).register((stack, components) -> {
+            CopyableComponent<?> cc = factory.createForStack(stack);
+            if (cc != null) {
+                components.put(type, cc);
+            }
+        });
     }
 
     /**

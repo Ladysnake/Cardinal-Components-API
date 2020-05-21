@@ -23,22 +23,18 @@
 package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ItemComponentFactory;
 import nerdhub.cardinal.components.api.component.ItemComponentFactoryRegistry;
 import nerdhub.cardinal.components.api.component.StaticItemComponentInitializer;
+import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
-import nerdhub.cardinal.components.internal.asm.MethodData;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.Type;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandleInfo;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,58 +42,58 @@ import java.util.Map;
 public final class StaticItemComponentPlugin extends DispatchingLazy implements ItemComponentFactoryRegistry {
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
     private final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+    public static final String WILDARD_IMPL_SUFFIX = "ItemStackImpl_All";
 
-    private static String getSuffix(@Nullable Identifier itemId) {
-        if (itemId == null) {
-            return "ItemStackImpl_All";
-        }
+    private static String getSuffix(Identifier itemId) {
         return "ItemStackImpl_" + CcaAsmHelper.getJavaIdentifierName(itemId);
     }
 
-    private final Map<@Nullable Identifier, Map</*ComponentType*/Identifier, MethodData>> componentFactories = new HashMap<>();
-    private final String itemStackClass = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_1799");
-    private final Map<@Nullable Identifier, Class<? extends FeedbackContainerFactory<?, ?>>> factoryClasses = new HashMap<>();
+    private final Map<@Nullable Identifier, Map</*ComponentType*/Identifier, ItemComponentFactory<?>>> componentFactories = new HashMap<>();
+    private final Map<Identifier, Class<? extends DynamicContainerFactory<?,?>>> factoryClasses = new HashMap<>();
+    private Class<? extends DynamicContainerFactory<?, ?>> wildcardFactoryClass;
 
-    @Nullable
-    public Class<? extends FeedbackContainerFactory<?, ?>> getFactoryClass(Identifier itemId) {
-        CcaBootstrap.INSTANCE.ensureInitialized();
-        Class<? extends FeedbackContainerFactory<?, ?>> specificFactory = this.factoryClasses.get(itemId);
+    public Class<? extends DynamicContainerFactory<?,?>> getFactoryClass(Identifier itemId) {
+        this.ensureInitialized();
+        Class<? extends DynamicContainerFactory<?,?>> specificFactory = this.factoryClasses.get(itemId);
         if (specificFactory != null) {
             return specificFactory;
         }
-        return this.factoryClasses.get(null);
+        assert this.wildcardFactoryClass != null;
+        return this.wildcardFactoryClass;
     }
 
     @Override
-    public void register(Identifier componentId, @Nullable Identifier itemId, MethodHandle factory) {
-        MethodHandleInfo factoryInfo = this.lookup.revealDirect(factory);
-        MethodType factoryType = factoryInfo.getMethodType();
-        if (factoryType.parameterCount() > 1 || factoryType.parameterCount() == 1 && factoryType.parameterType(0) != ItemStack.class) {
-            throw new StaticComponentLoadingException("Invalid factory signature " + factory + ". Should be either no-args or a single ItemStack argument.");
-        }
-        Map<Identifier, MethodData> specializedMap = this.componentFactories.computeIfAbsent(itemId, t -> new HashMap<>());
-        MethodData previousFactory = specializedMap.get(componentId);
+    public void register(Identifier componentId, @Nullable Identifier itemId, ItemComponentFactory<?> factory) {
+        this.checkLoading(ItemComponentFactoryRegistry.class, "register");
+        Map<Identifier, ItemComponentFactory<?>> specializedMap = this.componentFactories.computeIfAbsent(itemId, t -> new HashMap<>());
+        ItemComponentFactory<?> previousFactory = specializedMap.get(componentId);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + componentId + " on " + (itemId == null ? "every item" : "item '" + itemId + "'") + ": " + factory + " and " + previousFactory);
         }
-        specializedMap.put(componentId, new MethodData(factoryInfo, factory));
+        specializedMap.put(componentId, factory);
     }
 
     @Override
     protected void init() {
         CcaBootstrap.INSTANCE.processSpecializedInitializers(StaticItemComponentInitializer.class,
-            (initializer, provider) -> initializer.registerItemComponentFactories(this, this.lookup));
-        Type itemType = Type.getObjectType(this.itemStackClass.replace('.', '/'));
-        Map<Identifier, MethodData> wildcardMap = this.componentFactories.getOrDefault(null, Collections.emptyMap());
-        for (Map.Entry<Identifier, Map<Identifier, MethodData>> entry : this.componentFactories.entrySet()) {
+            (initializer, provider) -> initializer.registerItemComponentFactories(this));
+        Map<Identifier, ItemComponentFactory<?>> wildcardMap = this.componentFactories.getOrDefault(null, Collections.emptyMap());
+        try {
+            Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactory.class, wildcardMap, WILDARD_IMPL_SUFFIX);
+            this.wildcardFactoryClass = StaticComponentPluginBase.spinContainerFactory(WILDARD_IMPL_SUFFIX, DynamicContainerFactory.class, containerCls, ItemComponentCallback.class, 2, ItemStack.class);
+        } catch (IOException e) {
+            throw new StaticComponentLoadingException("Failed to generate the fallback component container for item stacks", e);
+        }
+        for (Map.Entry<Identifier, Map<Identifier, ItemComponentFactory<?>>> entry : this.componentFactories.entrySet()) {
+            if (entry.getKey() == null) continue;
             try {
-                Map<Identifier, MethodData> compiled = new HashMap<>(entry.getValue());
+                Map<Identifier, ItemComponentFactory<?>> compiled = new HashMap<>(entry.getValue());
                 wildcardMap.forEach(compiled::putIfAbsent);
                 String implSuffix = getSuffix(entry.getKey());
-                Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.spinComponentContainer(compiled, implSuffix, itemType);
-                this.factoryClasses.put(entry.getKey(), StaticComponentPluginBase.spinSingleArgFactory(implSuffix, Type.getType(containerCls), itemType));
+                Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactory.class, compiled, implSuffix);
+                this.factoryClasses.put(entry.getKey(), StaticComponentPluginBase.spinContainerFactory(implSuffix, DynamicContainerFactory.class, containerCls, ItemComponentCallback.class, 2, ItemStack.class));
             } catch (IOException e) {
-                throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + (entry.getKey() == null ? "every item" : entry.getKey()), e);
+                throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entry.getKey(), e);
             }
         }
     }

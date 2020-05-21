@@ -20,28 +20,19 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.component;
-
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import net.minecraft.item.ItemStack;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
-
+package nerdhub.cardinal.components.internal.asm;
 
 /**
- * Applied to a method to declare it as a component factory for {@linkplain ItemStack item stacks}.
- *
- * <p>The annotated method must take either no arguments, or 1 argument of type {@link ItemStack}.
- * The return type must be either {@link Component} or a subclass.
- *
- * <p>When invoked, the factory can return either a {@link Component} of the right type, or {@code null}.
- * If the factory method returns {@code null}, the stack will not support that type of component
- * (cf. {@link ComponentProvider#hasComponent(ComponentType)}).
- * @since 2.4.0
+ * A class loader allowing the creation of any class from its bytecode, as well as its injection into the classpath
  */
-@ApiStatus.Experimental
-public interface ItemComponentFactory<C extends CopyableComponent<?>> {
-    @Nullable
-    C createForStack(ItemStack stack);
+public class CcaClassLoader extends ClassLoader {
+    public static final CcaClassLoader INSTANCE = new CcaClassLoader();
+
+    private CcaClassLoader() {
+        super(CcaClassLoader.class.getClassLoader());
+    }
+
+    public Class<?> define(String name, byte[] data) {
+        return this.defineClass(name, data, 0, data.length);
+    }
 }

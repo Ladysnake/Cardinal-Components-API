@@ -26,7 +26,7 @@ import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import nerdhub.cardinal.components.internal.CardinalItemInternals;
-import nerdhub.cardinal.components.internal.FeedbackContainerFactory;
+import nerdhub.cardinal.components.internal.DynamicContainerFactory;
 import nerdhub.cardinal.components.internal.ItemCaller;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.Item;
@@ -37,7 +37,7 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(Item.class)
 public abstract class MixinItem implements ItemCaller {
     @Unique private final Event<ItemComponentCallback> cardinal_componentsEvent = CardinalItemInternals.createItemComponentsEvent();
-    @Unique private FeedbackContainerFactory<ItemStack, CopyableComponent<?>> cardinal_containerFactory;
+    @Unique private DynamicContainerFactory<ItemStack, CopyableComponent<?>> cardinal_containerFactory;
 
     @Override
     public Event<ItemComponentCallback> cardinal_getItemComponentEvent() {

@@ -22,11 +22,14 @@
  */
 package nerdhub.cardinal.components.api.event;
 
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.LevelComponentFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.class_5217;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * The callback interface for receiving component initialization events
@@ -47,6 +50,16 @@ public interface LevelComponentCallback extends ComponentCallback<class_5217, Co
                 callback.initComponents(level, components);
             }
         });
+
+    @ApiStatus.Experimental
+    static <C extends Component> void register(ComponentType<C> type, LevelComponentFactory<C> factory) {
+        EVENT.register((level, components) -> {
+            Component c = factory.createForSave(level);
+            if (c != null) {
+                components.put(type, c);
+            }
+        });
+    }
 
     /**
      * Initialize components for the given level properties object.
