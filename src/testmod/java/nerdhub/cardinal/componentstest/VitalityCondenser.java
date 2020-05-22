@@ -27,6 +27,7 @@ import nerdhub.cardinal.components.api.component.BlockComponentProvider;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.util.provider.EmptyComponentProvider;
+import nerdhub.cardinal.componentstest.vita.Vita;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -57,8 +58,8 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
     @ApiStatus.OverrideOnly
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
-        CardinalComponentsTest.VITA.get(world).transferTo(
-                Objects.requireNonNull(this.getComponent(world, pos, CardinalComponentsTest.VITA, null)),
+        Vita.TYPE.get(world).transferTo(
+                Objects.requireNonNull(this.getComponent(world, pos, Vita.TYPE, null)),
                 1
         );
     }
@@ -70,7 +71,7 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
         // only on client side, to confirm that sync works
         if (world.isClient) {
             player.sendMessage(new TranslatableText("componenttest:action.chunk_vitality",
-                    CardinalComponentsTest.VITA.get(this.getChunkProvider(world, pos)).getVitality()), true);
+                    Vita.TYPE.get(this.getChunkProvider(world, pos)).getVitality()), true);
         }
         return ActionResult.SUCCESS;
     }

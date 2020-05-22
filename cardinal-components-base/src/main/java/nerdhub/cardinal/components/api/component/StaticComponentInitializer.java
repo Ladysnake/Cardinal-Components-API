@@ -27,7 +27,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * Entrypoint getting invoked to declare static component types.
@@ -47,7 +47,7 @@ public interface StaticComponentInitializer {
     /**
      * @return the identifiers of the {@link ComponentType}s this initializer supports
      */
-    Set<Identifier> getSupportedComponentTypes();
+    Collection<Identifier> getSupportedComponentTypes();
 
     /**
      * Called when static component bootstrap is finished.

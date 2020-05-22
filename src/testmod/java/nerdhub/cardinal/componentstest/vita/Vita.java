@@ -22,9 +22,15 @@
  */
 package nerdhub.cardinal.componentstest.vita;
 
+import nerdhub.cardinal.components.api.ComponentRegistry;
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.componentstest.TestStaticComponentInitializer;
 
 public interface Vita extends Component {
+    ComponentType<Vita> TYPE = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.VITA_ID, Vita.class);
+    ComponentType<Vita> ALT_TYPE = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
+
     int getVitality();
     void setVitality(int value);
     default void transferTo(Vita dest, int amount) {

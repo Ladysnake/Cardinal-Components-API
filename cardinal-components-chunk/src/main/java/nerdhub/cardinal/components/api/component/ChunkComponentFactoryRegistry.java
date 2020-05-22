@@ -34,6 +34,15 @@ public interface ChunkComponentFactoryRegistry {
     /**
      * Registers a {@link ChunkComponentFactory}.
      *
+     * @param factory the factory to use to create components of the given type
+     */
+    default <C extends Component> void register(ComponentType<C> type, ChunkComponentFactory<? extends C> factory) {
+        this.register(type.getId(), factory);
+    }
+
+    /**
+     * Registers a {@link ChunkComponentFactory}.
+     *
      * @param componentId the id of a {@link ComponentType}
      * @param factory     the factory to use to create components of the given type
      */
