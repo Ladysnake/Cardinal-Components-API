@@ -23,8 +23,6 @@
 package nerdhub.cardinal.componentstest;
 
 import com.google.common.reflect.TypeToken;
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentContainerMetafactory;
@@ -58,10 +56,8 @@ import java.util.function.BiFunction;
 public class CardinalComponentsTest {
 
     public static final Logger LOGGER = LogManager.getLogger("Component Test");
-    public static final ComponentType<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.VITA_ID, Vita.class);
-    public static final ComponentType<Vita> ALT_VITA = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
 
-    public static final String VITA_STICK_ID = "componenttest:vita_stick";
+    public static final Identifier VITA_STICK_ID = id("vita_stick");
     // inline self component callback registration
     public static final VitalityStickItem VITALITY_STICK = Registry.register(Registry.ITEM, VITA_STICK_ID,
             new VitalityStickItem(new Item.Settings().group(ItemGroup.COMBAT)));
@@ -72,10 +68,14 @@ public class CardinalComponentsTest {
     public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(Registry.ENTITY_TYPE, "componenttest:vita_zombie",
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, VitalityZombieEntity::new).dimensions(EntityType.ZOMBIE.getDimensions()).build());
 
+    public static Identifier id(String path) {
+        return new Identifier("componenttest", path);
+    }
+
     public static void init() {
         LOGGER.info("Hello, Components!");
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
-        EntityComponents.setRespawnCopyStrategy(VITA, RespawnCopyStrategy.ALWAYS_COPY);
+        EntityComponents.setRespawnCopyStrategy(Vita.TYPE, RespawnCopyStrategy.ALWAYS_COPY);
         LOGGER.info(ComponentContainerMetafactory.metafactory(
             TestStaticComponentInitializer.CUSTOM_PROVIDER_1,
             TypeToken.of(TestContainerFactory.class),

@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.api.component;
 
 import com.google.common.reflect.TypeToken;
+import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -31,5 +32,9 @@ import org.jetbrains.annotations.ApiStatus;
  */
 @ApiStatus.Experimental
 public interface GenericComponentFactoryRegistry {
+    default <F> void register(ComponentType<?> type, Identifier providerId, TypeToken<F> factoryType, F factory) {
+        this.register(type.getId(), providerId, factoryType, factory);
+    }
+
     <F> void register(Identifier componentId, Identifier providerId, TypeToken<F> factoryType, F factory);
 }
