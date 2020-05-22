@@ -33,17 +33,15 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.Entity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class CardinalEntityInternals {
     private CardinalEntityInternals() { throw new AssertionError(); }
 
-    private static final Map<Class<? extends Entity>, Event<?>> ENTITY_EVENTS = new HashMap<>();
+    private static final Map<Class<? extends Entity>, Event> ENTITY_EVENTS = Collections.synchronizedMap(new HashMap<>());
     private static final Map<Class<? extends Entity>, DynamicContainerFactory<Entity, Component>> entityContainerFactories = new HashMap<>();
     private static final Map<ComponentType<?>, RespawnCopyStrategy<?>> RESPAWN_COPY_STRATEGIES = new HashMap<>();
+    private static final Object factoryMutex = new Object();
 
     @SuppressWarnings("unchecked")
     public static <T extends Entity> Event<EntityComponentCallback<T>> event(Class<T> clazz) {
@@ -70,23 +68,30 @@ public final class CardinalEntityInternals {
     @SuppressWarnings("unchecked")
     public static ComponentContainer<?> createEntityComponentContainer(Entity entity) {
         Class<? extends Entity> entityClass = entity.getClass();
-        return entityContainerFactories.computeIfAbsent(entityClass, cl -> {
-            List<Event<?>> events = new ArrayList<>();
-            Class<? extends Entity> c = cl;
-            Class<? extends Entity> parentWithStaticComponents = null;
+        DynamicContainerFactory<Entity, Component> existing = entityContainerFactories.get(entityClass);
+        if (existing != null) {
+            return existing.create(entity);
+        }
+        synchronized (factoryMutex) {
+            // computeIfAbsent and not put, because the factory may have been generated while waiting
+            return entityContainerFactories.computeIfAbsent(entityClass, cl -> {
+                List<Event<?>> events = new ArrayList<>();
+                Class<? extends Entity> c = cl;
+                Class<? extends Entity> parentWithStaticComponents = null;
 
-            while (Entity.class.isAssignableFrom(c)) {
-                events.add(EntityComponentCallback.event(c));
-                if (parentWithStaticComponents == null && StaticEntityComponentPlugin.INSTANCE.requiresStaticFactory(c)) {   // try to find a specialized ASM factory
-                    parentWithStaticComponents = c;
+                while (Entity.class.isAssignableFrom(c)) {
+                    events.add(EntityComponentCallback.event(c));
+                    if (parentWithStaticComponents == null && StaticEntityComponentPlugin.INSTANCE.requiresStaticFactory(c)) {   // try to find a specialized ASM factory
+                        parentWithStaticComponents = c;
+                    }
+                    c = (Class<? extends Entity>) c.getSuperclass();
                 }
-                c = (Class<? extends Entity>) c.getSuperclass();
-            }
-            assert parentWithStaticComponents != null;
-            Class<? extends DynamicContainerFactory<Entity,Component>> factoryClass = (Class<? extends DynamicContainerFactory<Entity, Component>>) StaticEntityComponentPlugin.INSTANCE.spinDedicatedFactory(new StaticEntityComponentPlugin.Key(events.size(), parentWithStaticComponents));
+                assert parentWithStaticComponents != null;
+                Class<? extends DynamicContainerFactory<Entity,Component>> factoryClass = (Class<? extends DynamicContainerFactory<Entity, Component>>) StaticEntityComponentPlugin.INSTANCE.spinDedicatedFactory(new StaticEntityComponentPlugin.Key(events.size(), parentWithStaticComponents));
 
-            return ComponentsInternals.createFactory(factoryClass, Lists.reverse(events).toArray(new Event[0]));
-        }).create(entity);
+                return ComponentsInternals.createFactory(factoryClass, Lists.reverse(events).toArray(new Event[0]));
+            }).create(entity);
+        }
     }
 
     public static <C extends Component> void registerRespawnCopyStrat(ComponentType<C> type, RespawnCopyStrategy<? super C> strategy) {
