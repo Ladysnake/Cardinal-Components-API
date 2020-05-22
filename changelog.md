@@ -16,6 +16,11 @@ you need to add a dependency on that module.**
 - Fixed `PlayerSyncCallback` not firing when a player is teleported to another dimensions through commands
 
 ------------------------------------------------------
+Version 2.3.6
+------------------------------------------------------
+- Fixed a random crash when an entity spawned for the first time simultaneously on client and server (#26)
+
+------------------------------------------------------
 Version 2.3.5
 ------------------------------------------------------
 - Fixed thrown items with different components being able to merge
