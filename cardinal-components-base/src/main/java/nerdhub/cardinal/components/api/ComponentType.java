@@ -31,6 +31,7 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnegative;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
@@ -60,10 +61,10 @@ public class ComponentType<T extends Component> {
         this.rawId = rawId;
     }
 
-    @SuppressWarnings("WeakerAccess")   // overridden by generated types
-    @Nullable
-    protected T getNullable(ComponentProvider provider) {
-        return provider.getComponent(this);
+    @Nonnegative
+    @ApiStatus.Internal
+    public final int getRawId() {
+        return this.rawId;
     }
 
     /* ------------- public methods -------------- */
@@ -72,26 +73,30 @@ public class ComponentType<T extends Component> {
         return this.id;
     }
 
-    @ApiStatus.Internal
-    public final int getRawId() {
-        return this.rawId;
-    }
-
     public final Class<T> getComponentClass() {
         return this.componentClass;
     }
 
     /**
-     * @deprecated use {@code ObjectPath.fromFunction(}{@link #asRawGetter() this.asRawGetter()}{@code }}
+     * @deprecated use {@code ObjectPath.fromFunction(}{@link #getNullable(ComponentProvider) this::getNullable}{@code )}
+     * (from the cardinal-components-util module)
      */
     @Deprecated
     public final Function<ComponentProvider, T> asComponentPath() {
         return this::getNullable;
     }
 
+    /**
+     * @param provider a component provider
+     * @return the attached component of this type, or
+     * {@code null} if the provider does not support this type of component
+     * @see #get(Object)
+     * @see #maybeGet(Object)
+     */
+    // overridden by generated types
     @ApiStatus.Experimental
-    public final Function<ComponentProvider, @Nullable T> asRawGetter() {
-        return this::getNullable;
+    public @Nullable T getNullable(ComponentProvider provider) {
+        return provider.getComponent(this);
     }
 
     /**
@@ -112,7 +117,6 @@ public class ComponentType<T extends Component> {
     }
 
     /**
-     *
      * @param provider a component provider
      * @param <V>      the class of the component provider
      * @return an {@code Optional} describing a component of this type, or an empty
@@ -134,9 +138,10 @@ public class ComponentType<T extends Component> {
      * <pre>{@code
      *      event.register((provider, components) -> components.put(type, factory.apply(provider)));
      * }</pre>
-     * @param event the event for which components of this type should be attached
+     *
+     * @param event   the event for which components of this type should be attached
      * @param factory a factory creating instances for this {@code ComponentType}
-     * @param <P> the type of providers targeted by the event
+     * @param <P>     the type of providers targeted by the event
      * @return {@code this}
      * @throws IllegalArgumentException if {@code event} is not a valid component event
      * @deprecated use statically defined component factories
@@ -148,7 +153,7 @@ public class ComponentType<T extends Component> {
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return this.getClass().getSimpleName() + "[\"" + this.id + "\"]";
     }
 }

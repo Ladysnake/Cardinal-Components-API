@@ -73,7 +73,7 @@ public interface ComponentRegistry {
     @Nullable
     ComponentType<?> get(Identifier id);
 
-    LazyComponentType getLazy(Identifier id);
+    LazyComponentType<?> getLazy(Identifier id);
 
     /**
      * Return a sequential stream with this registry at its source.

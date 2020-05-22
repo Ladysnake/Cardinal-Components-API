@@ -196,7 +196,7 @@ public final class CcaBootstrap extends DispatchingLazy {
             // get the generated lazy component type constant
             methodWriter.visitFieldInsn(Opcodes.GETSTATIC, CcaAsmHelper.STATIC_COMPONENT_TYPES, CcaAsmHelper.getTypeConstantName(identifier), "L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";");
             // stack: <this> lazyComponentType
-            methodWriter.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.LAZY_COMPONENT_TYPE, "get", "()L" + CcaAsmHelper.COMPONENT_TYPE + ";", false);
+            methodWriter.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.LAZY_COMPONENT_TYPE, "unwrap", "()L" + CcaAsmHelper.COMPONENT_TYPE + ";", false);
             // stack: <this> componentType
             methodWriter.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_CONTAINER, "get", "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)L" + CcaAsmHelper.COMPONENT + ";", true);
             // stack: component
