@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.util.Identifier;
 
 import javax.annotation.Nullable;
@@ -43,7 +44,7 @@ public interface ItemComponentFactoryRegistry {
      *  @param itemId      the id of an item to target, or {@code null} to target every stack.
      * @param factory     the factory to use to create components of the given type
      */
-    default <C extends Component> void register(ComponentType<C> type, @Nullable Identifier itemId, ItemComponentFactory<? extends C> factory) {
+    default <C extends CopyableComponent<?>> void register(ComponentType<? super C> type, @Nullable Identifier itemId, ItemComponentFactory<C> factory) {
         this.register(type.getId(), itemId, factory);
     }
 

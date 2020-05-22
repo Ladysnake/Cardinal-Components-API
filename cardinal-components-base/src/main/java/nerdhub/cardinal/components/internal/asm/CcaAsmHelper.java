@@ -22,19 +22,18 @@
  */
 package nerdhub.cardinal.components.internal.asm;
 
-import jdk.internal.org.objectweb.asm.Type;
+import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.util.LazyComponentType;
 import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
+import nerdhub.cardinal.components.internal.ComponentRegistryImpl;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 
@@ -64,12 +63,27 @@ public final class CcaAsmHelper {
     public static final String LAZY_COMPONENT_TYPE = Type.getInternalName(LazyComponentType.class);
     public static final String IDENTIFIER = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960").replace('.', '/');
     public static final String EVENT = Type.getInternalName(Event.class);
+    // methods
+    public static final String BY_RAW_ID_DESC;
+    public static final String BY_RAW_ID;
+    public static final String GET_DESC;
     // generated references
     public static final String STATIC_COMPONENT_CONTAINER = "nerdhub/cardinal/components/_generated_/GeneratedComponentContainer";
     public static final String STATIC_CONTAINER_GETTER_DESC = "()Lnerdhub/cardinal/components/api/component/Component;";
     public static final String STATIC_COMPONENT_TYPE = "nerdhub/cardinal/components/_generated_/ComponentType";
     public static final String STATIC_COMPONENT_TYPES = "nerdhub/cardinal/components/_generated_/StaticComponentTypes";
     public static final String STATIC_CONTAINER_FACTORY = "nerdhub/cardinal/components/_generated_/GeneratedContainerFactory";
+
+    static {
+        try {
+            Method byRawId = ComponentRegistryImpl.class.getMethod("byRawId", int.class);
+            BY_RAW_ID_DESC = Type.getMethodDescriptor(byRawId);
+            BY_RAW_ID = byRawId.getName();
+            GET_DESC = Type.getMethodDescriptor(ComponentContainer.class.getMethod("get", ComponentType.class));
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException("Failed to find one or more method descriptors", e);
+        }
+    }
 
     public static Class<?> generateClass(ClassNode classNode) throws IOException {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -134,5 +148,12 @@ public final class CcaAsmHelper {
 
     private static IllegalArgumentException badFunctionalInterface(Class<?> callbackClass) {
         return new IllegalArgumentException(callbackClass + " is not a functional interface!");
+    }
+
+    public static void stackStaticComponentType(MethodVisitor method, Identifier componentId) {
+        method.visitLdcInsn(((ComponentRegistryImpl) ComponentRegistry.INSTANCE).assignRawId(componentId));
+        // stack: rawId
+        method.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(ComponentRegistryImpl.class), BY_RAW_ID, BY_RAW_ID_DESC, false);
+        // stack: componentType
     }
 }
