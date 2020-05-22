@@ -22,6 +22,14 @@
  */
 package nerdhub.cardinal.components.internal.asm;
 
+import jdk.internal.org.objectweb.asm.Type;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
+import nerdhub.cardinal.components.api.util.LazyComponentType;
+import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
+import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 import org.objectweb.asm.ClassReader;
@@ -48,14 +56,14 @@ public final class CcaAsmHelper {
     public static final boolean DEBUG_CLASSES = Boolean.getBoolean("cca.debug.asm");
     public static final int ASM_VERSION = Opcodes.ASM6;
     // existing references
-    public static final String COMPONENT = "nerdhub/cardinal/components/api/component/Component";
-    public static final String COMPONENT_CONTAINER = "nerdhub/cardinal/components/api/component/ComponentContainer";
-    public static final String COMPONENT_TYPE = "nerdhub/cardinal/components/api/ComponentType";
-    public static final String COMPONENT_PROVIDER = "nerdhub/cardinal/components/api/component/ComponentProvider";
-    public static final String DYNAMIC_COMPONENT_CONTAINER_IMPL = "nerdhub/cardinal/components/api/util/container/FastComponentContainer";
-    public static final String LAZY_COMPONENT_TYPE = "nerdhub/cardinal/components/api/util/LazyComponentType";
+    public static final String COMPONENT = Type.getInternalName(Component.class);
+    public static final String COMPONENT_CONTAINER = Type.getInternalName(ComponentContainer.class);
+    public static final String COMPONENT_TYPE = Type.getInternalName(ComponentType.class);
+    public static final String COMPONENT_PROVIDER = Type.getInternalName(ComponentProvider.class);
+    public static final String DYNAMIC_COMPONENT_CONTAINER_IMPL = Type.getInternalName(FastComponentContainer.class);
+    public static final String LAZY_COMPONENT_TYPE = Type.getInternalName(LazyComponentType.class);
     public static final String IDENTIFIER = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960").replace('.', '/');
-    public static final String EVENT = "net/fabricmc/fabric/api/event/Event";
+    public static final String EVENT = Type.getInternalName(Event.class);
     // generated references
     public static final String STATIC_COMPONENT_CONTAINER = "nerdhub/cardinal/components/_generated_/GeneratedComponentContainer";
     public static final String STATIC_CONTAINER_GETTER_DESC = "()Lnerdhub/cardinal/components/api/component/Component;";
