@@ -14,6 +14,7 @@ you need to add a dependency on that module.**
 - Added `LazyComponentType`, allowing mods to retrieve a `ComponentType` handle before it is registered
 - It is no longer possible for a `ComponentCallback` to override an existing component
 - Fixed `PlayerSyncCallback` not firing when a player is teleported to another dimensions through commands
+- Added dynamic conversion methods to `NbtSerializable` (defaulted to delegate to nbt serialization)
 
 ------------------------------------------------------
 Version 2.3.6
