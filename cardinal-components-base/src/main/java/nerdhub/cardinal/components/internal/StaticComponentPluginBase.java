@@ -53,7 +53,6 @@ import java.util.function.BiConsumer;
 public abstract class StaticComponentPluginBase<T, I extends StaticComponentInitializer, F> extends DispatchingLazy {
     private static final String FOR_EACH_DESC;
     private static final String FAST_COMPONENT_CONTAINER_CTOR_DESC;
-    private static final String GET_DESC;
     private static final String CAN_BE_ASSIGNED_DESC;
 
     private static final String EVENT_DESC = Type.getDescriptor(Event.class);
@@ -63,7 +62,6 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
         try {
             FOR_EACH_DESC = Type.getMethodDescriptor(ComponentContainer.class.getMethod("forEach", BiConsumer.class));
             FAST_COMPONENT_CONTAINER_CTOR_DESC = Type.getConstructorDescriptor(FastComponentContainer.class.getConstructor(int.class));
-            GET_DESC = Type.getMethodDescriptor(ComponentContainer.class.getMethod("get", ComponentType.class));
             CAN_BE_ASSIGNED_DESC = Type.getMethodDescriptor(FastComponentContainer.class.getDeclaredMethod("canBeAssigned", ComponentType.class));
             EVENT$INVOKER_DESC = Type.getMethodDescriptor(Event.class.getMethod("invoker"));
         } catch (NoSuchMethodException e) {
@@ -129,7 +127,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
         init.visitVarInsn(Opcodes.ALOAD, 0);
         init.visitVarInsn(Opcodes.ILOAD, 1);
         init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "<init>", FAST_COMPONENT_CONTAINER_CTOR_DESC, false);
-        MethodVisitor get = classNode.visitMethod(Opcodes.ACC_PUBLIC, "get", GET_DESC, null, null);
+        MethodVisitor get = classNode.visitMethod(Opcodes.ACC_PUBLIC, "get", CcaAsmHelper.GET_DESC, null, null);
         MethodVisitor forEach = classNode.visitMethod(Opcodes.ACC_PUBLIC, "forEach", FOR_EACH_DESC, null, null);
         MethodVisitor canBeAssigned = classNode.visitMethod(Opcodes.ACC_PROTECTED, "canBeAssigned", CAN_BE_ASSIGNED_DESC, null, null);
         Label canBeAssignedFalse = new Label();
@@ -178,7 +176,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
             // store in the field
             init.visitFieldInsn(Opcodes.PUTFIELD, containerImplName, fieldName, fieldDescriptor);
             // stack: <this>
-            stackStaticComponentType(init, identifier);
+            CcaAsmHelper.stackStaticComponentType(init, identifier);
             // stack: <this> componentType
             init.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "addContainedType", "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)V", false);
             // <empty stack>
@@ -189,7 +187,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
             // (would require reserving raw ids in advance for static components)
             Label nextGet = new Label();
             get.visitVarInsn(Opcodes.ALOAD, 1);
-            stackStaticComponentType(get, identifier);
+            CcaAsmHelper.stackStaticComponentType(get, identifier);
             get.visitJumpInsn(Opcodes.IF_ACMPNE, nextGet);
             stackStaticComponent(get, containerImplName, fieldName, fieldDescriptor);
             get.visitInsn(Opcodes.ARETURN);
@@ -198,7 +196,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
             /* forEach implementation */
             forEach.visitVarInsn(Opcodes.ALOAD, 1);
             // stack: biConsumer
-            stackStaticComponentType(forEach, identifier);
+            CcaAsmHelper.stackStaticComponentType(forEach, identifier);
             // stack: biConsumer componentType
             stackStaticComponent(forEach, containerImplName, fieldName, fieldDescriptor);
             // stack: biConsumer componentType component
@@ -207,7 +205,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
             /* canBeAssigned implementation */
             canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
             // stack: componentType
-            stackStaticComponentType(canBeAssigned, identifier);
+            CcaAsmHelper.stackStaticComponentType(canBeAssigned, identifier);
             // stack: componentType componentType2
             canBeAssigned.visitJumpInsn(Opcodes.IF_ACMPEQ, canBeAssignedFalse);
             // <empty stack>
@@ -228,7 +226,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
         init.visitEnd();
         get.visitVarInsn(Opcodes.ALOAD, 0);
         get.visitVarInsn(Opcodes.ALOAD, 1);
-        get.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "get", GET_DESC, false);
+        get.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "get", CcaAsmHelper.GET_DESC, false);
         get.visitInsn(Opcodes.ARETURN);
         get.visitEnd();
         forEach.visitVarInsn(Opcodes.ALOAD, 0);
@@ -431,13 +429,6 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
     private static void stackStaticComponent(MethodVisitor method, String containerImplName, String fieldName, String fieldDescriptor) {
         method.visitVarInsn(Opcodes.ALOAD, 0);
         method.visitFieldInsn(Opcodes.GETFIELD, containerImplName, fieldName, fieldDescriptor);
-    }
-
-    private static void stackStaticComponentType(MethodVisitor method, Identifier componentId) {
-        // get the generated lazy component type constant
-        method.visitFieldInsn(Opcodes.GETSTATIC, CcaAsmHelper.STATIC_COMPONENT_TYPES, CcaAsmHelper.getTypeConstantName(componentId), "L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";");
-        // stack: <this> component lazyComponentType
-        method.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.LAZY_COMPONENT_TYPE, "unwrap", "()L" + CcaAsmHelper.COMPONENT_TYPE + ";", false);
     }
 
     public Class<? extends DynamicContainerFactory<T,?>> getContainerFactoryClass() {

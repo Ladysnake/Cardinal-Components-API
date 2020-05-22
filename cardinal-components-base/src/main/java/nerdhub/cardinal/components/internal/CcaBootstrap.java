@@ -117,27 +117,32 @@ public final class CcaBootstrap extends DispatchingLazy {
      * @return a map of {@link ComponentType} ids to specialized implementations
      */
     private Map<Identifier, Class<? extends ComponentType<?>>> spinStaticComponentTypes(Set<Identifier> staticComponentTypes) throws IOException {
-        ClassNode staticContainerWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
-        ClassNode staticComponentTypesNode = new ClassNode(CcaAsmHelper.ASM_VERSION);
-        class ComponentTypeWriter {
-            private final ClassNode node;
-            private final Identifier identifier;
+        /* generate the component container getter */
 
-            private ComponentTypeWriter(ClassNode node, Identifier identifier) {
-                this.node = node;
-                this.identifier = identifier;
-            }
-        }
-        List<ComponentTypeWriter> componentTypeWriters = new ArrayList<>(staticComponentTypes.size());
+        ClassNode staticContainerWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
         staticContainerWriter.visit(Opcodes.V1_8, Opcodes.ACC_ABSTRACT | Opcodes.ACC_PUBLIC | Opcodes.ACC_INTERFACE, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, null, "java/lang/Object", new String[]{CcaAsmHelper.COMPONENT_CONTAINER});
-        staticComponentTypesNode.visit(Opcodes.V1_8, Opcodes.ACC_FINAL | Opcodes.ACC_PUBLIC, CcaAsmHelper.STATIC_COMPONENT_TYPES, null, "java/lang/Object", null);
-        MethodVisitor componentTypesInit = staticComponentTypesNode.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
-        for (Identifier identifier : staticComponentTypes) {
+
+        for (Identifier componentId : staticComponentTypes) {
+            MethodVisitor methodWriter = staticContainerWriter.visitMethod(Opcodes.ACC_PUBLIC, CcaAsmHelper.getStaticStorageGetterName(componentId), CcaAsmHelper.STATIC_CONTAINER_GETTER_DESC, null, null);
+            methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
+            // stack: <this>
+            CcaAsmHelper.stackStaticComponentType(methodWriter, componentId);
+            // stack: <this> componentType
+            methodWriter.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_CONTAINER, "get", CcaAsmHelper.GET_DESC, true);
+            // stack: component
+            methodWriter.visitInsn(Opcodes.ARETURN);
+            methodWriter.visitEnd();
+        }
+
+        staticContainerWriter.visitEnd();
+        CcaAsmHelper.generateClass(staticContainerWriter);
+
+        Map<Identifier, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>(staticComponentTypes.size());
+        for (Identifier componentId : staticComponentTypes) {
             /* generate the component type class */
 
             ClassNode componentTypeWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
-            String componentTypeName = CcaAsmHelper.getComponentTypeName(identifier);
-            componentTypeWriters.add(new ComponentTypeWriter(componentTypeWriter, identifier));
+            String componentTypeName = CcaAsmHelper.getComponentTypeName(componentId);
             componentTypeWriter.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, componentTypeName, null, CcaAsmHelper.COMPONENT_TYPE, null);
 
             MethodVisitor init = componentTypeWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", COMPONENT_TYPE_INIT_DESC, null, null);
@@ -163,7 +168,7 @@ public final class CcaBootstrap extends DispatchingLazy {
             // stack: object
             get.visitTypeInsn(Opcodes.CHECKCAST, CcaAsmHelper.STATIC_COMPONENT_CONTAINER);
             // stack: generatedComponentContainer
-            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, CcaAsmHelper.getStaticStorageGetterName(identifier), CcaAsmHelper.STATIC_CONTAINER_GETTER_DESC, true);
+            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, CcaAsmHelper.getStaticStorageGetterName(componentId), CcaAsmHelper.STATIC_CONTAINER_GETTER_DESC, true);
             // stack: component
             get.visitInsn(Opcodes.ARETURN);
             // if the native component container is null, we use the classic runtime way
@@ -180,39 +185,9 @@ public final class CcaBootstrap extends DispatchingLazy {
             get.visitInsn(Opcodes.ARETURN);
             get.visitEnd();
 
-            /* generate a Lazy field in StaticComponentTypes */
-
-            String typeConstantName = CcaAsmHelper.getTypeConstantName(identifier);
-            staticComponentTypesNode.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, typeConstantName, "L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";", null, null);
-            componentTypesInit.visitLdcInsn(identifier.toString());
-            componentTypesInit.visitMethodInsn(Opcodes.INVOKESTATIC, CcaAsmHelper.LAZY_COMPONENT_TYPE, "create", "(Ljava/lang/String;)L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";", false);
-            componentTypesInit.visitFieldInsn(Opcodes.PUTSTATIC, CcaAsmHelper.STATIC_COMPONENT_TYPES, typeConstantName, "L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";");
-
-            /* generate the component container getter */
-
-            MethodVisitor methodWriter = staticContainerWriter.visitMethod(Opcodes.ACC_PUBLIC, CcaAsmHelper.getStaticStorageGetterName(identifier), CcaAsmHelper.STATIC_CONTAINER_GETTER_DESC, null, null);
-            methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
-            // stack: <this>
-            // get the generated lazy component type constant
-            methodWriter.visitFieldInsn(Opcodes.GETSTATIC, CcaAsmHelper.STATIC_COMPONENT_TYPES, CcaAsmHelper.getTypeConstantName(identifier), "L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";");
-            // stack: <this> lazyComponentType
-            methodWriter.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.LAZY_COMPONENT_TYPE, "unwrap", "()L" + CcaAsmHelper.COMPONENT_TYPE + ";", false);
-            // stack: <this> componentType
-            methodWriter.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_CONTAINER, "get", "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)L" + CcaAsmHelper.COMPONENT + ";", true);
-            // stack: component
-            methodWriter.visitInsn(Opcodes.ARETURN);
-            methodWriter.visitEnd();
+            @SuppressWarnings("unchecked") Class<? extends ComponentType<?>> ct = (Class<? extends ComponentType<?>>) CcaAsmHelper.generateClass(componentTypeWriter);
+            generatedComponentTypes.put(componentId, ct);
         }
-        staticContainerWriter.visitEnd();
-        CcaAsmHelper.generateClass(staticContainerWriter);
-        componentTypesInit.visitInsn(Opcodes.RETURN);
-        componentTypesInit.visitEnd();
-        Map<Identifier, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>(componentTypeWriters.size());
-        for (ComponentTypeWriter componentTypeWriter : componentTypeWriters) {
-            @SuppressWarnings("unchecked") Class<? extends ComponentType<?>> ct = (Class<? extends ComponentType<?>>) CcaAsmHelper.generateClass(componentTypeWriter.node);
-            generatedComponentTypes.put(componentTypeWriter.identifier, ct);
-        }
-        CcaAsmHelper.generateClass(staticComponentTypesNode);
         return generatedComponentTypes;
     }
 
