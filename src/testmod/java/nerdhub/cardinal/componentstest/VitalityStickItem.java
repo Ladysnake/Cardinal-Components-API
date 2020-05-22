@@ -56,10 +56,10 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
-        Vita vita = Vita.TYPE.get(stack);
+        Vita vita = Vita.get(stack);
         if (vita.getVitality() > 0 && !world.isClient) {
             if (player.isSneaking()) {
-                AmbientVita worldVita = (AmbientVita) Vita.TYPE.get(
+                AmbientVita worldVita = (AmbientVita) Vita.get(
                         world.random.nextInt(10) == 0
                                 ? world.getLevelProperties()
                                 : world
@@ -67,7 +67,7 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
                 vita.transferTo(worldVita, 1);
                 worldVita.syncWithAll(((ServerWorld)world).getServer());
             } else {
-                vita.transferTo(Vita.TYPE.get(player), vita.getVitality());
+                vita.transferTo(Vita.get(player), vita.getVitality());
             }
         }
         return TypedActionResult.pass(stack);
@@ -77,7 +77,7 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity holder) {
         // The entity may not have the component, but the stack always does.
         Vita.TYPE.maybeGet(target)
-                .ifPresent(v -> v.transferTo(Vita.TYPE.get(stack), 1));
+                .ifPresent(v -> v.transferTo(Vita.get(stack), 1));
         return true;
     }
 

@@ -27,7 +27,6 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.api.util.LazyComponentType;
 import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
 import nerdhub.cardinal.components.internal.ComponentRegistryImpl;
 import net.fabricmc.fabric.api.event.Event;
@@ -60,7 +59,6 @@ public final class CcaAsmHelper {
     public static final String COMPONENT_TYPE = Type.getInternalName(ComponentType.class);
     public static final String COMPONENT_PROVIDER = Type.getInternalName(ComponentProvider.class);
     public static final String DYNAMIC_COMPONENT_CONTAINER_IMPL = Type.getInternalName(FastComponentContainer.class);
-    public static final String LAZY_COMPONENT_TYPE = Type.getInternalName(LazyComponentType.class);
     public static final String IDENTIFIER = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960").replace('.', '/');
     public static final String EVENT = Type.getInternalName(Event.class);
     // methods
@@ -71,7 +69,6 @@ public final class CcaAsmHelper {
     public static final String STATIC_COMPONENT_CONTAINER = "nerdhub/cardinal/components/_generated_/GeneratedComponentContainer";
     public static final String STATIC_CONTAINER_GETTER_DESC = "()Lnerdhub/cardinal/components/api/component/Component;";
     public static final String STATIC_COMPONENT_TYPE = "nerdhub/cardinal/components/_generated_/ComponentType";
-    public static final String STATIC_COMPONENT_TYPES = "nerdhub/cardinal/components/_generated_/StaticComponentTypes";
     public static final String STATIC_CONTAINER_FACTORY = "nerdhub/cardinal/components/_generated_/GeneratedContainerFactory";
 
     static {

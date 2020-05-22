@@ -53,8 +53,8 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
         );
         Text worldVita = new TranslatableText(
                 "componenttest:title.world_vitality",
-                Vita.TYPE.get(world).getVitality(),
-                Vita.TYPE.get(world.getLevelProperties()).getVitality()
+                Vita.get(world).getVitality(),
+                Vita.get(world.getLevelProperties()).getVitality()
         );
         InGameHud inGameHud = MinecraftClient.getInstance().inGameHud;
         inGameHud.setTitles(null, worldVita, -1, -1, -1);

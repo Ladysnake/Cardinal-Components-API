@@ -30,6 +30,10 @@ import nerdhub.cardinal.componentstest.TestStaticComponentInitializer;
 public interface Vita extends Component {
     ComponentType<Vita> TYPE = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.VITA_ID, Vita.class);
     ComponentType<Vita> ALT_TYPE = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
+    
+    static <T> Vita get(T provider) {
+        return TYPE.get(provider);
+    }
 
     int getVitality();
     void setVitality(int value);
