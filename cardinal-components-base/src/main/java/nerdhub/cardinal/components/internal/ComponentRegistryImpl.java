@@ -24,6 +24,8 @@ package nerdhub.cardinal.components.internal;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
@@ -38,6 +40,7 @@ import java.util.stream.Stream;
 
 public final class ComponentRegistryImpl implements ComponentRegistry {
 
+    private final Object2IntMap<Identifier> id2Raw = new Object2IntOpenHashMap<>();
     private final Map<Identifier, ComponentType<?>> registry = new LinkedHashMap<>();
     private final ComponentTypeAccess access;
     private int nextRawId = 0;
@@ -62,9 +65,9 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
                 ComponentType<T> registered;
                 Class<? extends ComponentType<?>> generated = CcaBootstrap.INSTANCE.getGeneratedComponentTypeClass(componentId);
                 if (generated != null) {
-                    registered = this.instantiateStaticType(generated, componentId, componentClass, this.nextRawId++);
+                    registered = this.instantiateStaticType(generated, componentId, componentClass, this.getRawId(componentId));
                 } else {
-                    registered = this.access.create(componentId, componentClass, this.nextRawId++);
+                    registered = this.access.create(componentId, componentClass, this.getRawId(componentId));
                 }
                 this.registry.put(componentId, registered);
                 SharedComponentSecrets.registeredComponents.set(this.registry.values().toArray(new ComponentType[0]));
@@ -72,6 +75,16 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
                 return registered;
             }
         }
+    }
+
+    public synchronized int getRawId(Identifier componentId) {
+        if (this.id2Raw.containsKey(componentId)) {
+            return this.id2Raw.getInt(componentId);
+        }
+        int rawId = this.nextRawId;
+        this.id2Raw.put(componentId, rawId);
+        this.nextRawId++;
+        return rawId;
     }
 
     private <T extends Component> ComponentType<T> instantiateStaticType(Class<? extends ComponentType<?>> generated, Identifier componentId, Class<T> componentClass, int rawId) {
@@ -89,7 +102,7 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
     }
 
     @Override
-    public LazyComponentType getLazy(Identifier id) {
+    public LazyComponentType<?> getLazy(Identifier id) {
         return LazyComponentType.create(id);
     }
 

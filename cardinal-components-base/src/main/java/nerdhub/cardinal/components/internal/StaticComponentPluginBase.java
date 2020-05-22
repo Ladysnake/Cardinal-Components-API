@@ -56,7 +56,6 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
     private static final String GET_DESC;
     private static final String CAN_BE_ASSIGNED_DESC;
 
-    private static final String EVENT_NAME = Type.getInternalName(Event.class);
     private static final String EVENT_DESC = Type.getDescriptor(Event.class);
     private static final String EVENT$INVOKER_DESC;
 
@@ -234,7 +233,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
         get.visitEnd();
         forEach.visitVarInsn(Opcodes.ALOAD, 0);
         forEach.visitVarInsn(Opcodes.ALOAD, 1);
-        forEach.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "forEach", "(L" + Type.getInternalName(BiConsumer.class) + ";)V", false);
+        forEach.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "forEach", FOR_EACH_DESC, false);
         forEach.visitInsn(Opcodes.RETURN);
         forEach.visitEnd();
         canBeAssigned.visitVarInsn(Opcodes.ALOAD, 0);
@@ -388,7 +387,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
                 // stack: container container <this>
                 createContainer.visitFieldInsn(Opcodes.GETFIELD, factoryImplName, componentEventsField + "_" + i, componentEventsFieldDesc);
                 // stack: container container this.componentEvent_i
-                createContainer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, EVENT_NAME, "invoker", EVENT$INVOKER_DESC, false);
+                createContainer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.EVENT, "invoker", EVENT$INVOKER_DESC, false);
                 // stack: container container componentCallback_i
                 createContainer.visitTypeInsn(Opcodes.CHECKCAST, componentCallbackName);
                 createContainer.visitInsn(Opcodes.SWAP);
@@ -438,7 +437,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
         // get the generated lazy component type constant
         method.visitFieldInsn(Opcodes.GETSTATIC, CcaAsmHelper.STATIC_COMPONENT_TYPES, CcaAsmHelper.getTypeConstantName(componentId), "L" + CcaAsmHelper.LAZY_COMPONENT_TYPE + ";");
         // stack: <this> component lazyComponentType
-        method.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.LAZY_COMPONENT_TYPE, "get", "()L" + CcaAsmHelper.COMPONENT_TYPE + ";", false);
+        method.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.LAZY_COMPONENT_TYPE, "unwrap", "()L" + CcaAsmHelper.COMPONENT_TYPE + ";", false);
     }
 
     public Class<? extends DynamicContainerFactory<T,?>> getContainerFactoryClass() {

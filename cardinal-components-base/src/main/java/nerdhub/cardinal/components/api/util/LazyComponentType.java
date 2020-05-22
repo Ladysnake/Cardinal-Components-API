@@ -30,51 +30,92 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 @ApiStatus.Experimental
-public final class LazyComponentType {
-    public static LazyComponentType create(String id) {
+public final class LazyComponentType<C extends Component> {
+
+    // used by generated classes
+    public static LazyComponentType<?> create(String id) {
         return create(new Identifier(id));
     }
 
-    public static LazyComponentType create(Identifier id) {
-        return new LazyComponentType(id);
+    public static LazyComponentType<?> create(Identifier id) {
+        return new LazyComponentType<>(id, null);
+    }
+
+    public static <C extends Component> LazyComponentType<C> create(Identifier id, Class<C> componentClass) {
+        Objects.requireNonNull(componentClass);
+        return new LazyComponentType<>(id, componentClass);
     }
 
     private final Identifier componentId;
-    private ComponentType<?> value;
+    private final Class<C> componentClass;
+    private ComponentType<C> wrapped;
 
-    private LazyComponentType(Identifier componentId) {
+    private LazyComponentType(Identifier componentId, @Nullable Class<C> componentClass) {
         this.componentId = componentId;
+        this.componentClass = componentClass;
     }
 
     public boolean isRegistered() {
-        return this.tryGet(false) != null;
+        return this.tryUnwrap(false) != null;
     }
 
-    public ComponentType<?> get() {
-        return this.tryGet(true);
+    // used by generated classes
+    public ComponentType<C> unwrap() {
+        return this.tryUnwrap(true);
     }
 
-    public <T extends Component> ComponentType<T> get(Class<T> type) {
-        @SuppressWarnings("unchecked") ComponentType<T> ret = (ComponentType<T>) this.get();
-        if (!type.isAssignableFrom(ret.getComponentClass())) {
-            throw new IllegalStateException("Queried type " + type + " mismatches with registered type " +ret.getComponentClass());
+    public void register() {
+        if (this.componentClass == null) {
+            throw new NullPointerException("Cannot register a ComponentType with an unknown component class");
         }
-        return ret;
+        ComponentRegistry.INSTANCE.registerIfAbsent(this.componentId, this.componentClass);
+    }
+
+    public Identifier getId() {
+        return this.componentId;
+    }
+
+    /**
+     * Convenience method to retrieve a component without explicitly unwrapping a {@link ComponentType}.
+     *
+     * @param provider a component provider
+     * @return the nonnull value of the held component of this type
+     * @see ComponentType#get(Object)
+     * @see ComponentType#maybeGet(Object)
+     */
+    public C getComponent(Object provider) {
+        return this.unwrap().get(provider);
     }
 
     @Nullable
     @Contract("true -> !null")
-    private ComponentType<?> tryGet(boolean enforceInitialized) {
-        ComponentType<?> value = this.value;
-        if (value == null) {
-            ComponentType<?> newValue = ComponentRegistry.INSTANCE.get(this.componentId);
-            if (enforceInitialized && newValue == null) {
-                throw new IllegalStateException("The component type for '" + this.componentId  +"'  was not registered");
-            }
-            this.value = newValue;
-            return newValue;
+    private ComponentType<C> tryUnwrap(boolean enforceInitialized) {
+        ComponentType<C> value = this.wrapped;
+        if (value != null) {
+            return value;
         }
-        return value;
+        ComponentType<?> registered = ComponentRegistry.INSTANCE.get(this.getId());
+        if (registered == null && enforceInitialized) {
+            if (this.componentClass == null) {
+                throw new IllegalStateException("The component type for '" + this.getId()  + "'  was not registered");
+            } else {
+                ComponentType<C> newValue = ComponentRegistry.INSTANCE.registerIfAbsent(this.getId(), this.componentClass);
+                this.wrapped = newValue;
+                return newValue;
+            }
+        } else if (registered != null) {
+            if (this.componentClass == null || this.componentClass == registered.getComponentClass()) {
+                // either this holder has no type (cast from wildcard to wildcard), or the type has already been checked
+                @SuppressWarnings("unchecked") ComponentType<C> newValue = (ComponentType<C>) registered;
+                this.wrapped = newValue;
+                return newValue;
+            } else {
+                throw new IllegalStateException("Queried type " + this.componentClass + " mismatches with registered type " + registered.getComponentClass());
+            }
+        }
+        return null;
     }
 }
