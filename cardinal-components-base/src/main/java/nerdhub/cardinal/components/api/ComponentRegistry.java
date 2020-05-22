@@ -23,9 +23,9 @@
 package nerdhub.cardinal.components.api;
 
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.util.LazyComponentType;
 import nerdhub.cardinal.components.internal.ComponentRegistryImpl;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Lazy;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
@@ -73,7 +73,7 @@ public interface ComponentRegistry {
     @Nullable
     ComponentType<?> get(Identifier id);
 
-    LazyComponentType<?> getLazy(Identifier id);
+    Lazy<ComponentType<?>> getLazy(Identifier id);
 
     /**
      * Return a sequential stream with this registry at its source.

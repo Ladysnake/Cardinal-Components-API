@@ -35,11 +35,6 @@ import java.util.Objects;
 @ApiStatus.Experimental
 public final class LazyComponentType<C extends Component> {
 
-    // used by generated classes
-    public static LazyComponentType<?> create(String id) {
-        return create(new Identifier(id));
-    }
-
     public static LazyComponentType<?> create(Identifier id) {
         return new LazyComponentType<>(id, null);
     }
