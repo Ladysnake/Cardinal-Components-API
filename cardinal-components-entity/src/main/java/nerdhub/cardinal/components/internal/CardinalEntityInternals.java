@@ -32,17 +32,15 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.Entity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class CardinalEntityInternals {
     private CardinalEntityInternals() { throw new AssertionError(); }
 
-    private static final Map<Class<? extends Entity>, Event> ENTITY_EVENTS = new HashMap<>();
+    private static final Map<Class<? extends Entity>, Event> ENTITY_EVENTS = Collections.synchronizedMap(new HashMap<>());
     private static final Map<Class<? extends Entity>, FeedbackContainerFactory<Entity, Component>> ENTITY_CONTAINER_FACTORIES = new HashMap<>();
     private static final Map<ComponentType<?>, RespawnCopyStrategy<?>> RESPAWN_COPY_STRATEGIES = new HashMap<>();
+    private static final Object factoryMutex = new Object();
 
     @SuppressWarnings("unchecked")
     public static <T extends Entity> Event<EntityComponentCallback<T>> event(Class<T> clazz) {
@@ -68,15 +66,22 @@ public final class CardinalEntityInternals {
      */
     @SuppressWarnings("unchecked")
     public static FeedbackContainerFactory<Entity, Component> getEntityContainerFactory(Class<? extends Entity> clazz) {
-        return ENTITY_CONTAINER_FACTORIES.computeIfAbsent(clazz, cl -> {
-            List<Event<EntityComponentCallback<? extends Entity>>> events = new ArrayList<>();
-            Class c = clazz;
-            while (Entity.class.isAssignableFrom(c)) {
-                events.add(EntityComponentCallback.event(c));
-                c = c.getSuperclass();
-            }
-            return new FeedbackContainerFactory<>(Lists.reverse(events).toArray(new Event[0]));
-        });
+        FeedbackContainerFactory<Entity, Component> existing = ENTITY_CONTAINER_FACTORIES.get(clazz);
+        if (existing != null) {
+            return existing;
+        }
+        synchronized (factoryMutex) {
+            // computeIfAbsent and not put, because the factory may have been generated while waiting
+            return ENTITY_CONTAINER_FACTORIES.computeIfAbsent(clazz, cl -> {
+                List<Event<EntityComponentCallback<? extends Entity>>> events = new ArrayList<>();
+                Class c = clazz;
+                while (Entity.class.isAssignableFrom(c)) {
+                    events.add(EntityComponentCallback.event(c));
+                    c = c.getSuperclass();
+                }
+                return new FeedbackContainerFactory<>(Lists.reverse(events).toArray(new Event[0]));
+            });
+        }
     }
 
     public static <C extends Component> void registerRespawnCopyStrat(ComponentType<C> type, RespawnCopyStrategy<? super C> strategy) {
