@@ -57,7 +57,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class StaticComponentPluginBase<T, I extends StaticComponentInitializer, F> extends DispatchingLazy {
+public abstract class StaticComponentPluginBase<T, I extends StaticComponentInitializer, F> extends LazyDispatcher {
     private static final String FOR_EACH_DESC;
     private static final String FAST_COMPONENT_CONTAINER_CTOR_DESC;
     private static final String CAN_BE_ASSIGNED_DESC;
