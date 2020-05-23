@@ -22,6 +22,10 @@
  */
 package nerdhub.cardinal.components.internal;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
+import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
@@ -48,7 +52,10 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class StaticComponentPluginBase<T, I extends StaticComponentInitializer, F> extends DispatchingLazy {
     private static final String FOR_EACH_DESC;
@@ -74,7 +81,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
     private final Class<T> providerClass;
     private final String implSuffix;
     private final Class<I> initializerType;
-    private Class<? extends DynamicContainerFactory<T,?>> containerFactoryClass;
+    private Class<? extends DynamicContainerFactory<T, ?>> containerFactoryClass;
 
     protected StaticComponentPluginBase(String likelyInitTrigger, Class<T> providerClass, Class<? super F> componentFactoryType, Class<I> initializerType, String implSuffix) {
         super(likelyInitTrigger);
@@ -93,10 +100,9 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
      * <p>Generated component container classes will take an additional {@code int} as first argument to their
      * constructors. That number corresponds to the expected dynamic size of the container (see {@link FastComponentContainer}).
      *
-     *
      * @param componentFactoryType the interface implemented by the component factories used to initialize this container
-     * @param componentFactories a map of {@link ComponentType} ids to factories for components of that type
-     * @param implNameSuffix a unique suffix for the generated class
+     * @param componentFactories   a map of {@link ComponentType} ids to factories for components of that type
+     * @param implNameSuffix       a unique suffix for the generated class
      * @return the generated container class
      */
     public static <I> Class<? extends ComponentContainer<?>> spinComponentContainer(Class<? super I> componentFactoryType, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
@@ -109,7 +115,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
         Type[] actualCtorArgs = new Type[factoryArgs.length + 1];
         actualCtorArgs[0] = Type.INT_TYPE;
         for (int i = 0; i < factoryArgs.length; i++) {
-            actualCtorArgs[i+1] = Type.getType(factoryArgs[i]);
+            actualCtorArgs[i + 1] = Type.getType(factoryArgs[i]);
         }
         String ctorDesc = Type.getMethodDescriptor(Type.VOID_TYPE, actualCtorArgs);
         int ctorFirstAvailableVar = actualCtorArgs.length + 1;  // explicit args + <this>
@@ -120,22 +126,23 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
             containerImplName,
             null,
             CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL,
-            new String[] {CcaAsmHelper.STATIC_COMPONENT_CONTAINER}
+            new String[]{CcaAsmHelper.STATIC_COMPONENT_CONTAINER}
         );
+
+        String componentFieldDescriptor = Type.getDescriptor(Component.class);
+        String factoryFieldDescriptor = Type.getDescriptor(componentFactoryType);
+
         MethodVisitor init = classNode.visitMethod(Opcodes.ACC_PUBLIC, "<init>", ctorDesc, null, null);
         init.visitCode();
         init.visitVarInsn(Opcodes.ALOAD, 0);
         init.visitVarInsn(Opcodes.ILOAD, 1);
         init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "<init>", FAST_COMPONENT_CONTAINER_CTOR_DESC, false);
-        MethodVisitor get = classNode.visitMethod(Opcodes.ACC_PUBLIC, "get", CcaAsmHelper.GET_DESC, null, null);
+
         MethodVisitor forEach = classNode.visitMethod(Opcodes.ACC_PUBLIC, "forEach", FOR_EACH_DESC, null, null);
-        MethodVisitor canBeAssigned = classNode.visitMethod(Opcodes.ACC_PROTECTED, "canBeAssigned", CAN_BE_ASSIGNED_DESC, null, null);
-        Label canBeAssignedFalse = new Label();
+
         for (Identifier identifier : componentFactories.keySet()) {
             String fieldName = CcaAsmHelper.getJavaIdentifierName(identifier);
             String factoryFieldName = getFactoryFieldName(identifier);
-            String fieldDescriptor = Type.getDescriptor(Component.class);
-            String factoryFieldDescriptor = Type.getDescriptor(componentFactoryType);
             /* field declaration */
             classNode.visitField(
                 Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC,
@@ -147,7 +154,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
             classNode.visitField(
                 Opcodes.ACC_PRIVATE | Opcodes.ACC_FINAL,
                 fieldName,
-                fieldDescriptor,
+                componentFieldDescriptor,
                 null,
                 null
             ).visitEnd();
@@ -174,7 +181,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
             init.visitVarInsn(Opcodes.ALOAD, ctorFirstAvailableVar);
             // stack: <this> <this> component
             // store in the field
-            init.visitFieldInsn(Opcodes.PUTFIELD, containerImplName, fieldName, fieldDescriptor);
+            init.visitFieldInsn(Opcodes.PUTFIELD, containerImplName, fieldName, componentFieldDescriptor);
             // stack: <this>
             CcaAsmHelper.stackStaticComponentType(init, identifier);
             // stack: <this> componentType
@@ -182,33 +189,14 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
             // <empty stack>
             init.visitLabel(nextInit);
 
-            /* get implementation */
-            // note: this implementation is O(n). For best results, we could make a big lookup table based on component ids
-            // (would require reserving raw ids in advance for static components)
-            Label nextGet = new Label();
-            get.visitVarInsn(Opcodes.ALOAD, 1);
-            CcaAsmHelper.stackStaticComponentType(get, identifier);
-            get.visitJumpInsn(Opcodes.IF_ACMPNE, nextGet);
-            stackStaticComponent(get, containerImplName, fieldName, fieldDescriptor);
-            get.visitInsn(Opcodes.ARETURN);
-            get.visitLabel(nextGet);
-
             /* forEach implementation */
             forEach.visitVarInsn(Opcodes.ALOAD, 1);
             // stack: biConsumer
             CcaAsmHelper.stackStaticComponentType(forEach, identifier);
             // stack: biConsumer componentType
-            stackStaticComponent(forEach, containerImplName, fieldName, fieldDescriptor);
+            stackStaticComponent(forEach, containerImplName, fieldName, componentFieldDescriptor);
             // stack: biConsumer componentType component
             forEach.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(BiConsumer.class), "accept", "(Ljava/lang/Object;Ljava/lang/Object;)V", true);
-
-            /* canBeAssigned implementation */
-            canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
-            // stack: componentType
-            CcaAsmHelper.stackStaticComponentType(canBeAssigned, identifier);
-            // stack: componentType componentType2
-            canBeAssigned.visitJumpInsn(Opcodes.IF_ACMPEQ, canBeAssignedFalse);
-            // <empty stack>
 
             /* getter implementation */
             MethodVisitor getter = classNode.visitMethod(
@@ -218,34 +206,22 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
                 null,
                 null
             );
-            stackStaticComponent(getter, containerImplName, fieldName, fieldDescriptor);
+            stackStaticComponent(getter, containerImplName, fieldName, componentFieldDescriptor);
             getter.visitInsn(Opcodes.ARETURN);
             getter.visitEnd();
         }
         init.visitInsn(Opcodes.RETURN);
         init.visitEnd();
-        get.visitVarInsn(Opcodes.ALOAD, 0);
-        get.visitVarInsn(Opcodes.ALOAD, 1);
-        get.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "get", CcaAsmHelper.GET_DESC, false);
-        get.visitInsn(Opcodes.ARETURN);
-        get.visitEnd();
         forEach.visitVarInsn(Opcodes.ALOAD, 0);
         forEach.visitVarInsn(Opcodes.ALOAD, 1);
         forEach.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "forEach", FOR_EACH_DESC, false);
         forEach.visitInsn(Opcodes.RETURN);
         forEach.visitEnd();
-        canBeAssigned.visitVarInsn(Opcodes.ALOAD, 0);
-        canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
-        canBeAssigned.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "canBeAssigned", CAN_BE_ASSIGNED_DESC, false);
-        canBeAssigned.visitJumpInsn(Opcodes.IFEQ, canBeAssignedFalse);
-        Label canBeAssignedEnd = new Label();
-        canBeAssigned.visitInsn(Opcodes.ICONST_1);
-        canBeAssigned.visitJumpInsn(Opcodes.GOTO, canBeAssignedEnd);
-        canBeAssigned.visitLabel(canBeAssignedFalse);
-        canBeAssigned.visitInsn(Opcodes.ICONST_0);
-        canBeAssigned.visitLabel(canBeAssignedEnd);
-        canBeAssigned.visitInsn(Opcodes.IRETURN);
-        canBeAssigned.visitEnd();
+
+        if (!componentFactories.isEmpty()) {
+            generateLookupMethods(componentFactories.keySet(), containerImplName, classNode, componentFieldDescriptor);
+        }
+
         @SuppressWarnings("unchecked") Class<? extends ComponentContainer<?>> ret = (Class<? extends ComponentContainer<?>>) CcaAsmHelper.generateClass(classNode);
         for (Map.Entry<Identifier, I> entry : componentFactories.entrySet()) {
             try {
@@ -259,6 +235,67 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
         return ret;
     }
 
+    private static void generateLookupMethods(Set<Identifier> components, String containerImplName, ClassNode classNode, String componentFieldDescriptor) {
+        MethodVisitor canBeAssigned = classNode.visitMethod(Opcodes.ACC_PROTECTED, "canBeAssigned", CAN_BE_ASSIGNED_DESC, null, null);
+        MethodVisitor get = classNode.visitMethod(Opcodes.ACC_PUBLIC, "get", CcaAsmHelper.GET_DESC, null, null);
+        canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
+        // stack[canBeAssigned]: componentType
+        get.visitVarInsn(Opcodes.ALOAD, 0);
+        get.visitVarInsn(Opcodes.ALOAD, 1);
+        // stack[get]: <this> componentType
+        canBeAssigned.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.COMPONENT_TYPE, "getRawId", "()I", false);
+        // stack[canBeAssigned]: rawId
+        get.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.COMPONENT_TYPE, "getRawId", "()I", false);
+        // stack[get]: <this> rawId
+        Label yesAssign = new Label();
+        Label noAssign = new Label();
+        Label defaultGetCase = new Label();
+        Int2ObjectSortedMap<Identifier> raw2Id = components.stream().collect(Collectors.toMap(
+            ((ComponentRegistryImpl) ComponentRegistry.INSTANCE)::assignRawId,
+            Function.identity(), (r, r2) -> {
+                throw new IllegalStateException("Duplicate key " + r + ", " + r2);
+            }, Int2ObjectRBTreeMap::new
+        ));
+        int nbCases = raw2Id.lastIntKey() + 1;  // 0 is a valid raw id
+        Label[] getLabels = new Label[nbCases];
+        Label[] canBeAssignedLabels = new Label[nbCases];
+        for (int i = 0; i < nbCases; i++) {
+            boolean contained = raw2Id.containsKey(i);
+            getLabels[i] = contained ? new Label() : defaultGetCase;
+            canBeAssignedLabels[i] = contained ? noAssign : yesAssign;
+        }
+        canBeAssigned.visitTableSwitchInsn(0, nbCases - 1, yesAssign, canBeAssignedLabels);
+        // <empty stack[canBeAssigned]>
+        get.visitTableSwitchInsn(0, nbCases - 1, defaultGetCase, getLabels);
+        // stack[get]: <this>
+
+        canBeAssigned.visitLabel(noAssign);
+        canBeAssigned.visitInsn(Opcodes.ICONST_0);
+        // stack[canBeAssigned]: <false>
+        canBeAssigned.visitInsn(Opcodes.IRETURN);
+
+        for (Int2ObjectMap.Entry<Identifier> entry : raw2Id.int2ObjectEntrySet()) {
+            // stack[get]: <this>
+            get.visitLabel(getLabels[entry.getIntKey()]);
+            get.visitFieldInsn(Opcodes.GETFIELD, containerImplName, CcaAsmHelper.getJavaIdentifierName(entry.getValue()), componentFieldDescriptor);
+            // stack[get]: component
+            get.visitInsn(Opcodes.ARETURN);
+        }
+        canBeAssigned.visitLabel(yesAssign);
+        // <empty stack[canBeAssigned]>
+        canBeAssigned.visitVarInsn(Opcodes.ALOAD, 0);
+        canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
+        canBeAssigned.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "canBeAssigned", CAN_BE_ASSIGNED_DESC, false);
+        canBeAssigned.visitInsn(Opcodes.IRETURN);
+        get.visitLabel(defaultGetCase);
+        // stack[get]: <this>
+        get.visitVarInsn(Opcodes.ALOAD, 1);
+        // stack[get]: <this> componentType
+        get.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "get", CcaAsmHelper.GET_DESC, false);
+        get.visitInsn(Opcodes.ARETURN);
+        get.visitEnd();
+    }
+
     @NotNull
     private static String getFactoryFieldName(Identifier identifier) {
         return CcaAsmHelper.getJavaIdentifierName(identifier) + "$factory";
@@ -270,10 +307,10 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
      *
      * <p>The generated class has a single constructor, taking {@code eventCount} parameters of type {@link Event}.
      *
-     * @param implNameSuffix a unique suffix for the generated class
+     * @param implNameSuffix       a unique suffix for the generated class
      * @param containerFactoryType the factory interface that is to be implemented by the returned class
-     * @param containerImpl  the type of containers that is to be instantiated by the generated factory
-     * @param actualFactoryParams the actual type of the arguments taken by the {@link ComponentContainer} constructor
+     * @param containerImpl        the type of containers that is to be instantiated by the generated factory
+     * @param actualFactoryParams  the actual type of the arguments taken by the {@link ComponentContainer} constructor
      */
     public static <I> Class<? extends I> spinContainerFactory(String implNameSuffix, Class<? super I> containerFactoryType, Class<? extends ComponentContainer<?>> containerImpl, @Nullable Class<?> componentCallbackType, int eventCount, Class<?>... actualFactoryParams) throws IOException {
         checkValidJavaIdentifier(implNameSuffix);
@@ -340,7 +377,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
         String containerImplName = Type.getInternalName(containerImpl);
         ClassNode containerFactoryWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
         String factoryImplName = CcaAsmHelper.STATIC_CONTAINER_FACTORY + '_' + implNameSuffix;
-        containerFactoryWriter.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, factoryImplName, null, "java/lang/Object", new String[] {Type.getInternalName(containerFactoryType)});
+        containerFactoryWriter.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, factoryImplName, null, "java/lang/Object", new String[]{Type.getInternalName(containerFactoryType)});
         String componentEventsFieldDesc = EVENT_DESC;
         String componentEventsField = "componentEvent";
         String componentCallbackName = componentCallbackType == null ? null : Type.getInternalName(componentCallbackType);
@@ -431,7 +468,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
         method.visitFieldInsn(Opcodes.GETFIELD, containerImplName, fieldName, fieldDescriptor);
     }
 
-    public Class<? extends DynamicContainerFactory<T,?>> getContainerFactoryClass() {
+    public Class<? extends DynamicContainerFactory<T, ?>> getContainerFactoryClass() {
         this.ensureInitialized();
 
         return this.containerFactoryClass;
