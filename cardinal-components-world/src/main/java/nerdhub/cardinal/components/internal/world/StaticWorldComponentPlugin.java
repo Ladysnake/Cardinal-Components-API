@@ -25,7 +25,7 @@ package nerdhub.cardinal.components.internal.world;
 import nerdhub.cardinal.components.api.component.StaticWorldComponentInitializer;
 import nerdhub.cardinal.components.api.component.WorldComponentFactory;
 import nerdhub.cardinal.components.api.component.WorldComponentFactoryRegistry;
-import nerdhub.cardinal.components.internal.StaticComponentPluginBase;
+import nerdhub.cardinal.components.internal.asm.StaticComponentPluginBase;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 

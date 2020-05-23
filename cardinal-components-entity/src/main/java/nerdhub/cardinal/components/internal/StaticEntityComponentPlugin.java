@@ -24,7 +24,9 @@ package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.component.*;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.internal.asm.CcaBootstrap;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
+import nerdhub.cardinal.components.internal.asm.StaticComponentPluginBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 

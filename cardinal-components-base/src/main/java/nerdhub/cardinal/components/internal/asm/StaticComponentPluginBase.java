@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.internal;
+package nerdhub.cardinal.components.internal.asm;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
@@ -33,8 +33,9 @@ import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.StaticComponentInitializer;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
 import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
-import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
-import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
+import nerdhub.cardinal.components.internal.ComponentRegistryImpl;
+import nerdhub.cardinal.components.internal.DynamicContainerFactory;
+import nerdhub.cardinal.components.internal.LazyDispatcher;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
