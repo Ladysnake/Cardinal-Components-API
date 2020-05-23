@@ -26,6 +26,7 @@ import nerdhub.cardinal.components.api.component.ChunkComponentFactory;
 import nerdhub.cardinal.components.api.component.ChunkComponentFactoryRegistry;
 import nerdhub.cardinal.components.api.component.StaticChunkComponentInitializer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import nerdhub.cardinal.components.internal.asm.StaticComponentPluginBase;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.chunk.Chunk;
 

@@ -36,14 +36,12 @@ import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Locale;
 
 public final class CcaAsmHelper {
 
@@ -109,17 +107,10 @@ public final class CcaAsmHelper {
         return STATIC_COMPONENT_TYPE + "$" + getJavaIdentifierName(identifier);
     }
 
-    @Nonnull
     public static String getJavaIdentifierName(Identifier identifier) {
         return identifier.toString().replace(':', '$').replace('/', '$');
     }
 
-    @Nonnull
-    public static String getTypeConstantName(Identifier identifier) {
-        return getJavaIdentifierName(identifier).toUpperCase(Locale.ROOT);
-    }
-
-    @Nonnull
     public static String getStaticStorageGetterName(Identifier identifier) {
         return "get$" + getJavaIdentifierName(identifier);
     }

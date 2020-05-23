@@ -20,12 +20,11 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.internal;
+package nerdhub.cardinal.components.internal.asm;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.StaticComponentInitializer;
-import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
-import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
+import nerdhub.cardinal.components.internal.LazyDispatcher;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;

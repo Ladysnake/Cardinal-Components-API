@@ -30,6 +30,7 @@ import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.ComponentRegisteredCallback;
+import nerdhub.cardinal.components.internal.asm.CcaBootstrap;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Lazy;
 
