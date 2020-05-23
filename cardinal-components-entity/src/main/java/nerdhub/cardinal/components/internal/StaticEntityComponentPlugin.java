@@ -31,7 +31,7 @@ import net.minecraft.util.Identifier;
 import java.io.IOException;
 import java.util.*;
 
-public final class StaticEntityComponentPlugin extends DispatchingLazy implements EntityComponentFactoryRegistry {
+public final class StaticEntityComponentPlugin extends LazyDispatcher implements EntityComponentFactoryRegistry {
     public static final StaticEntityComponentPlugin INSTANCE = new StaticEntityComponentPlugin();
 
     public StaticEntityComponentPlugin() {

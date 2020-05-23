@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class StaticItemComponentPlugin extends DispatchingLazy implements ItemComponentFactoryRegistry {
+public final class StaticItemComponentPlugin extends LazyDispatcher implements ItemComponentFactoryRegistry {
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
     public static final String WILDARD_IMPL_SUFFIX = "ItemStackImpl_All";
 

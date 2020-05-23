@@ -43,7 +43,7 @@ import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-public final class CcaBootstrap extends DispatchingLazy {
+public final class CcaBootstrap extends LazyDispatcher {
 
     public static final String COMPONENT_TYPE_INIT_DESC = Type.getMethodDescriptor(Type.VOID_TYPE, Type.getObjectType(CcaAsmHelper.IDENTIFIER), Type.getType(Class.class), Type.INT_TYPE);
     public static final String COMPONENT_TYPE_GET0_DESC = "(L" + CcaAsmHelper.COMPONENT_PROVIDER + ";)L" + CcaAsmHelper.COMPONENT + ";";
