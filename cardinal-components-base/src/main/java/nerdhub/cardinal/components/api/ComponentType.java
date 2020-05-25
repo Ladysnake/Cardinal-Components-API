@@ -111,7 +111,13 @@ public class ComponentType<T extends Component> {
         T component = this.getNullable((ComponentProvider) provider);
         assert component == null || this.getComponentClass().isInstance(component);
         if (component == null) {
-            throw new NoSuchElementException(provider + " provides no component of type " + this.id);
+            try {
+                throw new NoSuchElementException(provider + " provides no component of type " + this.id);
+            } catch (NullPointerException e) {  // some toString implementations crash in init because the name is not set
+                NoSuchElementException e1 = new NoSuchElementException(this.id + " not available");
+                e1.addSuppressed(e);
+                throw e1;
+            }
         }
         return component;
     }
