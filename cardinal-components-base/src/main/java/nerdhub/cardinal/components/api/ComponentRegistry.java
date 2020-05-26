@@ -29,6 +29,7 @@ import net.minecraft.util.Lazy;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -42,7 +43,9 @@ import java.util.stream.Stream;
  */
 @ApiStatus.NonExtendable
 public interface ComponentRegistry {
-    /** The component registry */
+    /**
+     * The component registry
+     */
     ComponentRegistry INSTANCE = new ComponentRegistryImpl(ComponentType::new);
 
     /**
@@ -68,12 +71,35 @@ public interface ComponentRegistry {
      * Directly retrieves a ComponentType using its id.
      *
      * @return the {@code ComponentType} that got registered with {@code id}, or {@code null}
-     *         if no such {@code ComponentType} is found.
+     * if no such {@code ComponentType} is found.
      */
     @Nullable
     ComponentType<?> get(Identifier id);
 
+    /**
+     * Lazily retrieve a {@code ComponentType} using its id.
+     *
+     * <p>If the {@code ComponentType} has not been registered by the time {@link Lazy#get()} is called,
+     * an {@code IllegalStateException} is thrown by the latter.
+     *
+     * @param id the unique identifier of the requested {@code ComponentType}
+     * @return a {@code Lazy} describing the {@code ComponentType} that gets registered with {@code id}.
+     */
+    @ApiStatus.Experimental
     Lazy<ComponentType<?>> getLazy(Identifier id);
+
+    /**
+     * Lazily retrieve a {@code ComponentType} using its id.
+     *
+     * <p>If the {@code ComponentType} has not been registered by the time {@link Lazy#get()} is called,
+     * an empty {@code Optional} is returned by the latter.
+     *
+     * @param id the unique identifier of the requested {@code ComponentType}
+     * @return a {@code Lazy} describing the {@code ComponentType} that may get registered with {@code id}.
+     * @apiNote this method is especially useful when the component type belongs to an optional dependency
+     */
+    @ApiStatus.Experimental
+    Lazy<Optional<ComponentType<?>>> getLazyOptional(Identifier id);
 
     /**
      * Return a sequential stream with this registry at its source.
