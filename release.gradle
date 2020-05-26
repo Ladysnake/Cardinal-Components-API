@@ -161,7 +161,7 @@ curseforge {
 
 tasks.curseforge.dependsOn(checkGitStatus)
 
-task release(dependsOn: [tasks.publish, tasks.githubRelease, tasks.ladysnakeGithubRelease, tasks.bintrayUpload, /*tasks.curseforge*/]) {
+task release(dependsOn: [tasks.publish, tasks.githubRelease, tasks.ladysnakeGithubRelease, tasks.bintrayUpload, tasks.curseforge]) {
     group = 'publishing'
     description = 'Releases a new version to Maven, Github and Curseforge'
 }
