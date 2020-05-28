@@ -22,7 +22,7 @@
  */
 package nerdhub.cardinal.components.mixins.common.item;
 
-import nerdhub.cardinal.components.internal.ItemStackAccessor;
+import nerdhub.cardinal.components.internal.InternalComponentProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
@@ -44,7 +44,7 @@ public abstract class MixinPacketByteBuf {
     @Inject(method = "writeItemStack", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/PacketByteBuf;writeCompoundTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/network/PacketByteBuf;", shift = At.Shift.AFTER), cancellable = true)
     private void writeItemStack(ItemStack stack, CallbackInfoReturnable<PacketByteBuf> cir) {
         //noinspection ConstantConditions
-        this.writeCompoundTag(((ItemStackAccessor)(Object)stack).cardinal_getComponentContainer().toTag(new CompoundTag()));
+        this.writeCompoundTag(((InternalComponentProvider)(Object)stack).getComponentContainer().toTag(new CompoundTag()));
     }
 
     @SuppressWarnings({"ConstantConditions"})
@@ -52,7 +52,7 @@ public abstract class MixinPacketByteBuf {
     private void readStack(CallbackInfoReturnable<ItemStack> cir) {
         ItemStack stack = cir.getReturnValue();
         if(!stack.isEmpty()) {
-            ((ItemStackAccessor) ((Object) stack)).cardinal_getComponentContainer().fromTag(this.readCompoundTag());
+            ((InternalComponentProvider) ((Object) stack)).getComponentContainer().fromTag(this.readCompoundTag());
         }
     }
 }
