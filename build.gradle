@@ -28,13 +28,32 @@ subprojects {
     archivesBaseName = project.name
     group = "${rootProject.group}.${rootProject.archivesBaseName}"
 
-    apply from: "https://raw.githubusercontent.com/OnyxStudios/Gradle-Scripts/master/scripts/fabric/basic_project.gradle"
 }
 
 allprojects {
     apply plugin: "fabric-loom"
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
     version = System.getenv("TRAVIS_TAG") ?: rootProject.mod_version
+
+    // import utility functions
+    apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/utilities.gradle"
+
+    tasks.withType(Javadoc) {
+        options.addStringOption("Xdoclint:none", "-quiet")
+    }
+
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        archiveClassifier = "sources"
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        from javadoc.destinationDir
+        archiveClassifier = "javadoc"
+    }
+    tasks.build.dependsOn javadocJar
 
     repositories {
         maven {
@@ -90,6 +109,8 @@ allprojects {
             projectDisplayName = rootProject.archivesBaseName
         }
     }
+
+    apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/publish/nerdhub_maven.gradle"
 }
 
 subprojects {
