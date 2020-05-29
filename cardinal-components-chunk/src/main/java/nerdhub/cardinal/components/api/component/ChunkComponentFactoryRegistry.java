@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -31,6 +32,15 @@ import org.jetbrains.annotations.ApiStatus;
  */
 @ApiStatus.Experimental
 public interface ChunkComponentFactoryRegistry {
+    /**
+     * Registers a {@link ChunkComponentFactory}.
+     *
+     * @param factory the factory to use to create components of the given type
+     */
+    default <C extends CopyableComponent<?>> void register(ComponentType<? super C> type, ChunkComponentFactory<C> factory) {
+        this.register(type.getId(), factory);
+    }
+
     /**
      * Registers a {@link ChunkComponentFactory}.
      *

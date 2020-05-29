@@ -26,11 +26,11 @@ import com.google.common.reflect.TypeToken;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.GenericComponentFactoryRegistry;
 import nerdhub.cardinal.components.api.component.StaticGenericComponentInitializer;
-import nerdhub.cardinal.components.internal.CcaBootstrap;
-import nerdhub.cardinal.components.internal.DispatchingLazy;
-import nerdhub.cardinal.components.internal.StaticComponentPluginBase;
+import nerdhub.cardinal.components.internal.LazyDispatcher;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
+import nerdhub.cardinal.components.internal.asm.CcaBootstrap;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
+import nerdhub.cardinal.components.internal.asm.StaticComponentPluginBase;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.Identifier;
@@ -39,7 +39,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
-public final class StaticGenericComponentPlugin extends DispatchingLazy implements GenericComponentFactoryRegistry {
+public final class StaticGenericComponentPlugin extends LazyDispatcher implements GenericComponentFactoryRegistry {
     public static final StaticGenericComponentPlugin INSTANCE = new StaticGenericComponentPlugin();
     private ModContainer currentProvider;
 

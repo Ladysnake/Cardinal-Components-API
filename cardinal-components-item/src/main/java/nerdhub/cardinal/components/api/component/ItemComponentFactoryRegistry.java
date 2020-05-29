@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.util.Identifier;
 
 import javax.annotation.Nullable;
@@ -31,6 +32,22 @@ import javax.annotation.Nullable;
  * @since 2.4.0
  */
 public interface ItemComponentFactoryRegistry {
+    /**
+     * Registers an {@link ItemComponentFactory}.
+     *
+     * <p> A {@code null} {@code componentId} works as a wildcard parameter.
+     * A callback registered to the wilcard event is called for every item stack ever
+     * created. For performance reasons, wildcard callbacks should be avoided
+     * where possible. Notably, when registering callbacks for various items,
+     * it is often better to register a separate specialized callback for each one
+     * than a single generic callback with additional checks.
+     *  @param itemId      the id of an item to target, or {@code null} to target every stack.
+     * @param factory     the factory to use to create components of the given type
+     */
+    default <C extends CopyableComponent<?>> void register(ComponentType<? super C> type, @Nullable Identifier itemId, ItemComponentFactory<C> factory) {
+        this.register(type.getId(), itemId, factory);
+    }
+
     /**
      * Registers an {@link ItemComponentFactory}.
      *
