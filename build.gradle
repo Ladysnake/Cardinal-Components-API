@@ -136,6 +136,20 @@ allprojects {
     }
 
     apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/publish/nerdhub_maven.gradle"
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
+                    builtBy(remapJar)
+                }
+                artifact(sourcesJar) {
+                    builtBy(remapSourcesJar)
+                }
+                artifact(javadocJar)
+            }
+        }
+    }
 }
 
 subprojects {
@@ -219,9 +233,6 @@ build.dependsOn(remapTestmodJar)
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
-                builtBy(remapJar)
-            }
             pom.withXml {
                 def depsNode = asNode().appendNode("dependencies")
                 subprojects.each {
