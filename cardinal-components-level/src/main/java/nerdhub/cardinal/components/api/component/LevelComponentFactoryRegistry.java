@@ -34,6 +34,15 @@ public interface LevelComponentFactoryRegistry {
     /**
      * Registers a {@link LevelComponentFactory}.
      *
+ * @param factory     the factory to use to create components of the given type
+     */
+    default <C extends Component> void register(ComponentType<C> type, LevelComponentFactory<C> factory) {
+        this.register(type.getId(), factory);
+    }
+
+    /**
+     * Registers a {@link LevelComponentFactory}.
+     *
      * @param componentId the id of a {@link ComponentType}
      * @param factory     the factory to use to create components of the given type
      */

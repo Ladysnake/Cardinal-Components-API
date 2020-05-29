@@ -26,13 +26,13 @@ import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.internal.SharedComponentSecrets;
+import nerdhub.cardinal.components.internal.ComponentRegistryImpl;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
 /**
@@ -49,12 +49,6 @@ import java.util.function.BiConsumer;
  *
  */
 public class FastComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
-    /**
-     * All of the component types that can be stored in containers.
-     * (Cached for performance.)
-     */
-    private static final AtomicReference<ComponentType<?>[]> keyUniverse = SharedComponentSecrets.getRegisteredComponents();
-
     private final BitSet containedTypes;
     private final Int2ObjectOpenHashMap<C> vals;
 
@@ -66,7 +60,7 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
      * @param expected the expected number of <em>dynamically added</em> elements in the container
      */
     public FastComponentContainer(int expected) {
-        this.containedTypes = new BitSet(keyUniverse.get().length);
+        this.containedTypes = new BitSet(((ComponentRegistryImpl) ComponentRegistry.INSTANCE).size());
         this.vals = new Int2ObjectOpenHashMap<>(expected, Hash.VERY_FAST_LOAD_FACTOR);
     }
 
@@ -127,7 +121,7 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
     @Override   // overridden by generated subclasses
     public void forEach(BiConsumer<? super ComponentType<?>, ? super C> action) {
         this.vals.int2ObjectEntrySet().fastForEach((e) ->
-            action.accept(keyUniverse.get()[e.getIntKey()], e.getValue()));
+            action.accept(ComponentRegistryImpl.byRawId(e.getIntKey()), e.getValue()));
     }
 
     // Views
@@ -280,7 +274,7 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
                 throw new NoSuchElementException();
             }
             this.advance = true;
-            ComponentType<?> key = keyUniverse.get()[this.curId];
+            ComponentType<?> key = ComponentRegistryImpl.byRawId(this.curId);
             @SuppressWarnings("unchecked") C value = (C) FastComponentContainer.this.get(key);
             assert value != null;
             return value;
@@ -307,7 +301,7 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
                 throw new NoSuchElementException();
             }
             this.advance = true;
-            return keyUniverse.get()[this.curId];
+            return ComponentRegistryImpl.byRawId(this.curId);
         }
     }
 
@@ -330,7 +324,7 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
                 throw new NoSuchElementException();
             }
             this.advance = true;
-            ComponentType<?> key = keyUniverse.get()[this.curId];
+            ComponentType<?> key = ComponentRegistryImpl.byRawId(this.curId);
             @SuppressWarnings("unchecked") C value = (C) FastComponentContainer.this.get(key);
             assert value != null;
             return new Entry(key, value);

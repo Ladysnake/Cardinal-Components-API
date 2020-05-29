@@ -25,11 +25,10 @@ package nerdhub.cardinal.components.api.util.container;
 import com.google.common.base.Preconditions;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.internal.SharedComponentSecrets;
+import nerdhub.cardinal.components.internal.ComponentRegistryImpl;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
 /**
@@ -53,12 +52,6 @@ import java.util.function.BiConsumer;
  * counterparts.
  */
 public final class IndexedComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
-    /**
-     * All of the component types that can be stored in this container.
-     * (Cached for performance.)
-     */
-    private final AtomicReference<ComponentType<?>[]> keyUniverse = SharedComponentSecrets.getRegisteredComponents();
-
     private int universeSize;
     private int minIndex;
 
@@ -100,7 +93,7 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
      * @return the number of components in this container
      */
     public int size() {
-        return size;
+        return this.size;
     }
 
     /**
@@ -125,7 +118,7 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
     @Override
     public C get(@Nullable Object key) {
         if (key != null && key.getClass() == ComponentType.class) {
-            return (C) get((ComponentType<?>) key);
+            return (C) this.get((ComponentType<?>) key);
         }
         return null;
     }
@@ -173,9 +166,9 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
         }
         @SuppressWarnings("unchecked") C oldValue = (C) vals[index];
         vals[index] = value;
-        assert vals[0] != null && vals[universeSize-1] != null;
+        assert vals[0] != null && vals[this.universeSize -1] != null;
         if (oldValue == null) {
-            size++;
+            this.size++;
         }
         return oldValue;
     }
@@ -186,7 +179,7 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
         for (int i = 0; i < vals.length; i++) {
             @SuppressWarnings("unchecked") C val = (C) vals[i];
             if (val != null) {
-                action.accept(this.keyUniverse.get()[this.minIndex + i], val);
+                action.accept(ComponentRegistryImpl.byRawId(this.minIndex + i), val);
             }
         }
     }
@@ -220,11 +213,11 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
      * @return a set view of the keys contained in this map
      */
     public Set<ComponentType<?>> keySet() {
-        Set<ComponentType<?>> ks = keySet;
+        Set<ComponentType<?>> ks = this.keySet;
         if (ks != null) {
             return ks;
         }
-        return keySet = new KeySet();
+        return this.keySet = new KeySet();
     }
 
     /**
@@ -239,11 +232,11 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
      */
     @Override
     public Collection<C> values() {
-        Collection<C> vs = values;
+        Collection<C> vs = this.values;
         if (vs != null) {
             return vs;
         }
-        return values = new Values();
+        return this.values = new Values();
     }
 
     /**
@@ -256,11 +249,11 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
      * @return a set view of the mappings contained in this container
      */
     public Set<Map.Entry<ComponentType<?>, C>> entrySet() {
-        Set<Map.Entry<ComponentType<?>,C>> es = entrySet;
+        Set<Map.Entry<ComponentType<?>,C>> es = this.entrySet;
         if (es != null) {
             return es;
         }
-        return entrySet = new EntrySet();
+        return this.entrySet = new EntrySet();
     }
 
     private class EntrySet extends AbstractSet<Map.Entry<ComponentType<?>,C>> {
@@ -273,13 +266,13 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
                 return false;
             Map.Entry<?,?> entry = (Map.Entry<?,?>)o;
             Object key = entry.getKey();
-            return key instanceof ComponentType && Objects.equals(entry.getValue(), get(key));
+            return key instanceof ComponentType && Objects.equals(entry.getValue(), IndexedComponentContainer.this.get(key));
         }
         public boolean remove(Object o) {
             throw new UnsupportedOperationException();
         }
         public int size() {
-            return size;
+            return IndexedComponentContainer.this.size;
         }
         public void clear() {
             throw new UnsupportedOperationException();
@@ -291,10 +284,10 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
             return new KeyIterator();
         }
         public int size() {
-            return size;
+            return IndexedComponentContainer.this.size;
         }
         public boolean contains(Object o) {
-            return containsKey(o);
+            return IndexedComponentContainer.this.containsKey(o);
         }
         public boolean remove(Object o) {
             throw new UnsupportedOperationException();
@@ -306,10 +299,10 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
             return new ValueIterator();
         }
         public int size() {
-            return size;
+            return IndexedComponentContainer.this.size;
         }
         public boolean contains(Object o) {
-            return containsValue(o);
+            return IndexedComponentContainer.this.containsValue(o);
         }
         public boolean remove(Object o) {
             throw new UnsupportedOperationException();
@@ -321,9 +314,9 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
         int index = 0;
 
         public boolean hasNext() {
-            while (index < vals.length && vals[index] == null)
-                index++;
-            return index != vals.length;
+            while (this.index < IndexedComponentContainer.this.vals.length && IndexedComponentContainer.this.vals[this.index] == null)
+                this.index++;
+            return this.index != IndexedComponentContainer.this.vals.length;
         }
 
         public void remove() {
@@ -333,24 +326,24 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
 
     private class KeyIterator extends ComponentContainerIterator<ComponentType<?>> {
         public ComponentType<?> next() {
-            if (!hasNext())
+            if (!this.hasNext())
                 throw new NoSuchElementException();
-            return keyUniverse.get()[minIndex + index++];
+            return ComponentRegistryImpl.byRawId(IndexedComponentContainer.this.minIndex + this.index++);
         }
     }
 
     private class ValueIterator extends ComponentContainerIterator<C> {
         @SuppressWarnings("unchecked")
         public C next() {
-            if (!hasNext()) throw new NoSuchElementException();
-            return (C) vals[index++];
+            if (!this.hasNext()) throw new NoSuchElementException();
+            return (C) IndexedComponentContainer.this.vals[this.index++];
         }
     }
 
     private class EntryIterator extends ComponentContainerIterator<Entry<ComponentType<?>, C>> {
         public Entry next() {
-            if (!hasNext()) throw new NoSuchElementException();
-            return new Entry(index++);
+            if (!this.hasNext()) throw new NoSuchElementException();
+            return new Entry(this.index++);
         }
 
 
@@ -362,38 +355,38 @@ public final class IndexedComponentContainer<C extends Component> extends Abstra
             }
 
             public ComponentType<?> getKey() {
-                return keyUniverse.get()[minIndex + index];
+                return ComponentRegistryImpl.byRawId(IndexedComponentContainer.this.minIndex + this.index);
             }
 
             @SuppressWarnings("unchecked")
             public C getValue() {
-                return (C) vals[index];
+                return (C) IndexedComponentContainer.this.vals[this.index];
             }
 
             @Nullable
             public C setValue(C value) {
-                return IndexedComponentContainer.this.put(getKey(), value);
+                return IndexedComponentContainer.this.put(this.getKey(), value);
             }
 
             public boolean equals(Object o) {
-                if (index < 0)
+                if (this.index < 0)
                     return o == this;
 
                 if (!(o instanceof Map.Entry))
                     return false;
 
                 Map.Entry<?,?> e = (Map.Entry<?,?>)o;
-                Component ourValue = vals[index];
+                Component ourValue = IndexedComponentContainer.this.vals[this.index];
                 Object hisValue = e.getValue();
-                return (e.getKey() == keyUniverse.get()[minIndex + index] && Objects.equals(ourValue, hisValue));
+                return (e.getKey() == ComponentRegistryImpl.byRawId(IndexedComponentContainer.this.minIndex + this.index) && Objects.equals(ourValue, hisValue));
             }
 
             public int hashCode() {
-                return (keyUniverse.get()[minIndex + index].hashCode() ^ vals[index].hashCode());
+                return (ComponentRegistryImpl.byRawId(IndexedComponentContainer.this.minIndex + this.index).hashCode() ^ IndexedComponentContainer.this.vals[this.index].hashCode());
             }
 
             public String toString() {
-                return keyUniverse.get()[minIndex + index] + "=" + vals[index];
+                return ComponentRegistryImpl.byRawId(IndexedComponentContainer.this.minIndex + this.index) + "=" + IndexedComponentContainer.this.vals[this.index];
             }
 
         }

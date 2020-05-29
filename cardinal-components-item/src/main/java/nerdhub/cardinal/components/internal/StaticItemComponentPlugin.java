@@ -28,7 +28,9 @@ import nerdhub.cardinal.components.api.component.ItemComponentFactoryRegistry;
 import nerdhub.cardinal.components.api.component.StaticItemComponentInitializer;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import nerdhub.cardinal.components.internal.asm.CcaAsmHelper;
+import nerdhub.cardinal.components.internal.asm.CcaBootstrap;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
+import nerdhub.cardinal.components.internal.asm.StaticComponentPluginBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class StaticItemComponentPlugin extends DispatchingLazy implements ItemComponentFactoryRegistry {
+public final class StaticItemComponentPlugin extends LazyDispatcher implements ItemComponentFactoryRegistry {
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
     public static final String WILDARD_IMPL_SUFFIX = "ItemStackImpl_All";
 

@@ -24,30 +24,34 @@ package nerdhub.cardinal.components.internal;
 
 import org.jetbrains.annotations.ApiStatus;
 
-public abstract class DispatchingLazy {
-    private boolean requiresInitialization = true;
-    private boolean loading = false;
+public abstract class LazyDispatcher {
+    private volatile boolean requiresInitialization = true;
+    private volatile boolean loading = false;
     private final String likelyInitTrigger;
 
-    protected DispatchingLazy(String likelyInitTrigger) {
+    protected LazyDispatcher(String likelyInitTrigger) {
         this.likelyInitTrigger = likelyInitTrigger;
     }
 
-    public void ensureInitialized() {
+    protected void ensureInitialized() {
         if (this.requiresInitialization) {
-            if (this.loading) {
-                this.onCircularLoading();
-            } else {
-                this.loading = true;
+            synchronized (this) {
+                if (this.requiresInitialization) {
+                    if (this.loading) {
+                        this.onCircularLoading();
+                    } else {
+                        this.loading = true;
 
-                try {
-                    this.init();
-                } finally {
-                    this.loading = false;
+                        try {
+                            this.init();
+                        } finally {
+                            this.loading = false;
+                        }
+
+                        this.requiresInitialization = false;
+                        this.postInit();
+                    }
                 }
-
-                this.requiresInitialization = false;
-                this.postInit();
             }
         }
     }

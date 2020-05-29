@@ -32,6 +32,15 @@ public interface WorldComponentFactoryRegistry {
     /**
      * Registers a {@link WorldComponentFactory}.
      *
+     * @param factory the factory to use to create components of the given type
+     */
+    default <C extends Component> void register(ComponentType<C> type, WorldComponentFactory<? extends C> factory) {
+        this.register(type.getId(), factory);
+    }
+
+    /**
+     * Registers a {@link WorldComponentFactory}.
+     *
      * @param componentId the id of a {@link ComponentType}
      * @param factory     the factory to use to create components of the given type
      */

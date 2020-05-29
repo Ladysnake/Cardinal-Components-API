@@ -24,14 +24,16 @@ package nerdhub.cardinal.components.internal;
 
 import nerdhub.cardinal.components.api.component.*;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.internal.asm.CcaBootstrap;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
+import nerdhub.cardinal.components.internal.asm.StaticComponentPluginBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
 import java.io.IOException;
 import java.util.*;
 
-public final class StaticEntityComponentPlugin extends DispatchingLazy implements EntityComponentFactoryRegistry {
+public final class StaticEntityComponentPlugin extends LazyDispatcher implements EntityComponentFactoryRegistry {
     public static final StaticEntityComponentPlugin INSTANCE = new StaticEntityComponentPlugin();
 
     public StaticEntityComponentPlugin() {
@@ -48,6 +50,7 @@ public final class StaticEntityComponentPlugin extends DispatchingLazy implement
     private final Map<Key, Class<? extends DynamicContainerFactory<?,?>>> factoryClasses = new HashMap<>();
 
     public boolean requiresStaticFactory(Class<? extends Entity> entityClass) {
+        this.ensureInitialized();
         return entityClass == Entity.class || this.componentFactories.containsKey(entityClass);
     }
 
