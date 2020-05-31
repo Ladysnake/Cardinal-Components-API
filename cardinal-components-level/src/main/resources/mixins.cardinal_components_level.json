@@ -7,7 +7,7 @@
         "common.level.MixinClientWorldProperties"
     ],
     "mixins": [
-        "common.level.MixinPrimaryWorldProperties",
+        "common.level.MixinLevelProperties",
         "common.level.MixinUnmodifiableLevelProperties",
         "common.level.MixinWorldProperties"
     ],

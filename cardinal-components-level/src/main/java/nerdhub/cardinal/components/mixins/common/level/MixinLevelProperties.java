@@ -48,7 +48,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import javax.annotation.Nonnull;
 
 @Mixin(LevelProperties.class)
-public abstract class MixinPrimaryWorldProperties implements ServerWorldProperties, InternalComponentProvider {
+public abstract class MixinLevelProperties implements ServerWorldProperties, InternalComponentProvider {
     @Unique
     private static final Lazy<DynamicContainerFactory<WorldProperties,?>> componentContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getContainerFactoryClass(), LevelComponentCallback.EVENT));
