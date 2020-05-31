@@ -6,7 +6,7 @@ import java.time.Year
 plugins {
     id "fabric-loom" version "0.4.3" apply false
     id "net.minecrell.licenser" version "0.2.1"
-    id "com.matthewprenger.cursegradle" version "1.2.0"
+    id "com.matthewprenger.cursegradle" version "1.4.0"
     id "maven-publish"
     id "java-library"
 }
