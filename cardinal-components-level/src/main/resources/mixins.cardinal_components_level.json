@@ -8,8 +8,7 @@
     ],
     "mixins": [
         "common.level.MixinLevelProperties",
-        "common.level.MixinUnmodifiableLevelProperties",
-        "common.level.MixinWorldProperties"
+        "common.level.MixinUnmodifiableLevelProperties"
     ],
     "injectors": {
         "defaultRequire": 1
