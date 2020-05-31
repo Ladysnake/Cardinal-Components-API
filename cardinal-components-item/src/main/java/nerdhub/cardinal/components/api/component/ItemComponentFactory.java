@@ -24,6 +24,7 @@ package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +41,13 @@ import org.jetbrains.annotations.Nullable;
  */
 @ApiStatus.Experimental
 @FunctionalInterface
-public interface ItemComponentFactory<C extends CopyableComponent<?>> {
+public interface ItemComponentFactory<C extends CopyableComponent<?>> extends ItemComponentFactoryV2<C> {
+    @Nullable
+    @Override
+    default C createForStack(Item item, ItemStack stack) {
+        return this.createForStack(stack);
+    }
+
     @Nullable
     C createForStack(ItemStack stack);
 }

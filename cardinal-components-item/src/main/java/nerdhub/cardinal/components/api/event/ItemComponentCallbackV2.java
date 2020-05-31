@@ -25,7 +25,7 @@ package nerdhub.cardinal.components.api.event;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ItemComponentFactory;
+import nerdhub.cardinal.components.api.component.ItemComponentFactoryV2;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.util.ItemComponent;
 import nerdhub.cardinal.components.internal.CardinalItemInternals;
@@ -33,7 +33,6 @@ import nerdhub.cardinal.components.internal.ItemCaller;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
@@ -53,11 +52,9 @@ import javax.annotation.Nullable;
  * More formally, if a callback is registered for an item {@code i},
  * its {@code initComponents} method will be invoked for any stack {@code s}
  * verifying {@code s.getItem() == i}.
- *
- * @see ItemComponentCallbackV2
  */
 @FunctionalInterface
-public interface ItemComponentCallback extends ComponentCallback<ItemStack, CopyableComponent<?>> {
+public interface ItemComponentCallbackV2 {
 
     /**
      * Returns the {@code Event} used to register component callbacks for
@@ -74,30 +71,18 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Copy
      * @return the {@code Event} used to register component callbacks for stacks
      * of the given item.
      */
-    static Event<ItemComponentCallback> event(@Nullable Item item) {
-        return item == null ? CardinalItemInternals.WILDCARD_ITEM_EVENT : ((ItemCaller) item).cardinal_getItemComponentEvent();
+    static Event<ItemComponentCallbackV2> event(@Nullable Item item) {
+        return item == null ? CardinalItemInternals.WILDCARD_ITEM_EVENT_V2 : ((ItemCaller) item).cardinal_getItemComponentEventV2();
     }
 
     @ApiStatus.Experimental
-    static <C extends Component> void register(ComponentType<C> type, @Nullable Item item, ItemComponentFactory<? extends C> factory) {
-        event(item).register((stack, components) -> {
-            CopyableComponent<?> cc = factory.createForStack(stack);
+    static <C extends Component> void register(ComponentType<C> type, @Nullable Item item, ItemComponentFactoryV2<? extends C> factory) {
+        event(item).register((it, stack, components) -> {
+            CopyableComponent<?> cc = factory.createForStack(it, stack);
             if (cc != null) {
                 components.put(type, cc);
             }
         });
-    }
-
-    /**
-     * Convenience method to register an item that implements its own component callback
-     *
-     * @param item an item that initializes itself the components of its stacks
-     * @param <I>  the type of the item
-     * @return {@code item} for easy chaining
-     */
-    static <I extends Item & ItemComponentCallback> I registerSelf(I item) {
-        event(item).register(item);
-        return item;
     }
 
     /**
@@ -106,14 +91,15 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Copy
      * on the stack as soon as all callbacks have been invoked.
      *
      * <p><b>Some stacks may be initialized with a count of 0, causing {@link ItemStack#getItem()} to
-     * return {@link Items#AIR}.</b> If the item is needed for initializing components,
-     * use {@link ItemComponentCallbackV2} instead.
+     * return {@link net.minecraft.item.Items#AIR}.</b> Use the provided {@code item} argument,
+     * reflecting the real item the stack was constructed with, to run any check.
      *
      * <p> Example code: <pre><code>
      *  ItemComponentCallback.event(Items.DIAMOND_PICKAXE)
-     *      .register((stack, components) -> components.put(TYPE, new MyComponent()) : null);
+     *      .register((item, stack, components) -> components.put(TYPE, new MyComponent()));
      * </code></pre>
      *
+     * @param item       the stack's true item.
      * @param stack      the {@code ItemStack} being constructed
      * @param components the stack's component container
      * @implNote Because this method is called for each stack creation, implementations
@@ -121,7 +107,6 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Copy
      * should be considered for components that are costly to initialize.
      * @see ItemComponent
      */
-    @Override
-    void initComponents(ItemStack stack, ComponentContainer<CopyableComponent<?>> components);
+    void initComponents(Item item, ItemStack stack, ComponentContainer<CopyableComponent<?>> components);
 
 }

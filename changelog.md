@@ -1,8 +1,9 @@
 ------------------------------------------------------
 Version 2.4.0
 ------------------------------------------------------
-### 2.4.0-nightly.20w22a.build.2
-- Fixed crashes due to invalid `ComponentProvider` implementation in `LevelProperties`
+### 2.4.0-nightly.20w22a.build.3
+- Added `ItemComponentCallbackV2` and `ItemComponentFactoryV2` as alternatives respectively to `ItemComponentCallback` and `ItemComponentFactory`,
+  passing the stack's true item as context.
 
 ### 2.4.0 General Changelog
 **Backwards-compatibility note: while this release is compatible with older applications, 
@@ -10,14 +11,23 @@ some classes have been moved to a new module called `cardinal-components-util`.
 If you are missing some types, or if you use the `cardinal-components-block` module, 
 you need to add a dependency on that module.**
 
-- Updated world and level modules to MC 1.16
+- Updated entity, chunk, world, and level modules to MC 1.16
+
+Additions
 - Added statically declared components (**experimental feature !**)
-  - Developers can use `-Dcca.debug.asm=true` to their VM options to help debug CCA's issues with static component generation
+  - Mods can declare and attach their components using dedicated entrypoints, typically subclasses of `StaticComponentInitializer`.
+  - Developers can add `-Dcca.debug.asm=true` to their VM options to help debug CCA's issues with static component generation
 - Added a new module - `cardinal-components-util`
   - Most classes that were not essential to CCA working got moved from `cardinal-components-base` to that module
-- Added `LazyComponentType`, allowing mods to retrieve a `ComponentType` handle before it is registered
+  - Added `LazyComponentType`, allowing mods to retrieve a `ComponentType` handle before it is registered
+- Added `ItemComponentCallbackV2` and `ItemComponentFactoryV2` as alternatives respectively to `ItemComponentCallback` and `ItemComponentFactory`,
+  passing the stack's true item as context.
 - Added `Dynamic` conversion methods to `NbtSerializable` (defaulted to delegate to nbt serialization)
+
+Changes
 - It is no longer possible for a `ComponentCallback` to override an existing component
+
+Fixes
 - Fixed `PlayerSyncCallback` not firing when a player is teleported to another dimensions through commands
 
 ------------------------------------------------------

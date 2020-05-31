@@ -49,6 +49,22 @@ public interface ItemComponentFactoryRegistry {
     }
 
     /**
+     * Registers an {@link ItemComponentFactoryV2}.
+     *
+     * <p> A {@code null} {@code componentId} works as a wildcard parameter.
+     * A callback registered to the wilcard event is called for every item stack ever
+     * created. For performance reasons, wildcard callbacks should be avoided
+     * where possible. Notably, when registering callbacks for various items,
+     * it is often better to register a separate specialized callback for each one
+     * than a single generic callback with additional checks.
+     *  @param itemId      the id of an item to target, or {@code null} to target every stack.
+     * @param factory     the factory to use to create components of the given type
+     */
+    default <C extends CopyableComponent<?>> void register(ComponentType<? super C> type, @Nullable Identifier itemId, ItemComponentFactoryV2<C> factory) {
+        this.register(type.getId(), itemId, factory);
+    }
+
+    /**
      * Registers an {@link ItemComponentFactory}.
      *
      * <p> A {@code null} {@code componentId} works as a wildcard parameter.
@@ -62,5 +78,9 @@ public interface ItemComponentFactoryRegistry {
      * @param itemId      the id of an item to target, or {@code null} to target every stack.
      * @param factory     the factory to use to create components of the given type
      */
-    void register(Identifier componentId, @Nullable Identifier itemId, ItemComponentFactory<?> factory);
+    default void register(Identifier componentId, @Nullable Identifier itemId, ItemComponentFactory<?> factory) {
+        this.register(componentId, itemId, (ItemComponentFactoryV2<?>) factory);
+    }
+
+    void register(Identifier componentId, @Nullable Identifier itemId, ItemComponentFactoryV2<?> factory);
 }
