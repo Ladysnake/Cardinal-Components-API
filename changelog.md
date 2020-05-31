@@ -1,10 +1,10 @@
 ------------------------------------------------------
 Version 2.4.0
 ------------------------------------------------------
-## 2.4.0-nightly.20w22a.build.2
+### 2.4.0-nightly.20w22a.build.2
 - Fixed crashes due to invalid `ComponentProvider` implementation in `LevelProperties`
 
-## 2.4.0 General Changelog
+### 2.4.0 General Changelog
 **Backwards-compatibility note: while this release is compatible with older applications, 
 some classes have been moved to a new module called `cardinal-components-util`. 
 If you are missing some types, or if you use the `cardinal-components-block` module, 
