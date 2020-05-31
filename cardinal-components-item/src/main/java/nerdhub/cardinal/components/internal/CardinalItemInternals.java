@@ -28,6 +28,7 @@ import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
+import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.item.Item;
@@ -39,27 +40,39 @@ import javax.annotation.Nullable;
 import java.util.Map;
 
 public final class CardinalItemInternals {
-    public static final Event<ItemComponentCallback> WILDCARD_ITEM_EVENT = createItemComponentsEvent();
+    public static final Event<ItemComponentCallbackV2> WILDCARD_ITEM_EVENT_V2 = createItemComponentsEventV2();
+    public static final Event<ItemComponentCallback> WILDCARD_ITEM_EVENT = createItemComponentsEvent(WILDCARD_ITEM_EVENT_V2);
 
-    public static Event<ItemComponentCallback> createItemComponentsEvent() {
-        return EventFactory.createArrayBacked(ItemComponentCallback.class,
+    public static Event<ItemComponentCallbackV2> createItemComponentsEventV2() {
+        return EventFactory.createArrayBacked(ItemComponentCallbackV2.class,
+            (listeners) -> (item, stack, components) -> {
+                for (ItemComponentCallbackV2 listener : listeners) {
+                    listener.initComponents(item, stack, components);
+                }
+            });
+    }
+
+    public static Event<ItemComponentCallback> createItemComponentsEvent(Event<ItemComponentCallbackV2> proxied) {
+        Event<ItemComponentCallback> ret = EventFactory.createArrayBacked(ItemComponentCallback.class,
             (listeners) -> (stack, components) -> {
                 for (ItemComponentCallback listener : listeners) {
                     listener.initComponents(stack, components);
                 }
             });
+        proxied.register((item, stack, components) -> ret.invoker().initComponents(stack, components));
+        return ret;
     }
 
     /**
      * Creates a container factory for an item id.
      *
      * <p>The container factory will populate the container by invoking the event for that item
-     * as well as the {@linkplain #WILDCARD_ITEM_EVENT wildcard event}.
+     * as well as the {@linkplain #WILDCARD_ITEM_EVENT_V2 wildcard event}.
      */
-    public static DynamicContainerFactory<ItemStack, CopyableComponent<?>> createItemStackContainerFactory(Item item) {
+    public static ItemComponentContainerFactory createItemStackContainerFactory(Item item) {
         Identifier itemId = Registry.ITEM.getId(item);
-        @SuppressWarnings("unchecked") Class<? extends DynamicContainerFactory<ItemStack, CopyableComponent<?>>> factoryClass = (Class<? extends DynamicContainerFactory<ItemStack, CopyableComponent<?>>>) StaticItemComponentPlugin.INSTANCE.getFactoryClass(itemId);
-        return ComponentsInternals.createFactory(factoryClass, WILDCARD_ITEM_EVENT, ((ItemCaller) item).cardinal_getItemComponentEvent());
+        Class<? extends ItemComponentContainerFactory> factoryClass = StaticItemComponentPlugin.INSTANCE.getFactoryClass(itemId);
+        return ComponentsInternals.createFactory(factoryClass, WILDCARD_ITEM_EVENT_V2, ((ItemCaller) item).cardinal_getItemComponentEventV2());
     }
 
     @SuppressWarnings({"ConstantConditions", "unchecked", "rawtypes"})

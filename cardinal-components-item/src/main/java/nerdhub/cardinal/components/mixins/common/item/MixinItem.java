@@ -25,9 +25,10 @@ package nerdhub.cardinal.components.mixins.common.item;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
+import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;
 import nerdhub.cardinal.components.internal.CardinalItemInternals;
-import nerdhub.cardinal.components.internal.DynamicContainerFactory;
 import nerdhub.cardinal.components.internal.ItemCaller;
+import nerdhub.cardinal.components.internal.ItemComponentContainerFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -36,12 +37,18 @@ import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(Item.class)
 public abstract class MixinItem implements ItemCaller {
-    @Unique private final Event<ItemComponentCallback> cardinal_componentsEvent = CardinalItemInternals.createItemComponentsEvent();
-    @Unique private DynamicContainerFactory<ItemStack, CopyableComponent<?>> cardinal_containerFactory;
+    @Unique private final Event<ItemComponentCallbackV2> cardinal_componentsEventV2 = CardinalItemInternals.createItemComponentsEventV2();
+    @Unique private final Event<ItemComponentCallback> cardinal_componentsEvent = CardinalItemInternals.createItemComponentsEvent(this.cardinal_componentsEventV2);
+    @Unique private ItemComponentContainerFactory cardinal_containerFactory;
 
     @Override
     public Event<ItemComponentCallback> cardinal_getItemComponentEvent() {
         return this.cardinal_componentsEvent;
+    }
+
+    @Override
+    public Event<ItemComponentCallbackV2> cardinal_getItemComponentEventV2() {
+        return this.cardinal_componentsEventV2;
     }
 
     @Override
@@ -50,6 +57,6 @@ public abstract class MixinItem implements ItemCaller {
         if (this.cardinal_containerFactory == null) {
             this.cardinal_containerFactory = CardinalItemInternals.createItemStackContainerFactory((Item) (Object) this);
         }
-        return this.cardinal_containerFactory.create(stack);
+        return this.cardinal_containerFactory.create((Item) (Object) this, stack);
     }
 }

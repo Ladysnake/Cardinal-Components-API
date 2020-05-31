@@ -97,7 +97,7 @@ public final class TestStaticComponentInitializer implements
 
     @Override
     public void registerItemComponentFactories(ItemComponentFactoryRegistry registry) {
-        registry.register(Vita.TYPE, null, stack -> new BaseVita(stack.getCount()));
+        registry.register(Vita.TYPE, null, (item, stack) -> new BaseVita(stack.getCount()));
         registry.register(Vita.TYPE, CardinalComponentsTest.VITA_STICK_ID, stack -> new BaseVita());
     }
 

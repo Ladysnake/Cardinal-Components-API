@@ -20,18 +20,28 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.internal;
+package nerdhub.cardinal.components.api.component;
 
-import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import nerdhub.cardinal.components.api.event.ItemComponentCallback;
-import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;
-import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
-public interface ItemCaller {
-	Event<ItemComponentCallback> cardinal_getItemComponentEvent();
-	Event<ItemComponentCallbackV2> cardinal_getItemComponentEventV2();
 
-	ComponentContainer<CopyableComponent<?>> cardinal_createComponents(ItemStack stack);
+/**
+ * A component factory for {@linkplain ItemStack item stacks}.
+ *
+ * <p>When invoked, the factory can return either a {@link Component} of the right type, or {@code null}.
+ * If the factory method returns {@code null}, the stack will not support that type of component
+ * (cf. {@link ComponentProvider#hasComponent(ComponentType)}).
+ *
+ * @since 2.4.0
+ */
+@ApiStatus.Experimental
+@FunctionalInterface
+public interface ItemComponentFactoryV2<C extends CopyableComponent<?>> {
+    @Nullable
+    C createForStack(Item item, ItemStack stack);
 }
