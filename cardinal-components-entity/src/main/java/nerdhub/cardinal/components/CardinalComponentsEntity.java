@@ -31,6 +31,7 @@ import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
 import nerdhub.cardinal.components.api.event.TrackingStartCallback;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
+import nerdhub.cardinal.components.internal.ComponentsInternals;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
@@ -52,8 +53,8 @@ public final class CardinalComponentsEntity {
     private static void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless) {
         boolean keepInventory = original.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || clone.isSpectator();
         ComponentProvider.fromEntity(original).forEachComponent((type, from) -> type.maybeGet(clone).ifPresent(
-                        to -> EntityComponents.getRespawnCopyStrategy((ComponentType) type).copyForRespawn(from, to, lossless, keepInventory)
-                ));
+            to -> EntityComponents.getRespawnCopyStrategy((ComponentType) type).copyForRespawn(from, to, lossless, keepInventory)
+        ));
     }
 
     private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {
@@ -68,22 +69,27 @@ public final class CardinalComponentsEntity {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             ClientSidePacketRegistry.INSTANCE.register(EntitySyncedComponent.PACKET_ID, (context, buffer) -> {
-                int entityId = buffer.readInt();
-                Identifier componentTypeId = buffer.readIdentifier();
-                ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
-                if (componentType == null) {
-                    return;
-                }
-                PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-                context.getTaskQueue().execute(() -> {
-                    try {
-                        componentType.maybeGet(context.getPlayer().world.getEntityById(entityId))
-                            .filter(c -> c instanceof SyncedComponent)
-                            .ifPresent(c -> ((SyncedComponent) c).processPacket(context, copy));
-                    } finally {
-                        copy.release();
+                try {
+                    int entityId = buffer.readInt();
+                    Identifier componentTypeId = buffer.readIdentifier();
+                    ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+                    if (componentType == null) {
+                        return;
                     }
-                });
+                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                    context.getTaskQueue().execute(() -> {
+                        try {
+                            componentType.maybeGet(context.getPlayer().world.getEntityById(entityId))
+                                .filter(c -> c instanceof SyncedComponent)
+                                .ifPresent(c -> ((SyncedComponent) c).processPacket(context, copy));
+                        } finally {
+                            copy.release();
+                        }
+                    });
+                } catch (Exception e) {
+                    ComponentsInternals.LOGGER.error("Error while reading entity components from network", e);
+                    throw e;
+                }
             });
         }
     }

@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.mixins.common.item;
 
+import nerdhub.cardinal.components.internal.ComponentsInternals;
 import nerdhub.cardinal.components.internal.InternalComponentProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
@@ -52,7 +53,12 @@ public abstract class MixinPacketByteBuf {
     private void readStack(CallbackInfoReturnable<ItemStack> cir) {
         ItemStack stack = cir.getReturnValue();
         if(!stack.isEmpty()) {
-            ((InternalComponentProvider) ((Object) stack)).getComponentContainer().fromTag(this.readCompoundTag());
+            try {
+                ((InternalComponentProvider) ((Object) stack)).getComponentContainer().fromTag(this.readCompoundTag());
+            } catch (Exception e) {
+                ComponentsInternals.LOGGER.error("Error while reading item stack components from network", e);
+                throw e;
+            }
         }
     }
 }

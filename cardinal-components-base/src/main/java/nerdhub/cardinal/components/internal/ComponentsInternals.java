@@ -28,6 +28,8 @@ import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
 import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import net.fabricmc.fabric.api.event.Event;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import java.lang.invoke.*;
@@ -38,6 +40,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 public final class ComponentsInternals {
+    public static final Logger LOGGER = LogManager.getLogger("Cardinal Components API");
+
     private static final Field EVENT$TYPE;
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     private static final Map<Event<? extends ComponentCallback<?, ?>>, MethodHandle> FACTORY_CACHE = new HashMap<>();
