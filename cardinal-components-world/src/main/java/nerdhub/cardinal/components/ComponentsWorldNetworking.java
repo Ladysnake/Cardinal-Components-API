@@ -29,6 +29,7 @@ import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.WorldSyncCallback;
 import nerdhub.cardinal.components.api.util.sync.WorldSyncedComponent;
+import nerdhub.cardinal.components.internal.ComponentsInternals;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -51,23 +52,28 @@ public final class ComponentsWorldNetworking {
     // Safe to put in the same class as no client-only class is directly referenced
     public static void initClient() {
         ClientSidePacketRegistry.INSTANCE.register(WorldSyncedComponent.PACKET_ID, (context, buffer) -> {
-            Identifier componentTypeId = buffer.readIdentifier();
-            ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
-            if (componentType == null) {
-                return;
-            }
-            PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-            context.getTaskQueue().execute(() -> {
-                try {
-                    assert MinecraftClient.getInstance().world != null;
-                    Component c = componentType.get(MinecraftClient.getInstance().world);
-                    if (c instanceof SyncedComponent) {
-                        ((SyncedComponent) c).processPacket(context, copy);
-                    }
-                } finally {
-                    copy.release();
+            try {
+                Identifier componentTypeId = buffer.readIdentifier();
+                ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+                if (componentType == null) {
+                    return;
                 }
-            });
+                PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                context.getTaskQueue().execute(() -> {
+                    try {
+                        assert MinecraftClient.getInstance().world != null;
+                        Component c = componentType.get(MinecraftClient.getInstance().world);
+                        if (c instanceof SyncedComponent) {
+                            ((SyncedComponent) c).processPacket(context, copy);
+                        }
+                    } finally {
+                        copy.release();
+                    }
+                });
+            } catch (Exception e) {
+                ComponentsInternals.LOGGER.error("Error while reading world components from network", e);
+                throw e;
+            }
         });
     }
 

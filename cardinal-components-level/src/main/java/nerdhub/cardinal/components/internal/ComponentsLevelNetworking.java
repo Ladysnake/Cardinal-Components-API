@@ -54,23 +54,28 @@ public final class ComponentsLevelNetworking {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             ClientSidePacketRegistry.INSTANCE.register(LevelSyncedComponent.PACKET_ID, (context, buffer) -> {
-                Identifier componentTypeId = buffer.readIdentifier();
-                ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
-                if (componentType == null) {
-                    return;
-                }
-                PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-                context.getTaskQueue().execute(() -> {
-                    try {
-                        assert MinecraftClient.getInstance().world != null;
-                        Component c = componentType.get(MinecraftClient.getInstance().world.getLevelProperties());
-                        if (c instanceof SyncedComponent) {
-                            ((SyncedComponent) c).processPacket(context, copy);
-                        }
-                    } finally {
-                        copy.release();
+                try {
+                    Identifier componentTypeId = buffer.readIdentifier();
+                    ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+                    if (componentType == null) {
+                        return;
                     }
-                });
+                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                    context.getTaskQueue().execute(() -> {
+                        try {
+                            assert MinecraftClient.getInstance().world != null;
+                            Component c = componentType.get(MinecraftClient.getInstance().world.getLevelProperties());
+                            if (c instanceof SyncedComponent) {
+                                ((SyncedComponent) c).processPacket(context, copy);
+                            }
+                        } finally {
+                            copy.release();
+                        }
+                    });
+                } catch (Exception e) {
+                    ComponentsInternals.LOGGER.error("Error while reading world save components from network", e);
+                    throw e;
+                }
             });
         }
     }

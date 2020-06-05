@@ -49,24 +49,29 @@ public final class ComponentsChunkNetworking {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             ClientSidePacketRegistry.INSTANCE.register(ChunkSyncedComponent.PACKET_ID, (context, buffer) -> {
-                int chunkX = buffer.readInt();
-                int chunkZ = buffer.readInt();
-                Identifier componentTypeId = buffer.readIdentifier();
-                ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
-                if (componentType == null) {
-                    return;
-                }
-                PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-                context.getTaskQueue().execute(() -> {
-                    try {
-                        // Note: on the client, unloaded chunks return EmptyChunk
-                        componentType.maybeGet(context.getPlayer().world.getChunk(chunkX, chunkZ))
-                            .filter(c -> c instanceof SyncedComponent)
-                            .ifPresent(c -> ((SyncedComponent) c).processPacket(context, copy));
-                    } finally {
-                        copy.release();
+                try {
+                    int chunkX = buffer.readInt();
+                    int chunkZ = buffer.readInt();
+                    Identifier componentTypeId = buffer.readIdentifier();
+                    ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+                    if (componentType == null) {
+                        return;
                     }
-                });
+                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                    context.getTaskQueue().execute(() -> {
+                        try {
+                            // Note: on the client, unloaded chunks return EmptyChunk
+                            componentType.maybeGet(context.getPlayer().world.getChunk(chunkX, chunkZ))
+                                .filter(c -> c instanceof SyncedComponent)
+                                .ifPresent(c -> ((SyncedComponent) c).processPacket(context, copy));
+                        } finally {
+                            copy.release();
+                        }
+                    });
+                } catch (Exception e) {
+                    ComponentsInternals.LOGGER.error("Error while reading chunk components from network", e);
+                    throw e;
+                }
             });
         }
     }
