@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.internal;
 
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.LevelComponentFactory;
 import nerdhub.cardinal.components.api.component.LevelComponentFactoryRegistry;
 import nerdhub.cardinal.components.api.component.StaticLevelComponentInitializer;
@@ -47,5 +48,11 @@ public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<
     public void register(Identifier componentId, LevelComponentFactory<?> factory) {
         this.checkLoading(LevelComponentFactoryRegistry.class, "register");
         super.register(componentId, factory);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<? extends DynamicContainerFactory<WorldProperties, Component>> getContainerFactoryClass() {
+        return (Class<? extends DynamicContainerFactory<WorldProperties, Component>>) super.getContainerFactoryClass();
     }
 }
