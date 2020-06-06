@@ -22,15 +22,15 @@
  */
 package nerdhub.cardinal.components.mixins.common.item;
 
-import nerdhub.cardinal.components.internal.ComponentsInternals;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.internal.InternalComponentProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
@@ -38,27 +38,28 @@ import javax.annotation.Nullable;
 @Mixin(PacketByteBuf.class)
 public abstract class MixinPacketByteBuf {
 
-    @Shadow public abstract PacketByteBuf writeCompoundTag(@Nullable CompoundTag compoundTag_1);
-
-    @Shadow @Nullable public abstract CompoundTag readCompoundTag();
-
-    @Inject(method = "writeItemStack", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/PacketByteBuf;writeCompoundTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/network/PacketByteBuf;", shift = At.Shift.AFTER), cancellable = true)
-    private void writeItemStack(ItemStack stack, CallbackInfoReturnable<PacketByteBuf> cir) {
+    @Nullable
+    @ModifyVariable(method = "writeItemStack", at = @At(value = "LOAD"))
+    private CompoundTag markModdedStack(@Nullable CompoundTag tag, ItemStack stack) {
         //noinspection ConstantConditions
-        this.writeCompoundTag(((InternalComponentProvider)(Object)stack).getComponentContainer().toTag(new CompoundTag()));
+        ComponentContainer<?> componentContainer = ((InternalComponentProvider) (Object) stack).getComponentContainer();
+        if (componentContainer.isEmpty()) {
+            return tag;
+        }
+        CompoundTag newTag = tag == null ? new CompoundTag() : tag.copy();
+        newTag.put("cca_synced_components", componentContainer.toTag(new CompoundTag()));
+        return newTag;
     }
 
-    @SuppressWarnings({"ConstantConditions"})
-    @Inject(method = "readItemStack", at = @At(value = "RETURN"))
+    @Inject(method = "readItemStack", at = @At(value = "RETURN", ordinal = 1))
     private void readStack(CallbackInfoReturnable<ItemStack> cir) {
         ItemStack stack = cir.getReturnValue();
-        if(!stack.isEmpty()) {
-            try {
-                ((InternalComponentProvider) ((Object) stack)).getComponentContainer().fromTag(this.readCompoundTag());
-            } catch (Exception e) {
-                ComponentsInternals.LOGGER.error("Error while reading item stack components from network", e);
-                throw e;
-            }
+
+        CompoundTag syncedComponents = stack.getSubTag("cca_synced_components");
+        if (syncedComponents != null) {
+            //noinspection ConstantConditions
+            ((InternalComponentProvider) ((Object) stack)).getComponentContainer().fromTag(syncedComponents);
+            stack.removeSubTag("cca_synced_components");
         }
     }
 }
