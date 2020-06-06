@@ -23,19 +23,25 @@
 package nerdhub.cardinal.components.mixins.common.item;
 
 import nerdhub.cardinal.components.internal.CardinalItemInternals;
-import net.minecraft.item.Item;
+import net.minecraft.class_5357;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.SmithingScreenHandler;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-@Mixin(SmithingScreenHandler.class)
+@Mixin(class_5357.class)
 public abstract class MixinSmithingScreenHandler {
-    @Inject(method = "updateResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/CompoundTag;copy()Lnet/minecraft/nbt/CompoundTag;"), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void updateResult(CallbackInfo ci, ItemStack input1, ItemStack input2, Item it, ItemStack result) {
-        CardinalItemInternals.copyComponents(input1, result);
+    @Shadow
+    @Final
+    private ItemStack field_25391;
+
+    @Inject(method = "craft", at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/CompoundTag;copy()Lnet/minecraft/nbt/CompoundTag;"), locals = LocalCapture.CAPTURE_FAILSOFT)
+    private void craft(Inventory inv, CallbackInfoReturnable<ItemStack> ci, ItemStack result) {
+        CardinalItemInternals.copyComponents(this.field_25391, result);
     }
 }

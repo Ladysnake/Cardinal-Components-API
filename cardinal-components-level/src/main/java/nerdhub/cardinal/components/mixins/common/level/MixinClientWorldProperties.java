@@ -44,7 +44,7 @@ import java.util.Set;
 @Mixin(ClientWorld.Properties.class)
 public abstract class MixinClientWorldProperties implements MutableWorldProperties, ComponentProvider {
     @Unique
-    private static final Lazy<DynamicContainerFactory<WorldProperties,? extends Component>> componentContainerFactory
+    private static final Lazy<DynamicContainerFactory<WorldProperties,Component>> componentContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getContainerFactoryClass(), LevelComponentCallback.EVENT));
     @Unique
     protected ComponentContainer<?> components = componentContainerFactory.get().create(this);

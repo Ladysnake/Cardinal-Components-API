@@ -24,6 +24,7 @@ package nerdhub.cardinal.components.mixins.common.level;
 
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.Lifecycle;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.LevelComponentCallback;
 import nerdhub.cardinal.components.internal.ComponentsInternals;
@@ -34,7 +35,9 @@ import net.minecraft.class_5315;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.Lazy;
+import net.minecraft.util.registry.RegistryTracker;
 import net.minecraft.world.WorldProperties;
+import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.ServerWorldProperties;
@@ -56,12 +59,12 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Int
     protected ComponentContainer<?> components = componentContainerFactory.get().create(this);
 
     @Inject(method = "method_29029", at = @At("RETURN"))
-    private static void readComponents(Dynamic<Tag> dynamic, DataFixer dataFixer, int i, CompoundTag compoundTag, LevelInfo levelInfo, class_5315 arg, CallbackInfoReturnable<LevelProperties> cir) {
+    private static void readComponents(Dynamic<Tag> dynamic, DataFixer dataFixer, int dataVersion, CompoundTag compoundTag, LevelInfo levelInfo, class_5315 arg, GeneratorOptions generatorOptions, Lifecycle lifecycle, CallbackInfoReturnable<LevelProperties> cir) {
         ((InternalComponentProvider)cir.getReturnValue()).getComponentContainer().fromDynamic(dynamic);
     }
 
     @Inject(method = "updateProperties", at = @At("RETURN"))
-    private void writeComponents(CompoundTag data, CompoundTag player, CallbackInfo ci) {
+    private void writeComponents(RegistryTracker tracker, CompoundTag data, CompoundTag player, CallbackInfo ci) {
         this.components.toTag(data);
     }
 

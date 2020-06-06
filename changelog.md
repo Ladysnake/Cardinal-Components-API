@@ -1,9 +1,9 @@
 ------------------------------------------------------
 Version 2.4.0
 ------------------------------------------------------
-### 2.4.0-nightly.20w22a.build.3
-- Added `ItemComponentCallbackV2` and `ItemComponentFactoryV2` as alternatives respectively to `ItemComponentCallback` and `ItemComponentFactory`,
-  passing the stack's true item as context.
+### 2.4.0-nightly.1.16-pre2
+- Updated the item, world, and level modules to 1.16-pre2
+- Added better logging for networking errors
 
 ### 2.4.0 General Changelog
 **Backwards-compatibility note: while this release is compatible with older applications, 
@@ -26,6 +26,7 @@ Additions
 
 Changes
 - It is no longer possible for a `ComponentCallback` to override an existing component
+- Networking errors should now be logged before they get swallowed by Netty
 
 Fixes
 - Fixed `PlayerSyncCallback` not firing when a player is teleported to another dimensions through commands
