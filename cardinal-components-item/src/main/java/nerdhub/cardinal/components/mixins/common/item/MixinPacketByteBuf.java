@@ -28,8 +28,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.PacketByteBuf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Surrogate;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
@@ -41,8 +43,29 @@ public abstract class MixinPacketByteBuf {
 
     @Shadow @Nullable public abstract CompoundTag readCompoundTag();
 
-    @Inject(method = "writeItemStack", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/PacketByteBuf;writeCompoundTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/util/PacketByteBuf;", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(
+        method = {
+            "writeItemStack(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/util/PacketByteBuf;",
+            "writeItemStack(Lnet/minecraft/class_1799;Z)Lnet/minecraft/class_2540;" // writeItemStack(Lnet/minecraft/item/ItemStack;Z)Lnet/minecraft/util/PacketByteBuf;
+        },
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/util/PacketByteBuf;writeCompoundTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/util/PacketByteBuf;",
+            shift = At.Shift.AFTER
+        ),
+        cancellable = true
+    )
+    private void writeItemStack(ItemStack stack, boolean limitedTag, CallbackInfoReturnable<PacketByteBuf> cir) {
+        this.cardinal_writeItemStack(stack);
+    }
+
+    @Surrogate
     private void writeItemStack(ItemStack stack, CallbackInfoReturnable<PacketByteBuf> cir) {
+        this.cardinal_writeItemStack(stack);
+    }
+
+    @Unique
+    private void cardinal_writeItemStack(ItemStack stack) {
         //noinspection ConstantConditions
         this.writeCompoundTag(((ItemStackAccessor)(Object)stack).cardinal_getComponentContainer().toTag(new CompoundTag()));
     }
