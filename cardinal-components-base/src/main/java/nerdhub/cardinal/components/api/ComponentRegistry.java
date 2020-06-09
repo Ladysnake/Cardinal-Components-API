@@ -25,11 +25,9 @@ package nerdhub.cardinal.components.api;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.internal.ComponentRegistryImpl;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Lazy;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -75,31 +73,6 @@ public interface ComponentRegistry {
      */
     @Nullable
     ComponentType<?> get(Identifier id);
-
-    /**
-     * Lazily retrieve a {@code ComponentType} using its id.
-     *
-     * <p>If the {@code ComponentType} has not been registered by the time {@link Lazy#get()} is called,
-     * an {@code IllegalStateException} is thrown by the latter.
-     *
-     * @param id the unique identifier of the requested {@code ComponentType}
-     * @return a {@code Lazy} describing the {@code ComponentType} that gets registered with {@code id}.
-     */
-    @ApiStatus.Experimental
-    Lazy<ComponentType<?>> getLazy(Identifier id);
-
-    /**
-     * Lazily retrieve a {@code ComponentType} using its id.
-     *
-     * <p>If the {@code ComponentType} has not been registered by the time {@link Lazy#get()} is called,
-     * an empty {@code Optional} is returned by the latter.
-     *
-     * @param id the unique identifier of the requested {@code ComponentType}
-     * @return a {@code Lazy} describing the {@code ComponentType} that may get registered with {@code id}.
-     * @apiNote this method is especially useful when the component type belongs to an optional dependency
-     */
-    @ApiStatus.Experimental
-    Lazy<Optional<ComponentType<?>>> getLazyOptional(Identifier id);
 
     /**
      * Return a sequential stream with this registry at its source.

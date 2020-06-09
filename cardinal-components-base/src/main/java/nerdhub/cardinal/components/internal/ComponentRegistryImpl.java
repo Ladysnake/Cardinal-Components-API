@@ -32,14 +32,12 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.ComponentRegisteredCallback;
 import nerdhub.cardinal.components.internal.asm.CcaBootstrap;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Lazy;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public final class ComponentRegistryImpl implements ComponentRegistry {
@@ -139,17 +137,6 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
     @Override
     public ComponentType<?> get(Identifier id) {
         return this.get(this.id2Raw.getInt(id));
-    }
-
-    @Override
-    public Lazy<ComponentType<?>> getLazy(Identifier id) {
-        int rawId = this.assignRawId(id);
-        return new Lazy<>(() -> byRawId(rawId));
-    }
-
-    @Override
-    public Lazy<Optional<ComponentType<?>>> getLazyOptional(Identifier id) {
-        return new Lazy<>(() -> Optional.ofNullable(this.get(id)));
     }
 
     @Override
