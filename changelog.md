@@ -1,4 +1,9 @@
 ------------------------------------------------------
+Version 2.3.7
+------------------------------------------------------
+- Fixed Cardinal-Components-Item crashing with Optifine (thanks to ZekerZhayard)
+
+------------------------------------------------------
 Version 2.3.6
 ------------------------------------------------------
 - Fixed a random crash when an entity spawned for the first time simultaneously on client and server (#26)
