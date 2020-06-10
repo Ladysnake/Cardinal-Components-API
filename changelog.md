@@ -1,9 +1,10 @@
 ------------------------------------------------------
 Version 2.4.0
 ------------------------------------------------------
-### 2.4.0-nightly.1.16-pre2
-- Updated the item, world, and level modules to 1.16-pre2
-- Added better logging for networking errors
+### 2.4.0-nightly.1.16-pre3
+- `cardinal-components-item` no longer alters the layout of packets encoding ItemStacks
+- Added a `PlayerComponent` interface that can replace `RespawnCopyStrategy`
+- Removed some experimental not very useful methods in ComponentRegistry
 
 ### 2.4.0 General Changelog
 **Backwards-compatibility note: while this release is compatible with older applications, 
@@ -11,7 +12,7 @@ some classes have been moved to a new module called `cardinal-components-util`.
 If you are missing some types, or if you use the `cardinal-components-block` module, 
 you need to add a dependency on that module.**
 
-- Updated entity, chunk, world, and level modules to MC 1.16
+- Updated entity, item, chunk, world, and level modules to MC 1.16
 
 Additions
 - Added statically declared components (**experimental feature !**)
@@ -27,6 +28,7 @@ Additions
 Changes
 - It is no longer possible for a `ComponentCallback` to override an existing component
 - Networking errors should now be logged before they get swallowed by Netty
+- `cardinal-component-item` should no longer prevent players from connecting to vanilla servers
 
 Fixes
 - Fixed `PlayerSyncCallback` not firing when a player is teleported to another dimensions through commands
