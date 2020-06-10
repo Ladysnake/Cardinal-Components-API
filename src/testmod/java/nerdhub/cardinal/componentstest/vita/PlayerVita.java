@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.componentstest.vita;
 
+import nerdhub.cardinal.components.api.util.PlayerComponent;
 import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -30,7 +31,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 /**
  * A Vita component attached to players, and automatically synchronized with their owner
  */
-public class PlayerVita extends EntityVita implements EntitySyncedComponent {
+public class PlayerVita extends EntityVita implements EntitySyncedComponent, PlayerComponent<Vita> {
 
     public PlayerVita(PlayerEntity owner) {
         super(owner, 0);
@@ -53,5 +54,12 @@ public class PlayerVita extends EntityVita implements EntitySyncedComponent {
     @Override
     public LivingEntity getEntity() {
         return this.owner;
+    }
+
+    @Override
+    public void copyForRespawn(Vita original, boolean lossless, boolean keepInventory) {
+        if (lossless || keepInventory) {
+            this.copyFrom(original);
+        }
     }
 }

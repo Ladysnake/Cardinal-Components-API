@@ -47,6 +47,9 @@ public interface CopyableComponent<C extends Component> extends TypeAwareCompone
         this.fromTag(other.toTag(new CompoundTag()));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     ComponentType<C> getComponentType();
 }

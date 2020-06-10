@@ -26,6 +26,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
+import nerdhub.cardinal.components.internal.CardinalEntityInternals;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.GameRules;
 
@@ -94,10 +95,9 @@ public interface RespawnCopyStrategy<C extends Component> {
      * @param to the component to copy data to
      * @param <C> the common component type
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     static <C extends Component> void copy(C from, C to) {
         if (to instanceof CopyableComponent) {
-            ((CopyableComponent) to).copyFrom(from);
+            CardinalEntityInternals.copyAsCopyable(from, (CopyableComponent<?>) to);
         } else {
             to.fromTag(from.toTag(new CompoundTag()));
         }

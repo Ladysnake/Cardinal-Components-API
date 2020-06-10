@@ -75,16 +75,19 @@ public final class CardinalItemInternals {
         return ComponentsInternals.createFactory(factoryClass, WILDCARD_ITEM_EVENT_V2, ((ItemCaller) item).cardinal_getItemComponentEventV2());
     }
 
-    @SuppressWarnings({"ConstantConditions", "unchecked", "rawtypes"})
     public static void copyComponents(ItemStack original, ItemStack copy) {
-        ComponentContainer<CopyableComponent<?>> other = (ComponentContainer<CopyableComponent<?>>) ((InternalComponentProvider) (Object) copy).getComponentContainer();
-        ((InternalComponentProvider) (Object) original).getComponentContainer().forEach((type, component) -> {
-                CopyableComponent ccp = (CopyableComponent) other.get(type);
-                if (ccp != null) {
-                    ccp.copyFrom(component);
-                }
+        ComponentProvider from = ComponentProvider.fromItemStack(original);
+        ComponentProvider.fromItemStack(copy).forEachComponent((type, component) -> {
+                copyComponent((CopyableComponent<?>) component, from);
             }
         );
+    }
+
+    private static <C extends Component> void copyComponent(CopyableComponent<C> ccp, ComponentProvider from) {
+        C fromComponent = ccp.getComponentType().getNullable(from);
+        if (fromComponent != null) {
+            ccp.copyFrom(fromComponent);
+        }
     }
 
     public static boolean areComponentsIncompatible(ItemStack stack1, ItemStack stack2) {
