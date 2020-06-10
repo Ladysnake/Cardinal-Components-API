@@ -43,22 +43,31 @@ public abstract class MixinPacketByteBuf {
 
     @Shadow @Nullable public abstract CompoundTag readCompoundTag();
 
+    @SuppressWarnings("UnresolvedMixinReference")    // Optifine-specific injection
     @Inject(
         method = {
-            "writeItemStack(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/util/PacketByteBuf;",
             "writeItemStack(Lnet/minecraft/class_1799;Z)Lnet/minecraft/class_2540;" // writeItemStack(Lnet/minecraft/item/ItemStack;Z)Lnet/minecraft/util/PacketByteBuf;
         },
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/util/PacketByteBuf;writeCompoundTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/util/PacketByteBuf;",
             shift = At.Shift.AFTER
-        ),
-        cancellable = true
+        )
     )
     private void writeItemStack(ItemStack stack, boolean limitedTag, CallbackInfoReturnable<PacketByteBuf> cir) {
         this.cardinal_writeItemStack(stack);
     }
 
+    @Inject(
+        method = {
+            "writeItemStack(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/util/PacketByteBuf;"
+        },
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/util/PacketByteBuf;writeCompoundTag(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/util/PacketByteBuf;",
+            shift = At.Shift.AFTER
+        )
+    )
     @Surrogate
     private void writeItemStack(ItemStack stack, CallbackInfoReturnable<PacketByteBuf> cir) {
         this.cardinal_writeItemStack(stack);
