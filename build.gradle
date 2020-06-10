@@ -11,7 +11,7 @@ plugins {
     id "java-library"
 }
 
-group = "com.github.NerdHubMC"
+group = "io.github.onyxstudios"
 archivesBaseName = "Cardinal-Components-API"
 
 subprojects {
