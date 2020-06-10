@@ -19,9 +19,9 @@ repositories {
 
 dependencies {
     // Replace modImplementation with modApi if you expose components in your own API
-    modImplementation "io.github.OnyxStudios:Cardinal-Components-API:<MODULE>:<VERSION>"
+    modImplementation "io.github.OnyxStudios.Cardinal-Components-API:<MODULE>:<VERSION>"
     // Includes Cardinal Components API as a Jar-in-Jar dependency (optional)
-    include "io.github.OnyxStudios:Cardinal-Components-API:<MODULE>:<VERSION>"
+    include "io.github.OnyxStudios.Cardinal-Components-API:<MODULE>:<VERSION>"
 }
 ```
 
