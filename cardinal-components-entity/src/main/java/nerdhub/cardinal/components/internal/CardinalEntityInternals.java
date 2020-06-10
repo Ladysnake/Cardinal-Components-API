@@ -27,7 +27,9 @@ import com.google.common.collect.Lists;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.api.util.PlayerComponent;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -36,9 +38,10 @@ import net.minecraft.entity.Entity;
 import java.util.*;
 
 public final class CardinalEntityInternals {
+
     private CardinalEntityInternals() { throw new AssertionError(); }
 
-    private static final Map<Class<? extends Entity>, Event> ENTITY_EVENTS = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<Class<? extends Entity>, Event<?>> ENTITY_EVENTS = Collections.synchronizedMap(new HashMap<>());
     private static final Map<Class<? extends Entity>, DynamicContainerFactory<Entity, Component>> entityContainerFactories = new HashMap<>();
     private static final Map<ComponentType<?>, RespawnCopyStrategy<?>> RESPAWN_COPY_STRATEGIES = new HashMap<>();
     private static final Object factoryMutex = new Object();
@@ -100,6 +103,22 @@ public final class CardinalEntityInternals {
 
     @SuppressWarnings("unchecked")
     public static <C extends Component> RespawnCopyStrategy<C> getRespawnCopyStrat(ComponentType<C> type) {
-        return (RespawnCopyStrategy<C>) RESPAWN_COPY_STRATEGIES.getOrDefault(type, RespawnCopyStrategy.LOSSLESS_ONLY);
+        return (RespawnCopyStrategy<C>) RESPAWN_COPY_STRATEGIES.getOrDefault(type, CardinalEntityInternals::defaultCopyStrategy);
+    }
+
+    private static void defaultCopyStrategy(Component from, Component to, boolean lossless, boolean keepInventory) {
+        if (to instanceof PlayerComponent) {
+            playerComponentCopy(from, (PlayerComponent<?>) to, lossless, keepInventory);
+        } else {
+            RespawnCopyStrategy.LOSSLESS_ONLY.copyForRespawn(from, to, lossless, keepInventory);
+        }
+    }
+
+    private static <C extends Component> void playerComponentCopy(Component from, PlayerComponent<C> to, boolean lossless, boolean keepInventory) {
+        to.copyForRespawn(to.getComponentType().getComponentClass().cast(from), lossless, keepInventory);
+    }
+
+    public static <C extends Component> void copyAsCopyable(Component from, CopyableComponent<C> to) {
+        to.copyFrom(to.getComponentType().getComponentClass().cast(from));
     }
 }

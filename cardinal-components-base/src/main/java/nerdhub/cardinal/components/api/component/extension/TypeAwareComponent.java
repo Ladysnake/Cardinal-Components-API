@@ -39,6 +39,17 @@ public interface TypeAwareComponent extends Component {
      * {@code TypeAwareComponent}, the expression
      * {@code ((TypeAwareComponent)t.get(p)).getComponentType() == t}
      * always evaluates to {@code true}.
+     *
+     * <p>For example:
+     * <pre>{@code
+     *      ComponentType<MyComponent> MY_COMPONENT = ComponentRegistry.register(...);
+     *
+     *      class MyTypeAwareComponent implements MyComponent, TypeAwareComponent {
+     *          public ComponentType getComponentType() {
+     *              return MY_COMPONENT;
+     *          }
+     *      }
+     * }</pre>
      */
     ComponentType<?> getComponentType();
 }
