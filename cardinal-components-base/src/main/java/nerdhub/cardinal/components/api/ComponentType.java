@@ -150,9 +150,7 @@ public class ComponentType<T extends Component> {
      * @param <P>     the type of providers targeted by the event
      * @return {@code this}
      * @throws IllegalArgumentException if {@code event} is not a valid component event
-     * @deprecated use statically defined component factories
      */
-    @Deprecated
     public final <P, C extends T, E extends ComponentCallback<P, ? super C>> ComponentType<T> attach(Event<E> event, Function<P, C> factory) {
         event.register(ComponentsInternals.createCallback(event, this, factory));
         return this;
