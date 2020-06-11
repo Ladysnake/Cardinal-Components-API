@@ -31,7 +31,6 @@ import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.LevelComponentCallback;
-import net.minecraft.class_5315;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.Lazy;
@@ -41,6 +40,7 @@ import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
 import net.minecraft.world.level.LevelProperties;
 import net.minecraft.world.level.ServerWorldProperties;
+import net.minecraft.world.level.storage.SaveVersionInfo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -59,7 +59,7 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Int
     protected ComponentContainer<?> components = componentContainerFactory.get().create(this);
 
     @Inject(method = "method_29029", at = @At("RETURN"))
-    private static void readComponents(Dynamic<Tag> dynamic, DataFixer dataFixer, int dataVersion, CompoundTag compoundTag, LevelInfo levelInfo, class_5315 arg, GeneratorOptions generatorOptions, Lifecycle lifecycle, CallbackInfoReturnable<LevelProperties> cir) {
+    private static void readComponents(Dynamic<Tag> dynamic, DataFixer dataFixer, int dataVersion, CompoundTag compoundTag, LevelInfo levelInfo, SaveVersionInfo arg, GeneratorOptions generatorOptions, Lifecycle lifecycle, CallbackInfoReturnable<LevelProperties> cir) {
         ((InternalComponentProvider)cir.getReturnValue()).getComponentContainer().fromDynamic(dynamic);
     }
 
