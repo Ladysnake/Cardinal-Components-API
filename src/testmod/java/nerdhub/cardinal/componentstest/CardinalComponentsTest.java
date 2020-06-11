@@ -23,14 +23,14 @@
 package nerdhub.cardinal.componentstest;
 
 import com.google.common.reflect.TypeToken;
+import dev.onyxstudios.cca.api.component.util.ComponentContainerMetafactory;
+import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ComponentContainerMetafactory;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
-import nerdhub.cardinal.components.internal.asm.StaticComponentLoadingException;
 import nerdhub.cardinal.componentstest.vita.Vita;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;

@@ -22,14 +22,14 @@
  */
 package nerdhub.cardinal.components.api.event;
 
+import dev.onyxstudios.cca.api.component.item.ItemComponentFactory;
+import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
+import dev.onyxstudios.cca.internal.item.ItemCaller;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ItemComponentFactory;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.util.ItemComponent;
-import nerdhub.cardinal.components.internal.CardinalItemInternals;
-import nerdhub.cardinal.components.internal.ItemCaller;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

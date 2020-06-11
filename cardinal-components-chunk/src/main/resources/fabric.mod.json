@@ -8,10 +8,10 @@
     "side": "universal",
     "entrypoints": {
         "main": [
-            "nerdhub.cardinal.components.internal.ComponentsChunkNetworking::init"
+            "dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking::init"
         ],
         "client": [
-            "nerdhub.cardinal.components.internal.ComponentsChunkNetworking::initClient"
+            "dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking::initClient"
         ]
     },
     "custom": {

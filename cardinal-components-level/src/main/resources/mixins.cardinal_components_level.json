@@ -2,13 +2,13 @@
     "required": true,
     "minVersion": "0.7.11",
     "compatibilityLevel": "JAVA_8",
-    "package": "nerdhub.cardinal.components.mixins",
+    "package": "dev.onyxstudios.cca.mixin.level",
     "client": [
-        "common.level.MixinClientWorldProperties"
+        "client.MixinClientWorldProperties"
     ],
     "mixins": [
-        "common.level.MixinLevelProperties",
-        "common.level.MixinUnmodifiableLevelProperties"
+      "common.MixinLevelProperties",
+      "common.MixinUnmodifiableLevelProperties"
     ],
     "injectors": {
         "defaultRequire": 1
