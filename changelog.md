@@ -30,6 +30,7 @@ Changes
 - It is no longer possible for a `ComponentCallback` to override an existing component
 - Networking errors should now be logged before they get swallowed by Netty
 - `cardinal-component-item` should no longer prevent players from connecting to vanilla servers
+- Internal classes and new interfaces are now in the `dev.onyxstudios.cca` package
 
 Fixes
 - Fixed `PlayerSyncCallback` not firing when a player is teleported to another dimensions through commands

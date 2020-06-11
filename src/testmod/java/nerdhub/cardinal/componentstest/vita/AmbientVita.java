@@ -49,7 +49,7 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
         // Very bad shortcut to get a dimension's name
         DimensionType dimension = world.getDimension();
         Text worldName = new LiteralText(
-            Objects.requireNonNull(dimension.isOverworld() ? "Overworld" : dimension.isNether() ? "Nether" : dimension.isEnd() ? "End" : "Brand New World")
+            Objects.requireNonNull(dimension == DimensionType.getOverworldDimensionType() ? "Overworld" : "Alien World")
         );
         Text worldVita = new TranslatableText(
                 "componenttest:title.world_vitality",

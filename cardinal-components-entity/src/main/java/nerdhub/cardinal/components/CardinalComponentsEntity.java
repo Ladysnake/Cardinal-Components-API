@@ -51,7 +51,7 @@ public final class CardinalComponentsEntity {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless) {
-        boolean keepInventory = original.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || clone.isSpectator();
+        boolean keepInventory = original.world.getGameRules().getBoolean(GameRules.field_19389) || clone.isSpectator();
         ComponentProvider.fromEntity(original).forEachComponent((type, from) -> type.maybeGet(clone).ifPresent(
             to -> EntityComponents.getRespawnCopyStrategy((ComponentType) type).copyForRespawn(from, to, lossless, keepInventory)
         ));

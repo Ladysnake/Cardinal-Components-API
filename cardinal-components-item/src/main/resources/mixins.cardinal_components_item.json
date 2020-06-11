@@ -13,7 +13,7 @@
         "common.MixinPacketByteBuf",
         "common.MixinPlayerInventory",
         "common.MixinShulkerBoxColoringRecipe",
-        "common.MixinSmithingScreenHandler"
+        "common.MixinSmithingRecipe"
     ],
     "injectors": {
         "defaultRequire": 1
