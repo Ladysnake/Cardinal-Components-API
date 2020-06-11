@@ -22,10 +22,10 @@
  */
 package nerdhub.cardinal.components.api;
 
+import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
-import nerdhub.cardinal.components.internal.ComponentsInternals;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;

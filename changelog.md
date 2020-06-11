@@ -1,7 +1,8 @@
 ------------------------------------------------------
 Version 2.4.0
 ------------------------------------------------------
-### 2.4.0-nightly.1.16-pre3
+### 2.4.0-nightly.1.16-pre4
+- **Internals and experimental APIs have been relocated. This *will* break compatibility between modules of different versions.**
 - `cardinal-components-item` no longer alters the layout of packets encoding ItemStacks
 - Added a `PlayerComponent` interface that can replace `RespawnCopyStrategy`
 - Removed some experimental not very useful methods in ComponentRegistry

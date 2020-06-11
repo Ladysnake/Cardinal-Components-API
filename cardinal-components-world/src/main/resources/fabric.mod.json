@@ -8,10 +8,10 @@
     "side": "universal",
     "entrypoints": {
         "main": [
-            "nerdhub.cardinal.components.ComponentsWorldNetworking::init"
+            "dev.onyxstudios.cca.internal.world.ComponentsWorldNetworking::init"
         ],
         "client": [
-            "nerdhub.cardinal.components.ComponentsWorldNetworking::initClient"
+            "dev.onyxstudios.cca.internal.world.ComponentsWorldNetworking::initClient"
         ]
     },
     "custom": {

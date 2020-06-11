@@ -23,7 +23,18 @@
 package nerdhub.cardinal.componentstest;
 
 import com.google.common.reflect.TypeToken;
-import nerdhub.cardinal.components.api.component.*;
+import dev.onyxstudios.cca.api.component.chunk.ChunkComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.component.chunk.StaticChunkComponentInitializer;
+import dev.onyxstudios.cca.api.component.entity.EntityComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.component.entity.StaticEntityComponentInitializer;
+import dev.onyxstudios.cca.api.component.item.ItemComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.component.item.StaticItemComponentInitializer;
+import dev.onyxstudios.cca.api.component.level.LevelComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.component.level.StaticLevelComponentInitializer;
+import dev.onyxstudios.cca.api.component.util.GenericComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.component.util.StaticGenericComponentInitializer;
+import dev.onyxstudios.cca.api.component.world.StaticWorldComponentInitializer;
+import dev.onyxstudios.cca.api.component.world.WorldComponentFactoryRegistry;
 import nerdhub.cardinal.componentstest.vita.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -39,9 +50,9 @@ import java.util.function.BiFunction;
 
 public final class TestStaticComponentInitializer implements
     StaticEntityComponentInitializer,
-    StaticChunkComponentInitializer,
+        StaticChunkComponentInitializer,
     StaticLevelComponentInitializer,
-    StaticWorldComponentInitializer,
+        StaticWorldComponentInitializer,
     StaticGenericComponentInitializer,
     StaticItemComponentInitializer {
 

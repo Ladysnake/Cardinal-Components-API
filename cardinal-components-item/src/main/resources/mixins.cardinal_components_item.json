@@ -2,18 +2,18 @@
     "required": true,
     "minVersion": "0.7.11",
     "compatibilityLevel": "JAVA_8",
-    "package": "nerdhub.cardinal.components.mixins",
+    "package": "dev.onyxstudios.cca.mixin.item",
     "mixins": [
-        "common.item.MixinBookCloningRecipe",
-        "common.item.MixinCauldronBlock",
-        "common.item.MixinItem",
-        "common.item.MixinItemEntity",
-        "common.item.MixinItemStack",
-        "common.item.MixinOnAStickItem",
-        "common.item.MixinPacketByteBuf",
-        "common.item.MixinPlayerInventory",
-        "common.item.MixinShulkerBoxColoringRecipe",
-        "common.item.MixinSmithingScreenHandler"
+        "common.MixinBookCloningRecipe",
+        "common.MixinCauldronBlock",
+        "common.MixinItem",
+        "common.MixinItemEntity",
+        "common.MixinItemStack",
+        "common.MixinOnAStickItem",
+        "common.MixinPacketByteBuf",
+        "common.MixinPlayerInventory",
+        "common.MixinShulkerBoxColoringRecipe",
+        "common.MixinSmithingScreenHandler"
     ],
     "injectors": {
         "defaultRequire": 1

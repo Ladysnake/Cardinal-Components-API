@@ -22,8 +22,8 @@
  */
 package nerdhub.cardinal.components.api;
 
+import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.internal.ComponentRegistryImpl;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
