@@ -22,9 +22,9 @@
  */
 package dev.onyxstudios.cca.internal.world;
 
-import dev.onyxstudios.cca.api.component.world.StaticWorldComponentInitializer;
-import dev.onyxstudios.cca.api.component.world.WorldComponentFactory;
-import dev.onyxstudios.cca.api.component.world.WorldComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.component.world.StaticWorldComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.world.WorldComponentFactory;
+import dev.onyxstudios.cca.api.v3.component.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;

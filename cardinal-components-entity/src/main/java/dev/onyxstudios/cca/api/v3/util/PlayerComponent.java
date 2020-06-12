@@ -20,45 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest.vita;
+package dev.onyxstudios.cca.api.v3.util;
 
-import dev.onyxstudios.cca.api.v3.util.PlayerComponent;
-import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
+import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import net.minecraft.world.GameRules;
+import org.jetbrains.annotations.ApiStatus;
 
-/**
- * A Vita component attached to players, and automatically synchronized with their owner
- */
-public class PlayerVita extends EntityVita implements EntitySyncedComponent, PlayerComponent<Vita> {
-
-    public PlayerVita(PlayerEntity owner) {
-        super(owner, 0);
-    }
-
-    @Override
-    public void sync() {
-        if (!this.getEntity().world.isClient) {
-            // We only sync with the holder, not with everyone around
-            this.syncWith((ServerPlayerEntity) this.getEntity());
-        }
-    }
-
-    @Override
-    public void setVitality(int value) {
-        super.setVitality(value);
-        this.sync();
-    }
-
-    @Override
-    public LivingEntity getEntity() {
-        return this.owner;
-    }
-
-    @Override
-    public void copyForRespawn(Vita original, boolean lossless, boolean keepInventory) {
-        if (lossless || keepInventory) {
+@ApiStatus.Experimental
+public interface PlayerComponent<C extends Component> extends CopyableComponent<C> {
+    /**
+     * Copy data from a component to another as part of a player respawn.
+     *
+     * @param original      the component to copy data from
+     * @param lossless      {@code true} if the player is copied exactly, such as when coming back from the End
+     * @param keepInventory {@code true} if the player's inventory and XP are kept, such as when
+     *                      {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
+     * @implNote the default implementation copies a component only when the entire data is transferred from a player to the other
+     */
+    default void copyForRespawn(C original, boolean lossless, boolean keepInventory) {
+        if (lossless) {
             this.copyFrom(original);
         }
     }

@@ -24,6 +24,7 @@ package dev.onyxstudios.cca.internal.entity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import dev.onyxstudios.cca.api.v3.util.PlayerComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import nerdhub.cardinal.components.api.ComponentType;
@@ -31,7 +32,6 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
-import nerdhub.cardinal.components.api.util.PlayerComponent;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;

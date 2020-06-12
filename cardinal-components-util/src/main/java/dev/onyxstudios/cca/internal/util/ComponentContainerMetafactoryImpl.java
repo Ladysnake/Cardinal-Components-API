@@ -25,7 +25,7 @@ package dev.onyxstudios.cca.internal.util;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.Parameter;
 import com.google.common.reflect.TypeToken;
-import dev.onyxstudios.cca.api.component.util.ContainerGenerationException;
+import dev.onyxstudios.cca.api.v3.component.util.ContainerGenerationException;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;

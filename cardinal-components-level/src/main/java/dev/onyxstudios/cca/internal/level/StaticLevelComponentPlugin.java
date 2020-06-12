@@ -22,9 +22,9 @@
  */
 package dev.onyxstudios.cca.internal.level;
 
-import dev.onyxstudios.cca.api.component.level.LevelComponentFactory;
-import dev.onyxstudios.cca.api.component.level.LevelComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.component.level.StaticLevelComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.level.LevelComponentFactory;
+import dev.onyxstudios.cca.api.v3.component.level.LevelComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.component.level.StaticLevelComponentInitializer;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;

@@ -23,7 +23,7 @@
 package nerdhub.cardinal.componentstest;
 
 import com.google.common.reflect.TypeToken;
-import dev.onyxstudios.cca.api.component.util.ComponentContainerMetafactory;
+import dev.onyxstudios.cca.api.v3.component.util.ComponentContainerMetafactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;

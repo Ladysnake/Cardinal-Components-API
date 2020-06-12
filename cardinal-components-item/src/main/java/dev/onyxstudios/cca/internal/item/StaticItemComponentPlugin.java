@@ -22,9 +22,9 @@
  */
 package dev.onyxstudios.cca.internal.item;
 
-import dev.onyxstudios.cca.api.component.item.ItemComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.component.item.ItemComponentFactoryV2;
-import dev.onyxstudios.cca.api.component.item.StaticItemComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactoryV2;
+import dev.onyxstudios.cca.api.v3.component.item.StaticItemComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
