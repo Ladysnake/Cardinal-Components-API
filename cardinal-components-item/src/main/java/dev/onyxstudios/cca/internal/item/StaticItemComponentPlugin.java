@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public final class StaticItemComponentPlugin extends LazyDispatcher implements ItemComponentFactoryRegistry {
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
@@ -76,7 +77,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + componentId + " on " + (itemId == null ? "every item" : "item '" + itemId + "'") + ": " + factory + " and " + previousFactory);
         }
-        specializedMap.put(componentId, factory);
+        specializedMap.put(componentId, (item, stack) -> Objects.requireNonNull(factory.createForStack(item, stack), "Component factory "+ factory + " for " + componentId + " returned null on " + stack));
     }
 
     @Override

@@ -29,6 +29,8 @@ import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
+import java.util.Objects;
+
 public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<World, StaticWorldComponentInitializer, WorldComponentFactory<?>> implements WorldComponentFactoryRegistry {
     public static final String WORLD_IMPL_SUFFIX = "WorldImpl";
 
@@ -46,6 +48,6 @@ public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<
     @Override
     public void register(Identifier componentId, WorldComponentFactory<?> factory) {
         this.checkLoading(WorldComponentFactoryRegistry.class, "register");
-        super.register(componentId, factory);
+        super.register(componentId, (world) -> Objects.requireNonNull(factory.createForWorld(world), "Component factory "+ factory + " for " + componentId + " returned null on " + world.getClass().getSimpleName()));
     }
 }

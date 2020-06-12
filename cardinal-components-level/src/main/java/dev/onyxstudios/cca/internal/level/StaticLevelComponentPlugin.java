@@ -31,6 +31,8 @@ import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.WorldProperties;
 
+import java.util.Objects;
+
 public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<WorldProperties, StaticLevelComponentInitializer, LevelComponentFactory<?>> implements LevelComponentFactoryRegistry {
     public static final String LEVEL_IMPL_SUFFIX = "LevelImpl";
 
@@ -48,7 +50,7 @@ public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<
     @Override
     public void register(Identifier componentId, LevelComponentFactory<?> factory) {
         this.checkLoading(LevelComponentFactoryRegistry.class, "register");
-        super.register(componentId, factory);
+        super.register(componentId, (props) -> Objects.requireNonNull(factory.createForSave(props), "Component factory "+ factory + " for " + componentId + " returned null on " + props));
     }
 
     @SuppressWarnings("unchecked")

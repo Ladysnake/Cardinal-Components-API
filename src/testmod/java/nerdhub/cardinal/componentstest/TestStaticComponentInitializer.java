@@ -36,10 +36,8 @@ import dev.onyxstudios.cca.api.v3.component.util.StaticGenericComponentInitializ
 import dev.onyxstudios.cca.api.v3.component.world.StaticWorldComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.world.WorldComponentFactoryRegistry;
 import nerdhub.cardinal.componentstest.vita.*;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.mob.PhantomEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 
@@ -50,9 +48,9 @@ import java.util.function.BiFunction;
 
 public final class TestStaticComponentInitializer implements
     StaticEntityComponentInitializer,
-        StaticChunkComponentInitializer,
+    StaticChunkComponentInitializer,
     StaticLevelComponentInitializer,
-        StaticWorldComponentInitializer,
+    StaticWorldComponentInitializer,
     StaticGenericComponentInitializer,
     StaticItemComponentInitializer {
 
@@ -61,7 +59,8 @@ public final class TestStaticComponentInitializer implements
     public static final Identifier CUSTOM_PROVIDER_1 = new Identifier("componenttest:custom/1");
     public static final Identifier CUSTOM_PROVIDER_2 = new Identifier("componenttest:custom/2");
     public static final Identifier CUSTOM_PROVIDER_3 = new Identifier("componenttest:custom/3");
-    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>>() {};
+    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>>() {
+    };
 
     private static BaseVita createForEntity(LivingEntity e) {
         return new BaseVita((int) (Math.random() * 10));
@@ -78,9 +77,6 @@ public final class TestStaticComponentInitializer implements
         registry.register(Vita.TYPE, LivingEntity.class, TestStaticComponentInitializer::createForEntity);
         registry.register(Vita.TYPE, PlayerEntity.class, PlayerVita::new);
         registry.register(Vita.TYPE, VitalityZombieEntity.class, VitalityZombieEntity::createVitaComponent);
-        registry.register(Vita.TYPE, PhantomEntity.class, p -> {
-            return p.getType() == EntityType.PHANTOM ? null : createForEntity(p); // fuck vanilla phantoms specifically
-        });
     }
 
     @Override

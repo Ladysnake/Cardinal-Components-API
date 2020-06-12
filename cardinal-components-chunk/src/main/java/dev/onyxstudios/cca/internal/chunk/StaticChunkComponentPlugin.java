@@ -31,6 +31,8 @@ import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.chunk.Chunk;
 
+import java.util.Objects;
+
 public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<Chunk, StaticChunkComponentInitializer, ChunkComponentFactory<?>> implements ChunkComponentFactoryRegistry {
     public static final String CHUNK_IMPL_SUFFIX = "ChunkImpl";
 
@@ -48,7 +50,7 @@ public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<
     @Override
     public void register(Identifier componentId, ChunkComponentFactory<?> factory) {
         this.checkLoading(ChunkComponentFactoryRegistry.class, "register");
-        super.register(componentId, factory);
+        super.register(componentId, (chunk) -> Objects.requireNonNull(factory.createForChunk(chunk), "Component factory "+ factory + " for " + componentId + " returned null on " + chunk.getClass().getSimpleName()));
     }
 
     @Override

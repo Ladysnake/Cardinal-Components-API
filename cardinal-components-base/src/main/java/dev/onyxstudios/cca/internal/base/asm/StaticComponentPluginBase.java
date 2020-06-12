@@ -119,7 +119,6 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
             actualCtorArgs[i + 1] = Type.getType(factoryArgs[i]);
         }
         String ctorDesc = Type.getMethodDescriptor(Type.VOID_TYPE, actualCtorArgs);
-        int ctorFirstAvailableVar = actualCtorArgs.length + 1;  // explicit args + <this>
         ClassNode classNode = new ClassNode(CcaAsmHelper.ASM_VERSION);
         classNode.visit(
             Opcodes.V1_8,
@@ -132,6 +131,14 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
 
         String componentFieldDescriptor = Type.getDescriptor(Component.class);
         String factoryFieldDescriptor = Type.getDescriptor(componentFactoryType);
+
+/*      TODO enable when dynamic components are no more
+        classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "componentTypes", "Ljava/util/Set;", null, null);
+        MethodVisitor keySet = classNode.visitMethod(Opcodes.ACC_PUBLIC, "keySet", "()Ljava/util/Set;", null, null);
+        keySet.visitFieldInsn(Opcodes.GETSTATIC, containerImplName, "componentTypes", "Ljava/util/Set;");
+        keySet.visitInsn(Opcodes.ARETURN);
+        keySet.visitEnd();
+*/
 
         MethodVisitor init = classNode.visitMethod(Opcodes.ACC_PUBLIC, "<init>", ctorDesc, null, null);
         init.visitCode();
@@ -169,26 +176,26 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
             // initialize the component by calling the factory
             init.visitMethodInsn(Opcodes.INVOKEINTERFACE, componentFactoryName, sam.getName(), samDescriptor, true);
             // stack: component
+            // check not null
             init.visitInsn(Opcodes.DUP);
             // stack: component component
-            init.visitVarInsn(Opcodes.ASTORE, ctorFirstAvailableVar);
+            init.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
+            // stack: component garbage
+            init.visitInsn(Opcodes.POP);
             // stack: component
-            // if the factory method returned null, we just ignore it
-            Label nextInit = new Label();
-            init.visitJumpInsn(Opcodes.IFNULL, nextInit);
-            // <empty stack>
             init.visitVarInsn(Opcodes.ALOAD, 0);
-            init.visitInsn(Opcodes.DUP);
-            init.visitVarInsn(Opcodes.ALOAD, ctorFirstAvailableVar);
-            // stack: <this> <this> component
+            // stack: component <this>
+            init.visitInsn(Opcodes.SWAP);
+            // stack: <this> component
             // store in the field
             init.visitFieldInsn(Opcodes.PUTFIELD, containerImplName, fieldName, componentFieldDescriptor);
+            // <empty stack>
+            init.visitVarInsn(Opcodes.ALOAD, 0);
             // stack: <this>
             CcaAsmHelper.stackStaticComponentType(init, identifier);
             // stack: <this> componentType
             init.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "addContainedType", "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)V", false);
             // <empty stack>
-            init.visitLabel(nextInit);
 
             /* forEach implementation */
             forEach.visitVarInsn(Opcodes.ALOAD, 1);
