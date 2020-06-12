@@ -104,7 +104,8 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + componentId + " on " + target + ": " + factory + " and " + previousFactory);
         }
-        specializedMap.put(componentId, factory);
+        EntityComponentFactory<Component, E> checked = entity -> Objects.requireNonNull(factory.createForEntity(entity), "Component factory "+ factory + " for " + componentId + " returned null on " + entity.getClass().getSimpleName());
+        specializedMap.put(componentId, checked);
     }
 
     static class Key {
