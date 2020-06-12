@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# A hook script to verify what is about to be committed.
+# Called by "git commit" with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message if
+# it wants to stop the commit.
+#
+# This hook stops the commit if the added files are missing license headers.
+#
+addedFiles="$(git diff --name-only --diff-filter=A --cached)"
+if [ ! -z "${addedFiles// }" ];
+then
+    repoRoot="$(git rev-parse --show-toplevel)"
+    "$repoRoot/gradlew" checkLicenses > /dev/null
+    if [ $? -ne 0 ];
+    then
+        cat <<\EOF
+
+Error: Attempt to push one or more files without a license header. Please run gradlew updateLicenses and commit.
+EOF
+        exit 1
+    fi
+fi
