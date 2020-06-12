@@ -23,8 +23,8 @@
 package dev.onyxstudios.cca.internal.util;
 
 import com.google.common.reflect.TypeToken;
-import dev.onyxstudios.cca.api.component.util.GenericComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.component.util.StaticGenericComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.util.GenericComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.component.util.StaticGenericComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;

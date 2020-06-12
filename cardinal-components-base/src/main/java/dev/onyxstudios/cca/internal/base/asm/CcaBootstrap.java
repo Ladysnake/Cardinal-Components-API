@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
-import dev.onyxstudios.cca.api.component.StaticComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import nerdhub.cardinal.components.api.ComponentType;
 import net.fabricmc.loader.api.FabricLoader;

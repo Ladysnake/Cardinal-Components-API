@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
-import dev.onyxstudios.cca.api.component.StaticComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
