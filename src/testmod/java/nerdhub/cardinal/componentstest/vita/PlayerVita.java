@@ -31,7 +31,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 /**
  * A Vita component attached to players, and automatically synchronized with their owner
  */
-public class PlayerVita extends EntityVita implements EntitySyncedComponent, PlayerComponent<Vita> {
+public class PlayerVita extends EntityVita implements EntitySyncedComponent, PlayerComponent<BaseVita> {
 
     public PlayerVita(PlayerEntity owner) {
         super(owner, 0);
@@ -57,7 +57,7 @@ public class PlayerVita extends EntityVita implements EntitySyncedComponent, Pla
     }
 
     @Override
-    public void copyForRespawn(Vita original, boolean lossless, boolean keepInventory) {
+    public void copyForRespawn(BaseVita original, boolean lossless, boolean keepInventory) {
         if (lossless || keepInventory) {
             this.copyFrom(original);
         }

@@ -116,11 +116,13 @@ public final class CardinalEntityInternals {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static <C extends Component> void playerComponentCopy(Component from, PlayerComponent<C> to, boolean lossless, boolean keepInventory) {
-        to.copyForRespawn(to.getComponentType().getComponentClass().cast(from), lossless, keepInventory);
+        to.copyForRespawn((C) from, lossless, keepInventory);
     }
 
+    @SuppressWarnings("unchecked")
     public static <C extends Component> void copyAsCopyable(Component from, CopyableComponent<C> to) {
-        to.copyFrom(to.getComponentType().getComponentClass().cast(from));
+        to.copyFrom((C) from);
     }
 }

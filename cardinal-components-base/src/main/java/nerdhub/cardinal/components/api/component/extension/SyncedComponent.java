@@ -49,7 +49,7 @@ public interface SyncedComponent extends Component {
      * @deprecated use {@link #sync()} for an alternative with better semantics
      */
     @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.4.0")
+    @ApiStatus.ScheduledForRemoval
     default void markDirty() {
         this.sync();
     }

@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.api.util;
 
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 
@@ -29,4 +30,10 @@ public interface ItemComponent<C extends Component> extends Component, CopyableC
 
     @Override
     boolean isComponentEqual(Component other);
+
+    @Deprecated
+    @Override
+    default ComponentType<?> getComponentType() {
+        throw new UnsupportedOperationException();
+    }
 }
