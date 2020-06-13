@@ -1,8 +1,7 @@
 ------------------------------------------------------
 Version 2.4.0
 ------------------------------------------------------
-### 2.4.0-nightly.1.16-pre4
-- **Internals and experimental APIs have been relocated. This *will* break compatibility between modules of different versions.**
+### 2.4.0-nightly.1.16-pre5
 - `cardinal-components-item` no longer alters the layout of packets encoding ItemStacks
 - Added a `PlayerComponent` interface that can replace `RespawnCopyStrategy`
 - Removed some experimental not very useful methods in ComponentRegistry
@@ -12,6 +11,10 @@ Version 2.4.0
 some classes have been moved to a new module called `cardinal-components-util`. 
 If you are missing some types, or if you use the `cardinal-components-block` module, 
 you need to add a dependency on that module.**
+
+**Compatibility between modules of different versions has been broken in 2.4.0-nightly.1.16-pre4.**
+In case of crashes due to those incompatibilities, Modpack makers and players can add the latest version
+of the full library to their mods folder to update every module at once.
 
 - Updated entity, item, chunk, world, and level modules to MC 1.16
 
@@ -25,8 +28,10 @@ Additions
 - Added `ItemComponentCallbackV2` and `ItemComponentFactoryV2` as alternatives respectively to `ItemComponentCallback` and `ItemComponentFactory`,
   passing the stack's true item as context.
 - Added `Dynamic` conversion methods to `NbtSerializable` (defaulted to delegate to nbt serialization)
+- Added `PlayerComponent`, an experimental interface replacing `RespawnCopyStrategy`
 
 Changes
+- TypeAwareComponent now has a default implementation in most subinterfaces
 - It is no longer possible for a `ComponentCallback` to override an existing component
 - Networking errors should now be logged before they get swallowed by Netty
 - `cardinal-component-item` should no longer prevent players from connecting to vanilla servers
@@ -34,6 +39,12 @@ Changes
 
 Fixes
 - Fixed `PlayerSyncCallback` not firing when a player is teleported to another dimensions through commands
+- Fixed Cardinal-Components-Item preventing vanilla clients from connecting to modded servers and vice-versa
+
+------------------------------------------------------
+Version 2.3.7
+------------------------------------------------------
+- Fixed Cardinal-Components-Item crashing with Optifine (thanks to ZekerZhayard)
 
 ------------------------------------------------------
 Version 2.3.6
