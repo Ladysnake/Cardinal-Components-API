@@ -57,8 +57,15 @@ public interface ChunkSyncedComponent<C extends Component> extends ChunkComponen
 
     Chunk getChunk();
 
+    /**
+     * {@inheritDoc}
+     * @implNote The default implementation should generally be overridden.
+     * This implementation performs a linear-time lookup on the provider to find the component type
+     * this component is associated with.
+     * Implementing classes can nearly always provide a better implementation.
+     */
     @Override
-    default ComponentType<?> getComponentType() {
+    default ComponentType<? super C> getComponentType() {
         return TypeAwareComponent.lookupComponentType(ComponentProvider.fromChunk(this.getChunk()), this);
     }
 

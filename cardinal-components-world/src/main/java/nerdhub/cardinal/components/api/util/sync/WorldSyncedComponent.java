@@ -53,6 +53,13 @@ public interface WorldSyncedComponent extends BaseSyncedComponent {
 
     World getWorld();
 
+    /**
+     * {@inheritDoc}
+     * @implNote The default implementation should generally be overridden.
+     * This implementation performs a linear-time lookup on the provider to find the component type
+     * this component is associated with.
+     * Implementing classes can nearly always provide a better implementation.
+     */
     @Override
     default ComponentType<?> getComponentType() {
         return TypeAwareComponent.lookupComponentType(ComponentProvider.fromWorld(this.getWorld()), this);
