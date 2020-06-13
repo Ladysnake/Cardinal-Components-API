@@ -30,17 +30,27 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.Experimental
 public interface PlayerComponent<C extends Component> extends CopyableComponent<C> {
     /**
+     * Check whether component data should be copied as part of a respawn situation.
+     *
+     * @param lossless      {@code true} if the player is copied exactly, such as when coming back from the End
+     * @param keepInventory {@code true} if the player's inventory and XP are kept, such as when
+     *                      {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
+     * @return {@code true} if {@link #copyForRespawn} should be called for the current respawn situation
+     */
+    default boolean shouldCopyForRespawn(boolean lossless, boolean keepInventory) {
+        return lossless;
+    }
+
+    /**
      * Copy data from a component to another as part of a player respawn.
      *
      * @param original      the component to copy data from
      * @param lossless      {@code true} if the player is copied exactly, such as when coming back from the End
      * @param keepInventory {@code true} if the player's inventory and XP are kept, such as when
      *                      {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
-     * @implNote the default implementation copies a component only when the entire data is transferred from a player to the other
+     * @implNote the default implementation delegates to {@link #copyFrom(Component)}
      */
     default void copyForRespawn(C original, boolean lossless, boolean keepInventory) {
-        if (lossless) {
-            this.copyFrom(original);
-        }
+        this.copyFrom(original);
     }
 }
