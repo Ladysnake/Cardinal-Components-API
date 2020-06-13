@@ -118,7 +118,9 @@ public final class CardinalEntityInternals {
 
     @SuppressWarnings("unchecked")
     private static <C extends Component> void playerComponentCopy(Component from, PlayerComponent<C> to, boolean lossless, boolean keepInventory) {
-        to.copyForRespawn((C) from, lossless, keepInventory);
+        if (to.shouldCopyForRespawn(lossless, keepInventory)) {
+            to.copyForRespawn((C) from, lossless, keepInventory);
+        }
     }
 
     @SuppressWarnings("unchecked")

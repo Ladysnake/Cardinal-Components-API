@@ -57,9 +57,15 @@ public class PlayerVita extends EntityVita implements EntitySyncedComponent, Pla
     }
 
     @Override
+    public boolean shouldCopyForRespawn(boolean lossless, boolean keepInventory) {
+        return lossless || keepInventory;
+    }
+
+    @Override
     public void copyForRespawn(BaseVita original, boolean lossless, boolean keepInventory) {
-        if (lossless || keepInventory) {
-            this.copyFrom(original);
+        PlayerComponent.super.copyForRespawn(original, lossless, keepInventory);
+        if (!lossless && !keepInventory) {
+            this.vitality -= 5;
         }
     }
 }
