@@ -80,16 +80,19 @@ public final class CardinalItemInternals {
     public static void copyComponents(ItemStack original, ItemStack copy) {
         ComponentProvider from = ComponentProvider.fromItemStack(original);
         ComponentProvider.fromItemStack(copy).forEachComponent((type, component) -> {
-                copyComponent((CopyableComponent<?>) component, from);
+                copyComponent(type, (CopyableComponent<?>) component, from);
             }
         );
     }
 
-    private static <C extends Component> void copyComponent(CopyableComponent<C> ccp, ComponentProvider from) {
-        C fromComponent = ccp.getComponentType().getNullable(from);
+    private static <C extends Component> void copyComponent(ComponentType<?> type, CopyableComponent<C> component, ComponentProvider from) {
+        @SuppressWarnings("unchecked") C fromComponent = (C) type.getNullable(from);
         if (fromComponent != null) {
-            ccp.copyFrom(fromComponent);
+            component.copyFrom(fromComponent);
         }
+    }
+
+    private static <C extends Component> void copyComponent(CopyableComponent<C> ccp, ComponentProvider from) {
     }
 
     public static boolean areComponentsIncompatible(ItemStack stack1, ItemStack stack2) {

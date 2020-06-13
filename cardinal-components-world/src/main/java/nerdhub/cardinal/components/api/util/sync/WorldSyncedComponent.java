@@ -24,7 +24,9 @@ package nerdhub.cardinal.components.api.util.sync;
 
 import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
+import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;
@@ -50,6 +52,11 @@ public interface WorldSyncedComponent extends BaseSyncedComponent {
     Identifier PACKET_ID = new Identifier("cardinal-components", "world_sync");
 
     World getWorld();
+
+    @Override
+    default ComponentType<?> getComponentType() {
+        return TypeAwareComponent.lookupComponentType(ComponentProvider.fromWorld(this.getWorld()), this);
+    }
 
     @Override
     default void sync() {

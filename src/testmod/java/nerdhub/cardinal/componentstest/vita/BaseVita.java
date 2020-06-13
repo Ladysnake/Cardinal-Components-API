@@ -24,9 +24,10 @@ package nerdhub.cardinal.componentstest.vita;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.minecraft.nbt.CompoundTag;
 
-public class BaseVita implements Vita, CopyableComponent<Vita> {
+public class BaseVita implements Vita, TypeAwareComponent, CopyableComponent<BaseVita> {
     protected int vitality;
 
     public BaseVita() {
@@ -65,7 +66,7 @@ public class BaseVita implements Vita, CopyableComponent<Vita> {
     }
 
     @Override
-    public void copyFrom(Vita other) {
+    public void copyFrom(BaseVita other) {
         this.vitality = other.getVitality();
     }
 
@@ -73,11 +74,11 @@ public class BaseVita implements Vita, CopyableComponent<Vita> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Vita)) return false;
-        return vitality == ((Vita) o).getVitality();
+        return this.vitality == ((Vita) o).getVitality();
     }
 
     @Override
     public int hashCode() {
-        return Integer.hashCode(vitality);
+        return Integer.hashCode(this.vitality);
     }
 }

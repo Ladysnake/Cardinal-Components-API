@@ -23,8 +23,11 @@
 package nerdhub.cardinal.components.api.util.sync;
 
 import io.netty.buffer.Unpooled;
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
+import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import nerdhub.cardinal.components.api.util.ChunkComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
@@ -53,6 +56,11 @@ public interface ChunkSyncedComponent<C extends Component> extends ChunkComponen
     Identifier PACKET_ID = new Identifier("cardinal-components", "chunk_sync");
 
     Chunk getChunk();
+
+    @Override
+    default ComponentType<?> getComponentType() {
+        return TypeAwareComponent.lookupComponentType(ComponentProvider.fromChunk(this.getChunk()), this);
+    }
 
     @Override
     default void sync() {
