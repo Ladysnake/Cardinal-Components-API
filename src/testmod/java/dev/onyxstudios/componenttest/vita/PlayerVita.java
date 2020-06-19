@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest.vita;
+package dev.onyxstudios.componenttest.vita;
 
 import dev.onyxstudios.cca.api.v3.util.PlayerComponent;
 import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;

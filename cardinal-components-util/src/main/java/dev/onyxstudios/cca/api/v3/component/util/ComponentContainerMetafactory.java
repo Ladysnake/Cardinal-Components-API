@@ -23,6 +23,7 @@
 package dev.onyxstudios.cca.api.v3.component.util;
 
 import com.google.common.reflect.TypeToken;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.util.ComponentContainerMetafactoryImpl;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import net.fabricmc.fabric.api.event.Event;
@@ -38,11 +39,11 @@ public final class ComponentContainerMetafactory {
      * calling every registered factory for the given provider.
      *
      * @param genericProviderId    the id of the provider type for which components will be created,
-     *                             as declared in {@link GenericComponentFactoryRegistry#register(Identifier, Identifier, TypeToken, Object)}
+     *                             as declared in {@link GenericComponentFactoryRegistry#register(ComponentKey, Identifier, TypeToken, Object)}
      * @param containerFactoryType the interface implemented by the returned container factory.
      *                             Must be a {@link FunctionalInterface}.
      * @param componentFactoryType the type of the static factories called to initialize the returned container,
-     *                             as declared in {@link GenericComponentFactoryRegistry#register(Identifier, Identifier, TypeToken, Object)}.
+     *                             as declared in {@link GenericComponentFactoryRegistry#register(ComponentKey, Identifier, TypeToken, Object)}.
      *                             Must be a {@link FunctionalInterface}.
      * @return a {@link ComponentContainer} factory
      */
@@ -57,11 +58,11 @@ public final class ComponentContainerMetafactory {
      * calling every statically registered factory as well as every dynamically registered callback for the given provider.
      *
      * @param genericProviderId    the id of the provider type for which components will be created,
-     *                             as declared in {@link GenericComponentFactoryRegistry#register(Identifier, Identifier, TypeToken, Object)}
+     *                             as declared in {@link GenericComponentFactoryRegistry#register(ComponentKey, Identifier, TypeToken, Object)}
      * @param containerFactoryType the interface implemented by the returned container factory.
      *                             Must be a {@link FunctionalInterface}.
      * @param componentFactoryType the type of the static factories called to initialize the returned container,
-     *                             as declared in {@link GenericComponentFactoryRegistry#register(Identifier, Identifier, TypeToken, Object)}.
+     *                             as declared in {@link GenericComponentFactoryRegistry#register(ComponentKey, Identifier, TypeToken, Object)}.
      *                             Must be a {@link FunctionalInterface}.
      * @param callbackType         the type of the callbacks that will be fired to dynamically initialize
      * @param events               a list of runtime events that will be fired when creating a container

@@ -20,14 +20,14 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest;
+package dev.onyxstudios.componenttest;
 
+import dev.onyxstudios.componenttest.vita.Vita;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.BlockComponentProvider;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.util.provider.EmptyComponentProvider;
-import nerdhub.cardinal.componentstest.vita.Vita;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -45,7 +45,6 @@ import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -59,7 +58,7 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
         Vita.get(world).transferTo(
-                Objects.requireNonNull(this.getComponent(world, pos, Vita.TYPE, null)),
+                TestComponents.VITA.get(this.getChunkProvider(world, pos)),
                 1
         );
     }
@@ -94,7 +93,6 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
 
     private ComponentProvider getChunkProvider(BlockView blockView, BlockPos pos) {
         if (blockView instanceof CollisionView) {
-            // method_22350 == getChunk
             return ComponentProvider.fromChunk(((WorldView) blockView).getChunk(pos));
         }
         return EmptyComponentProvider.instance();

@@ -20,13 +20,24 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest;
+package dev.onyxstudios.componenttest.vita;
 
-import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityRendererRegistry;
-import net.minecraft.client.render.entity.ZombieEntityRenderer;
+import dev.onyxstudios.componenttest.TestComponents;
+import nerdhub.cardinal.components.api.component.Component;
 
-public class CCATestClient {
-    public static void clientInit() {
-        EntityRendererRegistry.INSTANCE.register(CardinalComponentsTest.VITALITY_ZOMBIE, (entityRenderDispatcher, context) -> new ZombieEntityRenderer(entityRenderDispatcher));
+public interface Vita extends Component {
+
+    static <T> Vita get(T provider) {
+        return TestComponents.VITA.get(provider);
+    }
+
+    int getVitality();
+    void setVitality(int value);
+    default void transferTo(Vita dest, int amount) {
+        int sourceVitality = this.getVitality();
+        int actualAmount = Math.min(sourceVitality, amount);
+        this.setVitality(sourceVitality - actualAmount);
+        dest.setVitality(dest.getVitality() + actualAmount);
     }
 }
+

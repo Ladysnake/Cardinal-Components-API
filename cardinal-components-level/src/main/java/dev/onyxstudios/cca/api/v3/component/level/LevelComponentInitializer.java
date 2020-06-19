@@ -20,31 +20,28 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.chunk;
+package dev.onyxstudios.cca.api.v3.component.level;
 
-import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * Entrypoint getting invoked to register <em>static</em> chunk component factories.
+ * Entrypoint getting invoked to register <em>static</em> item component factories.
  *
- * <p>The entrypoint, like every {@link StaticComponentInitializer}, is exposed as
- * {@code cardinal-components:static-init} in the mod json and runs for any environment.
- * It usually executes right before the first {@link Chunk} instance is created.
+ * <p>The entrypoint is exposed as {@code cardinal-components-level} in the mod json and runs for any environment.
+ * It usually executes right before the first {@linkplain WorldProperties save properties object} gets loaded.
  *
  * @since 2.4.0
  */
-@ApiStatus.ScheduledForRemoval
-@Deprecated
-public interface StaticChunkComponentInitializer extends StaticComponentInitializer {
+@ApiStatus.Experimental
+public interface LevelComponentInitializer {
     /**
      * Called to register component factories for statically declared component types.
      *
      * <p><strong>The passed registry must not be held onto!</strong> Static component factories
      * must not be registered outside of this method.
      *
-     * @param registry a {@link ChunkComponentFactoryRegistry} for <em>statically declared</em> components
+     * @param registry a {@link LevelComponentFactoryRegistry} for <em>statically declared</em> components
      */
-    void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry);
+    void registerLevelComponentFactories(LevelComponentFactoryRegistry registry);
 }

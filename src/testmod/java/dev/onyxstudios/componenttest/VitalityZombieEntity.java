@@ -20,28 +20,31 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest.vita;
+package dev.onyxstudios.componenttest;
 
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.componentstest.TestStaticComponentInitializer;
+import dev.onyxstudios.componenttest.vita.EntityVita;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.world.World;
 
-public interface Vita extends Component {
-    ComponentType<Vita> TYPE = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.VITA_ID, Vita.class);
-    ComponentType<Vita> ALT_TYPE = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
-    
-    static <T> Vita get(T provider) {
-        return TYPE.get(provider);
+import javax.annotation.Nonnull;
+
+public class VitalityZombieEntity extends ZombieEntity {
+    public VitalityZombieEntity(EntityType<? extends ZombieEntity> type, World world) {
+        super(type, world);
     }
 
-    int getVitality();
-    void setVitality(int value);
-    default void transferTo(Vita dest, int amount) {
-        int sourceVitality = this.getVitality();
-        int actualAmount = Math.min(sourceVitality, amount);
-        this.setVitality(sourceVitality - actualAmount);
-        dest.setVitality(dest.getVitality() + actualAmount);
+    @Override
+    public void tickMovement() {
+        super.tickMovement();
+        if (this.world.isClient) {
+            this.world.addParticle(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY() + 0.3D, this.getZ(), this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D);
+        }
+    }
+
+    @Nonnull
+    public EntityVita createVitaComponent() {
+        return new EntityVita(this, 20);
     }
 }
-

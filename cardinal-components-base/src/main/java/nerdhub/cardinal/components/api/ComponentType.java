@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.api;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
@@ -42,10 +43,8 @@ import java.util.function.Function;
  * @see ComponentRegistry
  */
 @ApiStatus.NonExtendable
-public class ComponentType<T extends Component> {
+public class ComponentType<T extends Component> extends ComponentKey<T> {
 
-    private final Class<T> componentClass;
-    private final Identifier id;
     private final int rawId;
 
     /* ------------ internal methods ------------- */
@@ -56,8 +55,7 @@ public class ComponentType<T extends Component> {
      * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
      */
     protected ComponentType(Identifier id, Class<T> componentClass, int rawId) {
-        this.componentClass = componentClass;
-        this.id = id;
+        super(id, componentClass);
         this.rawId = rawId;
     }
 
@@ -65,25 +63,6 @@ public class ComponentType<T extends Component> {
     @ApiStatus.Internal
     public final int getRawId() {
         return this.rawId;
-    }
-
-    /* ------------- public methods -------------- */
-
-    public final Identifier getId() {
-        return this.id;
-    }
-
-    public final Class<T> getComponentClass() {
-        return this.componentClass;
-    }
-
-    /**
-     * @deprecated use {@code ObjectPath.fromFunction(}{@link #getNullable(ComponentProvider) this::getNullable}{@code )}
-     * (from the cardinal-components-util module)
-     */
-    @Deprecated
-    public final Function<ComponentProvider, T> asComponentPath() {
-        return this::getNullable;
     }
 
     /**
@@ -94,9 +73,28 @@ public class ComponentType<T extends Component> {
      * @see #maybeGet(Object)
      */
     // overridden by generated types
+    // TODO V3 replace argument with ComponentContainer when it is safe to pass those around
+    @ApiStatus.Internal
     @ApiStatus.Experimental
     public @Nullable T getNullable(ComponentProvider provider) {
         return provider.getComponent(this);
+    }
+
+    /* ------------- public methods -------------- */
+
+    /**
+     * @deprecated use {@code ObjectPath.fromFunction(}{@link #getNullable(ComponentProvider) this::getNullable}{@code )}
+     * (from the cardinal-components-util module)
+     */
+    @Deprecated
+    public final Function<ComponentProvider, T> asComponentPath() {
+        return this::getNullable;
+    }
+
+    @Nullable
+    @Override
+    public <V> T getNullable(V provider) {
+        return this.getNullable((ComponentProvider) provider);
     }
 
     /**
@@ -112,9 +110,9 @@ public class ComponentType<T extends Component> {
         assert component == null || this.getComponentClass().isInstance(component);
         if (component == null) {
             try {
-                throw new NoSuchElementException(provider + " provides no component of type " + this.id);
+                throw new NoSuchElementException(provider + " provides no component of type " + this.getId());
             } catch (NullPointerException e) {  // some toString implementations crash in init because the name is not set
-                NoSuchElementException e1 = new NoSuchElementException(this.id + " not available");
+                NoSuchElementException e1 = new NoSuchElementException(this.getId() + " not available");
                 e1.addSuppressed(e);
                 throw e1;
             }
@@ -154,10 +152,5 @@ public class ComponentType<T extends Component> {
     public final <P, C extends T, E extends ComponentCallback<P, ? super C>> ComponentType<T> attach(Event<E> event, Function<P, C> factory) {
         event.register(ComponentsInternals.createCallback(event, this, factory));
         return this;
-    }
-
-    @Override
-    public final String toString() {
-        return this.getClass().getSimpleName() + "[\"" + this.id + "\"]";
     }
 }

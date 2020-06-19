@@ -64,10 +64,10 @@ public final class CcaAsmHelper {
     public static final String BY_RAW_ID;
     public static final String GET_DESC;
     // generated references
-    public static final String STATIC_COMPONENT_CONTAINER = "nerdhub/cardinal/components/_generated_/GeneratedComponentContainer";
+    public static final String STATIC_COMPONENT_CONTAINER = "dev/onyxstudios/cca/_generated_/GeneratedComponentContainer";
     public static final String STATIC_CONTAINER_GETTER_DESC = "()Lnerdhub/cardinal/components/api/component/Component;";
-    public static final String STATIC_COMPONENT_TYPE = "nerdhub/cardinal/components/_generated_/ComponentType";
-    public static final String STATIC_CONTAINER_FACTORY = "nerdhub/cardinal/components/_generated_/GeneratedContainerFactory";
+    public static final String STATIC_COMPONENT_TYPE = "dev/onyxstudios/cca/_generated_/ComponentType";
+    public static final String STATIC_CONTAINER_FACTORY = "dev/onyxstudios/cca/_generated_/GeneratedContainerFactory";
 
     static {
         try {

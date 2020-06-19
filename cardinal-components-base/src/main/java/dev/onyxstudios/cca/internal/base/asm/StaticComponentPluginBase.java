@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
-import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
@@ -37,6 +36,8 @@ import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
 import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Label;
@@ -50,15 +51,13 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class StaticComponentPluginBase<T, I extends StaticComponentInitializer, F> extends LazyDispatcher {
+public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher {
     private static final String FOR_EACH_DESC;
     private static final String FAST_COMPONENT_CONTAINER_CTOR_DESC;
     private static final String CAN_BE_ASSIGNED_DESC;
@@ -81,15 +80,13 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
     private final Map<Identifier, F> componentFactories = new LinkedHashMap<>();
     private final Class<T> providerClass;
     private final String implSuffix;
-    private final Class<I> initializerType;
     private Class<? extends DynamicContainerFactory<T, ?>> containerFactoryClass;
 
-    protected StaticComponentPluginBase(String likelyInitTrigger, Class<T> providerClass, Class<? super F> componentFactoryType, Class<I> initializerType, String implSuffix) {
+    protected StaticComponentPluginBase(String likelyInitTrigger, Class<T> providerClass, Class<? super F> componentFactoryType, String implSuffix) {
         super(likelyInitTrigger);
         this.componentFactoryType = componentFactoryType;
         this.providerClass = providerClass;
         this.implSuffix = implSuffix;
-        this.initializerType = initializerType;
     }
 
     /**
@@ -132,7 +129,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
         String componentFieldDescriptor = Type.getDescriptor(Component.class);
         String factoryFieldDescriptor = Type.getDescriptor(componentFactoryType);
 
-/*      TODO enable when dynamic components are no more
+/*      TODO V3 enable static keyset optimization when dynamic components are no more
         classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "componentTypes", "Ljava/util/Set;", null, null);
         MethodVisitor keySet = classNode.visitMethod(Opcodes.ACC_PUBLIC, "keySet", "()Ljava/util/Set;", null, null);
         keySet.visitFieldInsn(Opcodes.GETSTATIC, containerImplName, "componentTypes", "Ljava/util/Set;");
@@ -484,7 +481,7 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
 
     @Override
     protected void init() {
-        CcaBootstrap.INSTANCE.processSpecializedInitializers(this.initializerType, (entrypoint, provider) -> this.dispatchRegistration(entrypoint));
+        processInitializers(this.getEntrypoints(), this::dispatchRegistration);
 
         try {
             Class<? extends ComponentContainer<?>> containerCls = spinComponentContainer(this.componentFactoryType, this.componentFactories, this.implSuffix);
@@ -493,6 +490,19 @@ public abstract class StaticComponentPluginBase<T, I extends StaticComponentInit
             throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + this.providerClass, e);
         }
     }
+
+    public static <I> void processInitializers(Collection<EntrypointContainer<I>> entrypoints, Consumer<I> action) {
+        for (EntrypointContainer<I> entrypoint : entrypoints) {
+            try {
+                action.accept(entrypoint.getEntrypoint());
+            } catch (Throwable e) {
+                ModMetadata metadata = entrypoint.getProvider().getMetadata();
+                throw new StaticComponentLoadingException(String.format("Exception while registering static component factories for %s (%s)", metadata.getName(), metadata.getId()), e);
+            }
+        }
+    }
+
+    protected abstract Collection<EntrypointContainer<I>> getEntrypoints();
 
     protected abstract void dispatchRegistration(I entrypoint);
 

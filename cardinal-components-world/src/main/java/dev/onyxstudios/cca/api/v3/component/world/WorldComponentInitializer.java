@@ -20,10 +20,20 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
-package nerdhub.cardinal.componentstest.vita;
+package dev.onyxstudios.cca.api.v3.component.world;
 
-import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.ApiStatus;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+/**
+ * Entrypoint getting invoked to register <em>static</em> world component factories.
+ *
+ * <p>The entrypoint is exposed as {@code cardinal-components-world} in the mod json and runs for any environment.
+ * It usually executes right before the first {@link World} instance is created.
+ *
+ * @since 2.4.0
+ */
+@ApiStatus.Experimental
+public interface WorldComponentInitializer {
+    void registerWorldComponentFactories(WorldComponentFactoryRegistry registry);
+}

@@ -23,15 +23,17 @@
 package dev.onyxstudios.cca.internal.util;
 
 import com.google.common.reflect.TypeToken;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.util.GenericComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.util.StaticGenericComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.util.GenericComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
-import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.Identifier;
 
@@ -83,27 +85,29 @@ public final class StaticGenericComponentPlugin extends LazyDispatcher implement
     }
 
     @Override
-    public <F> void register(Identifier componentId, Identifier providerId, TypeToken<F> componentFactoryType, F factory) {
-        this.checkLoading(GenericComponentFactoryRegistry.class, "register");
-        Map<Identifier, OwnedObject<?>> specializedMap = this.componentFactories.computeIfAbsent(providerId, t -> new HashMap<>());
-        Object previousFactory = specializedMap.get(componentId);
-        if (previousFactory != null) {
-            throw new StaticComponentLoadingException("Duplicate factory declarations for " + componentId + " on provider '" + providerId + "': " + factory + " and " + previousFactory);
+    protected void init() {
+        for (EntrypointContainer<GenericComponentInitializer> entrypoint : FabricLoader.getInstance().getEntrypointContainers("cardinal-components-util", GenericComponentInitializer.class)) {
+            try {
+                this.currentProvider = entrypoint.getProvider();
+                entrypoint.getEntrypoint().registerGenericComponentFactories(this);
+            } catch (Throwable e) {
+                ModMetadata metadata = entrypoint.getProvider().getMetadata();
+                throw new StaticComponentLoadingException(String.format("Exception while registering static component factories for %s (%s)", metadata.getName(), metadata.getId()), e);
+            } finally {
+                this.currentProvider = null;
+            }
         }
-        specializedMap.put(componentId, new OwnedObject<>(this.currentProvider, componentFactoryType, factory));
     }
 
     @Override
-    protected void init() {
-        CcaBootstrap.INSTANCE.processSpecializedInitializers(StaticGenericComponentInitializer.class,
-            (initializer, provider) -> {
-                try {
-                    this.currentProvider = provider;
-                    initializer.registerGenericComponentFactories(this);
-                } finally {
-                    this.currentProvider = null;
-                }
-            });
+    public <F> void register(ComponentKey<?> type, Identifier providerId, TypeToken<F> factoryType, F factory) {
+        this.checkLoading(GenericComponentFactoryRegistry.class, "register");
+        Map<Identifier, OwnedObject<?>> specializedMap = this.componentFactories.computeIfAbsent(providerId, t -> new HashMap<>());
+        Object previousFactory = specializedMap.get(type.getId());
+        if (previousFactory != null) {
+            throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on provider '" + providerId + "': " + factory + " and " + previousFactory);
+        }
+        specializedMap.put(type.getId(), new OwnedObject<>(this.currentProvider, factoryType, factory));
     }
 
     private static class OwnedObject<T> {

@@ -22,40 +22,48 @@
  */
 package dev.onyxstudios.cca.internal.level;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.level.LevelComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.level.LevelComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.level.StaticLevelComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.level.LevelComponentInitializer;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
-import net.minecraft.util.Identifier;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.world.WorldProperties;
 
+import java.util.Collection;
 import java.util.Objects;
 
-public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<WorldProperties, StaticLevelComponentInitializer, LevelComponentFactory<?>> implements LevelComponentFactoryRegistry {
+public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<WorldProperties, LevelComponentInitializer, LevelComponentFactory<?>> implements LevelComponentFactoryRegistry {
     public static final String LEVEL_IMPL_SUFFIX = "LevelImpl";
 
     public static final StaticLevelComponentPlugin INSTANCE = new StaticLevelComponentPlugin();
 
     private StaticLevelComponentPlugin() {
-        super("loading a world save", WorldProperties.class, LevelComponentFactory.class, StaticLevelComponentInitializer.class, LEVEL_IMPL_SUFFIX);
+        super("loading a world save", WorldProperties.class, LevelComponentFactory.class, LEVEL_IMPL_SUFFIX);
     }
 
     @Override
-    protected void dispatchRegistration(StaticLevelComponentInitializer entrypoint) {
+    protected Collection<EntrypointContainer<LevelComponentInitializer>> getEntrypoints() {
+        return FabricLoader.getInstance().getEntrypointContainers("cardinal-components-level", LevelComponentInitializer.class);
+    }
+
+    @Override
+    protected void dispatchRegistration(LevelComponentInitializer entrypoint) {
         entrypoint.registerLevelComponentFactories(this);
-    }
-
-    @Override
-    public void register(Identifier componentId, LevelComponentFactory<?> factory) {
-        this.checkLoading(LevelComponentFactoryRegistry.class, "register");
-        super.register(componentId, (props) -> Objects.requireNonNull(factory.createForSave(props), "Component factory "+ factory + " for " + componentId + " returned null on " + props));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends DynamicContainerFactory<WorldProperties, Component>> getContainerFactoryClass() {
         return (Class<? extends DynamicContainerFactory<WorldProperties, Component>>) super.getContainerFactoryClass();
+    }
+
+    @Override
+    public <C extends Component> void register(ComponentKey<C> type, LevelComponentFactory<C> factory) {
+        this.checkLoading(LevelComponentFactoryRegistry.class, "register");
+        super.register(type.getId(), (props) -> Objects.requireNonNull(((LevelComponentFactory<?>) factory).createForSave(props), "Component factory "+ factory + " for " + type.getId() + " returned null on " + props));
     }
 }

@@ -22,22 +22,19 @@
  */
 package dev.onyxstudios.cca.api.v3.component.chunk;
 
-import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import net.minecraft.world.chunk.Chunk;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> chunk component factories.
  *
- * <p>The entrypoint, like every {@link StaticComponentInitializer}, is exposed as
- * {@code cardinal-components:static-init} in the mod json and runs for any environment.
+ * <p>The entrypoint is exposed as {@code cardinal-components-chunk} in the mod json and runs for any environment.
  * It usually executes right before the first {@link Chunk} instance is created.
  *
  * @since 2.4.0
  */
-@ApiStatus.ScheduledForRemoval
-@Deprecated
-public interface StaticChunkComponentInitializer extends StaticComponentInitializer {
+@ApiStatus.Experimental
+public interface ChunkComponentInitializer {
     /**
      * Called to register component factories for statically declared component types.
      *

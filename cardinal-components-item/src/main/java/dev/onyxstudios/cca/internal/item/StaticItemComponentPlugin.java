@@ -22,16 +22,19 @@
  */
 package dev.onyxstudios.cca.internal.item;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactoryV2;
-import dev.onyxstudios.cca.api.v3.component.item.StaticItemComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.item.ItemComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
-import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -70,20 +73,11 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     }
 
     @Override
-    public void register(Identifier componentId, @Nullable Identifier itemId, ItemComponentFactoryV2<?> factory) {
-        this.checkLoading(ItemComponentFactoryRegistry.class, "register");
-        Map<Identifier, ItemComponentFactoryV2<?>> specializedMap = this.componentFactories.computeIfAbsent(itemId, t -> new HashMap<>());
-        ItemComponentFactoryV2<?> previousFactory = specializedMap.get(componentId);
-        if (previousFactory != null) {
-            throw new StaticComponentLoadingException("Duplicate factory declarations for " + componentId + " on " + (itemId == null ? "every item" : "item '" + itemId + "'") + ": " + factory + " and " + previousFactory);
-        }
-        specializedMap.put(componentId, (item, stack) -> Objects.requireNonNull(factory.createForStack(item, stack), "Component factory "+ factory + " for " + componentId + " returned null on " + stack));
-    }
-
-    @Override
     protected void init() {
-        CcaBootstrap.INSTANCE.processSpecializedInitializers(StaticItemComponentInitializer.class,
-            (initializer, provider) -> initializer.registerItemComponentFactories(this));
+        StaticComponentPluginBase.processInitializers(
+            FabricLoader.getInstance().getEntrypointContainers("cardinal-components-item", ItemComponentInitializer.class),
+            initializer -> initializer.registerItemComponentFactories(this)
+        );
         Map<Identifier, ItemComponentFactoryV2<?>> wildcardMap = this.componentFactories.getOrDefault(null, Collections.emptyMap());
         try {
             Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, wildcardMap, WILDARD_IMPL_SUFFIX);
@@ -103,5 +97,21 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
                 throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entry.getKey(), e);
             }
         }
+    }
+
+    @Override
+    public <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, @javax.annotation.Nullable Identifier itemId, ItemComponentFactory<C> factory) {
+        this.register(type, itemId, (ItemComponentFactoryV2<C>) factory);
+    }
+
+    @Override
+    public <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, @javax.annotation.Nullable Identifier itemId, ItemComponentFactoryV2<C> factory) {
+        this.checkLoading(ItemComponentFactoryRegistry.class, "register");
+        Map<Identifier, ItemComponentFactoryV2<?>> specializedMap = this.componentFactories.computeIfAbsent(itemId, t -> new HashMap<>());
+        ItemComponentFactoryV2<?> previousFactory = specializedMap.get(type.getId());
+        if (previousFactory != null) {
+            throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + (itemId == null ? "every item" : "item '" + itemId + "'") + ": " + factory + " and " + previousFactory);
+        }
+        specializedMap.put(type.getId(), (item, stack) -> Objects.requireNonNull(((ItemComponentFactoryV2<?>) factory).createForStack(item, stack), "Component factory "+ factory + " for " + type.getId() + " returned null on " + stack));
     }
 }

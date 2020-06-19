@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.component.item;
 
-import nerdhub.cardinal.components.api.ComponentType;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
@@ -46,9 +46,7 @@ public interface ItemComponentFactoryRegistry {
      *  @param itemId      the id of an item to target, or {@code null} to target every stack.
      * @param factory     the factory to use to create components of the given type
      */
-    default <C extends CopyableComponent<?>> void register(ComponentType<? super C> type, @Nullable Identifier itemId, ItemComponentFactory<C> factory) {
-        this.register(type.getId(), itemId, factory);
-    }
+    <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, @Nullable Identifier itemId, ItemComponentFactory<C> factory);
 
     /**
      * Registers an {@link ItemComponentFactoryV2}.
@@ -62,27 +60,5 @@ public interface ItemComponentFactoryRegistry {
      *  @param itemId      the id of an item to target, or {@code null} to target every stack.
      * @param factory     the factory to use to create components of the given type
      */
-    default <C extends CopyableComponent<?>> void register(ComponentType<? super C> type, @Nullable Identifier itemId, ItemComponentFactoryV2<C> factory) {
-        this.register(type.getId(), itemId, factory);
-    }
-
-    /**
-     * Registers an {@link ItemComponentFactory}.
-     *
-     * <p> A {@code null} {@code componentId} works as a wildcard parameter.
-     * A callback registered to the wilcard event is called for every item stack ever
-     * created. For performance reasons, wildcard callbacks should be avoided
-     * where possible. Notably, when registering callbacks for various items,
-     * it is often better to register a separate specialized callback for each one
-     * than a single generic callback with additional checks.
-     *
-     * @param componentId the id of a {@link ComponentType}
-     * @param itemId      the id of an item to target, or {@code null} to target every stack.
-     * @param factory     the factory to use to create components of the given type
-     */
-    default void register(Identifier componentId, @Nullable Identifier itemId, ItemComponentFactory<?> factory) {
-        this.register(componentId, itemId, (ItemComponentFactoryV2<?>) factory);
-    }
-
-    void register(Identifier componentId, @Nullable Identifier itemId, ItemComponentFactoryV2<?> factory);
+    <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, @Nullable Identifier itemId, ItemComponentFactoryV2<C> factory);
 }

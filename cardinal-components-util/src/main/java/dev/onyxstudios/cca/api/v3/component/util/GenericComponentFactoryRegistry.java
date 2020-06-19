@@ -23,7 +23,7 @@
 package dev.onyxstudios.cca.api.v3.component.util;
 
 import com.google.common.reflect.TypeToken;
-import nerdhub.cardinal.components.api.ComponentType;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -32,9 +32,5 @@ import org.jetbrains.annotations.ApiStatus;
  */
 @ApiStatus.Experimental
 public interface GenericComponentFactoryRegistry {
-    default <F> void register(ComponentType<?> type, Identifier providerId, TypeToken<F> factoryType, F factory) {
-        this.register(type.getId(), providerId, factoryType, factory);
-    }
-
-    <F> void register(Identifier componentId, Identifier providerId, TypeToken<F> factoryType, F factory);
+    <F> void register(ComponentKey<?> type, Identifier providerId, TypeToken<F> factoryType, F factory);
 }

@@ -17,7 +17,7 @@ vita available in the chunk.
 
 ## Code map
 
-- `nerdhub.cardinal.componentstest`: root package
+- `dev.onyxstudios.componenttest`: root package
     - `vita`: component classes
         - `Vita`: the interface defining Vita behaviour
         - `BaseVita`: base implementation

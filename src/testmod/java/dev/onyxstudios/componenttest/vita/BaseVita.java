@@ -20,8 +20,9 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest.vita;
+package dev.onyxstudios.componenttest.vita;
 
+import dev.onyxstudios.componenttest.TestComponents;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
@@ -62,7 +63,7 @@ public class BaseVita implements Vita, TypeAwareComponent, CopyableComponent<Bas
     @Override
     public ComponentType<Vita> getComponentType() {
         // Hardcoded but could be passed in the constructor
-        return Vita.TYPE;
+        return (ComponentType<Vita>) TestComponents.VITA;
     }
 
     @Override

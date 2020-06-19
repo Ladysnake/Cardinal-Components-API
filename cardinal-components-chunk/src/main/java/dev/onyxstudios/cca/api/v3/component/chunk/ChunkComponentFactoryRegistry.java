@@ -22,9 +22,8 @@
  */
 package dev.onyxstudios.cca.api.v3.component.chunk;
 
-import nerdhub.cardinal.components.api.ComponentType;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -37,15 +36,5 @@ public interface ChunkComponentFactoryRegistry {
      *
      * @param factory the factory to use to create components of the given type
      */
-    default <C extends CopyableComponent<?>> void register(ComponentType<? super C> type, ChunkComponentFactory<C> factory) {
-        this.register(type.getId(), factory);
-    }
-
-    /**
-     * Registers a {@link ChunkComponentFactory}.
-     *
-     * @param componentId the id of a {@link ComponentType}
-     * @param factory     the factory to use to create components of the given type
-     */
-    void register(Identifier componentId, ChunkComponentFactory<?> factory);
+    <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, ChunkComponentFactory<C> factory);
 }

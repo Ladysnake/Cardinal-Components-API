@@ -22,9 +22,8 @@
  */
 package dev.onyxstudios.cca.api.v3.component.world;
 
-import nerdhub.cardinal.components.api.ComponentType;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.component.Component;
-import net.minecraft.util.Identifier;
 
 /**
  * @since 2.4.0
@@ -35,15 +34,5 @@ public interface WorldComponentFactoryRegistry {
      *
      * @param factory the factory to use to create components of the given type
      */
-    default <C extends Component> void register(ComponentType<C> type, WorldComponentFactory<? extends C> factory) {
-        this.register(type.getId(), factory);
-    }
-
-    /**
-     * Registers a {@link WorldComponentFactory}.
-     *
-     * @param componentId the id of a {@link ComponentType}
-     * @param factory     the factory to use to create components of the given type
-     */
-    void register(Identifier componentId, WorldComponentFactory<?> factory);
+    <C extends Component> void register(ComponentKey<C> type, WorldComponentFactory<? extends C> factory);
 }

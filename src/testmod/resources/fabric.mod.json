@@ -8,13 +8,36 @@
     "side": "universal",
     "entrypoints": {
         "main": [
-            "nerdhub.cardinal.componentstest.CardinalComponentsTest::init"
+            "dev.onyxstudios.componenttest.CardinalComponentsTest::init"
         ],
         "client": [
-            "nerdhub.cardinal.componentstest.CCATestClient::clientInit"
+            "dev.onyxstudios.componenttest.CCATestClient::clientInit"
         ],
         "cardinal-components:static-init": [
-            "nerdhub.cardinal.componentstest.TestStaticComponentInitializer"
+            "dev.onyxstudios.componenttest.TestStaticComponentInitializer"
+        ],
+        "cardinal-components-chunk": [
+            "dev.onyxstudios.componenttest.TestComponents"
+        ],
+        "cardinal-components-entity": [
+            "dev.onyxstudios.componenttest.TestComponents"
+        ],
+        "cardinal-components-item": [
+            "dev.onyxstudios.componenttest.TestComponents"
+        ],
+        "cardinal-components-level": [
+            "dev.onyxstudios.componenttest.TestComponents"
+        ],
+        "cardinal-components-util": [
+            "dev.onyxstudios.componenttest.TestComponents"
+        ],
+        "cardinal-components-world": [
+            "dev.onyxstudios.componenttest.TestComponents"
+        ]
+    },
+    "custom": {
+        "cardinal-components": [
+            "componenttest:vita"
         ]
     },
     "depends": {

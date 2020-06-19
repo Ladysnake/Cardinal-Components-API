@@ -24,6 +24,7 @@ package dev.onyxstudios.cca.api.v3.component.world;
 
 import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> world component factories.
@@ -34,6 +35,8 @@ import net.minecraft.world.World;
  *
  * @since 2.4.0
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public interface StaticWorldComponentInitializer extends StaticComponentInitializer {
     void registerWorldComponentFactories(WorldComponentFactoryRegistry registry);
 }

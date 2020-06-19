@@ -20,10 +20,13 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
-package nerdhub.cardinal.componentstest;
+package dev.onyxstudios.componenttest;
 
-import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
+import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityRendererRegistry;
+import net.minecraft.client.render.entity.ZombieEntityRenderer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+public class CCATestClient {
+    public static void clientInit() {
+        EntityRendererRegistry.INSTANCE.register(CardinalComponentsTest.VITALITY_ZOMBIE, (entityRenderDispatcher, context) -> new ZombieEntityRenderer(entityRenderDispatcher));
+    }
+}

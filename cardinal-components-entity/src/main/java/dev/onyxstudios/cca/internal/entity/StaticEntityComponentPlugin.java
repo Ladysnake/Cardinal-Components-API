@@ -22,17 +22,18 @@
  */
 package dev.onyxstudios.cca.internal.entity;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.entity.StaticEntityComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
-import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
@@ -92,20 +93,22 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
 
     @Override
     protected void init() {
-        CcaBootstrap.INSTANCE.processSpecializedInitializers(StaticEntityComponentInitializer.class,
-            (entrypoint, provider) -> entrypoint.registerEntityComponentFactories(this));
+        StaticComponentPluginBase.processInitializers(
+            FabricLoader.getInstance().getEntrypointContainers("cardinal-components-entity", EntityComponentInitializer.class),
+            initializer -> initializer.registerEntityComponentFactories(this)
+        );
     }
 
     @Override
-    public <E extends Entity> void register(Identifier componentId, Class<E> target, EntityComponentFactory<?, E> factory) {
+    public <C extends Component, E extends Entity> void register(ComponentKey<C> type, Class<E> target, EntityComponentFactory<C, E> factory) {
         this.checkLoading(EntityComponentFactoryRegistry.class, "register");
         Map<Identifier, EntityComponentFactory<?, ?>> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
-        EntityComponentFactory<?, ?> previousFactory = specializedMap.get(componentId);
+        EntityComponentFactory<?, ?> previousFactory = specializedMap.get(type.getId());
         if (previousFactory != null) {
-            throw new StaticComponentLoadingException("Duplicate factory declarations for " + componentId + " on " + target + ": " + factory + " and " + previousFactory);
+            throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + target + ": " + factory + " and " + previousFactory);
         }
-        EntityComponentFactory<Component, E> checked = entity -> Objects.requireNonNull(factory.createForEntity(entity), "Component factory "+ factory + " for " + componentId + " returned null on " + entity.getClass().getSimpleName());
-        specializedMap.put(componentId, checked);
+        EntityComponentFactory<Component, E> checked = entity -> Objects.requireNonNull(((EntityComponentFactory<?, E>) factory).createForEntity(entity), "Component factory "+ factory + " for " + type.getId() + " returned null on " + entity.getClass().getSimpleName());
+        specializedMap.put(type.getId(), checked);
     }
 
     static class Key {

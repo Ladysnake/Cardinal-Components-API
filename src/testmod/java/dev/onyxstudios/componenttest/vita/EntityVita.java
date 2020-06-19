@@ -20,22 +20,29 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.level;
+package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
-import org.jetbrains.annotations.ApiStatus;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 
-/**
- * @since 2.4.0
- */
-@ApiStatus.Experimental
-public interface LevelComponentFactoryRegistry {
-    /**
-     * Registers a {@link LevelComponentFactory}.
-     *
-     * @param factory the factory to use to create components of the given type
-     */
-    <C extends Component> void register(ComponentKey<C> type, LevelComponentFactory<C> factory);
+public class EntityVita extends BaseVita {
+    protected LivingEntity owner;
 
+    public EntityVita(LivingEntity owner, int baseVitality) {
+        this.owner = owner;
+        this.vitality = baseVitality;
+    }
+
+    @Override
+    public void setVitality(int value) {
+        super.setVitality(value);
+        if (!this.owner.world.isClient) {
+            if (this.getVitality() == 0) {
+                owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
+            } else if (this.getVitality() > 10) {
+                owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1000));
+            }
+        }
+    }
 }
