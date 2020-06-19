@@ -60,6 +60,10 @@ public abstract class LazyDispatcher {
         throw new IllegalStateException("Circular loading issue, a mod is probably "  + this.likelyInitTrigger + " in the wrong place");
     }
 
+    protected boolean requiresInitialization() {
+        return this.requiresInitialization;
+    }
+
     @ApiStatus.OverrideOnly
     protected abstract void init();
 

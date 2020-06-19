@@ -22,32 +22,41 @@
  */
 package dev.onyxstudios.cca.internal.world;
 
-import dev.onyxstudios.cca.api.v3.component.world.StaticWorldComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.world.WorldComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.world.WorldComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.component.world.WorldComponentInitializer;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import net.minecraft.util.Identifier;
+import nerdhub.cardinal.components.api.component.Component;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.world.World;
 
+import java.util.Collection;
 import java.util.Objects;
 
-public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<World, StaticWorldComponentInitializer, WorldComponentFactory<?>> implements WorldComponentFactoryRegistry {
+public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<World, WorldComponentInitializer, WorldComponentFactory<?>> implements WorldComponentFactoryRegistry {
     public static final String WORLD_IMPL_SUFFIX = "WorldImpl";
 
     public static final StaticWorldComponentPlugin INSTANCE = new StaticWorldComponentPlugin();
 
     private StaticWorldComponentPlugin() {
-        super("loading a world", World.class, WorldComponentFactory.class, StaticWorldComponentInitializer.class, WORLD_IMPL_SUFFIX);
+        super("loading a world", World.class, WorldComponentFactory.class, WORLD_IMPL_SUFFIX);
     }
 
     @Override
-    protected void dispatchRegistration(StaticWorldComponentInitializer entrypoint) {
+    protected Collection<EntrypointContainer<WorldComponentInitializer>> getEntrypoints() {
+        return FabricLoader.getInstance().getEntrypointContainers("cardinal-components-world", WorldComponentInitializer.class);
+    }
+
+    @Override
+    protected void dispatchRegistration(WorldComponentInitializer entrypoint) {
         entrypoint.registerWorldComponentFactories(this);
     }
 
     @Override
-    public void register(Identifier componentId, WorldComponentFactory<?> factory) {
+    public <C extends Component> void register(ComponentKey<C> type, WorldComponentFactory<? extends C> factory) {
         this.checkLoading(WorldComponentFactoryRegistry.class, "register");
-        super.register(componentId, (world) -> Objects.requireNonNull(factory.createForWorld(world), "Component factory "+ factory + " for " + componentId + " returned null on " + world.getClass().getSimpleName()));
+        super.register(type.getId(), (world) -> Objects.requireNonNull(((WorldComponentFactory<?>) factory).createForWorld(world), "Component factory "+ factory + " for " + type.getId() + " returned null on " + world.getClass().getSimpleName()));
     }
 }

@@ -20,27 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest.vita;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package dev.onyxstudios.componenttest.vita;
 
-import nerdhub.cardinal.components.api.util.sync.ChunkSyncedComponent;
-import net.minecraft.world.chunk.Chunk;
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-// if synchronization was not needed, BaseVita could have been used directly
-public class ChunkVita extends BaseVita implements ChunkSyncedComponent<BaseVita> {
-    private final Chunk chunk;
-
-    public ChunkVita(Chunk chunk) {
-        this.chunk = chunk;
-    }
-
-    @Override
-    public void setVitality(int value) {
-        super.setVitality(value);
-        this.sync();
-    }
-
-    @Override
-    public Chunk getChunk() {
-        return this.chunk;
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;

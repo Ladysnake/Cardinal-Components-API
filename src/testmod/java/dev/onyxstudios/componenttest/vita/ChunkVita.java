@@ -20,31 +20,27 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.chunk;
+package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
+import nerdhub.cardinal.components.api.util.sync.ChunkSyncedComponent;
 import net.minecraft.world.chunk.Chunk;
-import org.jetbrains.annotations.ApiStatus;
 
-/**
- * Entrypoint getting invoked to register <em>static</em> chunk component factories.
- *
- * <p>The entrypoint, like every {@link StaticComponentInitializer}, is exposed as
- * {@code cardinal-components:static-init} in the mod json and runs for any environment.
- * It usually executes right before the first {@link Chunk} instance is created.
- *
- * @since 2.4.0
- */
-@ApiStatus.ScheduledForRemoval
-@Deprecated
-public interface StaticChunkComponentInitializer extends StaticComponentInitializer {
-    /**
-     * Called to register component factories for statically declared component types.
-     *
-     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
-     * must not be registered outside of this method.
-     *
-     * @param registry a {@link ChunkComponentFactoryRegistry} for <em>statically declared</em> components
-     */
-    void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry);
+// if synchronization was not needed, BaseVita could have been used directly
+public class ChunkVita extends BaseVita implements ChunkSyncedComponent<BaseVita> {
+    private final Chunk chunk;
+
+    public ChunkVita(Chunk chunk) {
+        this.chunk = chunk;
+    }
+
+    @Override
+    public void setVitality(int value) {
+        super.setVitality(value);
+        this.sync();
+    }
+
+    @Override
+    public Chunk getChunk() {
+        return this.chunk;
+    }
 }

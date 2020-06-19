@@ -20,31 +20,27 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest;
+package dev.onyxstudios.cca.api.v3.component.util;
 
-import nerdhub.cardinal.componentstest.vita.EntityVita;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.world.World;
+import org.jetbrains.annotations.ApiStatus;
 
-import javax.annotation.Nonnull;
-
-public class VitalityZombieEntity extends ZombieEntity {
-    public VitalityZombieEntity(EntityType<? extends ZombieEntity> type, World world) {
-        super(type, world);
-    }
-
-    @Override
-    public void tickMovement() {
-        super.tickMovement();
-        if (this.world.isClient) {
-            this.world.addParticle(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY() + 0.3D, this.getZ(), this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D);
-        }
-    }
-
-    @Nonnull
-    public EntityVita createVitaComponent() {
-        return new EntityVita(this, 20);
-    }
+/**
+ * Entrypoint getting invoked to register <em>static</em> generic (typically for third party providers)
+ * component factories.
+ *
+ * <p>The entrypoint is exposed as {@code "cardinal-components-util"} in the mod json and runs for any environment.
+ *
+ * @since 2.4.0
+ */
+@ApiStatus.Experimental
+public interface GenericComponentInitializer {
+    /**
+     * Called to register component factories for statically declared component types.
+     *
+     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
+     * must not be registered outside of this method.
+     *
+     * @param registry a {@link GenericComponentFactoryRegistry} for <em>statically declared</em> components
+     */
+    void registerGenericComponentFactories(GenericComponentFactoryRegistry registry);
 }

@@ -20,14 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest;
+package dev.onyxstudios.componenttest;
 
-import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import nerdhub.cardinal.components.api.event.ItemComponentCallback;
-import nerdhub.cardinal.componentstest.vita.AmbientVita;
-import nerdhub.cardinal.componentstest.vita.BaseVita;
-import nerdhub.cardinal.componentstest.vita.Vita;
+import dev.onyxstudios.componenttest.vita.AmbientVita;
+import dev.onyxstudios.componenttest.vita.Vita;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -48,7 +44,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class VitalityStickItem extends Item implements ItemComponentCallback {
+public class VitalityStickItem extends Item {
     public VitalityStickItem(Settings settings) {
         super(settings);
     }
@@ -76,7 +72,7 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     @Override
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity holder) {
         // The entity may not have the component, but the stack always does.
-        Vita.TYPE.maybeGet(target)
+        TestComponents.VITA.maybeGet(target)
                 .ifPresent(v -> v.transferTo(Vita.get(stack), 1));
         return true;
     }
@@ -85,20 +81,15 @@ public class VitalityStickItem extends Item implements ItemComponentCallback {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> lines, TooltipContext ctx) {
         super.appendTooltip(stack, world, lines, ctx);
-        lines.add(new TranslatableText("componenttest:tooltip.vitality", Vita.TYPE.get(stack).getVitality()));
+        lines.add(new TranslatableText("componenttest:tooltip.vitality", TestComponents.VITA.get(stack).getVitality()));
         PlayerEntity holder = MinecraftClient.getInstance().player;
         if (holder != null) {
-            lines.add(new TranslatableText("componenttest:tooltip.self_vitality", Vita.TYPE.get(holder).getVitality()));
+            lines.add(new TranslatableText("componenttest:tooltip.self_vitality", TestComponents.VITA.get(holder).getVitality()));
         }
     }
 
     @Override
     public boolean canMine(BlockState block, World world, BlockPos pos, PlayerEntity player) {
         return !player.isCreative();
-    }
-
-    @Override
-    public void initComponents(ItemStack stack, ComponentContainer<CopyableComponent<?>> components) {
-        components.put(Vita.TYPE, new BaseVita());
     }
 }

@@ -20,98 +20,89 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest;
+package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.chunk.ChunkComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.chunk.StaticChunkComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.entity.StaticEntityComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.item.StaticItemComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.item.ItemComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.level.LevelComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.level.StaticLevelComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.level.LevelComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.util.GenericComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.util.StaticGenericComponentInitializer;
-import dev.onyxstudios.cca.api.v3.component.world.StaticWorldComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.util.GenericComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.world.WorldComponentFactoryRegistry;
-import nerdhub.cardinal.componentstest.vita.*;
+import dev.onyxstudios.cca.api.v3.component.world.WorldComponentInitializer;
+import dev.onyxstudios.componenttest.vita.*;
+import nerdhub.cardinal.components.api.ComponentRegistry;
+import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
-public final class TestStaticComponentInitializer implements
-    StaticEntityComponentInitializer,
-    StaticChunkComponentInitializer,
-    StaticLevelComponentInitializer,
-    StaticWorldComponentInitializer,
-    StaticGenericComponentInitializer,
-    StaticItemComponentInitializer {
+public final class TestComponents implements
+    EntityComponentInitializer,
+    ChunkComponentInitializer,
+    LevelComponentInitializer,
+    WorldComponentInitializer,
+    GenericComponentInitializer,
+    ItemComponentInitializer {
 
-    public static final Identifier VITA_ID = new Identifier("componenttest:vita");
-    public static final Identifier ALT_VITA_ID = new Identifier("componenttest:alt_vita");
     public static final Identifier CUSTOM_PROVIDER_1 = new Identifier("componenttest:custom/1");
     public static final Identifier CUSTOM_PROVIDER_2 = new Identifier("componenttest:custom/2");
     public static final Identifier CUSTOM_PROVIDER_3 = new Identifier("componenttest:custom/3");
-    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>>() {
-    };
+
+    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>>() {};
+
+    public static final ComponentKey<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(CardinalComponentsTest.id("vita"), Vita.class);
+    public static final ComponentKey<Vita> ALT_VITA = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
+    public static final ComponentType<Vita> OLD__VITA = ComponentRegistry.INSTANCE.registerIfAbsent(CardinalComponentsTest.id("old_vita"), Vita.class);
 
     private static BaseVita createForEntity(LivingEntity e) {
         return new BaseVita((int) (Math.random() * 10));
     }
 
     @Override
-    public Collection<Identifier> getSupportedComponentTypes() {
-        return Arrays.asList(VITA_ID, ALT_VITA_ID);
-    }
-
-    @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.register(Vita.ALT_TYPE, HostileEntity.class, e -> new BaseVita());
-        registry.register(Vita.TYPE, LivingEntity.class, TestStaticComponentInitializer::createForEntity);
-        registry.register(Vita.TYPE, PlayerEntity.class, PlayerVita::new);
-        registry.register(Vita.TYPE, VitalityZombieEntity.class, VitalityZombieEntity::createVitaComponent);
+        registry.register(ALT_VITA, HostileEntity.class, e -> new BaseVita());
+        registry.register(VITA, LivingEntity.class, TestComponents::createForEntity);
+        registry.register(VITA, PlayerEntity.class, PlayerVita::new);
+        registry.register(VITA, VitalityZombieEntity.class, VitalityZombieEntity::createVitaComponent);
     }
 
     @Override
     public void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry) {
-        registry.register(Vita.TYPE, ChunkVita::new);
+        registry.register(VITA, ChunkVita::new);
     }
 
     @Override
     public void registerLevelComponentFactories(LevelComponentFactoryRegistry registry) {
-        registry.register(Vita.TYPE, properties -> new AmbientVita.LevelVita());
+        registry.register(VITA, properties -> new AmbientVita.LevelVita());
     }
 
     @Override
     public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
-        registry.register(Vita.TYPE, AmbientVita.WorldVita::new);
+        registry.register(VITA, AmbientVita.WorldVita::new);
     }
 
     @Override
     public void registerGenericComponentFactories(GenericComponentFactoryRegistry registry) {
         BiFunction<UUID, PlayerEntity, BaseVita> createForThirdParty = (uuid, p) -> new BaseVita();
-        registry.register(Vita.TYPE, CUSTOM_PROVIDER_1, CUSTOM_FACTORY_TYPE, createForThirdParty);
-        registry.register(Vita.TYPE, CUSTOM_PROVIDER_2, CUSTOM_FACTORY_TYPE, createForThirdParty);
-        registry.register(Vita.TYPE, CUSTOM_PROVIDER_3, CUSTOM_FACTORY_TYPE, createForThirdParty);
+        registry.register(VITA, CUSTOM_PROVIDER_1, CUSTOM_FACTORY_TYPE, createForThirdParty);
+        registry.register(VITA, CUSTOM_PROVIDER_2, CUSTOM_FACTORY_TYPE, createForThirdParty);
+        registry.register(VITA, CUSTOM_PROVIDER_3, CUSTOM_FACTORY_TYPE, createForThirdParty);
     }
 
     @Override
     public void registerItemComponentFactories(ItemComponentFactoryRegistry registry) {
-        registry.register(Vita.TYPE, null, (item, stack) -> new BaseVita(stack.getCount()));
-        registry.register(Vita.TYPE, CardinalComponentsTest.VITA_STICK_ID, stack -> new BaseVita());
+        registry.register(VITA, null, (item, stack) -> new BaseVita(stack.getCount()));
+        registry.register(VITA, CardinalComponentsTest.VITA_STICK_ID, stack -> new BaseVita());
     }
-
-    @Override
-    public void finalizeStaticBootstrap() {
-        CardinalComponentsTest.LOGGER.info("CCA Bootstrap complete!");
-        CardinalComponentsTest.TestCallback.EVENT.register((uuid, p, components) -> components.put(Vita.ALT_TYPE, new BaseVita()));
-    }
-
 }

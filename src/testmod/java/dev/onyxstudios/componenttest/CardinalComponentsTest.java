@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.componentstest;
+package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.component.util.ComponentContainerMetafactory;
@@ -29,9 +29,6 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
-import nerdhub.cardinal.components.api.util.EntityComponents;
-import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
-import nerdhub.cardinal.componentstest.vita.Vita;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -75,15 +72,14 @@ public class CardinalComponentsTest {
     public static void init() {
         LOGGER.info("Hello, Components!");
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
-        EntityComponents.setRespawnCopyStrategy(Vita.TYPE, RespawnCopyStrategy.ALWAYS_COPY);
         LOGGER.info(ComponentContainerMetafactory.metafactory(
-            TestStaticComponentInitializer.CUSTOM_PROVIDER_1,
+            TestComponents.CUSTOM_PROVIDER_1,
             TypeToken.of(TestContainerFactory.class),
             new TypeToken<BiFunction<UUID, PlayerEntity, ? extends Component>>() {}
         ).create(UUID.randomUUID(), null));
         try {
             LOGGER.info(ComponentContainerMetafactory.metafactory(
-                TestStaticComponentInitializer.CUSTOM_PROVIDER_1,
+                TestComponents.CUSTOM_PROVIDER_1,
                 TypeToken.of(TestContainerFactory.class),
                 new TypeToken<BiFunction<UUID, PlayerEntity, ? extends Component>>() {}
             ).create(UUID.randomUUID(), null));
@@ -91,21 +87,21 @@ public class CardinalComponentsTest {
         } catch (IllegalStateException ignored) { }
         try {
             LOGGER.info(ComponentContainerMetafactory.metafactory(
-                TestStaticComponentInitializer.CUSTOM_PROVIDER_2,
+                TestComponents.CUSTOM_PROVIDER_2,
                 new TypeToken<BiFunction<UUID, PlayerEntity, ? extends ComponentContainer<?>>>() {},
                 new TypeToken<BiFunction<UUID, PlayerEntity, ? extends SyncedComponent>>() {}
             ).apply(UUID.randomUUID(), null));
             assert false : "Registered factory does not return " + SyncedComponent.class;
         } catch (StaticComponentLoadingException ignored) { }
         LOGGER.info(ComponentContainerMetafactory.metafactory(
-            TestStaticComponentInitializer.CUSTOM_PROVIDER_2,
+            TestComponents.CUSTOM_PROVIDER_2,
             new TypeToken<BiFunction<UUID, PlayerEntity, ComponentContainer<? extends CopyableComponent<?>>>>() {},
             new TypeToken<BiFunction<UUID, PlayerEntity, ? extends CopyableComponent<?>>>() {}
         ).apply(UUID.randomUUID(), null));
         LOGGER.info(ComponentContainerMetafactory.metafactory(
-            TestStaticComponentInitializer.CUSTOM_PROVIDER_3,
+            TestComponents.CUSTOM_PROVIDER_3,
             TypeToken.of(TestContainerFactory.class),
-            TestStaticComponentInitializer.CUSTOM_FACTORY_TYPE,
+            TestComponents.CUSTOM_FACTORY_TYPE,
             TestCallback.class,
             TestCallback.EVENT
         ).create(UUID.randomUUID(), null));

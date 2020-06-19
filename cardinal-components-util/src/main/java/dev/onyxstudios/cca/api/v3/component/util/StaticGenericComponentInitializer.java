@@ -34,7 +34,8 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @since 2.4.0
  */
-@ApiStatus.Experimental
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public interface StaticGenericComponentInitializer extends StaticComponentInitializer {
     /**
      * Called to register component factories for statically declared component types.

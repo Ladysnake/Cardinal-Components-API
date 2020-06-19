@@ -22,40 +22,48 @@
  */
 package dev.onyxstudios.cca.internal.chunk;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.chunk.ChunkComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.chunk.ChunkComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.chunk.StaticChunkComponentInitializer;
+import dev.onyxstudios.cca.api.v3.component.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import net.minecraft.util.Identifier;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.world.chunk.Chunk;
 
+import java.util.Collection;
 import java.util.Objects;
 
-public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<Chunk, StaticChunkComponentInitializer, ChunkComponentFactory<?>> implements ChunkComponentFactoryRegistry {
+public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<Chunk, ChunkComponentInitializer, ChunkComponentFactory<?>> implements ChunkComponentFactoryRegistry {
     public static final String CHUNK_IMPL_SUFFIX = "ChunkImpl";
 
     public static final StaticChunkComponentPlugin INSTANCE = new StaticChunkComponentPlugin();
 
     private StaticChunkComponentPlugin() {
-        super("loading a chunk", Chunk.class, ChunkComponentFactory.class, StaticChunkComponentInitializer.class, CHUNK_IMPL_SUFFIX);
+        super("loading a chunk", Chunk.class, ChunkComponentFactory.class, CHUNK_IMPL_SUFFIX);
     }
 
     @Override
-    protected void dispatchRegistration(StaticChunkComponentInitializer entrypoint) {
+    protected Collection<EntrypointContainer<ChunkComponentInitializer>> getEntrypoints() {
+        return FabricLoader.getInstance().getEntrypointContainers("cardinal-components-chunk", ChunkComponentInitializer.class);
+    }
+
+    @Override
+    protected void dispatchRegistration(ChunkComponentInitializer entrypoint) {
         entrypoint.registerChunkComponentFactories(this);
-    }
-
-    @Override
-    public void register(Identifier componentId, ChunkComponentFactory<?> factory) {
-        this.checkLoading(ChunkComponentFactoryRegistry.class, "register");
-        super.register(componentId, (chunk) -> Objects.requireNonNull(factory.createForChunk(chunk), "Component factory "+ factory + " for " + componentId + " returned null on " + chunk.getClass().getSimpleName()));
     }
 
     @Override
     public Class<? extends DynamicContainerFactory<Chunk, CopyableComponent<?>>> getContainerFactoryClass() {
         @SuppressWarnings("unchecked") Class<? extends DynamicContainerFactory<Chunk, CopyableComponent<?>>> ret = (Class<? extends DynamicContainerFactory<Chunk, CopyableComponent<?>>>) super.getContainerFactoryClass();
         return ret;
+    }
+
+    @Override
+    public <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, ChunkComponentFactory<C> factory) {
+        this.checkLoading(ChunkComponentFactoryRegistry.class, "register");
+        super.register(type.getId(), (chunk) -> Objects.requireNonNull(((ChunkComponentFactory<?>) factory).createForChunk(chunk), "Component factory "+ factory + " for " + type.getId() + " returned null on " + chunk.getClass().getSimpleName()));
     }
 }

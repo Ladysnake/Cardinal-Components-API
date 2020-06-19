@@ -20,31 +20,33 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.chunk;
+package dev.onyxstudios.componenttest;
 
 import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
-import net.minecraft.world.chunk.Chunk;
-import org.jetbrains.annotations.ApiStatus;
+import dev.onyxstudios.componenttest.vita.BaseVita;
+import dev.onyxstudios.componenttest.vita.Vita;
+import nerdhub.cardinal.components.api.ComponentRegistry;
+import nerdhub.cardinal.components.api.ComponentType;
+import net.minecraft.util.Identifier;
 
-/**
- * Entrypoint getting invoked to register <em>static</em> chunk component factories.
- *
- * <p>The entrypoint, like every {@link StaticComponentInitializer}, is exposed as
- * {@code cardinal-components:static-init} in the mod json and runs for any environment.
- * It usually executes right before the first {@link Chunk} instance is created.
- *
- * @since 2.4.0
- */
-@ApiStatus.ScheduledForRemoval
-@Deprecated
-public interface StaticChunkComponentInitializer extends StaticComponentInitializer {
-    /**
-     * Called to register component factories for statically declared component types.
-     *
-     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
-     * must not be registered outside of this method.
-     *
-     * @param registry a {@link ChunkComponentFactoryRegistry} for <em>statically declared</em> components
-     */
-    void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry);
+import java.util.Collection;
+import java.util.Collections;
+
+public final class TestStaticComponentInitializer implements StaticComponentInitializer {
+
+    // note: the actual ComponentKey must not be registered in this class' <clinit>, to avoid circular initialization
+    public static final Identifier ALT_VITA_ID = new Identifier("componenttest:alt_vita");
+
+    @Override
+    public Collection<Identifier> getSupportedComponentTypes() {
+        return Collections.singleton(ALT_VITA_ID);
+    }
+
+    @Override
+    public void finalizeStaticBootstrap() {
+        CardinalComponentsTest.LOGGER.info("CCA Bootstrap complete!");
+        ComponentType<Vita> altVita = ComponentRegistry.INSTANCE.registerIfAbsent(ALT_VITA_ID, Vita.class);
+        CardinalComponentsTest.TestCallback.EVENT.register((uuid, p, components) -> components.put(altVita, new BaseVita()));
+    }
+
 }

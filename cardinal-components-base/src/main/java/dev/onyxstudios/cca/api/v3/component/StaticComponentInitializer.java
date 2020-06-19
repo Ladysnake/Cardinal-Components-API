@@ -28,6 +28,7 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Entrypoint getting invoked to declare static component types.
@@ -38,7 +39,7 @@ import java.util.Collection;
  * on its own class to avoid running static initializers too early, e.g. because they were referenced in field or method
  * signatures in the same class.
  *
- * <p>The entrypoint is exposed as {@code cardinal-components:static-init} in the mod json
+ * <p>The entrypoint is exposed as {@code "cardinal-components:static-init"} in the mod json
  * and runs for any environment. It usually executes right before the first {@link ComponentType}
  * is created, but can be triggered at any time by another module.
  */
@@ -47,7 +48,9 @@ public interface StaticComponentInitializer {
     /**
      * @return the identifiers of the {@link ComponentType}s this initializer supports
      */
-    Collection<Identifier> getSupportedComponentTypes();
+    default Collection<Identifier> getSupportedComponentTypes() {
+        return Collections.emptySet();
+    }
 
     /**
      * Called when static component bootstrap is finished.

@@ -20,22 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.level;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package dev.onyxstudios.componenttest;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
-import org.jetbrains.annotations.ApiStatus;
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-/**
- * @since 2.4.0
- */
-@ApiStatus.Experimental
-public interface LevelComponentFactoryRegistry {
-    /**
-     * Registers a {@link LevelComponentFactory}.
-     *
-     * @param factory the factory to use to create components of the given type
-     */
-    <C extends Component> void register(ComponentKey<C> type, LevelComponentFactory<C> factory);
-
-}
+import javax.annotation.ParametersAreNonnullByDefault;
