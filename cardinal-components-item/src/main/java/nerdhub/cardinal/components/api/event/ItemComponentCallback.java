@@ -80,12 +80,7 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Copy
 
     @ApiStatus.Experimental
     static <C extends Component> void register(ComponentType<C> type, @Nullable Item item, ItemComponentFactory<? extends C> factory) {
-        event(item).register((stack, components) -> {
-            CopyableComponent<?> cc = factory.createForStack(stack);
-            if (cc != null) {
-                components.put(type, cc);
-            }
-        });
+        event(item).register((stack, components) -> components.put(type, factory.createForStack(stack)));
     }
 
     /**

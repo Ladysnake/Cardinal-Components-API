@@ -26,7 +26,7 @@ import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.ApiStatus;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 /**
  * A component factory for {@linkplain WorldProperties world saves}.
@@ -45,6 +45,6 @@ public interface LevelComponentFactory<C extends Component> {
      *
      * @param properties the {@code WorldProperties} being constructed
      */
-    @Nullable
+    @Nonnull
     C createForSave(WorldProperties properties);
 }

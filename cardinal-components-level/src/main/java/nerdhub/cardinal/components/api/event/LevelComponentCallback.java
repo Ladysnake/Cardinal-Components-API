@@ -53,12 +53,7 @@ public interface LevelComponentCallback extends ComponentCallback<WorldPropertie
 
     @ApiStatus.Experimental
     static <C extends Component> void register(ComponentType<C> type, LevelComponentFactory<C> factory) {
-        EVENT.register((level, components) -> {
-            Component c = factory.createForSave(level);
-            if (c != null) {
-                components.put(type, c);
-            }
-        });
+        EVENT.register((level, components) -> components.put(type, factory.createForSave(level)));
     }
 
     /**
