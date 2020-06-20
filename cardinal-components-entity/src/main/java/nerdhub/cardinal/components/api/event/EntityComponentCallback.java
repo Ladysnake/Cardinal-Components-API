@@ -76,12 +76,7 @@ public interface EntityComponentCallback<E extends Entity> extends ComponentCall
 
     @ApiStatus.Experimental
     static <C extends Component, E extends Entity> void register(ComponentType<C> type, Class<E> targetClass, EntityComponentFactory<C, E> factory) {
-        event(targetClass).register((entity, components) -> {
-            C c = factory.createForEntity(entity);
-            if (c != null) {
-                components.put(type, c);
-            }
-        });
+        event(targetClass).register((entity, components) -> components.put(type, factory.createForEntity(entity)));
     }
 
     /**

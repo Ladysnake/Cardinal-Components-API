@@ -51,12 +51,7 @@ public interface WorldComponentCallback extends ComponentCallback<World, Compone
             });
 
     static <C extends Component> void register(ComponentType<C> type, WorldComponentFactory<C> factory) {
-        EVENT.register((world, components) -> {
-            C c = factory.createForWorld(world);
-            if (c != null) {
-                components.put(type, c);
-            }
-        });
+        EVENT.register((world, components) -> components.put(type, factory.createForWorld(world)));
     }
 
     /**

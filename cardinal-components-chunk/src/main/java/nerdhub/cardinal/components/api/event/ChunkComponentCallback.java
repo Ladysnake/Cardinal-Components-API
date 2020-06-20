@@ -54,12 +54,7 @@ public interface ChunkComponentCallback extends ComponentCallback<Chunk, Copyabl
 
     @ApiStatus.Experimental
     static <C extends Component> void register(ComponentType<C> type, ChunkComponentFactory<? extends C> factory) {
-        EVENT.register((chunk, components) -> {
-            CopyableComponent<?> cc = factory.createForChunk(chunk);
-            if (cc != null) {
-                components.put(type, cc);
-            }
-        });
+        EVENT.register((chunk, components) -> components.put(type, factory.createForChunk(chunk)));
     }
 
     /**
