@@ -32,19 +32,26 @@ import nerdhub.cardinal.components.api.event.ChunkComponentCallback;
 import net.minecraft.util.Lazy;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
-import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nonnull;
 
-@Mixin({ProtoChunk.class, WorldChunk.class})
-public abstract class MixinChunk implements Chunk, InternalComponentProvider {
+@Mixin(ProtoChunk.class)
+public abstract class MixinProtoChunk implements Chunk, InternalComponentProvider {
     @Unique
     private static final Lazy<DynamicContainerFactory<Chunk, CopyableComponent<?>>> componentsContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticChunkComponentPlugin.INSTANCE.getContainerFactoryClass(), ChunkComponentCallback.EVENT));
     @Unique
-    private final ComponentContainer<CopyableComponent<?>> components = componentsContainerFactory.get().create(this);
+    private ComponentContainer<CopyableComponent<?>> components;
+
+    @Inject(method = "<init>(Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/world/chunk/UpgradeData;[Lnet/minecraft/world/chunk/ChunkSection;Lnet/minecraft/world/ChunkTickScheduler;Lnet/minecraft/world/ChunkTickScheduler;)V", at = @At("RETURN"))
+    private void initComponents(CallbackInfo ci) {
+        this.components = componentsContainerFactory.get().create(this);
+    }
 
     @Nonnull
     @Override

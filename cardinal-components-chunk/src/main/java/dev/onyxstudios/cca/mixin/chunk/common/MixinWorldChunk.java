@@ -22,21 +22,46 @@
  */
 package dev.onyxstudios.cca.mixin.chunk.common;
 
+import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import nerdhub.cardinal.components.api.event.ChunkComponentCallback;
+import net.minecraft.util.Lazy;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import javax.annotation.Nonnull;
+
 @Mixin(WorldChunk.class)
 public abstract class MixinWorldChunk implements Chunk, InternalComponentProvider {
+    @Unique
+    private static final Lazy<DynamicContainerFactory<Chunk, CopyableComponent<?>>> componentsContainerFactory
+        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticChunkComponentPlugin.INSTANCE.getContainerFactoryClass(), ChunkComponentCallback.EVENT));
+    @Unique
+    private ComponentContainer<CopyableComponent<?>> components;
+
+    @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/world/biome/source/BiomeArray;Lnet/minecraft/world/chunk/UpgradeData;Lnet/minecraft/world/TickScheduler;Lnet/minecraft/world/TickScheduler;J[Lnet/minecraft/world/chunk/ChunkSection;Ljava/util/function/Consumer;)V", at = @At("RETURN"))
+    private void initComponents(CallbackInfo ci) {
+        this.components = componentsContainerFactory.get().create(this);
+    }
+
+    @Nonnull
+    @Override
+    public Object getStaticComponentContainer() {
+        return this.components;
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/world/chunk/ProtoChunk;)V", at = @At("RETURN"))
     private void copyFromProto(World world, ProtoChunk proto, CallbackInfo ci) {
