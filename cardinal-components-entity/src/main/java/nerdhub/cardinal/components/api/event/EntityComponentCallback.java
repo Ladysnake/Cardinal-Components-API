@@ -86,8 +86,13 @@ public interface EntityComponentCallback<E extends Entity> extends ComponentCall
 
     /**
      * Initialize components for the given entity.
-     * Components that are added to the given container will be available
+     *
+     * <p>Components that are added to the given container will be available
      * on the entity as soon as all callbacks have been invoked.
+     *
+     * <p><strong>The {@code entity} may not be fully initialized when this method is called!</strong>
+     * Implementations should resort to lazy initialization if they need properties not available in the
+     * base {@link Entity} class.
      *
      * @param entity     the entity being constructed
      * @param components the entity's component container
