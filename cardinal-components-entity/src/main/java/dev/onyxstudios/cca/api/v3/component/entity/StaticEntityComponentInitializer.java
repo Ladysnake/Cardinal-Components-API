@@ -34,6 +34,7 @@ import org.jetbrains.annotations.ApiStatus;
  * It usually executes right before the first {@link Entity} instance is created.
  *
  * @since 2.4.0
+ * @deprecated use {@link EntityComponentInitializer} and declare component ids in fabric.mod.json
  */
 @Deprecated
 @ApiStatus.ScheduledForRemoval

@@ -34,6 +34,7 @@ import org.jetbrains.annotations.ApiStatus;
  * It usually executes right before the first {@link Chunk} instance is created.
  *
  * @since 2.4.0
+ * @deprecated use {@link ChunkComponentInitializer} and declare component ids in fabric.mod.json
  */
 @ApiStatus.ScheduledForRemoval
 @Deprecated

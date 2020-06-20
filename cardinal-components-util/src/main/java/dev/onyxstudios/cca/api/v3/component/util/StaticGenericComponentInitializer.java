@@ -33,6 +33,7 @@ import org.jetbrains.annotations.ApiStatus;
  * {@code cardinal-components:static-init} in the mod json and runs for any environment.
  *
  * @since 2.4.0
+ * @deprecated use {@link GenericComponentInitializer} and declare component ids in fabric.mod.json
  */
 @Deprecated
 @ApiStatus.ScheduledForRemoval
