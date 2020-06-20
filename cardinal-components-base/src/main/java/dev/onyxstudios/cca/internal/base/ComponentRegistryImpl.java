@@ -100,6 +100,14 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
         }
     }
 
+    @Override
+    public <T extends Component> ComponentType<T> registerStatic(Identifier componentId, Class<T> componentClass) {
+        if (CcaBootstrap.INSTANCE.getGeneratedComponentTypeClass(componentId) == null) {
+            throw new IllegalStateException(componentId + "");
+        }
+        return this.registerIfAbsent(componentId, componentClass);
+    }
+
     public int size() {
         return this.size;
     }
