@@ -7,6 +7,7 @@ Version 2.4.0
     - more information on the new wiki: https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Attaching-components#static-registration
     - added a `registerStatic` method to `ComponentRegistry`
 - Updated the `PlayerComponent` interface to make its implementation simpler
+- Chunk and level components now get initialized at the end of their respective classes' constructor
 
 ### 2.4.0 General Changelog
 **Backwards-compatibility note: while this release is compatible with older applications, 
@@ -39,6 +40,7 @@ Changes
 - Networking errors should now be logged before they get swallowed by Netty
 - `cardinal-component-item` should no longer prevent modded clients from connecting to vanilla servers and vice-versa
 - Internal classes and new interfaces are now in the `dev.onyxstudios.cca` package
+- Chunk and level components now get initialized at the end of their respective classes' constructor
 
 Fixes
 - Fixed `PlayerSyncCallback` not firing when a player is teleported to another dimensions through commands
