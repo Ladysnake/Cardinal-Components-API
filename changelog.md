@@ -1,10 +1,12 @@
 ------------------------------------------------------
 Version 2.4.0
 ------------------------------------------------------
-### 2.4.0-nightly.1.16-pre5
-- `cardinal-components-item` no longer alters the layout of packets encoding ItemStacks
-- Added a `PlayerComponent` interface that can replace `RespawnCopyStrategy`
-- Removed some experimental not very useful methods in ComponentRegistry
+### 2.4.0-nightly.1.16-rc1
+- Reworked static component initialization - now using fabric.mod.json as it was intended
+    - static components must be declared as a custom value representing an array of strings
+    - more information on the new wiki: https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Attaching-components#static-registration
+    - added a `registerStatic` method to `ComponentRegistry`
+- Updated the `PlayerComponent` interface to make its implementation simpler
 
 ### 2.4.0 General Changelog
 **Backwards-compatibility note: while this release is compatible with older applications, 
@@ -29,12 +31,13 @@ Additions
   passing the stack's true item as context.
 - Added `Dynamic` conversion methods to `NbtSerializable` (defaulted to delegate to nbt serialization)
 - Added `PlayerComponent`, an experimental interface replacing `RespawnCopyStrategy`
+- Cardinal Components now has a [wiki](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/)!
 
 Changes
 - TypeAwareComponent now has a default implementation in most subinterfaces
 - It is no longer possible for a `ComponentCallback` to override an existing component
 - Networking errors should now be logged before they get swallowed by Netty
-- `cardinal-component-item` should no longer prevent players from connecting to vanilla servers
+- `cardinal-component-item` should no longer prevent modded clients from connecting to vanilla servers and vice-versa
 - Internal classes and new interfaces are now in the `dev.onyxstudios.cca` package
 
 Fixes
