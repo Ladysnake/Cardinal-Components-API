@@ -41,6 +41,18 @@ import javax.annotation.Nonnull;
 @ApiStatus.Experimental
 @FunctionalInterface
 public interface ItemComponentFactoryV2<C extends CopyableComponent<?>> {
+    /**
+     * Initialize components for the given stack.
+     *
+     * <p>The component returned by this method will be available
+     * on the chunk as soon as all component factories have been invoked.
+     *
+     * @param item  the actual item held by the stack, may differ from the result of {@link ItemStack#getItem()}
+     * @param stack the {@code ItemStack} being constructed
+     * @implNote Because this method is called for each stack creation, implementations
+     * should avoid side effects and keep costly computations at a minimum. Lazy initialization
+     * should be considered for components that are costly to initialize.
+     */
     @Nonnull
     C createForStack(Item item, ItemStack stack);
 }

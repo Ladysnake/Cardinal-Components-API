@@ -38,6 +38,14 @@ import javax.annotation.Nonnull;
 @ApiStatus.Experimental
 @FunctionalInterface
 public interface WorldComponentFactory<C extends Component> {
+    /**
+     * Initialize components for the given world.
+     *
+     * <p>The component returned by this method will be available
+     * on the world as soon as all component factories have been invoked.
+     *
+     * @param world the world being constructed
+     */
     @Nonnull
     C createForWorld(World world);
 }
