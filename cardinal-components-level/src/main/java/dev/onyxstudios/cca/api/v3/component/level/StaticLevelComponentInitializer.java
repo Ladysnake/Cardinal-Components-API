@@ -34,6 +34,7 @@ import org.jetbrains.annotations.ApiStatus;
  * It usually executes right before the first {@linkplain WorldProperties save properties object} gets loaded.
  *
  * @since 2.4.0
+ * @deprecated use {@link LevelComponentInitializer} and declare component ids in fabric.mod.json
  */
 @Deprecated
 @ApiStatus.ScheduledForRemoval
