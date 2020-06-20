@@ -61,9 +61,9 @@ public final class TestComponents implements
 
     public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>>() {};
 
-    public static final ComponentKey<Vita> VITA = ComponentRegistry.INSTANCE.registerIfAbsent(CardinalComponentsTest.id("vita"), Vita.class);
-    public static final ComponentKey<Vita> ALT_VITA = ComponentRegistry.INSTANCE.registerIfAbsent(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
-    public static final ComponentType<Vita> OLD__VITA = ComponentRegistry.INSTANCE.registerIfAbsent(CardinalComponentsTest.id("old_vita"), Vita.class);
+    public static final ComponentKey<Vita> VITA = ComponentRegistry.INSTANCE.registerStatic(CardinalComponentsTest.id("vita"), Vita.class);
+    public static final ComponentKey<Vita> ALT_VITA = ComponentRegistry.INSTANCE.registerStatic(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
+    public static final ComponentType<Vita> OLD_VITA = ComponentRegistry.INSTANCE.registerIfAbsent(CardinalComponentsTest.id("old_vita"), Vita.class);
 
     private static BaseVita createForEntity(LivingEntity e) {
         return new BaseVita((int) (Math.random() * 10));

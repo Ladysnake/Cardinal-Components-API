@@ -25,6 +25,7 @@ package dev.onyxstudios.componenttest;
 import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.component.util.ComponentContainerMetafactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
+import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
@@ -72,6 +73,10 @@ public class CardinalComponentsTest {
     public static void init() {
         LOGGER.info("Hello, Components!");
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
+        try {
+            ComponentRegistry.INSTANCE.registerStatic(TestComponents.OLD_VITA.getId(), TestComponents.OLD_VITA.getComponentClass());
+            assert false : "Static components must be registered through mod metadata or plugin";
+        } catch (IllegalStateException ignored) { }
         LOGGER.info(ComponentContainerMetafactory.metafactory(
             TestComponents.CUSTOM_PROVIDER_1,
             TypeToken.of(TestContainerFactory.class),
