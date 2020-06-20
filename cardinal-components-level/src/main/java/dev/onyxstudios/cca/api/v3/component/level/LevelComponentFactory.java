@@ -22,9 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.component.level;
 
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -33,9 +31,7 @@ import javax.annotation.Nullable;
 /**
  * A component factory for {@linkplain WorldProperties world saves}.
  *
- * <p>When invoked, the factory can return either a {@link Component} of the right type, or {@code null}.
- * If the factory method returns {@code null}, the save properties object will not support that type of component
- * (cf. {@link ComponentProvider#hasComponent(ComponentType)}).
+ * <p>When invoked, the factory must return a {@link Component} of the right type.
  *
  * @since 2.4.0
  */

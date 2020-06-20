@@ -22,34 +22,31 @@
  */
 package dev.onyxstudios.cca.api.v3.component.item;
 
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nonnull;
 
 
 /**
  * A component factory for {@linkplain ItemStack item stacks}.
  *
- * <p>When invoked, the factory can return either a {@link Component} of the right type, or {@code null}.
- * If the factory method returns {@code null}, the stack will not support that type of component
- * (cf. {@link ComponentProvider#hasComponent(ComponentType)}).
+ * <p>When invoked, the factory must return a {@link Component} of the right type.
  *
  * @since 2.4.0
  */
 @ApiStatus.Experimental
 @FunctionalInterface
 public interface ItemComponentFactory<C extends CopyableComponent<?>> extends ItemComponentFactoryV2<C> {
-    @Nullable
+    @Nonnull
     @Override
     default C createForStack(Item item, ItemStack stack) {
         return this.createForStack(stack);
     }
 
-    @Nullable
+    @Nonnull
     C createForStack(ItemStack stack);
 }
