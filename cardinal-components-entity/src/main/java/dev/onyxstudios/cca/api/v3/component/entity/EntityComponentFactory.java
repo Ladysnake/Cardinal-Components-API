@@ -39,6 +39,21 @@ import javax.annotation.Nonnull;
 @ApiStatus.Experimental
 @FunctionalInterface
 public interface EntityComponentFactory<C extends Component, E extends Entity> {
+    /**
+     * Create a component of type {@code C} for the given entity.
+     *
+     * <p>The component returned by this method will be available
+     * on the entity as soon as all component factories have been invoked.
+     *
+     * <p><strong>The {@code entity} may not be fully initialized when this method is called!</strong>
+     * Implementations should resort to lazy initialization if they need properties not available in the
+     * base {@link Entity} class.
+     *
+     * @param entity     the entity being constructed
+     * @implNote Because this method is called for each entity creation, implementations
+     * should avoid side effects and keep costly computations at a minimum. Lazy initialization
+     * should be considered for components that are costly to initialize.
+     */
     @Nonnull
     C createForEntity(E entity);
 }

@@ -47,6 +47,17 @@ public interface ItemComponentFactory<C extends CopyableComponent<?>> extends It
         return this.createForStack(stack);
     }
 
+    /**
+     * Initialize components for the given stack.
+     *
+     * <p>The component returned by this method will be available
+     * on the chunk as soon as all component factories have been invoked.
+     *
+     * @param stack      the {@code ItemStack} being constructed
+     * @implNote Because this method is called for each stack creation, implementations
+     * should avoid side effects and keep costly computations at a minimum. Lazy initialization
+     * should be considered for components that are costly to initialize.
+     */
     @Nonnull
     C createForStack(ItemStack stack);
 }

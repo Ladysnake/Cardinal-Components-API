@@ -37,6 +37,14 @@ import javax.annotation.Nullable;
  */
 @ApiStatus.Experimental
 public interface LevelComponentFactory<C extends Component> {
+    /**
+     * Initialize components for the given world properties.
+     *
+     * <p>The component returned by this method will be available
+     * on the properties object as soon as all component factories have been invoked.
+     *
+     * @param properties the {@code WorldProperties} being constructed
+     */
     @Nullable
     C createForSave(WorldProperties properties);
 }
