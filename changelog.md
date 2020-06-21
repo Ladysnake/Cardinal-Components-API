@@ -1,13 +1,8 @@
 ------------------------------------------------------
 Version 2.4.0
 ------------------------------------------------------
-### 2.4.0-nightly.1.16-rc1
-- Reworked static component initialization - now using fabric.mod.json as it was intended
-    - static components must be declared as a custom value representing an array of strings
-    - more information on the new wiki: https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Attaching-components#static-registration
-    - added a `registerStatic` method to `ComponentRegistry`
-- Updated the `PlayerComponent` interface to make its implementation simpler
-- Chunk and level components now get initialized at the end of their respective classes' constructor
+### 2.4.0-nightly.1.16-rc1.build.2
+- Fixed crash on launch when no mod registered a static component
 
 ### 2.4.0 General Changelog
 **Backwards-compatibility note: while this release is compatible with older applications, 
