@@ -33,7 +33,7 @@ public abstract class LazyDispatcher {
         this.likelyInitTrigger = likelyInitTrigger;
     }
 
-    protected void ensureInitialized() {
+    public void ensureInitialized() {
         if (this.requiresInitialization) {
             synchronized (this) {
                 if (this.requiresInitialization) {

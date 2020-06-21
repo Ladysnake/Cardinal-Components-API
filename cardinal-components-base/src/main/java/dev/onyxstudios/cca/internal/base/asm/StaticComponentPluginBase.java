@@ -104,6 +104,8 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
      * @return the generated container class
      */
     public static <I> Class<? extends ComponentContainer<?>> spinComponentContainer(Class<? super I> componentFactoryType, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
+        CcaBootstrap.INSTANCE.ensureInitialized();
+
         checkValidJavaIdentifier(implNameSuffix);
         String containerImplName = CcaAsmHelper.STATIC_COMPONENT_CONTAINER + '_' + implNameSuffix;
         String componentFactoryName = Type.getInternalName(componentFactoryType);
@@ -318,6 +320,8 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
      * @param actualFactoryParams  the actual type of the arguments taken by the {@link ComponentContainer} constructor
      */
     public static <I> Class<? extends I> spinContainerFactory(String implNameSuffix, Class<? super I> containerFactoryType, Class<? extends ComponentContainer<?>> containerImpl, @Nullable Class<?> componentCallbackType, int eventCount, Class<?>... actualFactoryParams) throws IOException {
+        CcaBootstrap.INSTANCE.ensureInitialized();
+
         checkValidJavaIdentifier(implNameSuffix);
         Constructor<?>[] constructors = containerImpl.getConstructors();
 
