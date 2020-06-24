@@ -1,10 +1,6 @@
 ------------------------------------------------------
 Version 2.4.0
 ------------------------------------------------------
-### 2.4.0-nightly.1.16-rc1.build.2
-- Fixed crash on launch when no mod registered a static component
-
-### 2.4.0 General Changelog
 **Backwards-compatibility note: while this release is compatible with older applications, 
 some classes have been moved to a new module called `cardinal-components-util`. 
 If you are missing some types, or if you use the `cardinal-components-block` module, 
@@ -14,12 +10,16 @@ you need to add a dependency on that module.**
 In case of crashes due to those incompatibilities, Modpack makers and players can add the latest version
 of the full library to their mods folder to update every module at once.
 
-- Updated entity, item, chunk, world, and level modules to MC 1.16
+- Updated all modules to MC 1.16
 
 Additions
+- We have a Wiki now: https://github.com/OnyxStudios/Cardinal-Components-API/wiki
 - Added statically declared components (**experimental feature !**)
-  - Mods can declare and attach their components using dedicated entrypoints, typically subclasses of `StaticComponentInitializer`.
+  - Mods can declare and attach their components using dedicated entrypoints, typically subclasses of `StaticComponentInitializer`
   - Developers can add `-Dcca.debug.asm=true` to their VM options to help debug CCA's issues with static component generation
+  - More information is available in the wiki
+    [[1]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Registering-and-using-a-component#static-registration)
+    [[2]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Attaching-components#static-registration)
 - Added a new module - `cardinal-components-util`
   - Most classes that were not essential to CCA working got moved from `cardinal-components-base` to that module
   - Added `LazyComponentType`, allowing mods to retrieve a `ComponentType` handle before it is registered
