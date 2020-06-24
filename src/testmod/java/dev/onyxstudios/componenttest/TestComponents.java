@@ -102,7 +102,7 @@ public final class TestComponents implements
 
     @Override
     public void registerItemComponentFactories(ItemComponentFactoryRegistry registry) {
-        registry.register(VITA, null, (item, stack) -> new BaseVita(stack.getCount()));
+        registry.register(ALT_VITA, null, (item, stack) -> new BaseVita(stack.getCount()));
         registry.register(VITA, CardinalComponentsTest.VITA_STICK_ID, stack -> new BaseVita());
     }
 }

@@ -79,7 +79,7 @@ public final class CardinalItemInternals {
 
     public static void copyComponents(ItemStack original, ItemStack copy) {
         ComponentProvider from = ComponentProvider.fromItemStack(original);
-        ComponentProvider.fromItemStack(copy).forEachComponent((type, component) -> {
+        ((InternalComponentProvider) ComponentProvider.fromItemStack(copy)).getComponentContainer().forEach((type, component) -> {
                 copyComponent(type, (CopyableComponent<?>) component, from);
             }
         );
