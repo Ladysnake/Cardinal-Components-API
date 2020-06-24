@@ -42,7 +42,6 @@ import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 
 import java.util.UUID;
@@ -104,7 +103,7 @@ public final class TestComponents implements
     @Override
     public void registerItemComponentFactories(ItemComponentFactoryRegistry registry) {
         registry.registerForAll(ALT_VITA, (item, stack) -> new BaseVita(stack.getCount()));
-        registry.registerFor(Items.DIAMOND_CHESTPLATE, ALT_VITA, stack -> new BaseVita());
+        registry.registerFor(new Identifier("diamond_chestplate"), ALT_VITA, stack -> new BaseVita(3));
         registry.registerFor(CardinalComponentsTest.VITA_STICK_ID, VITA, stack -> new BaseVita());
     }
 }

@@ -38,7 +38,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -98,24 +97,6 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
                 throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entry.getKey(), e);
             }
         }
-    }
-
-    @Override
-    public <C extends CopyableComponent<?>> void registerFor(Item item, ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
-        Objects.requireNonNull(item);
-        this.register(getId(item), type, factory);
-    }
-
-    @Override
-    public <C extends CopyableComponent<?>> void registerFor(Item item, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory) {
-        Objects.requireNonNull(item);
-        this.register(getId(item), type, factory);
-    }
-
-    private static Identifier getId(Item item) {
-        return Registry.ITEM.getKey(item)
-            .orElseThrow(() -> new IllegalStateException("Attempted to register a component factory for an unregistered item"))
-            .getValue();
     }
 
     @Override
