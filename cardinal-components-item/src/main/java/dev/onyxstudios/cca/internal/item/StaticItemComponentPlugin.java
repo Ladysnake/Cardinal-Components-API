@@ -38,6 +38,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -100,12 +101,46 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     }
 
     @Override
-    public <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, @javax.annotation.Nullable Identifier itemId, ItemComponentFactory<C> factory) {
-        this.register(type, itemId, (ItemComponentFactoryV2<C>) factory);
+    public <C extends CopyableComponent<?>> void registerFor(Item item, ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
+        Objects.requireNonNull(item);
+        this.register(getId(item), type, factory);
     }
 
     @Override
-    public <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, @javax.annotation.Nullable Identifier itemId, ItemComponentFactoryV2<C> factory) {
+    public <C extends CopyableComponent<?>> void registerFor(Item item, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory) {
+        Objects.requireNonNull(item);
+        this.register(getId(item), type, factory);
+    }
+
+    private static Identifier getId(Item item) {
+        return Registry.ITEM.getKey(item)
+            .orElseThrow(() -> new IllegalStateException("Attempted to register a component factory for an unregistered item"))
+            .getValue();
+    }
+
+    @Override
+    public <C extends CopyableComponent<?>> void registerForAll(ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
+        this.register(null, type, factory);
+    }
+
+    @Override
+    public <C extends CopyableComponent<?>> void registerForAll(ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory) {
+        this.register(null, type, factory);
+    }
+
+    @Override
+    public <C extends CopyableComponent<?>> void registerFor(Identifier itemId, ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
+        Objects.requireNonNull(itemId);
+        this.register(itemId, type, factory);
+    }
+
+    @Override
+    public <C extends CopyableComponent<?>> void registerFor(Identifier itemId, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory) {
+        Objects.requireNonNull(itemId);
+        this.register(itemId, type, factory);
+    }
+
+    private <C extends CopyableComponent<?>> void register(@Nullable Identifier itemId, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory) {
         this.checkLoading(ItemComponentFactoryRegistry.class, "register");
         Map<Identifier, ItemComponentFactoryV2<?>> specializedMap = this.componentFactories.computeIfAbsent(itemId, t -> new HashMap<>());
         ItemComponentFactoryV2<?> previousFactory = specializedMap.get(type.getId());

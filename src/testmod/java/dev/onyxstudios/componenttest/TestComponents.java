@@ -42,6 +42,7 @@ import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 
 import java.util.UUID;
@@ -71,10 +72,10 @@ public final class TestComponents implements
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.register(ALT_VITA, HostileEntity.class, e -> new BaseVita());
-        registry.register(VITA, LivingEntity.class, TestComponents::createForEntity);
-        registry.register(VITA, PlayerEntity.class, PlayerVita::new);
-        registry.register(VITA, VitalityZombieEntity.class, VitalityZombieEntity::createVitaComponent);
+        registry.registerFor(HostileEntity.class, ALT_VITA, e -> new BaseVita());
+        registry.registerFor(LivingEntity.class, VITA, TestComponents::createForEntity);
+        registry.registerFor(PlayerEntity.class, VITA, PlayerVita::new);
+        registry.registerFor(VitalityZombieEntity.class, VITA, VitalityZombieEntity::createVitaComponent);
     }
 
     @Override
@@ -102,7 +103,8 @@ public final class TestComponents implements
 
     @Override
     public void registerItemComponentFactories(ItemComponentFactoryRegistry registry) {
-        registry.register(ALT_VITA, null, (item, stack) -> new BaseVita(stack.getCount()));
-        registry.register(VITA, CardinalComponentsTest.VITA_STICK_ID, stack -> new BaseVita());
+        registry.registerForAll(ALT_VITA, (item, stack) -> new BaseVita(stack.getCount()));
+        registry.registerFor(Items.DIAMOND_CHESTPLATE, ALT_VITA, stack -> new BaseVita());
+        registry.registerFor(CardinalComponentsTest.VITA_STICK_ID, VITA, stack -> new BaseVita());
     }
 }
