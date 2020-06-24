@@ -24,10 +24,9 @@ package dev.onyxstudios.cca.api.v3.component.item;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
-
-import javax.annotation.Nullable;
 
 /**
  * @since 2.4.0
@@ -35,30 +34,67 @@ import javax.annotation.Nullable;
 @ApiStatus.Experimental
 public interface ItemComponentFactoryRegistry {
     /**
-     * Registers an {@link ItemComponentFactory}.
+     * Registers an {@link ItemComponentFactory} for stacks of a specific item.
      *
-     * <p> A {@code null} {@code componentId} works as a wildcard parameter.
-     * A callback registered to the wilcard event is called for every item stack ever
-     * created. For performance reasons, wildcard callbacks should be avoided
-     * where possible. Notably, when registering callbacks for various items,
-     * it is often better to register a separate specialized callback for each one
-     * than a single generic callback with additional checks.
-     *  @param itemId      the id of an item to target, or {@code null} to target every stack.
-     * @param factory     the factory to use to create components of the given type
+     * @param itemId  the id of an item to target
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, @Nullable Identifier itemId, ItemComponentFactory<C> factory);
+    <C extends CopyableComponent<?>> void registerFor(Identifier itemId, ComponentKey<? super C> type, ItemComponentFactory<C> factory);
 
     /**
-     * Registers an {@link ItemComponentFactoryV2}.
+     * Registers an {@link ItemComponentFactoryV2} for stacks of a specific item.
      *
-     * <p> A {@code null} {@code componentId} works as a wildcard parameter.
-     * A callback registered to the wilcard event is called for every item stack ever
+     * @param itemId  the id of an item to target
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
+     */
+    <C extends CopyableComponent<?>> void registerFor(Identifier itemId, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory);
+
+    /**
+     * Registers an {@link ItemComponentFactory} for stacks of a specific item.
+     *
+     * @param itemId  the id of an item to target
+     * @param factory the factory to use to create components of the given type
+     * @throws IllegalStateException if {@code item} has not yet been registered when this method is called
+     * @throws NullPointerException  if any of the arguments is {@code null}
+     */
+    <C extends CopyableComponent<?>> void registerFor(Item itemId, ComponentKey<? super C> type, ItemComponentFactory<C> factory);
+
+    /**
+     * Registers an {@link ItemComponentFactoryV2} for stacks of a specific item.
+     *
+     * @param item    the id of an item to target
+     * @param factory the factory to use to create components of the given type
+     * @throws IllegalStateException if {@code item} has not yet been registered when this method is called
+     */
+    <C extends CopyableComponent<?>> void registerFor(Item item, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory);
+
+    /**
+     * Registers an {@link ItemComponentFactory} for every item.
+     *
+     * <p> A callback registered using this method is called for every item stack ever
      * created. For performance reasons, wildcard callbacks should be avoided
      * where possible. Notably, when registering callbacks for various items,
      * it is often better to register a separate specialized callback for each one
      * than a single generic callback with additional checks.
-     *  @param itemId      the id of an item to target, or {@code null} to target every stack.
-     * @param factory     the factory to use to create components of the given type
+     *
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, @Nullable Identifier itemId, ItemComponentFactoryV2<C> factory);
+    <C extends CopyableComponent<?>> void registerForAll(ComponentKey<? super C> type, ItemComponentFactory<C> factory);
+
+    /**
+     * Registers an {@link ItemComponentFactoryV2} for every item.
+     *
+     * <p> A callback registered using this method is called for every item stack ever
+     * created. For performance reasons, wildcard callbacks should be avoided
+     * where possible. Notably, when registering callbacks for various items,
+     * it is often better to register a separate specialized callback for each one
+     * than a single generic callback with additional checks.
+     *
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
+     */
+    <C extends CopyableComponent<?>> void registerForAll(ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory);
 }

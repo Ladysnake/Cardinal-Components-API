@@ -43,7 +43,7 @@ import java.util.*;
 public final class StaticEntityComponentPlugin extends LazyDispatcher implements EntityComponentFactoryRegistry {
     public static final StaticEntityComponentPlugin INSTANCE = new StaticEntityComponentPlugin();
 
-    public StaticEntityComponentPlugin() {
+    private StaticEntityComponentPlugin() {
         super("instantiating an entity");
     }
 
@@ -101,6 +101,11 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
 
     @Override
     public <C extends Component, E extends Entity> void register(ComponentKey<C> type, Class<E> target, EntityComponentFactory<C, E> factory) {
+        this.registerFor(target, type, factory);
+    }
+
+    @Override
+    public <C extends Component, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> type, EntityComponentFactory<C, E> factory) {
         this.checkLoading(EntityComponentFactoryRegistry.class, "register");
         Map<Identifier, EntityComponentFactory<?, ?>> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
         EntityComponentFactory<?, ?> previousFactory = specializedMap.get(type.getId());
