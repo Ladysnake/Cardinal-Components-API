@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.api.v3.component.item;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -50,25 +49,6 @@ public interface ItemComponentFactoryRegistry {
      * @throws NullPointerException if any of the arguments is {@code null}
      */
     <C extends CopyableComponent<?>> void registerFor(Identifier itemId, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory);
-
-    /**
-     * Registers an {@link ItemComponentFactory} for stacks of a specific item.
-     *
-     * @param itemId  the id of an item to target
-     * @param factory the factory to use to create components of the given type
-     * @throws IllegalStateException if {@code item} has not yet been registered when this method is called
-     * @throws NullPointerException  if any of the arguments is {@code null}
-     */
-    <C extends CopyableComponent<?>> void registerFor(Item itemId, ComponentKey<? super C> type, ItemComponentFactory<C> factory);
-
-    /**
-     * Registers an {@link ItemComponentFactoryV2} for stacks of a specific item.
-     *
-     * @param item    the id of an item to target
-     * @param factory the factory to use to create components of the given type
-     * @throws IllegalStateException if {@code item} has not yet been registered when this method is called
-     */
-    <C extends CopyableComponent<?>> void registerFor(Item item, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory);
 
     /**
      * Registers an {@link ItemComponentFactory} for every item.
