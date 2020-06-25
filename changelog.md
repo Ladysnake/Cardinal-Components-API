@@ -13,9 +13,9 @@ of the full library to their mods folder to update every module at once.
 - Updated all modules to MC 1.16
 
 Additions
-- We have a Wiki now: https://github.com/OnyxStudios/Cardinal-Components-API/wiki
+- Cardinal Components now has a [wiki](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/)!
 - Added statically declared components (**experimental feature !**)
-  - Mods can declare and attach their components using dedicated entrypoints, typically subclasses of `StaticComponentInitializer`
+  - Mods can declare and attach their components using dedicated entrypoints, typically under the nomenclature `XComponentInitializer`
   - Developers can add `-Dcca.debug.asm=true` to their VM options to help debug CCA's issues with static component generation
   - More information is available in the wiki
     [[1]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Registering-and-using-a-component#static-registration)
@@ -27,15 +27,15 @@ Additions
   passing the stack's true item as context.
 - Added `Dynamic` conversion methods to `NbtSerializable` (defaulted to delegate to nbt serialization)
 - Added `PlayerComponent`, an experimental interface replacing `RespawnCopyStrategy`
-- Cardinal Components now has a [wiki](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/)!
 
 Changes
 - TypeAwareComponent now has a default implementation in most subinterfaces
 - It is no longer possible for a `ComponentCallback` to override an existing component
 - Networking errors should now be logged before they get swallowed by Netty
-- `cardinal-component-item` should no longer prevent modded clients from connecting to vanilla servers and vice-versa
+- `cardinal-component-item` no longer changes the vanilla networking protocol for `ItemStack`s
 - Internal classes and new interfaces are now in the `dev.onyxstudios.cca` package
 - Chunk and level components now get initialized at the end of their respective classes' constructor
+- Internals and new APIs are now in the `dev.onyxstudios.cca` package instead of `nerdhub.cardinal.components`
 
 Fixes
 - Fixed `PlayerSyncCallback` not firing when a player is teleported to another dimensions through commands
