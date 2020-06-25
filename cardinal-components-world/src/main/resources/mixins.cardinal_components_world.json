@@ -2,11 +2,11 @@
     "required": true,
     "minVersion": "0.7.11",
     "compatibilityLevel": "JAVA_8",
-    "package": "nerdhub.cardinal.components.mixins",
+    "package": "dev.onyxstudios.cca.mixin.world",
     "mixins": [
-      "common.world.MixinPlayerManager",
-      "common.world.MixinServerWorld",
-      "common.world.MixinWorld"
+      "common.MixinPlayerManager",
+      "common.MixinServerWorld",
+      "common.MixinWorld"
     ],
     "injectors": {
         "defaultRequire": 1

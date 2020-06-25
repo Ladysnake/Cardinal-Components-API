@@ -23,25 +23,23 @@
 package nerdhub.cardinal.components.api.util.container;
 
 import com.google.common.base.Preconditions;
+import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntIterator;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.internal.SharedComponentSecrets;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
 /**
  * A {@link Component} container with a fast, small-footprint implementation
  * based on {@link Int2ObjectMap}
  *
- * <p> <b>Note that this implementation is not synchronized./b>
+ * <p> <b>Note that this implementation is not synchronized.</b>
  * If multiple threads access an indexed container concurrently, and at least one of the threads
  * modifies the container structurally, it must be synchronized externally.
  * (A structural modification is any operation that adds one or more mappings;
@@ -50,13 +48,8 @@ import java.util.function.BiConsumer;
  * that naturally encapsulates the container.
  *
  */
-public final class FastComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
-    /**
-     * All of the component types that can be stored in this container.
-     * (Cached for performance.)
-     */
-    private final AtomicReference<ComponentType<?>[]> keyUniverse = SharedComponentSecrets.getRegisteredComponents();
-
+public class FastComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
+    private final BitSet containedTypes;
     private final Int2ObjectOpenHashMap<C> vals;
 
     public FastComponentContainer() {
@@ -64,10 +57,16 @@ public final class FastComponentContainer<C extends Component> extends AbstractC
     }
 
     /**
-     * @param expected the expected number of elements in the container
+     * @param expected the expected number of <em>dynamically added</em> elements in the container
      */
     public FastComponentContainer(int expected) {
+        this.containedTypes = new BitSet(((ComponentRegistryImpl) ComponentRegistry.INSTANCE).size());
         this.vals = new Int2ObjectOpenHashMap<>(expected, Hash.VERY_FAST_LOAD_FACTOR);
+    }
+
+    @SuppressWarnings("unused") // called by generated subclasses
+    protected void addContainedType(ComponentType<?> type) {
+        this.containedTypes.set(type.getRawId());
     }
 
     /**
@@ -75,19 +74,26 @@ public final class FastComponentContainer<C extends Component> extends AbstractC
      *
      * @return the number of components in this container
      */
+    @Override
     public int size() {
+        return this.containedTypes.cardinality();
+    }
+
+    @SuppressWarnings("unused") // called by generated factories to adjust the initial size of future containers
+    public final int dynamicSize() {
         return this.vals.size();
     }
 
+    @Override
     public boolean containsKey(ComponentType<?> key) {
-        return this.vals.containsKey(key.getRawId());
+        return this.containedTypes.get(key.getRawId());
     }
 
     /**
      * {@inheritDoc}
      */
     @Nullable
-    @Override
+    @Override   // overridden by generated subclasses
     @SuppressWarnings("unchecked")
     public <T extends Component> T get(ComponentType<T> key) {
         return (T) this.vals.get(key.getRawId());
@@ -102,13 +108,20 @@ public final class FastComponentContainer<C extends Component> extends AbstractC
         Preconditions.checkNotNull(key);
         Preconditions.checkNotNull(value);
         Preconditions.checkArgument(key.getComponentClass().isInstance(value), value + " is not of type " + key);
+        Preconditions.checkState(this.canBeAssigned(key), "Component type " + key + " was already defined with value " + this.get(key) + ", cannot replace with " + value);
+        this.containedTypes.set(key.getRawId());
         return this.vals.put(key.getRawId(), value);
     }
 
-    @Override
+    // overridden by generated subclasses
+    protected boolean canBeAssigned(ComponentType<?> key) {
+        return !this.containsKey(key);
+    }
+
+    @Override   // overridden by generated subclasses
     public void forEach(BiConsumer<? super ComponentType<?>, ? super C> action) {
         this.vals.int2ObjectEntrySet().fastForEach((e) ->
-            action.accept(this.keyUniverse.get()[e.getIntKey()], e.getValue()));
+            action.accept(ComponentRegistryImpl.byRawId(e.getIntKey()), e.getValue()));
     }
 
     // Views
@@ -130,12 +143,13 @@ public final class FastComponentContainer<C extends Component> extends AbstractC
      *
      * @return a set view of the keys contained in this map
      */
+    @Override
     public Set<ComponentType<?>> keySet() {
-        Set<ComponentType<?>> ks = keySet;
+        Set<ComponentType<?>> ks = this.keySet;
         if (ks != null) {
             return ks;
         }
-        return keySet = new KeySet();
+        return this.keySet = new KeySet();
     }
 
     /**
@@ -150,11 +164,11 @@ public final class FastComponentContainer<C extends Component> extends AbstractC
      */
     @Override
     public Collection<C> values() {
-        Collection<C> vs = values;
+        Collection<C> vs = this.values;
         if (vs != null) {
             return vs;
         }
-        return values = new Values();
+        return this.values = new Values();
     }
 
     /**
@@ -166,131 +180,180 @@ public final class FastComponentContainer<C extends Component> extends AbstractC
      *
      * @return a set view of the mappings contained in this enum map
      */
+    @Override
     public Set<Map.Entry<ComponentType<?>, C>> entrySet() {
-        Set<Map.Entry<ComponentType<?>,C>> es = entrySet;
+        Set<Map.Entry<ComponentType<?>,C>> es = this.entrySet;
         if (es != null) {
             return es;
         }
-        return entrySet = new EntrySet();
+        return this.entrySet = new EntrySet();
     }
 
     private class EntrySet extends AbstractSet<Map.Entry<ComponentType<?>,C>> {
+        @Override
         public Iterator<Map.Entry<ComponentType<?>, C>> iterator() {
             return new EntryIterator();
         }
 
+        @Override
         public boolean contains(Object o) {
             if (!(o instanceof Map.Entry))
                 return false;
             Map.Entry<?,?> entry = (Map.Entry<?,?>)o;
             Object key = entry.getKey();
-            return key instanceof ComponentType && Objects.equals(entry.getValue(), get(key));
+            return key instanceof ComponentType && Objects.equals(entry.getValue(), FastComponentContainer.this.get(key));
         }
+        @Override
         public boolean remove(Object o) {
             throw new UnsupportedOperationException();
         }
+        @Override
         public int size() {
             return FastComponentContainer.this.size();
         }
+        @Override
         public void clear() {
             throw new UnsupportedOperationException();
         }
     }
 
     private class KeySet extends AbstractSet<ComponentType<?>> {
+        @Override
         public Iterator<ComponentType<?>> iterator() {
             return new KeyIterator();
         }
+        @Override
         public int size() {
             return FastComponentContainer.this.size();
         }
+        @Override
         public boolean contains(Object o) {
-            return containsKey(o);
+            return FastComponentContainer.this.containsKey(o);
         }
+        @Override
         public boolean remove(Object o) {
             throw new UnsupportedOperationException();
         }
     }
 
     private class Values extends AbstractCollection<C> {
+        @Override
         public Iterator<C> iterator() {
             return new ValueIterator();
         }
+        @Override
         public int size() {
             return FastComponentContainer.this.size();
         }
+        @Override
         public boolean contains(Object o) {
-            return containsValue(o);
+            return FastComponentContainer.this.containsValue(o);
         }
+        @Override
         public boolean remove(Object o) {
             throw new UnsupportedOperationException();
         }
     }
 
     private class ValueIterator implements Iterator<C> {
-        ObjectIterator<C> it = vals.values().iterator();
+        private boolean advance = true;
+        private int curId = -1;
 
         @Override
         public boolean hasNext() {
-            return it.hasNext();
+            if (this.advance) {
+                this.curId = FastComponentContainer.this.containedTypes.nextSetBit(this.curId + 1);
+                this.advance = false;
+            }
+            return this.curId >= 0;
         }
 
+        @Override
         public C next() {
-            return it.next();
+            if (!this.hasNext()) {
+                throw new NoSuchElementException();
+            }
+            this.advance = true;
+            ComponentType<?> key = ComponentRegistryImpl.byRawId(this.curId);
+            @SuppressWarnings("unchecked") C value = (C) FastComponentContainer.this.get(key);
+            assert value != null;
+            return value;
         }
 
     }
 
-    private class KeyIterator implements Iterator<ComponentType<?>> {
-        IntIterator it = vals.keySet().iterator();
+    private final class KeyIterator implements Iterator<ComponentType<?>> {
+        private boolean advance = true;
+        private int curId = -1;
 
         @Override
         public boolean hasNext() {
-            return it.hasNext();
+            if (this.advance) {
+                this.curId = FastComponentContainer.this.containedTypes.nextSetBit(this.curId + 1);
+                this.advance = false;
+            }
+            return this.curId >= 0;
         }
 
+        @Override
         public ComponentType<?> next() {
-            return keyUniverse.get()[it.nextInt()];
+            if (!this.hasNext()) {
+                throw new NoSuchElementException();
+            }
+            this.advance = true;
+            return ComponentRegistryImpl.byRawId(this.curId);
         }
-
     }
 
-    private class EntryIterator implements Iterator<Entry<ComponentType<?>, C>> {
-        ObjectIterator<Int2ObjectMap.Entry<C>> it = vals.int2ObjectEntrySet().fastIterator();
-        public Entry next() {
-            Int2ObjectMap.Entry<C> entry = it.next();
-            return new Entry(entry.getIntKey(), entry.getValue());
-        }
+    private final class EntryIterator implements Iterator<Entry<ComponentType<?>, C>> {
+        private boolean advance = true;
+        private int curId = -1;
 
         @Override
         public boolean hasNext() {
-            return it.hasNext();
+            if (this.advance) {
+                this.curId = FastComponentContainer.this.containedTypes.nextSetBit(this.curId + 1);
+                this.advance = false;
+            }
+            return this.curId >= 0;
         }
 
-        private class Entry implements Map.Entry<ComponentType<?>, C> {
-            private int rawId;
-            private C value;
+        @Override
+        public Entry next() {
+            if (!this.hasNext()) {
+                throw new NoSuchElementException();
+            }
+            this.advance = true;
+            ComponentType<?> key = ComponentRegistryImpl.byRawId(this.curId);
+            @SuppressWarnings("unchecked") C value = (C) FastComponentContainer.this.get(key);
+            assert value != null;
+            return new Entry(key, value);
+        }
 
-            private Entry(int rawId, C value) {
-                this.rawId = rawId;
+        private final class Entry implements Map.Entry<ComponentType<?>, C> {
+            private final ComponentType<?> key;
+            private final C value;
+
+            private Entry(ComponentType<?> key, C value) {
+                this.key = key;
                 this.value = value;
             }
 
+            @Override
             public ComponentType<?> getKey() {
-                return keyUniverse.get()[rawId];
+                return this.key;
             }
 
+            @Override
             public C getValue() {
-                return value;
+                return this.value;
             }
 
             @Nullable
+            @Override
             public C setValue(C value) {
-                return FastComponentContainer.this.put(getKey(), value);
+                return FastComponentContainer.this.put(this.getKey(), value);
             }
-
         }
-
     }
-
 }

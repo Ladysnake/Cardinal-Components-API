@@ -23,16 +23,19 @@
 package nerdhub.cardinal.components.api.util.sync;
 
 import io.netty.buffer.Unpooled;
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
+import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import nerdhub.cardinal.components.api.util.ChunkComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
@@ -53,6 +56,18 @@ public interface ChunkSyncedComponent<C extends Component> extends ChunkComponen
     Identifier PACKET_ID = new Identifier("cardinal-components", "chunk_sync");
 
     Chunk getChunk();
+
+    /**
+     * {@inheritDoc}
+     * @implNote The default implementation should generally be overridden.
+     * This implementation performs a linear-time lookup on the provider to find the component type
+     * this component is associated with.
+     * Implementing classes can nearly always provide a better implementation.
+     */
+    @Override
+    default ComponentType<? super C> getComponentType() {
+        return TypeAwareComponent.lookupComponentType(ComponentProvider.fromChunk(this.getChunk()), this);
+    }
 
     @Override
     default void sync() {

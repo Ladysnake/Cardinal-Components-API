@@ -22,11 +22,23 @@
  */
 package nerdhub.cardinal.components.api.util;
 
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import org.jetbrains.annotations.ApiStatus;
 
 public interface ItemComponent<C extends Component> extends Component, CopyableComponent<C> {
 
     @Override
     boolean isComponentEqual(Component other);
+
+    /**
+     * @deprecated do not call or override this method, it will be removed eventually.
+     */
+    @ApiStatus.ScheduledForRemoval
+    @Deprecated
+    @Override
+    default ComponentType<?> getComponentType() {
+        throw new UnsupportedOperationException();
+    }
 }

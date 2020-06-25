@@ -22,8 +22,9 @@
  */
 package nerdhub.cardinal.components.api;
 
+import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
+import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.internal.ComponentRegistryImpl;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -41,7 +42,9 @@ import java.util.stream.Stream;
  */
 @ApiStatus.NonExtendable
 public interface ComponentRegistry {
-    /** The component registry */
+    /**
+     * The component registry
+     */
     ComponentRegistry INSTANCE = new ComponentRegistryImpl(ComponentType::new);
 
     /**
@@ -53,6 +56,9 @@ public interface ComponentRegistry {
      * Calling this method multiple times with the same id but different component classes
      * is forbidden and will throw an {@link IllegalStateException}.
      *
+     * <p>If {@code componentId} was declared statically as described by {@link #registerStatic(Identifier, Class)},
+     * this method behaves as if calling the latter.
+     *
      * @param componentId    a unique identifier for the registered component type
      * @param componentClass the interface or class of which to obtain a {@link ComponentType}
      * @return a shared instance of {@link ComponentType}
@@ -60,14 +66,51 @@ public interface ComponentRegistry {
      * @throws IllegalStateException    if a different component class has been registered with the same {@code componentId}
      * @apiNote It is recommended that {@code componentClass} be an interface, so that other
      * mods can interact with a well-defined API rather than directly accessing internals.
+     * @see #registerStatic(Identifier, Class)
      */
     <T extends Component> ComponentType<T> registerIfAbsent(Identifier componentId, Class<T> componentClass);
+
+    /**
+     * Registers a <em>static</em> component type for the given identifier and class, and returns
+     * a shared {@link ComponentType} representation.
+     *
+     * <p>The {@code componentId} must be declared statically, either in a mod's {@code fabric.mod.json} metadata
+     * (as a string array custom value element), or through {@link StaticComponentInitializer#getSupportedComponentTypes()}.
+     * For example, if {@code componentId}'s value is {@code "foo:bar"}, at least one of the loaded
+     * {@code fabric.mod.json} definitions must either declare a {@code "cardinal-components:static-init"} entrypoint,
+     * or include the following:
+     * <pre><code>
+     * "custom": {
+     *     "cardinal-components": [
+     *         "foo:bar"
+     *     ]
+     * }
+     * </code></pre>.
+     *
+     * <p> Calling this method multiple times with the same parameters has the same effect
+     * as calling {@link #get(Identifier)} after the first registration call.
+     * Calling this method multiple times with the same id but different component classes
+     * is forbidden and will throw an {@link IllegalStateException}.
+     *
+     * @param componentId    a unique identifier for the registered component type
+     * @param componentClass the interface or class of which to obtain a {@link ComponentType}
+     * @return a shared instance of {@link ComponentType}
+     * @throws IllegalArgumentException if {@code componentClass} does not extend {@link Component}
+     * @throws IllegalStateException    if a different component class has been registered with the same {@code componentId},
+     *                                  or if {@code componentId} has not been statically declared as a custom data value.
+     * @apiNote It is recommended that {@code componentClass} be an interface, so that other
+     * mods can interact with a well-defined API rather than directly accessing internals.
+     * @see #registerIfAbsent(Identifier, Class)
+     * @since 2.4.0
+     */
+    @ApiStatus.Experimental
+    <T extends Component> ComponentType<T> registerStatic(Identifier componentId, Class<T> componentClass);
 
     /**
      * Directly retrieves a ComponentType using its id.
      *
      * @return the {@code ComponentType} that got registered with {@code id}, or {@code null}
-     *         if no such {@code ComponentType} is found.
+     * if no such {@code ComponentType} is found.
      */
     @Nullable
     ComponentType<?> get(Identifier id);

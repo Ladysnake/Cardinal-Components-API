@@ -2,16 +2,16 @@
     "schemaVersion": 1,
     "environment": "*",
     "id": "cardinal-components-world",
-    "name": "Cardinal Components API",
+    "name": "Cardinal Components API (worlds)",
     "description": "dynamically exposing components",
     "version": "${version}",
     "side": "universal",
     "entrypoints": {
         "main": [
-            "nerdhub.cardinal.components.ComponentsWorldNetworking::init"
+            "dev.onyxstudios.cca.internal.world.ComponentsWorldNetworking::init"
         ],
         "client": [
-            "nerdhub.cardinal.components.ComponentsWorldNetworking::initClient"
+            "dev.onyxstudios.cca.internal.world.ComponentsWorldNetworking::initClient"
         ]
     },
     "custom": {
@@ -19,7 +19,7 @@
         "modmenu:parent": "cardinal-components"
     },
     "depends": {
-        "minecraft": "<1.16-",
+        "minecraft": ">=1.16-",
         "fabric-api-base": "*",
         "cardinal-components-base": "*"
     },
@@ -36,8 +36,8 @@
     ],
     "contact": {
         "homepage": "https://minecraft.curseforge.com/projects/318449",
-        "issues": "https://github.com/NerdHubMC/Cardinal-Components-API/issues",
-        "sources": "https://github.com/NerdHubMC/Cardinal-Components-API"
+        "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
+        "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
     },
     "license": "MIT",
     "mixins": [
