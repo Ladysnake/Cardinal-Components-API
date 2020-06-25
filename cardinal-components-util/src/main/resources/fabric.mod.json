@@ -1,0 +1,28 @@
+{
+    "schemaVersion": 1,
+    "environment": "*",
+    "id": "cardinal-components-util",
+    "name": "Cardinal Components API (utilities)",
+    "description": "dynamically exposing components",
+    "version": "${version}",
+    "side": "universal",
+    "custom": {
+        "modmenu:api": true,
+        "modmenu:parent": "cardinal-components"
+    },
+    "depends": {
+        "fabric-api-base": "*",
+        "cardinal-components-base": "*"
+    },
+    "authors": [
+        {
+            "name": "Pyrofab"
+        }
+    ],
+    "contact": {
+        "homepage": "https://minecraft.curseforge.com/projects/318449",
+        "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
+        "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
+    },
+    "license": "MIT"
+}

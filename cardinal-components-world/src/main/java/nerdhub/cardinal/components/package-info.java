@@ -20,10 +20,12 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+@ApiStatus.Internal
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 package nerdhub.cardinal.components;
 
 import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.ParametersAreNonnullByDefault;

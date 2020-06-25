@@ -26,11 +26,14 @@ import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.level.LevelProperties;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 /**
  * used to access an object's components.
@@ -66,7 +69,7 @@ public interface ComponentProvider {
      * Convenience method to retrieve a ComponentProvider from given {@link LevelProperties}.
      * Requires the <tt>cardinal-components-level</tt> module.
      */
-    static ComponentProvider fromLevel(LevelProperties level) {
+    static ComponentProvider fromLevel(WorldProperties level) {
         return (ComponentProvider) level;
     }
 
@@ -98,4 +101,20 @@ public interface ComponentProvider {
      * @return an unmodifiable view of the component types
      */
     Set<ComponentType<?>> getComponentTypes();
+
+    default void forEachComponent(BiConsumer<ComponentType<?>, Component> op) {
+        for (ComponentType<?> type : this.getComponentTypes()) {
+            op.accept(type, this.getComponent(type));
+        }
+    }
+
+    /**
+     * @return a runtime-generated component container storing statically declared components,
+     * or {@code null} if this container does not support static components.
+     */
+    @Nullable
+    @ApiStatus.OverrideOnly
+    default Object getStaticComponentContainer() {
+        return null;
+    }
 }

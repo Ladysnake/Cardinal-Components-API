@@ -2,15 +2,15 @@
   "required": true,
   "minVersion": "0.7.11",
   "compatibilityLevel": "JAVA_8",
-  "package": "nerdhub.cardinal.components.mixins",
+  "package": "dev.onyxstudios.cca.mixin.chunk",
   "mixins": [
-    "common.chunk.MixinChunk",
-    "common.chunk.MixinChunkHolder",
-    "common.chunk.MixinChunkSerializer",
-    "common.chunk.MixinEmptyChunk",
-    "common.chunk.MixinReadOnlyChunk",
-    "common.chunk.MixinThreadedAnvilChunkStorage",
-    "common.chunk.MixinWorldChunk"
+      "common.MixinChunkHolder",
+      "common.MixinChunkSerializer",
+      "common.MixinEmptyChunk",
+      "common.MixinProtoChunk",
+      "common.MixinReadOnlyChunk",
+      "common.MixinThreadedAnvilChunkStorage",
+      "common.MixinWorldChunk"
   ],
   "injectors": {
     "defaultRequire": 1

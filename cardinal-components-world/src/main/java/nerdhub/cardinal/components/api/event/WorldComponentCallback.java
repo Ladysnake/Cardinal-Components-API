@@ -22,6 +22,8 @@
  */
 package nerdhub.cardinal.components.api.event;
 
+import dev.onyxstudios.cca.api.v3.component.world.WorldComponentFactory;
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import net.fabricmc.fabric.api.event.Event;
@@ -47,6 +49,10 @@ public interface WorldComponentCallback extends ComponentCallback<World, Compone
                     callback.initComponents(world, components);
                 }
             });
+
+    static <C extends Component> void register(ComponentType<C> type, WorldComponentFactory<C> factory) {
+        EVENT.register((world, components) -> components.put(type, factory.createForWorld(world)));
+    }
 
     /**
      * Initialize components for the given world.

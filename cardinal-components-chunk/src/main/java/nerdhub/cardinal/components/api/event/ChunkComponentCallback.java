@@ -22,11 +22,15 @@
  */
 package nerdhub.cardinal.components.api.event;
 
+import dev.onyxstudios.cca.api.v3.component.chunk.ChunkComponentFactory;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.world.chunk.Chunk;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * The callback interface for receiving component initialization events
@@ -47,6 +51,11 @@ public interface ChunkComponentCallback extends ComponentCallback<Chunk, Copyabl
                     callback.initComponents(chunk, components);
                 }
             });
+
+    @ApiStatus.Experimental
+    static <C extends Component> void register(ComponentType<C> type, ChunkComponentFactory<? extends C> factory) {
+        EVENT.register((chunk, components) -> components.put(type, factory.createForChunk(chunk)));
+    }
 
     /**
      * Initialize components for the given chunk.

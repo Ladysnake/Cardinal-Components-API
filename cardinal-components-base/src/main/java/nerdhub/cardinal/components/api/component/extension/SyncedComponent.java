@@ -24,8 +24,8 @@ package nerdhub.cardinal.components.api.component.extension;
 
 import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.PacketByteBuf;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -49,7 +49,7 @@ public interface SyncedComponent extends Component {
      * @deprecated use {@link #sync()} for an alternative with better semantics
      */
     @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.4.0")
+    @ApiStatus.ScheduledForRemoval
     default void markDirty() {
         this.sync();
     }

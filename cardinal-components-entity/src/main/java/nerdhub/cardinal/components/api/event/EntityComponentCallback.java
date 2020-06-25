@@ -22,11 +22,14 @@
  */
 package nerdhub.cardinal.components.api.event;
 
+import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentFactory;
+import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.internal.CardinalEntityInternals;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.entity.Entity;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * The callback interface for receiving component initialization events
@@ -71,10 +74,20 @@ public interface EntityComponentCallback<E extends Entity> extends ComponentCall
         return CardinalEntityInternals.event(clazz);
     }
 
+    @ApiStatus.Experimental
+    static <C extends Component, E extends Entity> void register(ComponentType<C> type, Class<E> targetClass, EntityComponentFactory<C, E> factory) {
+        event(targetClass).register((entity, components) -> components.put(type, factory.createForEntity(entity)));
+    }
+
     /**
      * Initialize components for the given entity.
-     * Components that are added to the given container will be available
+     *
+     * <p>Components that are added to the given container will be available
      * on the entity as soon as all callbacks have been invoked.
+     *
+     * <p><strong>The {@code entity} may not be fully initialized when this method is called!</strong>
+     * Implementations should resort to lazy initialization if they need properties not available in the
+     * base {@link Entity} class.
      *
      * @param entity     the entity being constructed
      * @param components the entity's component container

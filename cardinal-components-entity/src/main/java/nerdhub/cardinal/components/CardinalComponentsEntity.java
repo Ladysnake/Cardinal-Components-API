@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components;
 
+import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
@@ -29,18 +30,15 @@ import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
 import nerdhub.cardinal.components.api.event.TrackingStartCallback;
-import nerdhub.cardinal.components.api.util.Components;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
 import net.minecraft.world.GameRules;
-
-import java.util.function.Consumer;
 
 public final class CardinalComponentsEntity {
     public static void init() {
@@ -54,15 +52,13 @@ public final class CardinalComponentsEntity {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless) {
         boolean keepInventory = original.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || clone.isSpectator();
-        Components.forEach(ComponentProvider.fromEntity(original),
-                (type, from) -> type.maybeGet(clone).ifPresent(
-                        to -> EntityComponents.getRespawnCopyStrategy((ComponentType) type).copyForRespawn(from, to, lossless, keepInventory)
-                )
-        );
+        ComponentProvider.fromEntity(original).forEachComponent((type, from) -> type.maybeGet(clone).ifPresent(
+            to -> EntityComponents.getRespawnCopyStrategy((ComponentType) type).copyForRespawn(from, to, lossless, keepInventory)
+        ));
     }
 
     private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {
-        Components.forEach(ComponentProvider.fromEntity(tracked), (componentType, component) -> {
+        ComponentProvider.fromEntity(tracked).forEachComponent((componentType, component) -> {
             if (component instanceof SyncedComponent) {
                 ((SyncedComponent) component).syncWith(player);
             }
@@ -73,23 +69,27 @@ public final class CardinalComponentsEntity {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             ClientSidePacketRegistry.INSTANCE.register(EntitySyncedComponent.PACKET_ID, (context, buffer) -> {
-                int entityId = buffer.readInt();
-                Identifier componentTypeId = buffer.readIdentifier();
-                ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
-                if (componentType == null) {
-                    return;
+                try {
+                    int entityId = buffer.readInt();
+                    Identifier componentTypeId = buffer.readIdentifier();
+                    ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+                    if (componentType == null) {
+                        return;
+                    }
+                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                    context.getTaskQueue().execute(() -> {
+                        try {
+                            componentType.maybeGet(context.getPlayer().world.getEntityById(entityId))
+                                .filter(c -> c instanceof SyncedComponent)
+                                .ifPresent(c -> ((SyncedComponent) c).processPacket(context, copy));
+                        } finally {
+                            copy.release();
+                        }
+                    });
+                } catch (Exception e) {
+                    ComponentsInternals.LOGGER.error("Error while reading entity components from network", e);
+                    throw e;
                 }
-                PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-                // Functional null avoidance with off-thread lambda instantiation, surely it's better than nested ifs...                        right ?
-                Consumer<Entity> entitySync = componentType.asComponentPath()
-                        .compose(ComponentProvider::fromEntity)
-                        .thenCastTo(SyncedComponent.class)
-                        .andThenDo(component -> component.processPacket(context, copy));
-                context.getTaskQueue().execute(() -> {
-                    Entity entity = context.getPlayer().world.getEntityById(entityId);
-                    entitySync.accept(entity);
-                    copy.release();
-                });
             });
         }
     }

@@ -22,14 +22,19 @@
  */
 package nerdhub.cardinal.components.api.event;
 
+import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactory;
+import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
+import dev.onyxstudios.cca.internal.item.ItemCaller;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.util.ItemComponent;
-import nerdhub.cardinal.components.internal.CardinalItemInternals;
-import nerdhub.cardinal.components.internal.ItemCaller;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 
@@ -48,6 +53,8 @@ import javax.annotation.Nullable;
  * More formally, if a callback is registered for an item {@code i},
  * its {@code initComponents} method will be invoked for any stack {@code s}
  * verifying {@code s.getItem() == i}.
+ *
+ * @see ItemComponentCallbackV2
  */
 @FunctionalInterface
 public interface ItemComponentCallback extends ComponentCallback<ItemStack, CopyableComponent<?>> {
@@ -71,6 +78,11 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Copy
         return item == null ? CardinalItemInternals.WILDCARD_ITEM_EVENT : ((ItemCaller) item).cardinal_getItemComponentEvent();
     }
 
+    @ApiStatus.Experimental
+    static <C extends Component> void register(ComponentType<C> type, @Nullable Item item, ItemComponentFactory<? extends C> factory) {
+        event(item).register((stack, components) -> components.put(type, factory.createForStack(stack)));
+    }
+
     /**
      * Convenience method to register an item that implements its own component callback
      *
@@ -87,6 +99,10 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Copy
      * Initialize components for the given item stack.
      * Components that are added to the given container will be available
      * on the stack as soon as all callbacks have been invoked.
+     *
+     * <p><b>Some stacks may be initialized with a count of 0, causing {@link ItemStack#getItem()} to
+     * return {@link Items#AIR}.</b> If the item is needed for initializing components,
+     * use {@link ItemComponentCallbackV2} instead.
      *
      * <p> Example code: <pre><code>
      *  ItemComponentCallback.event(Items.DIAMOND_PICKAXE)

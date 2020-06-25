@@ -2,16 +2,16 @@
     "schemaVersion": 1,
     "environment": "*",
     "id": "cardinal-components-chunk",
-    "name": "Cardinal Components API",
+    "name": "Cardinal Components API (chunks)",
     "description": "dynamically exposing components",
     "version": "${version}",
     "side": "universal",
     "entrypoints": {
         "main": [
-            "nerdhub.cardinal.components.internal.ComponentsChunkNetworking::init"
+            "dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking::init"
         ],
         "client": [
-            "nerdhub.cardinal.components.internal.ComponentsChunkNetworking::initClient"
+            "dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking::initClient"
         ]
     },
     "custom": {

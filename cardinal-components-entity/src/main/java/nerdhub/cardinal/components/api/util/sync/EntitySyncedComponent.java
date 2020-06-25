@@ -24,15 +24,17 @@ package nerdhub.cardinal.components.api.util.sync;
 
 import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
+import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
 
 /**
  * Default implementations of {@link SyncedComponent} methods, specialized for entity components
@@ -50,6 +52,18 @@ public interface EntitySyncedComponent extends BaseSyncedComponent {
     Identifier PACKET_ID = new Identifier("cardinal-components", "entity_sync");
 
     Entity getEntity();
+
+    /**
+     * {@inheritDoc}
+     * @implNote The default implementation should generally be overridden.
+     * This implementation performs a linear-time lookup on the provider to find the component type
+     * this component is associated with.
+     * Implementing classes can nearly always provide a better implementation.
+     */
+    @Override
+    default ComponentType<?> getComponentType() {
+        return TypeAwareComponent.lookupComponentType(ComponentProvider.fromEntity(this.getEntity()), this);
+    }
 
     @Override
     default void sync() {

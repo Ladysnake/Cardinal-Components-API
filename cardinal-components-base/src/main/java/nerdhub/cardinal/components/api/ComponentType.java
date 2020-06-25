@@ -22,15 +22,17 @@
  */
 package nerdhub.cardinal.components.api;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
-import nerdhub.cardinal.components.api.util.ObjectPath;
-import nerdhub.cardinal.components.internal.ComponentsInternals;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnegative;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
@@ -40,10 +42,9 @@ import java.util.function.Function;
  *
  * @see ComponentRegistry
  */
-public final class ComponentType<T extends Component> {
+@ApiStatus.NonExtendable
+public class ComponentType<T extends Component> extends ComponentKey<T> {
 
-    private final Class<T> componentClass;
-    private final Identifier id;
     private final int rawId;
 
     /* ------------ internal methods ------------- */
@@ -53,29 +54,47 @@ public final class ComponentType<T extends Component> {
      *
      * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
      */
-    /* package-private */
-    ComponentType(Identifier id, Class<T> componentClass, int rawId) {
-        this.componentClass = componentClass;
-        this.id = id;
+    protected ComponentType(Identifier id, Class<T> componentClass, int rawId) {
+        super(id, componentClass);
         this.rawId = rawId;
+    }
+
+    @Nonnegative
+    @ApiStatus.Internal
+    public final int getRawId() {
+        return this.rawId;
+    }
+
+    /**
+     * @param provider a component provider
+     * @return the attached component of this type, or
+     * {@code null} if the provider does not support this type of component
+     * @see #get(Object)
+     * @see #maybeGet(Object)
+     */
+    // overridden by generated types
+    // TODO V3 replace argument with ComponentContainer when it is safe to pass those around
+    @ApiStatus.Internal
+    @ApiStatus.Experimental
+    public @Nullable T getNullable(ComponentProvider provider) {
+        return provider.getComponent(this);
     }
 
     /* ------------- public methods -------------- */
 
-    public Identifier getId() {
-        return this.id;
+    /**
+     * @deprecated use {@code ObjectPath.fromFunction(}{@link #getNullable(ComponentProvider) this::getNullable}{@code )}
+     * (from the cardinal-components-util module)
+     */
+    @Deprecated
+    public final Function<ComponentProvider, T> asComponentPath() {
+        return this::getNullable;
     }
 
-    public int getRawId() {
-        return this.rawId;
-    }
-
-    public Class<T> getComponentClass() {
-        return componentClass;
-    }
-
-    public ObjectPath<ComponentProvider, T> asComponentPath() {
-        return c -> c.getComponent(this);
+    @Nullable
+    @Override
+    public <V> T getNullable(V provider) {
+        return this.getNullable((ComponentProvider) provider);
     }
 
     /**
@@ -86,26 +105,31 @@ public final class ComponentType<T extends Component> {
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      * @see #maybeGet(Object)
      */
-    public <V> T get(V provider) {
-        T component = (((ComponentProvider) provider)).getComponent(this);
+    public final <V> T get(V provider) {
+        T component = this.getNullable((ComponentProvider) provider);
         assert component == null || this.getComponentClass().isInstance(component);
         if (component == null) {
-            throw new NoSuchElementException(provider + " provides no component of type " + this.id);
+            try {
+                throw new NoSuchElementException(provider + " provides no component of type " + this.getId());
+            } catch (NullPointerException e) {  // some toString implementations crash in init because the name is not set
+                NoSuchElementException e1 = new NoSuchElementException(this.getId() + " not available");
+                e1.addSuppressed(e);
+                throw e1;
+            }
         }
         return component;
     }
 
     /**
-     *
      * @param provider a component provider
      * @param <V>      the class of the component provider
      * @return an {@code Optional} describing a component of this type, or an empty
      * {@code Optional} if {@code provider} does not have such a component.
      * @see #get(Object)
      */
-    public <V> Optional<T> maybeGet(@Nullable V provider) {
+    public final <V> Optional<T> maybeGet(@Nullable V provider) {
         if (provider instanceof ComponentProvider) {
-            return Optional.ofNullable(((ComponentProvider) provider).getComponent(this));
+            return Optional.ofNullable(this.getNullable((ComponentProvider) provider));
         }
         return Optional.empty();
     }
@@ -118,19 +142,15 @@ public final class ComponentType<T extends Component> {
      * <pre>{@code
      *      event.register((provider, components) -> components.put(type, factory.apply(provider)));
      * }</pre>
-     * @param event the event for which components of this type should be attached
+     *
+     * @param event   the event for which components of this type should be attached
      * @param factory a factory creating instances for this {@code ComponentType}
-     * @param <P> the type of providers targeted by the event
+     * @param <P>     the type of providers targeted by the event
      * @return {@code this}
      * @throws IllegalArgumentException if {@code event} is not a valid component event
      */
-    public <P, C extends T, E extends ComponentCallback<P, ? super C>> ComponentType<T> attach(Event<E> event, Function<P, C> factory) {
+    public final <P, C extends T, E extends ComponentCallback<P, ? super C>> ComponentType<T> attach(Event<E> event, Function<P, C> factory) {
         event.register(ComponentsInternals.createCallback(event, this, factory));
         return this;
-    }
-
-    @Override
-    public String toString() {
-        return "ComponentType[\"" + id + "\"]";
     }
 }

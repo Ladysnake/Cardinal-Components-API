@@ -22,11 +22,14 @@
  */
 package nerdhub.cardinal.components.api.event;
 
+import dev.onyxstudios.cca.api.v3.component.level.LevelComponentFactory;
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.world.level.LevelProperties;
+import net.minecraft.world.WorldProperties;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * The callback interface for receiving component initialization events
@@ -38,8 +41,8 @@ import net.minecraft.world.level.LevelProperties;
  * When a {@code LevelProperties} object is constructed, the callback's
  * {@link #initComponents} method is invoked.
  */
-@FunctionalInterface
-public interface LevelComponentCallback extends ComponentCallback<LevelProperties, Component> {
+@FunctionalInterface    // TODO rename the interface when yarn updates
+public interface LevelComponentCallback extends ComponentCallback<WorldProperties, Component> {
 
     Event<LevelComponentCallback> EVENT = EventFactory.createArrayBacked(LevelComponentCallback.class,
         (callbacks) -> (level, components) -> {
@@ -47,6 +50,11 @@ public interface LevelComponentCallback extends ComponentCallback<LevelPropertie
                 callback.initComponents(level, components);
             }
         });
+
+    @ApiStatus.Experimental
+    static <C extends Component> void register(ComponentType<C> type, LevelComponentFactory<C> factory) {
+        EVENT.register((level, components) -> components.put(type, factory.createForSave(level)));
+    }
 
     /**
      * Initialize components for the given level properties object.
@@ -57,5 +65,5 @@ public interface LevelComponentCallback extends ComponentCallback<LevelPropertie
      * @param components the level's component container
      */
     @Override
-    void initComponents(LevelProperties level, ComponentContainer<Component> components);
+    void initComponents(WorldProperties level, ComponentContainer<Component> components);
 }

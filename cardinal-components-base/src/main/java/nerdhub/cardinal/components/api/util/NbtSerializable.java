@@ -22,7 +22,10 @@
  */
 package nerdhub.cardinal.components.api.util;
 
+import com.mojang.serialization.Dynamic;
+import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.ApiStatus;
 
 public interface NbtSerializable {
     /**
@@ -43,4 +46,14 @@ public interface NbtSerializable {
      * @return {@code tag} for easy chaining
      */
     CompoundTag toTag(CompoundTag tag);
+
+    @ApiStatus.Experimental
+    default void fromDynamic(Dynamic<?> dynamic) {
+        this.fromTag((CompoundTag) dynamic.convert(NbtOps.INSTANCE).getValue());
+    }
+
+    @ApiStatus.Experimental
+    default <T> Dynamic<T> toDynamic(Dynamic<T> dynamic) {
+        return dynamic.convert(NbtOps.INSTANCE).map(tag -> this.toTag((CompoundTag)tag)).convert(dynamic.getOps());
+    }
 }

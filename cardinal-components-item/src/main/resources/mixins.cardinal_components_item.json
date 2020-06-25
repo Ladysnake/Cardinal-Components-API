@@ -1,20 +1,21 @@
 {
-  "required": true,
-  "minVersion": "0.7.11",
-  "compatibilityLevel": "JAVA_8",
-  "package": "nerdhub.cardinal.components.mixins",
-  "mixins": [
-    "common.item.MixinBookCloningRecipe",
-    "common.item.MixinCarrotOnAStickItem",
-    "common.item.MixinCauldronBlock",
-    "common.item.MixinItem",
-    "common.item.MixinItemEntity",
-    "common.item.MixinItemStack",
-    "common.item.MixinPacketByteBuf",
-    "common.item.MixinPlayerInventory",
-    "common.item.MixinShulkerBoxColoringRecipe"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  }
+    "required": true,
+    "minVersion": "0.7.11",
+    "compatibilityLevel": "JAVA_8",
+    "package": "dev.onyxstudios.cca.mixin.item",
+    "mixins": [
+        "common.MixinBookCloningRecipe",
+        "common.MixinCauldronBlock",
+        "common.MixinItem",
+        "common.MixinItemEntity",
+        "common.MixinItemStack",
+        "common.MixinOnAStickItem",
+        "common.MixinPacketByteBuf",
+        "common.MixinPlayerInventory",
+        "common.MixinShulkerBoxColoringRecipe",
+        "common.MixinSmithingRecipe"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
 }

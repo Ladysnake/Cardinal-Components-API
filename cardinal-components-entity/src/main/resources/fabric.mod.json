@@ -2,7 +2,7 @@
     "schemaVersion": 1,
     "environment": "*",
     "id": "cardinal-components-entity",
-    "name": "Cardinal Components API",
+    "name": "Cardinal Components API (entities)",
     "description": "dynamically exposing components",
     "version": "${version}",
     "side": "universal",
@@ -35,8 +35,8 @@
     ],
     "contact": {
         "homepage": "https://minecraft.curseforge.com/projects/318449",
-        "issues": "https://github.com/NerdHubMC/Cardinal-Components-API/issues",
-        "sources": "https://github.com/NerdHubMC/Cardinal-Components-API"
+        "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
+        "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
     },
     "license": "MIT",
     "mixins": [
