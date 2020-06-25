@@ -8,6 +8,10 @@ objects and behaviours, thereby helping both mod creation and compatibility.*
 
 **TL;DR: It allows you to attach data to things**
 
+
+Detailed information is available in this repository's [wiki](https://github.com/OnyxStudios/Cardinal-Components-API/wiki).
+The information below is a condensed form of the latter.
+
 ## Adding the API to your buildscript (loom 0.2.6+):
 Latest versions of Cardinal Components API are available on Bintray:
 ```gradle
