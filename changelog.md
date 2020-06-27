@@ -1,4 +1,10 @@
 ------------------------------------------------------
+Version 2.4.1
+------------------------------------------------------
+- Fixed crash when more than 16 components were registered
+- Fixed crash when dots were used in static component identifiers
+
+------------------------------------------------------
 Version 2.4.0
 ------------------------------------------------------
 **Backwards-compatibility note: while this release is compatible with older applications, 
