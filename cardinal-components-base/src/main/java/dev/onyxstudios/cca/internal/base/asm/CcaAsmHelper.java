@@ -108,7 +108,11 @@ public final class CcaAsmHelper {
     }
 
     public static String getJavaIdentifierName(Identifier identifier) {
-        return identifier.toString().replace(':', '$').replace('/', '$');
+        return identifier.toString()
+            .replace(':', '$')
+            .replace('/', '$')
+            .replace('.', '¤')
+            .replace('-', '£');
     }
 
     public static String getStaticStorageGetterName(Identifier identifier) {
