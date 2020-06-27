@@ -74,7 +74,7 @@ public final class CcaBootstrap extends LazyDispatcher {
     @Override
     protected void init() {
         try {
-            Set<Identifier> staticComponentTypes = new HashSet<>();
+            Set<Identifier> staticComponentTypes = new TreeSet<>(Comparator.comparing(Identifier::toString));
 
             for (ModContainer mod : FabricLoader.getInstance().getAllMods()) {
                 ModMetadata metadata = mod.getMetadata();
