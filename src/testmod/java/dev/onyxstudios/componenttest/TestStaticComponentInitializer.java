@@ -29,17 +29,23 @@ import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public final class TestStaticComponentInitializer implements StaticComponentInitializer {
 
     // note: the actual ComponentKey must not be registered in this class' <clinit>, to avoid circular initialization
-    public static final Identifier ALT_VITA_ID = new Identifier("componenttest:alt_vita");
+    public static final Identifier ALT_VITA_ID = new Identifier("componenttest", "alt-vita");
 
     @Override
     public Collection<Identifier> getSupportedComponentTypes() {
-        return Collections.singleton(ALT_VITA_ID);
+        List<Identifier> ret = new ArrayList<>(Collections.singleton(ALT_VITA_ID));
+        for (int i = 0; i < 128; i++) {
+            ret.add(new Identifier("-.-", "-random/test." + i));
+        }
+        return ret;
     }
 
     @Override
