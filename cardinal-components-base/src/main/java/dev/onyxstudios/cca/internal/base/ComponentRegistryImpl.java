@@ -90,8 +90,8 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
             } else {
                 registered = this.access.create(componentId, componentClass, rawId);
             }
-            if (this.raw2Types.length < rawId) {
-                this.raw2Types = new ComponentType[this.raw2Types.length + 16];
+            if (this.raw2Types.length <= rawId) {
+                this.raw2Types = Arrays.copyOf(this.raw2Types, rawId + 16);
             }
             this.raw2Types[rawId] = registered;
             this.size++;
@@ -103,7 +103,7 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
     @Override
     public <T extends Component> ComponentType<T> registerStatic(Identifier componentId, Class<T> componentClass) {
         if (CcaBootstrap.INSTANCE.getGeneratedComponentTypeClass(componentId) == null) {
-            throw new IllegalStateException(componentId + "");
+            throw new IllegalStateException(componentId + " was not registered through mod metadata or plugin");
         }
         return this.registerIfAbsent(componentId, componentClass);
     }

@@ -25,6 +25,7 @@ package dev.onyxstudios.componenttest;
 import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.component.util.ComponentContainerMetafactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
+import dev.onyxstudios.componenttest.vita.Vita;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
@@ -72,16 +73,24 @@ public class CardinalComponentsTest {
 
     public static void init() {
         LOGGER.info("Hello, Components!");
+
+        for (int i = 0; i < 16; i++) {
+            ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(String.valueOf(Math.random())), Vita.class);
+        }
+
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
+
         try {
             ComponentRegistry.INSTANCE.registerStatic(TestComponents.OLD_VITA.getId(), TestComponents.OLD_VITA.getComponentClass());
             assert false : "Static components must be registered through mod metadata or plugin";
         } catch (IllegalStateException ignored) { }
+
         LOGGER.info(ComponentContainerMetafactory.metafactory(
             TestComponents.CUSTOM_PROVIDER_1,
             TypeToken.of(TestContainerFactory.class),
             new TypeToken<BiFunction<UUID, PlayerEntity, ? extends Component>>() {}
         ).create(UUID.randomUUID(), null));
+
         try {
             LOGGER.info(ComponentContainerMetafactory.metafactory(
                 TestComponents.CUSTOM_PROVIDER_1,
@@ -90,6 +99,7 @@ public class CardinalComponentsTest {
             ).create(UUID.randomUUID(), null));
             assert false : "Only one factory should be created for any given provider type";
         } catch (IllegalStateException ignored) { }
+
         try {
             LOGGER.info(ComponentContainerMetafactory.metafactory(
                 TestComponents.CUSTOM_PROVIDER_2,
@@ -98,11 +108,13 @@ public class CardinalComponentsTest {
             ).apply(UUID.randomUUID(), null));
             assert false : "Registered factory does not return " + SyncedComponent.class;
         } catch (StaticComponentLoadingException ignored) { }
+
         LOGGER.info(ComponentContainerMetafactory.metafactory(
             TestComponents.CUSTOM_PROVIDER_2,
             new TypeToken<BiFunction<UUID, PlayerEntity, ComponentContainer<? extends CopyableComponent<?>>>>() {},
             new TypeToken<BiFunction<UUID, PlayerEntity, ? extends CopyableComponent<?>>>() {}
         ).apply(UUID.randomUUID(), null));
+
         LOGGER.info(ComponentContainerMetafactory.metafactory(
             TestComponents.CUSTOM_PROVIDER_3,
             TypeToken.of(TestContainerFactory.class),
@@ -110,6 +122,7 @@ public class CardinalComponentsTest {
             TestCallback.class,
             TestCallback.EVENT
         ).create(UUID.randomUUID(), null));
+
         LOGGER.info(ComponentContainerMetafactory.metafactory(
             new Identifier("componenttest:no_factory"),
             TypeToken.of(TestContainerFactory.class),
