@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import java.util.List;
 import java.util.Set;
 
-public class CardinalItemMixinPlugin implements IMixinConfigPlugin {
+public final class CardinalItemMixinPlugin implements IMixinConfigPlugin {
     private static final boolean OPTIBAD = FabricLoader.getInstance().isModLoaded("optifabric");
 
     @Override
@@ -45,10 +45,10 @@ public class CardinalItemMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (mixinClassName.equals("dev.onyxstudios.cca.mixin.item.common.MixinWritePacketByteBuf")) {
+        if ("dev.onyxstudios.cca.mixin.item.common.MixinWritePacketByteBuf".equals(mixinClassName)) {
             return !OPTIBAD;
         }
-        if (mixinClassName.equals("dev.onyxstudios.cca.mixin.item.common.MixinWritePacketByteBufOF")) {
+        if ("dev.onyxstudios.cca.mixin.item.common.MixinWritePacketByteBufOF".equals(mixinClassName)) {
             return OPTIBAD;
         }
         return true;
