@@ -44,6 +44,7 @@ import java.util.Map;
 public final class CardinalItemInternals {
     public static final Event<ItemComponentCallbackV2> WILDCARD_ITEM_EVENT_V2 = createItemComponentsEventV2();
     public static final Event<ItemComponentCallback> WILDCARD_ITEM_EVENT = createItemComponentsEvent(WILDCARD_ITEM_EVENT_V2);
+    public static final String CCA_SYNCED_COMPONENTS = "cca_synced_components";
 
     public static Event<ItemComponentCallbackV2> createItemComponentsEventV2() {
         return EventFactory.createArrayBacked(ItemComponentCallbackV2.class,

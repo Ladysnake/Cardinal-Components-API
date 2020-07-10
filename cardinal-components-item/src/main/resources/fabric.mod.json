@@ -14,6 +14,9 @@
         "fabric-api-base": "*",
         "cardinal-components-base": "*"
     },
+    "conflicts": {
+        "optifabric": "*"
+    },
     "authors": [
         {
             "name": "UpcraftLP",
