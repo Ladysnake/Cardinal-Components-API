@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(BookCloningRecipe.class)
-public class MixinBookCloningRecipe {
+public abstract class MixinBookCloningRecipe {
     @Inject(
         method = "craft",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;setTag(Lnet/minecraft/nbt/CompoundTag;)V"),

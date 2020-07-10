@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(OnAStickItem.class)
-public class MixinOnAStickItem {
+public abstract class MixinOnAStickItem {
     @ModifyVariable(
         method = "use",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;setTag(Lnet/minecraft/nbt/CompoundTag;)V"),

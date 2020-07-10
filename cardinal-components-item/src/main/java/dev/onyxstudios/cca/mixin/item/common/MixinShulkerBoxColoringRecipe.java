@@ -34,7 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ShulkerBoxColoringRecipe.class)
-public class MixinShulkerBoxColoringRecipe {
+public abstract class MixinShulkerBoxColoringRecipe {
     @Inject(
         method = "craft",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;hasTag()Z"),

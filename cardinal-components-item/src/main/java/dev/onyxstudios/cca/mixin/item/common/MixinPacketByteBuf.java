@@ -35,6 +35,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PacketByteBuf.class)
 public abstract class MixinPacketByteBuf {
 
+    /**
+     * @see MixinWritePacketByteBuf
+     * @see MixinWritePacketByteBufOF
+     */
     @Inject(method = "readItemStack", at = @At(value = "RETURN", ordinal = 1))
     private void readStack(CallbackInfoReturnable<ItemStack> cir) {
         ItemStack stack = cir.getReturnValue();
