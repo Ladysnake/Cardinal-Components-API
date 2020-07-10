@@ -3,6 +3,7 @@
     "minVersion": "0.7.11",
     "compatibilityLevel": "JAVA_8",
     "package": "dev.onyxstudios.cca.mixin.item",
+    "plugin": "dev.onyxstudios.cca.mixin.CardinalItemMixinPlugin",
     "mixins": [
         "common.MixinBookCloningRecipe",
         "common.MixinCauldronBlock",
@@ -13,7 +14,9 @@
         "common.MixinPacketByteBuf",
         "common.MixinPlayerInventory",
         "common.MixinShulkerBoxColoringRecipe",
-        "common.MixinSmithingRecipe"
+        "common.MixinSmithingRecipe",
+        "common.MixinWritePacketByteBuf",
+        "common.MixinWritePacketByteBufOF"
     ],
     "injectors": {
         "defaultRequire": 1

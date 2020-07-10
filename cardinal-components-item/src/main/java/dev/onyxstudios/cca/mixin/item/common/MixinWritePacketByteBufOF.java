@@ -24,26 +24,26 @@ package dev.onyxstudios.cca.mixin.item.common;
 
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
+import nerdhub.cardinal.components.api.component.ComponentContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(PacketByteBuf.class)
-public abstract class MixinPacketByteBuf {
+public abstract class MixinWritePacketByteBufOF {
+    @ModifyVariable(method = "writeItemStack", at = @At("HEAD"), argsOnly = true)
+    private ItemStack writeItemStackOptifine(ItemStack stack) {
+        @SuppressWarnings("ConstantConditions") ComponentContainer<?> componentContainer = ((InternalComponentProvider)(Object) stack).getComponentContainer();
 
-    @Inject(method = "readItemStack", at = @At(value = "RETURN", ordinal = 1))
-    private void readStack(CallbackInfoReturnable<ItemStack> cir) {
-        ItemStack stack = cir.getReturnValue();
-
-        CompoundTag syncedComponents = stack.getSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS);
-        if (syncedComponents != null) {
-            //noinspection ConstantConditions
-            ((InternalComponentProvider) ((Object) stack)).getComponentContainer().fromTag(syncedComponents);
-            stack.removeSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS);
+        if (!componentContainer.isEmpty()) {
+            ItemStack copy = stack.copy();
+            copy.putSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS, componentContainer.toTag(new CompoundTag()));
+            return copy;
         }
+
+        return stack;
     }
 }
