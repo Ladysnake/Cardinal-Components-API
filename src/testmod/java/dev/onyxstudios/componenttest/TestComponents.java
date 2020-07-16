@@ -36,6 +36,8 @@ import dev.onyxstudios.cca.api.v3.component.util.GenericComponentFactoryRegistry
 import dev.onyxstudios.cca.api.v3.component.util.GenericComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.component.world.WorldComponentInitializer;
+import dev.onyxstudios.cca.api.v3.scoreboard.component.ScoreboardComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.scoreboard.component.ScoreboardComponentInitializer;
 import dev.onyxstudios.componenttest.vita.*;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
@@ -53,7 +55,8 @@ public final class TestComponents implements
     LevelComponentInitializer,
     WorldComponentInitializer,
     GenericComponentInitializer,
-    ItemComponentInitializer {
+    ItemComponentInitializer,
+    ScoreboardComponentInitializer {
 
     public static final Identifier CUSTOM_PROVIDER_1 = new Identifier("componenttest:custom/1");
     public static final Identifier CUSTOM_PROVIDER_2 = new Identifier("componenttest:custom/2");
@@ -105,5 +108,10 @@ public final class TestComponents implements
         registry.registerForAll(ALT_VITA, (item, stack) -> new BaseVita(stack.getCount()));
         registry.registerFor(new Identifier("diamond_chestplate"), ALT_VITA, stack -> new BaseVita(3));
         registry.registerFor(CardinalComponentsTest.VITA_STICK_ID, VITA, stack -> new BaseVita());
+    }
+
+    @Override
+    public void registerScoreboardComponentFactories(ScoreboardComponentFactoryRegistry registry) {
+        registry.register(VITA, TeamVita::new);
     }
 }
