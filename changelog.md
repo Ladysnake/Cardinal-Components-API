@@ -1,4 +1,10 @@
 ------------------------------------------------------
+Version 2.4.2
+------------------------------------------------------
+- Fixed regression in `cardinal-components-item` causing crash with Optifine installed
+- Marked the `cardinal-components-level` module as incompatible with 1.16.2 and above
+
+------------------------------------------------------
 Version 2.4.1
 ------------------------------------------------------
 - Fixed crash when more than 16 components were registered

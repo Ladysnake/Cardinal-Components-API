@@ -19,7 +19,7 @@
         "modmenu:parent": "cardinal-components"
     },
     "depends": {
-        "minecraft": ">=1.16-",
+        "minecraft": ">=1.16- <1.16.2-",
         "fabric-api-base": "*",
         "cardinal-components-base": "*"
     },
