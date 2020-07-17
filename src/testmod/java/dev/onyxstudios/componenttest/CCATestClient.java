@@ -22,8 +22,8 @@
  */
 package dev.onyxstudios.componenttest;
 
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.event.client.ItemTooltipCallback;
 import net.minecraft.client.render.entity.ZombieEntityRenderer;
 import net.minecraft.text.TranslatableText;
 
