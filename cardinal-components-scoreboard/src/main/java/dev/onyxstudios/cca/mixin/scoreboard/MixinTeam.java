@@ -22,12 +22,12 @@
  */
 package dev.onyxstudios.cca.mixin.scoreboard;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.scoreboard.StaticTeamComponentPlugin;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Lazy;
 import org.spongepowered.asm.mixin.Mixin;
@@ -53,7 +53,7 @@ public abstract class MixinTeam implements InternalComponentProvider {
 
     @Nonnull
     @Override
-    public Object getStaticComponentContainer() {
+    public ComponentContainer<?> getComponentContainer() {
         return this.components;
     }
 }

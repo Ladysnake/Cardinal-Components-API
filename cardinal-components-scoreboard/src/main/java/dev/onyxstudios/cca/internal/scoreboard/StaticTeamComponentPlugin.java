@@ -22,13 +22,13 @@
  */
 package dev.onyxstudios.cca.internal.scoreboard;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.scoreboard.component.ScoreboardComponentInitializer;
 import dev.onyxstudios.cca.api.v3.scoreboard.component.TeamComponentFactory;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.scoreboard.Team;
 
