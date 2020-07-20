@@ -22,9 +22,9 @@
  */
 package dev.onyxstudios.cca.mixin.entity.common;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundTag;
@@ -63,7 +63,7 @@ public abstract class MixinEntity implements InternalComponentProvider {
 
     @Nonnull
     @Override
-    public Object getStaticComponentContainer() {
+    public dev.onyxstudios.cca.api.v3.component.ComponentContainer<?> getComponentContainer() {
         return this.components;
     }
 }

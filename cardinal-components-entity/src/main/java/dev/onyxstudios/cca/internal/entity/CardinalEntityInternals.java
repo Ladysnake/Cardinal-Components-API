@@ -24,12 +24,13 @@ package dev.onyxstudios.cca.internal.entity;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.util.PlayerComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
@@ -45,7 +46,7 @@ public final class CardinalEntityInternals {
 
     private static final Map<Class<? extends Entity>, Event<?>> ENTITY_EVENTS = Collections.synchronizedMap(new HashMap<>());
     private static final Map<Class<? extends Entity>, DynamicContainerFactory<Entity, Component>> entityContainerFactories = new HashMap<>();
-    private static final Map<ComponentType<?>, RespawnCopyStrategy<?>> RESPAWN_COPY_STRATEGIES = new HashMap<>();
+    private static final Map<ComponentKey<?>, RespawnCopyStrategy<?>> RESPAWN_COPY_STRATEGIES = new HashMap<>();
     private static final Object factoryMutex = new Object();
 
     @SuppressWarnings("unchecked")
@@ -104,7 +105,7 @@ public final class CardinalEntityInternals {
     }
 
     @SuppressWarnings("unchecked")
-    public static <C extends Component> RespawnCopyStrategy<C> getRespawnCopyStrat(ComponentType<C> type) {
+    public static <C extends Component> RespawnCopyStrategy<C> getRespawnCopyStrat(ComponentKey<C> type) {
         return (RespawnCopyStrategy<C>) RESPAWN_COPY_STRATEGIES.getOrDefault(type, CardinalEntityInternals::defaultCopyStrategy);
     }
 

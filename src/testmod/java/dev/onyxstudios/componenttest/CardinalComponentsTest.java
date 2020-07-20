@@ -23,12 +23,12 @@
 package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.util.ComponentContainerMetafactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.componenttest.vita.Vita;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.event.Event;
@@ -141,6 +141,6 @@ public class CardinalComponentsTest {
             }
         });
 
-        void initComponents(UUID uuid, @Nullable PlayerEntity p, ComponentContainer<Component> components);
+        void initComponents(UUID uuid, @Nullable PlayerEntity p, nerdhub.cardinal.components.api.component.ComponentContainer<Component> components);
     }
 }

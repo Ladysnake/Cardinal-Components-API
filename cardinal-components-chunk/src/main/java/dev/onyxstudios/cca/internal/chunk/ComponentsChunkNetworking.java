@@ -22,10 +22,12 @@
  */
 package dev.onyxstudios.cca.internal.chunk;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.ChunkSyncCallback;
 import nerdhub.cardinal.components.api.util.sync.ChunkSyncedComponent;
@@ -34,15 +36,22 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
+import java.util.Set;
+
 public final class ComponentsChunkNetworking {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            ChunkSyncCallback.EVENT.register((player, tracked) -> ComponentProvider.fromChunk(tracked)
-                .forEachComponent((componentType, component) -> {
+            ChunkSyncCallback.EVENT.register((player, tracked) -> {
+                Set<ComponentKey<?>> keys = ((InternalComponentProvider) tracked).getComponentContainer().keys();
+
+                for (ComponentKey<?> key : keys) {
+                    Component component = key.getNullable(tracked);
+
                     if (component instanceof SyncedComponent) {
                         ((SyncedComponent) component).syncWith(player);
                     }
-                }));
+                }
+            });
         }
     }
 

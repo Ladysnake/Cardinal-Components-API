@@ -20,32 +20,34 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.internal.world;
+package dev.onyxstudios.cca.api.v3.component;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.PersistentState;
+import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.util.NbtSerializable;
+import org.jetbrains.annotations.ApiStatus;
 
-public class ComponentPersistentState extends PersistentState {
-    private final ComponentContainer<?> components;
+import java.util.Set;
 
-    public ComponentPersistentState(String id, ComponentContainer<?> components) {
-        super(id);
-        this.components = components;
-    }
+/**
+ * A container for components.
+ *
+ * <p> Component values obey 2 constraints.
+ * <ul>
+ *     <li>Every component in a {@code ComponentContainer<C>} is an instance of {@code C}</li>
+ *     <li>A component mapped to a {@code ComponentType<T>} is also an instance of {@code T}</li>
+ * </ul>
+ * Both type constraints should generally be interfaces, to allow multiple inheritance.<br><br>
+ *
+ * <p> A {@code ComponentContainer} cannot have its components removed.
+ * Components can be added or replaced, but removal of existing component types
+ * is unsupported. This guarantees consistent behaviour for consumers.
+ *
+ * @param <C> The upper bound for components stored in this container
+ */
+@ApiStatus.NonExtendable
+@ApiStatus.Experimental
+public interface ComponentContainer<C extends Component> extends NbtSerializable {
+    Set<ComponentKey<?>> keys();
 
-    @Override
-    public boolean isDirty() {
-        return true;
-    }
-
-    @Override
-    public void fromTag(CompoundTag tag) {
-        this.components.fromTag(tag);
-    }
-
-    @Override
-    public CompoundTag toTag(CompoundTag tag) {
-        return this.components.toTag(tag);
-    }
+    Class<C> getComponentClass();
 }

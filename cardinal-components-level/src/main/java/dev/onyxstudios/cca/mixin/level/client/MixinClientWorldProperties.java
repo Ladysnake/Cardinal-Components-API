@@ -22,13 +22,12 @@
  */
 package dev.onyxstudios.cca.mixin.level.client;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.LevelComponentCallback;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.Lazy;
@@ -41,12 +40,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
+import javax.annotation.Nonnull;
 
 @Mixin(ClientWorld.Properties.class)
-public abstract class MixinClientWorldProperties implements MutableWorldProperties, ComponentProvider {
+public abstract class MixinClientWorldProperties implements MutableWorldProperties, InternalComponentProvider {
     @Unique
     private static final Lazy<DynamicContainerFactory<WorldProperties,Component>> componentContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getContainerFactoryClass(), LevelComponentCallback.EVENT));
@@ -58,19 +55,9 @@ public abstract class MixinClientWorldProperties implements MutableWorldProperti
         this.components = componentContainerFactory.get().create(this);
     }
 
+    @Nonnull
     @Override
-    public boolean hasComponent(ComponentType<?> type) {
-        return this.components.containsKey(type);
-    }
-
-    @Nullable
-    @Override
-    public <C extends Component> C getComponent(ComponentType<C> type) {
-        return components.get(type);
-    }
-
-    @Override
-    public Set<ComponentType<?>> getComponentTypes() {
-        return Collections.unmodifiableSet(this.components.keySet());
+    public ComponentContainer<?> getComponentContainer() {
+        return this.components;
     }
 }

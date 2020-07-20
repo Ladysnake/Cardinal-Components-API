@@ -47,7 +47,7 @@ public class FallBackComponentProvider implements ComponentProvider {
      */
     @Override
     public boolean hasComponent(ComponentType<?> type) {
-        return main.hasComponent(type) || fallback.hasComponent(type);
+        return type.isProvidedBy(main) || type.isProvidedBy(fallback);
     }
 
     /**

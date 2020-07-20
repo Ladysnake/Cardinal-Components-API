@@ -22,48 +22,24 @@
  */
 package dev.onyxstudios.cca.mixin.level.common;
 
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import net.minecraft.world.level.ServerWorldProperties;
 import net.minecraft.world.level.UnmodifiableLevelProperties;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import javax.annotation.Nullable;
-import java.util.Set;
-import java.util.function.BiConsumer;
+import javax.annotation.Nonnull;
 
 @Mixin(UnmodifiableLevelProperties.class)
-public abstract class MixinUnmodifiableLevelProperties implements ComponentProvider {
+public abstract class MixinUnmodifiableLevelProperties implements InternalComponentProvider {
 
     @Shadow @Final private ServerWorldProperties properties;
 
+    @Nonnull
     @Override
-    public boolean hasComponent(ComponentType<?> type) {
-        return ((ComponentProvider)this.properties).hasComponent(type);
-    }
-
-    @Nullable
-    @Override
-    public <C extends Component> C getComponent(ComponentType<C> type) {
-        return ((ComponentProvider)this.properties).getComponent(type);
-    }
-
-    @Override
-    public Set<ComponentType<?>> getComponentTypes() {
-        return ((ComponentProvider)this.properties).getComponentTypes();
-    }
-
-    @Override
-    public void forEachComponent(BiConsumer<ComponentType<?>, Component> op) {
-        ((ComponentProvider)this.properties).forEachComponent(op);
-    }
-
-    @Nullable
-    @Override
-    public Object getStaticComponentContainer() {
-        return ((ComponentProvider)this.properties).getStaticComponentContainer();
+    public ComponentContainer<?> getComponentContainer() {
+        return ((InternalComponentProvider) this.properties).getComponentContainer();
     }
 }

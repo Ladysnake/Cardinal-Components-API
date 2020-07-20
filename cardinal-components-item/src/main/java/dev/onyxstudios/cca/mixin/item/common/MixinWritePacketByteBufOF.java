@@ -22,9 +22,9 @@
  */
 package dev.onyxstudios.cca.mixin.item.common;
 
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
+import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
@@ -36,9 +36,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public abstract class MixinWritePacketByteBufOF {
     @ModifyVariable(method = "writeItemStack", at = @At("HEAD"), argsOnly = true)
     private ItemStack writeItemStackOptifine(ItemStack stack) {
-        @SuppressWarnings("ConstantConditions") ComponentContainer<?> componentContainer = ((InternalComponentProvider)(Object) stack).getComponentContainer();
+        ComponentContainer<?> componentContainer = InternalStackComponentProvider.get(stack).getComponentContainer();
 
-        if (!componentContainer.isEmpty()) {
+        if (!componentContainer.keys().isEmpty()) {
             ItemStack copy = stack.copy();
             copy.putSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS, componentContainer.toTag(new CompoundTag()));
             return copy;
