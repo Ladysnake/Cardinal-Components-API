@@ -25,11 +25,11 @@ package dev.onyxstudios.cca.mixin.level.common;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.LevelComponentCallback;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -70,7 +70,7 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Int
 
     @Inject(method = "method_29029", at = @At("RETURN"))
     private static void readComponents(Dynamic<Tag> dynamic, DataFixer dataFixer, int dataVersion, CompoundTag compoundTag, LevelInfo levelInfo, SaveVersionInfo arg, GeneratorOptions generatorOptions, Lifecycle lifecycle, CallbackInfoReturnable<LevelProperties> cir) {
-        ((InternalComponentProvider)cir.getReturnValue()).getComponentContainer().fromDynamic(dynamic);
+        ((InternalComponentProvider) cir.getReturnValue()).getComponentContainer().fromDynamic(dynamic);
     }
 
     @Inject(method = "updateProperties", at = @At("RETURN"))
@@ -80,7 +80,7 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Int
 
     @Nonnull
     @Override
-    public Object getStaticComponentContainer() {
+    public ComponentContainer<?> getComponentContainer() {
         return this.components;
     }
 }

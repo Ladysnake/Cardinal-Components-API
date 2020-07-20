@@ -25,12 +25,12 @@ package dev.onyxstudios.cca.api.v3.component;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -84,6 +84,11 @@ public abstract class ComponentKey<T extends Component> {
      */
     public abstract <V> Optional<T> maybeGet(@Nullable V provider);
 
+    @ApiStatus.Experimental
+    public <V> boolean isProvidedBy(V provider) {
+        return this.getNullable(provider) != null;
+    }
+
     @Override
     public final String toString() {
         return this.getClass().getSimpleName() + "[\"" + this.id + "\"]";
@@ -104,5 +109,21 @@ public abstract class ComponentKey<T extends Component> {
         if (!CcaBootstrap.INSTANCE.isGenerated(this.getClass())) throw new IllegalStateException();
         this.componentClass = componentClass;
         this.id = id;
+    }
+
+    /**
+     * @param container a component container
+     * @return the attached component of this type, or
+     * {@code null} if the container does not support this type of component
+     * @see #get(Object)
+     * @see #maybeGet(Object)
+     */
+    // overridden by generated types
+    @ApiStatus.Internal
+    public abstract @Nullable T getInternal(ComponentContainer<?> container);
+
+    @ApiStatus.Internal
+    public <C extends Component> C getFromContainer(ComponentContainer<C> container) {
+        return Objects.requireNonNull(container.getComponentClass().cast(this.getInternal(container)));
     }
 }

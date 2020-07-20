@@ -22,8 +22,8 @@
  */
 package dev.onyxstudios.cca.mixin.item.common;
 
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
+import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
@@ -42,11 +42,10 @@ public abstract class MixinPacketByteBuf {
     @Inject(method = "readItemStack", at = @At(value = "RETURN", ordinal = 1))
     private void readStack(CallbackInfoReturnable<ItemStack> cir) {
         ItemStack stack = cir.getReturnValue();
-
         CompoundTag syncedComponents = stack.getSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS);
+
         if (syncedComponents != null) {
-            //noinspection ConstantConditions
-            ((InternalComponentProvider) ((Object) stack)).getComponentContainer().fromTag(syncedComponents);
+            InternalStackComponentProvider.get(stack).getComponentContainer().fromTag(syncedComponents);
             stack.removeSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS);
         }
     }

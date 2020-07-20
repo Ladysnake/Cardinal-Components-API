@@ -22,12 +22,11 @@
  */
 package dev.onyxstudios.cca.mixin.item.common;
 
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
+import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
@@ -44,13 +43,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
-import java.util.function.BiConsumer;
 
-@Mixin(value = ItemStack.class, priority = 900)
-public abstract class MixinItemStack implements InternalComponentProvider {
+@Mixin(value = ItemStack.class)
+public abstract class MixinItemStack implements InternalStackComponentProvider {
+    @Unique
+    private static final ComponentContainer<CopyableComponent<?>> EMPTY_COMPONENTS = StaticComponentPluginBase.createEmptyContainer(CopyableComponent.class, "EmptyItemImpl");
 
     private ComponentContainer<CopyableComponent<?>> components;
 
@@ -83,8 +80,6 @@ public abstract class MixinItemStack implements InternalComponentProvider {
     @Shadow
     public abstract Item getItem();
 
-    @Shadow public abstract boolean isEmpty();
-
     /**
      * Direct reference to the item held by this {@code ItemStack}.
      *
@@ -99,6 +94,9 @@ public abstract class MixinItemStack implements InternalComponentProvider {
     @Shadow
     @Final
     private Item item;
+
+    @Shadow
+    private boolean empty;
 
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("RETURN"))
     private void initComponents(ItemConvertible item, int amount, CallbackInfo ci) {
@@ -118,32 +116,15 @@ public abstract class MixinItemStack implements InternalComponentProvider {
         this.components = ((ItemCaller) (this.item == null ? Items.AIR : this.item)).cardinal_createComponents((ItemStack) (Object) this);
     }
 
+    @Nonnull
     @Override
-    public boolean hasComponent(ComponentType<?> type) {
-        return !this.isEmpty() && components.containsKey(type);
-    }
-
-    @Nullable
-    @Override
-    public <C extends Component> C getComponent(ComponentType<C> type) {
-        return this.isEmpty() ? null : components.get(type);
-    }
-
-    @Override
-    public Set<ComponentType<?>> getComponentTypes() {
-        return this.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(components.keySet());
-    }
-
-    @Override
-    public void forEachComponent(BiConsumer<ComponentType<?>, Component> op) {
-        if (!this.isEmpty()) {
-            this.components.forEach(op);
-        }
+    public ComponentContainer<?> getComponentContainer() {
+        return this.empty ? EMPTY_COMPONENTS : this.components;
     }
 
     @Nonnull
     @Override
-    public Object getStaticComponentContainer() {
+    public ComponentContainer<?> getActualComponentContainer() {
         return this.components;
     }
 }

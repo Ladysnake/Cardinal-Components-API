@@ -20,32 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.internal.world;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package dev.onyxstudios.cca.api.v3.component.item;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.PersistentState;
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-public class ComponentPersistentState extends PersistentState {
-    private final ComponentContainer<?> components;
-
-    public ComponentPersistentState(String id, ComponentContainer<?> components) {
-        super(id);
-        this.components = components;
-    }
-
-    @Override
-    public boolean isDirty() {
-        return true;
-    }
-
-    @Override
-    public void fromTag(CompoundTag tag) {
-        this.components.fromTag(tag);
-    }
-
-    @Override
-    public CompoundTag toTag(CompoundTag tag) {
-        return this.components.toTag(tag);
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;

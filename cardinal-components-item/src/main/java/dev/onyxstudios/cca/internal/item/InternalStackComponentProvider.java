@@ -20,34 +20,17 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.mixin.chunk.common;
+package dev.onyxstudios.cca.internal.item;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.source.BiomeArray;
-import net.minecraft.world.chunk.EmptyChunk;
-import net.minecraft.world.chunk.WorldChunk;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
+import net.minecraft.item.ItemStack;
 
-import javax.annotation.Nonnull;
-
-@Mixin(EmptyChunk.class)
-public abstract class MixinEmptyChunk extends WorldChunk implements InternalComponentProvider {
-    @Unique
-    private static final ComponentContainer<CopyableComponent<?>> EMPTY_COMPONENTS = StaticComponentPluginBase.createEmptyContainer(CopyableComponent.class, "EmptyChunkImpl");
-
-    public MixinEmptyChunk(World world, ChunkPos pos, BiomeArray biomes) {
-        super(world, pos, biomes);
+public interface InternalStackComponentProvider extends InternalComponentProvider {
+    @SuppressWarnings("ConstantConditions")
+    static InternalStackComponentProvider get(ItemStack stack) {
+        return (InternalStackComponentProvider) (Object) stack;
     }
 
-    @Nonnull
-    @Override
-    public ComponentContainer<?> getComponentContainer() {
-        return EMPTY_COMPONENTS;
-    }
+    ComponentContainer<?> getActualComponentContainer();
 }

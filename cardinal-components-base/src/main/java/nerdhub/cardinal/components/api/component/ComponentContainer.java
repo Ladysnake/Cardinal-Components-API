@@ -45,7 +45,7 @@ import java.util.Map;
  *
  * @param <C> The upper bound for components stored in this container
  */
-public interface ComponentContainer<C extends Component> extends Map<ComponentType<?>, C>, NbtSerializable {
+public interface ComponentContainer<C extends Component> extends Map<ComponentType<?>, C>, NbtSerializable, dev.onyxstudios.cca.api.v3.component.ComponentContainer<C> {
 
     /**
      * Returns <tt>true</tt> if this container contains a component associated with
