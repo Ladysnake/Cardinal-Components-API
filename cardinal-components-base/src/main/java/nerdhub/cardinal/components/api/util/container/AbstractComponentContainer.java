@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.api.util.container;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
@@ -33,6 +34,7 @@ import net.minecraft.util.Identifier;
 
 import javax.annotation.Nullable;
 import java.util.AbstractMap;
+import java.util.Set;
 
 /**
  * This class provides a skeletal implementation of the {@code ComponentContainer} interface,
@@ -51,6 +53,17 @@ import java.util.AbstractMap;
  * @see FastComponentContainer
  */
 public abstract class AbstractComponentContainer<C extends Component> extends AbstractMap<ComponentType<?>, C> implements ComponentContainer<C> {
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Set<ComponentKey<?>> keys() {
+        return (Set<ComponentKey<?>>) (Set<?>) this.keySet();
+    }
+
+    @Override
+    public Class<C> getComponentClass() {
+        throw new UnsupportedOperationException();
+    }
 
     @SuppressWarnings("deprecation")    // overriding the deprecated method to avoid the compiler's warning...
     @Deprecated
@@ -83,6 +96,8 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
         return null;
     }
 
+    @Override
+    public abstract C put(ComponentType<?> key, C value);
     /**
      * {@inheritDoc}
      *
@@ -124,11 +139,12 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
     public CompoundTag toTag(CompoundTag tag) {
         if(!this.isEmpty()) {
             ListTag componentList = new ListTag();
-            this.forEach((type, component) -> {
+            for (ComponentKey<?> type : this.keySet()) {
+                C component = type.getFromContainer(this);
                 CompoundTag componentTag = new CompoundTag();
                 componentTag.putString("componentId", type.getId().toString());
                 componentList.add(component.toTag(componentTag));
-            });
+            }
             tag.put("cardinal_components", componentList);
         }
         return tag;

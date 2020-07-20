@@ -22,10 +22,10 @@
  */
 package dev.onyxstudios.cca.mixin.item.common;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
 import dev.onyxstudios.cca.internal.item.ItemComponentContainerFactory;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;

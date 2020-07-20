@@ -22,10 +22,12 @@
  */
 package nerdhub.cardinal.components;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
@@ -40,6 +42,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
 
+import java.util.Set;
+
 public final class CardinalComponentsEntity {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
@@ -49,20 +53,29 @@ public final class CardinalComponentsEntity {
         PlayerCopyCallback.EVENT.register(CardinalComponentsEntity::copyData);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     private static void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless) {
         boolean keepInventory = original.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || clone.isSpectator();
-        ComponentProvider.fromEntity(original).forEachComponent((type, from) -> type.maybeGet(clone).ifPresent(
-            to -> EntityComponents.getRespawnCopyStrategy((ComponentType) type).copyForRespawn(from, to, lossless, keepInventory)
-        ));
+        Set<ComponentKey<?>> keys = ((InternalComponentProvider) original).getComponentContainer().keys();
+
+        for (ComponentKey<?> key : keys) {
+            copyData(original, clone, lossless, keepInventory, key);
+        }
+    }
+
+    private static <C extends Component> void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless, boolean keepInventory, ComponentKey<C> key) {
+        C from = key.get(original);
+        C to = key.getNullable(clone);
+        if (to != null) EntityComponents.getRespawnCopyStrategy(key).copyForRespawn(from, to, lossless, keepInventory);
     }
 
     private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {
-        ComponentProvider.fromEntity(tracked).forEachComponent((componentType, component) -> {
+        for (ComponentKey<?> key : ((InternalComponentProvider) tracked).getComponentContainer().keys()) {
+            Component component = key.getNullable(tracked);
+
             if (component instanceof SyncedComponent) {
                 ((SyncedComponent) component).syncWith(player);
             }
-        });
+        }
     }
 
     // Safe to put in the same class as no client-only class is directly referenced

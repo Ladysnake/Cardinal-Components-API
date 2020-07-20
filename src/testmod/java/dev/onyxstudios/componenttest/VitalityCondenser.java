@@ -39,7 +39,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.CollisionView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.ApiStatus;
@@ -77,22 +76,22 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
 
     @Override
     public <T extends Component> boolean hasComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
-        return getChunkProvider(blockView, pos).hasComponent(type);
+        return type.isProvidedBy(this.getChunkProvider(blockView, pos));
     }
 
     @Nullable
     @Override
     public <T extends Component> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
-        return getChunkProvider(blockView, pos).getComponent(type);
+        return this.getChunkProvider(blockView, pos).getComponent(type);
     }
 
     @Override
     public Set<ComponentType<?>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side) {
-        return getChunkProvider(blockView, pos).getComponentTypes();
+        return this.getChunkProvider(blockView, pos).getComponentTypes();
     }
 
     private ComponentProvider getChunkProvider(BlockView blockView, BlockPos pos) {
-        if (blockView instanceof CollisionView) {
+        if (blockView instanceof WorldView) {
             return ComponentProvider.fromChunk(((WorldView) blockView).getChunk(pos));
         }
         return EmptyComponentProvider.instance();

@@ -22,17 +22,19 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
+import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
 import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
 import net.fabricmc.fabric.api.event.Event;
@@ -52,25 +54,25 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher {
-    private static final String FOR_EACH_DESC;
     private static final String FAST_COMPONENT_CONTAINER_CTOR_DESC;
     private static final String CAN_BE_ASSIGNED_DESC;
+    private static final String GET_COMPONENT_CLASS_DESC;
 
     private static final String EVENT_DESC = Type.getDescriptor(Event.class);
     private static final String EVENT$INVOKER_DESC;
 
+
     static {
         try {
-            FOR_EACH_DESC = Type.getMethodDescriptor(ComponentContainer.class.getMethod("forEach", BiConsumer.class));
             FAST_COMPONENT_CONTAINER_CTOR_DESC = Type.getConstructorDescriptor(FastComponentContainer.class.getConstructor(int.class));
             CAN_BE_ASSIGNED_DESC = Type.getMethodDescriptor(FastComponentContainer.class.getDeclaredMethod("canBeAssigned", ComponentType.class));
             EVENT$INVOKER_DESC = Type.getMethodDescriptor(Event.class.getMethod("invoker"));
+            GET_COMPONENT_CLASS_DESC = Type.getMethodDescriptor(ComponentContainer.class.getMethod("getComponentClass"));
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException("Failed to find one or more method descriptors", e);
         }
@@ -92,18 +94,19 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
     /**
      * Defines an implementation of {@link ComponentContainer} that supports direct component access.
      *
-     * <p>Instances of the returned class can be returned by {@link ComponentProvider#getStaticComponentContainer()}.
+     * <p>Instances of the returned class can be returned by {@link ComponentProvider#getComponentContainer()}.
      * <strong>This method must not be called before the static component container interface has been defined!</strong>
      *
      * <p>Generated component container classes will take an additional {@code int} as first argument to their
      * constructors. That number corresponds to the expected dynamic size of the container (see {@link FastComponentContainer}).
      *
      * @param componentFactoryType the interface implemented by the component factories used to initialize this container
+     * @param componentClass       the supertype of contained components
      * @param componentFactories   a map of {@link ComponentType} ids to factories for components of that type
      * @param implNameSuffix       a unique suffix for the generated class
      * @return the generated container class
      */
-    public static <I> Class<? extends ComponentContainer<?>> spinComponentContainer(Class<? super I> componentFactoryType, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
+    public static <I, C extends Component> Class<? extends ComponentContainer<C>> spinComponentContainer(Class<? super I> componentFactoryType, Class<? super C> componentClass, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
 
         checkValidJavaIdentifier(implNameSuffix);
@@ -114,9 +117,11 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         Class<?>[] factoryArgs = sam.getParameterTypes();
         Type[] actualCtorArgs = new Type[factoryArgs.length + 1];
         actualCtorArgs[0] = Type.INT_TYPE;
+
         for (int i = 0; i < factoryArgs.length; i++) {
             actualCtorArgs[i + 1] = Type.getType(factoryArgs[i]);
         }
+
         String ctorDesc = Type.getMethodDescriptor(Type.VOID_TYPE, actualCtorArgs);
         ClassNode classNode = new ClassNode(CcaAsmHelper.ASM_VERSION);
         classNode.visit(
@@ -131,21 +136,25 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         String componentFieldDescriptor = Type.getDescriptor(Component.class);
         String factoryFieldDescriptor = Type.getDescriptor(componentFactoryType);
 
+        classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "componentKeys", "Ljava/util/Set;", null, null);
 /*      TODO V3 enable static keyset optimization when dynamic components are no more
-        classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "componentTypes", "Ljava/util/Set;", null, null);
-        MethodVisitor keySet = classNode.visitMethod(Opcodes.ACC_PUBLIC, "keySet", "()Ljava/util/Set;", null, null);
-        keySet.visitFieldInsn(Opcodes.GETSTATIC, containerImplName, "componentTypes", "Ljava/util/Set;");
+        MethodVisitor keys = classNode.visitMethod(Opcodes.ACC_PUBLIC, "keys", "()Ljava/util/Set;", null, null);
+        keySet.visitFieldInsn(Opcodes.GETSTATIC, containerImplName, "componentKeys", "Ljava/util/Set;");
         keySet.visitInsn(Opcodes.ARETURN);
         keySet.visitEnd();
 */
+
+        MethodVisitor getComponentClass = classNode.visitMethod(Opcodes.ACC_PUBLIC, "getComponentClass", GET_COMPONENT_CLASS_DESC, null, null);
+        getComponentClass.visitCode();
+        getComponentClass.visitLdcInsn(Type.getType(componentClass));
+        getComponentClass.visitInsn(Opcodes.ARETURN);
+        getComponentClass.visitEnd();
 
         MethodVisitor init = classNode.visitMethod(Opcodes.ACC_PUBLIC, "<init>", ctorDesc, null, null);
         init.visitCode();
         init.visitVarInsn(Opcodes.ALOAD, 0);
         init.visitVarInsn(Opcodes.ILOAD, 1);
         init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "<init>", FAST_COMPONENT_CONTAINER_CTOR_DESC, false);
-
-        MethodVisitor forEach = classNode.visitMethod(Opcodes.ACC_PUBLIC, "forEach", FOR_EACH_DESC, null, null);
 
         for (Identifier identifier : componentFactories.keySet()) {
             String fieldName = CcaAsmHelper.getJavaIdentifierName(identifier);
@@ -196,15 +205,6 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
             init.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "addContainedType", "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)V", false);
             // <empty stack>
 
-            /* forEach implementation */
-            forEach.visitVarInsn(Opcodes.ALOAD, 1);
-            // stack: biConsumer
-            CcaAsmHelper.stackStaticComponentType(forEach, identifier);
-            // stack: biConsumer componentType
-            stackStaticComponent(forEach, containerImplName, fieldName, componentFieldDescriptor);
-            // stack: biConsumer componentType component
-            forEach.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(BiConsumer.class), "accept", "(Ljava/lang/Object;Ljava/lang/Object;)V", true);
-
             /* getter implementation */
             MethodVisitor getter = classNode.visitMethod(
                 Opcodes.ACC_PUBLIC,
@@ -219,17 +219,22 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         }
         init.visitInsn(Opcodes.RETURN);
         init.visitEnd();
-        forEach.visitVarInsn(Opcodes.ALOAD, 0);
-        forEach.visitVarInsn(Opcodes.ALOAD, 1);
-        forEach.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "forEach", FOR_EACH_DESC, false);
-        forEach.visitInsn(Opcodes.RETURN);
-        forEach.visitEnd();
 
         if (!componentFactories.isEmpty()) {
             generateLookupMethods(componentFactories.keySet(), containerImplName, classNode, componentFieldDescriptor);
         }
 
-        @SuppressWarnings("unchecked") Class<? extends ComponentContainer<?>> ret = (Class<? extends ComponentContainer<?>>) CcaAsmHelper.generateClass(classNode);
+        @SuppressWarnings("unchecked") Class<? extends ComponentContainer<C>> ret = (Class<? extends ComponentContainer<C>>) CcaAsmHelper.generateClass(classNode);
+
+        try {
+            // TODO properly initialize the static component key set
+            Field keySet = ret.getDeclaredField("componentKeys");
+            keySet.setAccessible(true);
+            keySet.set(null, new ReferenceArraySet<ComponentKey<?>>());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new StaticComponentLoadingException("Failed to initialize the set of component keys for " + ret, e);
+        }
+
         for (Map.Entry<Identifier, I> entry : componentFactories.entrySet()) {
             try {
                 Field factoryField = ret.getDeclaredField(getFactoryFieldName(entry.getKey()));
@@ -242,9 +247,10 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         return ret;
     }
 
+    // TODO remove when dynamic components are gone
     private static void generateLookupMethods(Set<Identifier> components, String containerImplName, ClassNode classNode, String componentFieldDescriptor) {
         MethodVisitor canBeAssigned = classNode.visitMethod(Opcodes.ACC_PROTECTED, "canBeAssigned", CAN_BE_ASSIGNED_DESC, null, null);
-        MethodVisitor get = classNode.visitMethod(Opcodes.ACC_PUBLIC, "get", CcaAsmHelper.GET_DESC, null, null);
+        MethodVisitor get = classNode.visitMethod(Opcodes.ACC_PUBLIC, "get", CcaAsmHelper.COMPONENT_CONTAINER$GET_DESC, null, null);
         canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
         // stack[canBeAssigned]: componentType
         get.visitVarInsn(Opcodes.ALOAD, 0);
@@ -298,7 +304,7 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         // stack[get]: <this>
         get.visitVarInsn(Opcodes.ALOAD, 1);
         // stack[get]: <this> componentType
-        get.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "get", CcaAsmHelper.GET_DESC, false);
+        get.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "get", CcaAsmHelper.COMPONENT_CONTAINER$GET_DESC, false);
         get.visitInsn(Opcodes.ARETURN);
         get.visitEnd();
     }
@@ -378,8 +384,8 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
                 }
             }
 
-            if (callbackParamClasses != null && callbackParamClasses[callbackParamClasses.length - 1] != ComponentContainer.class) {
-                throw new IllegalArgumentException("A component callback method must have a " + ComponentContainer.class + " as its last parameter, got " + componentCallbackSam);
+            if (callbackParamClasses != null && callbackParamClasses[callbackParamClasses.length - 1] != nerdhub.cardinal.components.api.component.ComponentContainer.class) {
+                throw new IllegalArgumentException("A component callback method must have a " + nerdhub.cardinal.components.api.component.ComponentContainer.class + " as its last parameter, got " + componentCallbackSam);
             }
         }
         String containerCtorDesc = Type.getConstructorDescriptor(constructors[0]);
@@ -477,6 +483,15 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         method.visitFieldInsn(Opcodes.GETFIELD, containerImplName, fieldName, fieldDescriptor);
     }
 
+    public static <C extends Component> ComponentContainer<C> createEmptyContainer(Class<? super C> componentClass, String implSuffix) {
+        try {
+            Class<? extends ComponentContainer<C>> containerCls = spinComponentContainer(Runnable.class, componentClass, Collections.emptyMap(), implSuffix);
+            return containerCls.getConstructor(int.class).newInstance(0);
+        } catch (IOException | ReflectiveOperationException e) {
+            throw new StaticComponentLoadingException("Failed to generate empty component container", e);
+        }
+    }
+
     public Class<? extends DynamicContainerFactory<T, ?>> getContainerFactoryClass() {
         this.ensureInitialized();
 
@@ -488,7 +503,7 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         processInitializers(this.getEntrypoints(), this::dispatchRegistration);
 
         try {
-            Class<? extends ComponentContainer<?>> containerCls = spinComponentContainer(this.componentFactoryType, this.componentFactories, this.implSuffix);
+            Class<? extends ComponentContainer<?>> containerCls = spinComponentContainer(this.componentFactoryType, Component.class, this.componentFactories, this.implSuffix);
             this.containerFactoryClass = this.spinContainerFactory(containerCls);
         } catch (IOException e) {
             throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + this.providerClass, e);

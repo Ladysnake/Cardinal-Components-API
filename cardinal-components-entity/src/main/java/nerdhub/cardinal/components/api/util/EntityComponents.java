@@ -22,9 +22,11 @@
  */
 package nerdhub.cardinal.components.api.util;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import org.jetbrains.annotations.ApiStatus;
 
 public final class EntityComponents {
 
@@ -47,6 +49,11 @@ public final class EntityComponents {
     }
 
     public static <C extends Component> RespawnCopyStrategy<C> getRespawnCopyStrategy(ComponentType<C> type) {
+        return CardinalEntityInternals.getRespawnCopyStrat(type);
+    }
+
+    @ApiStatus.Experimental
+    public static <C extends Component> RespawnCopyStrategy<C> getRespawnCopyStrategy(ComponentKey<C> type) {
         return CardinalEntityInternals.getRespawnCopyStrat(type);
     }
 }

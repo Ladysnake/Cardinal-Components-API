@@ -22,11 +22,10 @@
  */
 package dev.onyxstudios.cca.internal.item;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
@@ -39,7 +38,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 import javax.annotation.Nullable;
-import java.util.Map;
+import java.util.Set;
 
 public final class CardinalItemInternals {
     public static final Event<ItemComponentCallbackV2> WILDCARD_ITEM_EVENT_V2 = createItemComponentsEventV2();
@@ -79,40 +78,41 @@ public final class CardinalItemInternals {
     }
 
     public static void copyComponents(ItemStack original, ItemStack copy) {
-        ComponentProvider from = ComponentProvider.fromItemStack(original);
-        ((InternalComponentProvider) ComponentProvider.fromItemStack(copy)).getComponentContainer().forEach((type, component) -> {
-                copyComponent(type, (CopyableComponent<?>) component, from);
-            }
-        );
-    }
+        ComponentContainer<?> originalComponents = InternalStackComponentProvider.get(original).getActualComponentContainer();
+        ComponentContainer<?> copiedComponents = InternalStackComponentProvider.get(copy).getActualComponentContainer();
 
-    private static <C extends Component> void copyComponent(ComponentType<?> type, CopyableComponent<C> component, ComponentProvider from) {
-        @SuppressWarnings("unchecked") C fromComponent = (C) type.getNullable(from);
-        if (fromComponent != null) {
-            component.copyFrom(fromComponent);
+        for (ComponentKey<?> key : copiedComponents.keys()) {
+            copyComponent(key, (CopyableComponent<?>) key.getFromContainer(copiedComponents), originalComponents);
         }
     }
 
-    private static <C extends Component> void copyComponent(CopyableComponent<C> ccp, ComponentProvider from) {
+    private static <C extends Component> void copyComponent(ComponentKey<?> type, CopyableComponent<C> component, ComponentContainer<?> from) {
+        @SuppressWarnings("unchecked") C fromComponent = (C) type.getInternal(from);
+
+        if (fromComponent != null) {
+            component.copyFrom(fromComponent);
+        }
     }
 
     public static boolean areComponentsIncompatible(ItemStack stack1, ItemStack stack2) {
         if (stack1.isEmpty() || stack2.isEmpty()) {
             return stack1.isEmpty() != stack2.isEmpty();
         }
-        InternalComponentProvider accessor = (InternalComponentProvider) ComponentProvider.fromItemStack(stack1);
-        InternalComponentProvider other = (InternalComponentProvider) ComponentProvider.fromItemStack(stack2);
-        ComponentContainer<?> types = accessor.getComponentContainer();
-        if (types.size() != other.getComponentContainer().size()) {
+
+        Set<ComponentKey<?>> keys1 = ((InternalStackComponentProvider) ComponentProvider.fromItemStack(stack1)).getComponentContainer().keys();
+        Set<ComponentKey<?>> keys2 = ((InternalStackComponentProvider) ComponentProvider.fromItemStack(stack2)).getComponentContainer().keys();
+
+        if (keys1.size() != keys2.size()) {
             return true;
         }
-        for(Map.Entry<ComponentType<?>, ? extends Component> entry : types.entrySet()) {
-            @Nullable Component otherComponent = other.getComponent(entry.getKey());
-            if(otherComponent == null || !entry.getValue().isComponentEqual(otherComponent)) {
+
+        for(ComponentKey<?> key : keys1) {
+            @Nullable Component otherComponent = key.getNullable(stack2);
+            if(otherComponent == null || !key.get(stack1).isComponentEqual(otherComponent)) {
                 return true;
             }
         }
+
         return false;
     }
-
 }

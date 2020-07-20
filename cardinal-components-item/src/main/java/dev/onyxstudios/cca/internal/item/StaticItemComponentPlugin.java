@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.item;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactoryRegistry;
@@ -31,7 +32,6 @@ import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;
 import net.fabricmc.loader.api.FabricLoader;
@@ -48,6 +48,7 @@ import java.util.Objects;
 
 public final class StaticItemComponentPlugin extends LazyDispatcher implements ItemComponentFactoryRegistry {
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
+    public static final String EMPTY_IMPL_SUFFIX = "ItemStackImpl_Empty";
     public static final String WILDARD_IMPL_SUFFIX = "ItemStackImpl_All";
 
     private StaticItemComponentPlugin() {
@@ -78,20 +79,24 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
             FabricLoader.getInstance().getEntrypointContainers("cardinal-components-item", ItemComponentInitializer.class),
             initializer -> initializer.registerItemComponentFactories(this)
         );
+
         Map<Identifier, ItemComponentFactoryV2<?>> wildcardMap = this.componentFactories.getOrDefault(null, Collections.emptyMap());
+
         try {
-            Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, wildcardMap, WILDARD_IMPL_SUFFIX);
+            Class<? extends ComponentContainer<CopyableComponent<?>>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, CopyableComponent.class, wildcardMap, WILDARD_IMPL_SUFFIX);
             this.wildcardFactoryClass = StaticComponentPluginBase.spinContainerFactory(WILDARD_IMPL_SUFFIX, ItemComponentContainerFactory.class, containerCls, ItemComponentCallbackV2.class, 2, Item.class, ItemStack.class);
         } catch (IOException e) {
             throw new StaticComponentLoadingException("Failed to generate the fallback component container for item stacks", e);
         }
+
         for (Map.Entry<Identifier, Map<Identifier, ItemComponentFactoryV2<?>>> entry : this.componentFactories.entrySet()) {
             if (entry.getKey() == null) continue;
+
             try {
                 Map<Identifier, ItemComponentFactoryV2<?>> compiled = new HashMap<>(entry.getValue());
                 wildcardMap.forEach(compiled::putIfAbsent);
                 String implSuffix = getSuffix(entry.getKey());
-                Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, compiled, implSuffix);
+                Class<? extends ComponentContainer<CopyableComponent<?>>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, CopyableComponent.class, compiled, implSuffix);
                 this.factoryClasses.put(entry.getKey(), StaticComponentPluginBase.spinContainerFactory(implSuffix, ItemComponentContainerFactory.class, containerCls, ItemComponentCallbackV2.class, 2, Item.class, ItemStack.class));
             } catch (IOException e) {
                 throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entry.getKey(), e);

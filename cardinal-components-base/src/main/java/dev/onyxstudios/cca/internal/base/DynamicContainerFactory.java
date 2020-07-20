@@ -22,8 +22,8 @@
  */
 package dev.onyxstudios.cca.internal.base;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 
 /**
  * A container factory that takes a single argument, and populates containers dynamically by firing events.

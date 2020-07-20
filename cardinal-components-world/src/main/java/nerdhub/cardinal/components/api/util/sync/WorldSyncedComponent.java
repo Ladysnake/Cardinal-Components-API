@@ -22,9 +22,9 @@
  */
 package nerdhub.cardinal.components.api.util.sync;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.fabricmc.fabric.api.network.PacketContext;

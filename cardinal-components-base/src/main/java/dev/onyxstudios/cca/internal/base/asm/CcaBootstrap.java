@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import nerdhub.cardinal.components.api.ComponentType;
@@ -46,7 +47,7 @@ import java.util.*;
 public final class CcaBootstrap extends LazyDispatcher {
 
     public static final String COMPONENT_TYPE_INIT_DESC = Type.getMethodDescriptor(Type.VOID_TYPE, Type.getObjectType(CcaAsmHelper.IDENTIFIER), Type.getType(Class.class), Type.INT_TYPE);
-    public static final String COMPONENT_TYPE_GET0_DESC = "(L" + CcaAsmHelper.COMPONENT_PROVIDER + ";)L" + CcaAsmHelper.COMPONENT + ";";
+    public static final String COMPONENT_TYPE_GET0_DESC = "(L" + CcaAsmHelper.COMPONENT_CONTAINER + ";)L" + CcaAsmHelper.COMPONENT + ";";
     public static final String STATIC_INIT_ENTRYPOINT = "cardinal-components:static-init";
     public static final CcaBootstrap INSTANCE = new CcaBootstrap();
 
@@ -114,7 +115,7 @@ public final class CcaBootstrap extends LazyDispatcher {
 
     /**
      * Defines a {@link ComponentType} subclass for every statically declared component, as well as
-     * a global {@link nerdhub.cardinal.components.api.component.ComponentProvider} specialized interface
+     * a global {@link ComponentProvider} specialized interface
      * that declares a direct getter for every {@link ComponentType} that has been scanned by plugins.
      *
      * @param staticComponentTypes the set of all statically declared {@link ComponentType} ids
@@ -140,11 +141,9 @@ public final class CcaBootstrap extends LazyDispatcher {
             init.visitInsn(Opcodes.RETURN);
             init.visitEnd();
 
-            MethodVisitor get = componentTypeWriter.visitMethod(Opcodes.ACC_PROTECTED, "getNullable", COMPONENT_TYPE_GET0_DESC, null, null);
+            MethodVisitor get = componentTypeWriter.visitMethod(Opcodes.ACC_PROTECTED, "getInternal", COMPONENT_TYPE_GET0_DESC, null, null);
             get.visitCode();
             get.visitVarInsn(Opcodes.ALOAD, 1);
-            // stack: componentProvider
-            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_PROVIDER, "getStaticComponentContainer", "()Ljava/lang/Object;", true);
             // stack: object
             get.visitInsn(Opcodes.DUP);
             // stack: object object
@@ -189,7 +188,7 @@ public final class CcaBootstrap extends LazyDispatcher {
             // stack: <this>
             CcaAsmHelper.stackStaticComponentType(methodWriter, componentId);
             // stack: <this> componentType
-            methodWriter.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_CONTAINER, "get", CcaAsmHelper.GET_DESC, true);
+            methodWriter.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_CONTAINER, "get", CcaAsmHelper.COMPONENT_CONTAINER$GET_DESC, true);
             // stack: component
             methodWriter.visitInsn(Opcodes.ARETURN);
             methodWriter.visitEnd();

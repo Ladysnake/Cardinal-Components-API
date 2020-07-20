@@ -22,9 +22,9 @@
  */
 package dev.onyxstudios.cca.mixin.item.common;
 
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
+import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
@@ -39,9 +39,9 @@ public abstract class MixinWritePacketByteBuf {
     @Nullable
     @ModifyVariable(method = "writeItemStack(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/network/PacketByteBuf;", at = @At(value = "LOAD"))
     private CompoundTag writeItemStack(@Nullable CompoundTag tag, ItemStack stack) {
-        @SuppressWarnings("ConstantConditions") ComponentContainer<?> componentContainer = ((InternalComponentProvider) (Object) stack).getComponentContainer();
+        ComponentContainer<?> componentContainer = InternalStackComponentProvider.get(stack).getComponentContainer();
 
-        if (componentContainer.isEmpty()) {
+        if (componentContainer.keys().isEmpty()) {
             return tag;
         }
 

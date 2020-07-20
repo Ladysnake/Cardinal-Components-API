@@ -119,7 +119,8 @@ dependencies {
     modImplementation fabricApi.module("fabric-api-base", rootProject.fabric_api_version)
     modImplementation fabricApi.module("fabric-object-builder-api-v1", rootProject.fabric_api_version)
     modImplementation fabricApi.module("fabric-renderer-registries-v1", rootProject.fabric_api_version)
-    modImplementation fabricApi.module("fabric-events-lifecycle-v0", rootProject.fabric_api_version)
+    modImplementation fabricApi.module("fabric-lifecycle-events-v1", rootProject.fabric_api_version)
+    modImplementation fabricApi.module("fabric-item-api-v1", rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-networking-v0", rootProject.rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-resource-loader-v0", rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-mining-levels-v0", rootProject.fabric_api_version)
@@ -127,9 +128,8 @@ dependencies {
     modRuntime fabricApi.module("fabric-tool-attribute-api-v1", rootProject.fabric_api_version)
 
     // Optibad
-    modCompileOnly 'com.github.modmuss50:OptiFabric:1.1.0-beta2'
-    modRuntime 'com.github.modmuss50:OptiFabric:1.1.0-beta2'
-    modRuntime 'org.zeroturnaround:zt-zip:1.14' // required dep for optibad
+//    modRuntime 'com.github.modmuss50:OptiFabric:1.1.0-beta2'
+//    modRuntime 'org.zeroturnaround:zt-zip:1.14' // required dep for optibad
 
     testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
 

@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.entity;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentFactoryRegistry;
@@ -31,7 +32,6 @@ import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
@@ -81,7 +81,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
             try {
                 Class<? extends ComponentContainer<?>> containerCls = this.containerClasses.get(entityClass);
                 if (containerCls == null) {
-                    containerCls = StaticComponentPluginBase.spinComponentContainer(EntityComponentFactory.class, compiled, implSuffix);
+                    containerCls = StaticComponentPluginBase.spinComponentContainer(EntityComponentFactory.class, Component.class, compiled, implSuffix);
                     this.containerClasses.put(entityClass, containerCls);
                 }
                 return StaticComponentPluginBase.spinContainerFactory(implSuffix + "_" + k.eventCount, DynamicContainerFactory.class, containerCls, EntityComponentCallback.class, k.eventCount, entityClass);

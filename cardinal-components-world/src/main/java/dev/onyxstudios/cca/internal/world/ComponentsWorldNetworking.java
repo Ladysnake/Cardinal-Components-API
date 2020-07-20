@@ -22,11 +22,12 @@
  */
 package dev.onyxstudios.cca.internal.world;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.WorldSyncCallback;
 import nerdhub.cardinal.components.api.util.sync.WorldSyncedComponent;
@@ -36,15 +37,20 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
+import java.util.Set;
+
 public final class ComponentsWorldNetworking {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             WorldSyncCallback.EVENT.register((player, world) -> {
-                ComponentProvider.fromWorld(world).forEachComponent((componentType, component) -> {
-                            if (component instanceof SyncedComponent) {
-                                ((SyncedComponent) component).syncWith(player);
-                            }
-                        });
+                Set<ComponentKey<?>> keys = ((InternalComponentProvider)world).getComponentContainer().keys();
+                for (ComponentKey<?> key : keys) {
+                    Component component = key.getNullable(world);
+
+                    if (component instanceof SyncedComponent) {
+                        ((SyncedComponent) component).syncWith(player);
+                    }
+                }
             });
         }
     }
@@ -55,14 +61,17 @@ public final class ComponentsWorldNetworking {
             try {
                 Identifier componentTypeId = buffer.readIdentifier();
                 ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+
                 if (componentType == null) {
                     return;
                 }
+
                 PacketByteBuf copy = new PacketByteBuf(buffer.copy());
                 context.getTaskQueue().execute(() -> {
                     try {
                         assert MinecraftClient.getInstance().world != null;
                         Component c = componentType.get(MinecraftClient.getInstance().world);
+
                         if (c instanceof SyncedComponent) {
                             ((SyncedComponent) c).processPacket(context, copy);
                         }
