@@ -20,10 +20,28 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
-package dev.onyxstudios.cca.api.v3.component.item;
+package dev.onyxstudios.cca.api.v3.item;
 
-import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
+import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+/**
+ * Entrypoint getting invoked to register <em>static</em> item component factories.
+ *
+ * <p>The entrypoint is exposed as {@code "cardinal-components-item"} in the mod json and runs for any environment.
+ * It usually executes right before the first {@link ItemStack} instance is created.
+ *
+ * @since 2.4.0
+ */
+@ApiStatus.Experimental
+public interface ItemComponentInitializer {
+    /**
+     * Called to register component factories for statically declared component types.
+     *
+     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
+     * must not be registered outside of this method.
+     *
+     * @param registry an {@link ItemComponentFactoryRegistry} for <em>statically declared</em> components
+     */
+    void registerItemComponentFactories(ItemComponentFactoryRegistry registry);
+}

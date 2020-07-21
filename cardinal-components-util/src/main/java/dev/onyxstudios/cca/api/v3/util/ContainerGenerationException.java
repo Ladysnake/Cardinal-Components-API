@@ -20,28 +20,16 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.entity;
+package dev.onyxstudios.cca.api.v3.util;
 
-import net.minecraft.entity.Entity;
-import org.jetbrains.annotations.ApiStatus;
+import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 
-/**
- * Entrypoint getting invoked to register <em>static</em> entity component factories.
- *
- * <p>The entrypoint is exposed as {@code cardinal-components-entity} in the mod json and runs for any environment.
- * It usually executes right before the first {@link Entity} instance is created.
- *
- * @since 2.4.0
- */
-@ApiStatus.Experimental
-public interface EntityComponentInitializer {
-    /**
-     * Called to register component factories for statically declared component types.
-     *
-     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
-     * must not be registered outside of this method.
-     *
-     * @param registry an {@link EntityComponentFactoryRegistry} for <em>statically declared</em> components
-     */
-    void registerEntityComponentFactories(EntityComponentFactoryRegistry registry);
+public class ContainerGenerationException extends StaticComponentLoadingException {
+    public ContainerGenerationException(String message) {
+        super(message);
+    }
+
+    public ContainerGenerationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

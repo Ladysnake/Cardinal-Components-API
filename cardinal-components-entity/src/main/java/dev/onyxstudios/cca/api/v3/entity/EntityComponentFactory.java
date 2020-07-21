@@ -20,19 +20,17 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.item;
+package dev.onyxstudios.cca.api.v3.entity;
 
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.entity.Entity;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
 
 /**
- * A component factory for {@linkplain ItemStack item stacks}.
+ * A component factory for {@linkplain Entity entities}.
  *
  * <p>When invoked, the factory must return a {@link Component} of the right type.
  *
@@ -40,24 +38,22 @@ import javax.annotation.Nonnull;
  */
 @ApiStatus.Experimental
 @FunctionalInterface
-public interface ItemComponentFactory<C extends CopyableComponent<?>> extends ItemComponentFactoryV2<C> {
-    @Nonnull
-    @Override
-    default C createForStack(Item item, ItemStack stack) {
-        return this.createForStack(stack);
-    }
-
+public interface EntityComponentFactory<C extends Component, E extends Entity> {
     /**
-     * Initialize components for the given stack.
+     * Create a component of type {@code C} for the given entity.
      *
      * <p>The component returned by this method will be available
-     * on the chunk as soon as all component factories have been invoked.
+     * on the entity as soon as all component factories have been invoked.
      *
-     * @param stack      the {@code ItemStack} being constructed
-     * @implNote Because this method is called for each stack creation, implementations
+     * <p><strong>The {@code entity} may not be fully initialized when this method is called!</strong>
+     * Implementations should resort to lazy initialization if they need properties not available in the
+     * base {@link Entity} class.
+     *
+     * @param entity     the entity being constructed
+     * @implNote Because this method is called for each entity creation, implementations
      * should avoid side effects and keep costly computations at a minimum. Lazy initialization
      * should be considered for components that are costly to initialize.
      */
     @Nonnull
-    C createForStack(ItemStack stack);
+    C createForEntity(E entity);
 }

@@ -20,22 +20,36 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.level;
+package dev.onyxstudios.cca.api.v3.chunk;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import net.minecraft.world.chunk.Chunk;
 import org.jetbrains.annotations.ApiStatus;
 
+import javax.annotation.Nonnull;
+
 /**
+ * A component factory for {@linkplain Chunk chunks}.
+ *
+ * <p>When invoked, the factory must return a {@link Component} of the right type.
+ *
  * @since 2.4.0
  */
 @ApiStatus.Experimental
-public interface LevelComponentFactoryRegistry {
+@FunctionalInterface
+public interface ChunkComponentFactory<C extends CopyableComponent<?>> {
     /**
-     * Registers a {@link LevelComponentFactory}.
+     * Initialize components for the given chunk.
      *
-     * @param factory the factory to use to create components of the given type
+     * <p>The component returned by this method will be available
+     * on the chunk as soon as all component factories have been invoked.
+     *
+     * @param chunk      the chunk being constructed
+     * @implNote Because this method is called for each chunk creation, implementations
+     * should avoid side effects and keep costly computations at a minimum. Lazy initialization
+     * should be considered for components that are costly to initialize.
      */
-    <C extends Component> void register(ComponentKey<C> type, LevelComponentFactory<C> factory);
-
+    @Nonnull
+    C createForChunk(Chunk chunk);
 }

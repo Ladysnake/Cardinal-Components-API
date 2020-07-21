@@ -20,20 +20,28 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.world;
+package dev.onyxstudios.cca.api.v3.chunk;
 
-import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * Entrypoint getting invoked to register <em>static</em> world component factories.
+ * Entrypoint getting invoked to register <em>static</em> chunk component factories.
  *
- * <p>The entrypoint is exposed as {@code cardinal-components-world} in the mod json and runs for any environment.
- * It usually executes right before the first {@link World} instance is created.
+ * <p>The entrypoint is exposed as {@code cardinal-components-chunk} in the mod json and runs for any environment.
+ * It usually executes right before the first {@link Chunk} instance is created.
  *
  * @since 2.4.0
  */
 @ApiStatus.Experimental
-public interface WorldComponentInitializer {
-    void registerWorldComponentFactories(WorldComponentFactoryRegistry registry);
+public interface ChunkComponentInitializer {
+    /**
+     * Called to register component factories for statically declared component types.
+     *
+     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
+     * must not be registered outside of this method.
+     *
+     * @param registry a {@link ChunkComponentFactoryRegistry} for <em>statically declared</em> components
+     */
+    void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry);
 }

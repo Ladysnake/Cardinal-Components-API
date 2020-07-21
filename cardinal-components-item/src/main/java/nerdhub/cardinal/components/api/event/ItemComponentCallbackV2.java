@@ -22,7 +22,7 @@
  */
 package nerdhub.cardinal.components.api.event;
 
-import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactoryV2;
+import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryV2;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
 import nerdhub.cardinal.components.api.ComponentType;

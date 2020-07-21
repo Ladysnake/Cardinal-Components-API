@@ -20,31 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.level;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package dev.onyxstudios.cca.api.v3.item;
 
-import nerdhub.cardinal.components.api.component.Component;
-import net.minecraft.world.WorldProperties;
-import org.jetbrains.annotations.ApiStatus;
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-import javax.annotation.Nonnull;
-
-/**
- * A component factory for {@linkplain WorldProperties world saves}.
- *
- * <p>When invoked, the factory must return a {@link Component} of the right type.
- *
- * @since 2.4.0
- */
-@ApiStatus.Experimental
-public interface LevelComponentFactory<C extends Component> {
-    /**
-     * Initialize components for the given world properties.
-     *
-     * <p>The component returned by this method will be available
-     * on the properties object as soon as all component factories have been invoked.
-     *
-     * @param properties the {@code WorldProperties} being constructed
-     */
-    @Nonnull
-    C createForSave(WorldProperties properties);
-}
+import javax.annotation.ParametersAreNonnullByDefault;
