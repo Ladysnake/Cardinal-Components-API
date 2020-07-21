@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.util;
+package dev.onyxstudios.cca.api.v3.util;
 
 import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;

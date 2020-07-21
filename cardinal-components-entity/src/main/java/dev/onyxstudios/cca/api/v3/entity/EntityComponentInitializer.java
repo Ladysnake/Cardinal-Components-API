@@ -20,40 +20,28 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.entity;
+package dev.onyxstudios.cca.api.v3.entity;
 
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.entity.Entity;
 import org.jetbrains.annotations.ApiStatus;
 
-import javax.annotation.Nonnull;
-
-
 /**
- * A component factory for {@linkplain Entity entities}.
+ * Entrypoint getting invoked to register <em>static</em> entity component factories.
  *
- * <p>When invoked, the factory must return a {@link Component} of the right type.
+ * <p>The entrypoint is exposed as {@code cardinal-components-entity} in the mod json and runs for any environment.
+ * It usually executes right before the first {@link Entity} instance is created.
  *
  * @since 2.4.0
  */
 @ApiStatus.Experimental
-@FunctionalInterface
-public interface EntityComponentFactory<C extends Component, E extends Entity> {
+public interface EntityComponentInitializer {
     /**
-     * Create a component of type {@code C} for the given entity.
+     * Called to register component factories for statically declared component types.
      *
-     * <p>The component returned by this method will be available
-     * on the entity as soon as all component factories have been invoked.
+     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
+     * must not be registered outside of this method.
      *
-     * <p><strong>The {@code entity} may not be fully initialized when this method is called!</strong>
-     * Implementations should resort to lazy initialization if they need properties not available in the
-     * base {@link Entity} class.
-     *
-     * @param entity     the entity being constructed
-     * @implNote Because this method is called for each entity creation, implementations
-     * should avoid side effects and keep costly computations at a minimum. Lazy initialization
-     * should be considered for components that are costly to initialize.
+     * @param registry an {@link EntityComponentFactoryRegistry} for <em>statically declared</em> components
      */
-    @Nonnull
-    C createForEntity(E entity);
+    void registerEntityComponentFactories(EntityComponentFactoryRegistry registry);
 }

@@ -20,28 +20,31 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.chunk;
+package dev.onyxstudios.cca.api.v3.level;
 
-import net.minecraft.world.chunk.Chunk;
+import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.ApiStatus;
 
+import javax.annotation.Nonnull;
+
 /**
- * Entrypoint getting invoked to register <em>static</em> chunk component factories.
+ * A component factory for {@linkplain WorldProperties world saves}.
  *
- * <p>The entrypoint is exposed as {@code cardinal-components-chunk} in the mod json and runs for any environment.
- * It usually executes right before the first {@link Chunk} instance is created.
+ * <p>When invoked, the factory must return a {@link Component} of the right type.
  *
  * @since 2.4.0
  */
 @ApiStatus.Experimental
-public interface ChunkComponentInitializer {
+public interface LevelComponentFactory<C extends Component> {
     /**
-     * Called to register component factories for statically declared component types.
+     * Initialize components for the given world properties.
      *
-     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
-     * must not be registered outside of this method.
+     * <p>The component returned by this method will be available
+     * on the properties object as soon as all component factories have been invoked.
      *
-     * @param registry a {@link ChunkComponentFactoryRegistry} for <em>statically declared</em> components
+     * @param properties the {@code WorldProperties} being constructed
      */
-    void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry);
+    @Nonnull
+    C createForSave(WorldProperties properties);
 }

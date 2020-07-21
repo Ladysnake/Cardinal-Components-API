@@ -20,17 +20,22 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.util;
+package dev.onyxstudios.cca.api.v3.level;
 
-import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import net.minecraft.util.Identifier;
+import nerdhub.cardinal.components.api.component.Component;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
  * @since 2.4.0
  */
 @ApiStatus.Experimental
-public interface GenericComponentFactoryRegistry {
-    <F> void register(ComponentKey<?> type, Identifier providerId, TypeToken<F> factoryType, F factory);
+public interface LevelComponentFactoryRegistry {
+    /**
+     * Registers a {@link LevelComponentFactory}.
+     *
+     * @param factory the factory to use to create components of the given type
+     */
+    <C extends Component> void register(ComponentKey<C> type, LevelComponentFactory<C> factory);
+
 }

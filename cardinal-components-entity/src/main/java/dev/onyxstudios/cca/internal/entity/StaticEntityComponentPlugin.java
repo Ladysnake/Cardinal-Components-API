@@ -24,9 +24,9 @@ package dev.onyxstudios.cca.internal.entity;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentFactory;
-import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentInitializer;
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactory;
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;

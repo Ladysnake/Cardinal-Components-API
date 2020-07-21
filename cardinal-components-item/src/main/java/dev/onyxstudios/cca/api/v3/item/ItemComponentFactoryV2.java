@@ -20,28 +20,39 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.item;
+package dev.onyxstudios.cca.api.v3.item;
 
+import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 
+import javax.annotation.Nonnull;
+
+
 /**
- * Entrypoint getting invoked to register <em>static</em> item component factories.
+ * A component factory for {@linkplain ItemStack item stacks}.
  *
- * <p>The entrypoint is exposed as {@code "cardinal-components-item"} in the mod json and runs for any environment.
- * It usually executes right before the first {@link ItemStack} instance is created.
+ * <p>When invoked, the factory must return a {@link Component} of the right type.
  *
  * @since 2.4.0
  */
 @ApiStatus.Experimental
-public interface ItemComponentInitializer {
+@FunctionalInterface
+public interface ItemComponentFactoryV2<C extends CopyableComponent<?>> {
     /**
-     * Called to register component factories for statically declared component types.
+     * Initialize components for the given stack.
      *
-     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
-     * must not be registered outside of this method.
+     * <p>The component returned by this method will be available
+     * on the chunk as soon as all component factories have been invoked.
      *
-     * @param registry an {@link ItemComponentFactoryRegistry} for <em>statically declared</em> components
+     * @param item  the actual item held by the stack, may differ from the result of {@link ItemStack#getItem()}
+     * @param stack the {@code ItemStack} being constructed
+     * @implNote Because this method is called for each stack creation, implementations
+     * should avoid side effects and keep costly computations at a minimum. Lazy initialization
+     * should be considered for components that are costly to initialize.
      */
-    void registerItemComponentFactories(ItemComponentFactoryRegistry registry);
+    @Nonnull
+    C createForStack(Item item, ItemStack stack);
 }

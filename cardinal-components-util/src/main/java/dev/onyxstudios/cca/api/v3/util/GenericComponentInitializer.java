@@ -20,19 +20,27 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.world;
+package dev.onyxstudios.cca.api.v3.util;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
+ * Entrypoint getting invoked to register <em>static</em> generic (typically for third party providers)
+ * component factories.
+ *
+ * <p>The entrypoint is exposed as {@code "cardinal-components-util"} in the mod json and runs for any environment.
+ *
  * @since 2.4.0
  */
-public interface WorldComponentFactoryRegistry {
+@ApiStatus.Experimental
+public interface GenericComponentInitializer {
     /**
-     * Registers a {@link WorldComponentFactory}.
+     * Called to register component factories for statically declared component types.
      *
-     * @param factory the factory to use to create components of the given type
+     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
+     * must not be registered outside of this method.
+     *
+     * @param registry a {@link GenericComponentFactoryRegistry} for <em>statically declared</em> components
      */
-    <C extends Component> void register(ComponentKey<C> type, WorldComponentFactory<? extends C> factory);
+    void registerGenericComponentFactories(GenericComponentFactoryRegistry registry);
 }
