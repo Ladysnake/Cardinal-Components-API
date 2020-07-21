@@ -22,10 +22,10 @@
  */
 package dev.onyxstudios.cca.internal.scoreboard;
 
-import dev.onyxstudios.cca.api.v3.scoreboard.event.ScoreboardSyncCallback;
-import dev.onyxstudios.cca.api.v3.scoreboard.event.TeamAddCallback;
-import dev.onyxstudios.cca.api.v3.scoreboard.util.sync.ScoreboardSyncedComponent;
-import dev.onyxstudios.cca.api.v3.scoreboard.util.sync.TeamSyncedComponent;
+import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardSyncCallback;
+import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardSyncedComponent;
+import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
+import dev.onyxstudios.cca.api.v3.scoreboard.TeamSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;

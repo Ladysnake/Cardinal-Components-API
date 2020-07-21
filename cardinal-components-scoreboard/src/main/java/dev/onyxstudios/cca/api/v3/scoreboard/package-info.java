@@ -20,28 +20,12 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.scoreboard.component;
+@ApiStatus.Internal
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package dev.onyxstudios.cca.api.v3.scoreboard;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.ApiStatus;
 
-/**
- * @since 2.4.2
- */
-@ApiStatus.Experimental
-public interface ScoreboardComponentFactoryRegistry {
-    /**
-     * Registers a {@link TeamComponentFactory}.
-     *
-     * @param factory the factory to use to create components of the given type
-     */
-    <C extends Component> void register(ComponentKey<C> type, TeamComponentFactory<? extends C> factory);
-
-    /**
-     * Registers a {@link ScoreboardComponentFactory}.
-     *
-     * @param factory the factory to use to create components of the given type
-     */
-    <C extends Component> void register(ComponentKey<C> type, ScoreboardComponentFactory<? extends C> factory);
-}
+import javax.annotation.ParametersAreNonnullByDefault;

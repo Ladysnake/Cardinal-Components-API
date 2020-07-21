@@ -20,12 +20,32 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-@ApiStatus.Internal
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
-package dev.onyxstudios.cca.api.v3.scoreboard.component;
+package dev.onyxstudios.cca.api.v3.scoreboard;
 
-import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
+import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.scoreboard.Scoreboard;
 import org.jetbrains.annotations.ApiStatus;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import javax.annotation.Nonnull;
+
+/**
+ * A component factory for {@linkplain Scoreboard scoreboards}.
+ *
+ * <p>When invoked, the factory must return a {@link Component} of the right type.
+ *
+ * @since 2.4.2
+ */
+@ApiStatus.Experimental
+@FunctionalInterface
+public interface ScoreboardComponentFactory<C extends Component> {
+    /**
+     * Initialize components for the given scoreboard.
+     *
+     * <p>The component returned by this method will be available
+     * on the scoreboard as soon as all component factories have been invoked.
+     *
+     * @param scoreboard the scoreboard being constructed
+     */
+    @Nonnull
+    C createForScoreboard(Scoreboard scoreboard);
+}

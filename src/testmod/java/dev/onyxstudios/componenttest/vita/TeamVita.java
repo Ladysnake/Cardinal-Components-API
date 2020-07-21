@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.scoreboard.util.sync.TeamSyncedComponent;
+import dev.onyxstudios.cca.api.v3.scoreboard.TeamSyncedComponent;
 import net.minecraft.scoreboard.Team;
 
 public class TeamVita extends BaseVita implements TeamSyncedComponent {

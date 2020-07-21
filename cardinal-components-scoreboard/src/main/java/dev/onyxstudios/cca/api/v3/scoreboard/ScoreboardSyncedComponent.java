@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.scoreboard.util.sync;
+package dev.onyxstudios.cca.api.v3.scoreboard;
 
 import dev.onyxstudios.cca.mixin.scoreboard.ServerScoreboardAccessor;
 import io.netty.buffer.Unpooled;

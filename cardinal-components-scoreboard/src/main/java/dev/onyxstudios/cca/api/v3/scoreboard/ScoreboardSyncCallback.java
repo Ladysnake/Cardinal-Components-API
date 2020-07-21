@@ -20,32 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.scoreboard.component;
+package dev.onyxstudios.cca.api.v3.scoreboard;
 
-import nerdhub.cardinal.components.api.component.Component;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.scoreboard.Scoreboard;
-import org.jetbrains.annotations.ApiStatus;
-
-import javax.annotation.Nonnull;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
- * A component factory for {@linkplain Scoreboard scoreboards}.
- *
- * <p>When invoked, the factory must return a {@link Component} of the right type.
- *
- * @since 2.4.2
+ * The callback interface for receiving scoreboard synchronization events.
  */
-@ApiStatus.Experimental
 @FunctionalInterface
-public interface ScoreboardComponentFactory<C extends Component> {
+public interface ScoreboardSyncCallback {
+    Event<ScoreboardSyncCallback> EVENT = EventFactory.createArrayBacked(ScoreboardSyncCallback.class, (p, t) -> {}, listeners -> (player, scoreboard) -> {
+        for (ScoreboardSyncCallback callback : listeners) {
+            callback.onScoreboardSync(player, scoreboard);
+        }
+    });
+
     /**
-     * Initialize components for the given scoreboard.
-     *
-     * <p>The component returned by this method will be available
-     * on the scoreboard as soon as all component factories have been invoked.
-     *
-     * @param scoreboard the scoreboard being constructed
+     * Called when a team's data is sent to a player
      */
-    @Nonnull
-    C createForScoreboard(Scoreboard scoreboard);
+    void onScoreboardSync(ServerPlayerEntity player, Scoreboard scoreboard);
 }

@@ -20,25 +20,28 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.scoreboard.event;
+package dev.onyxstudios.cca.api.v3.scoreboard;
 
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.scoreboard.Team;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import nerdhub.cardinal.components.api.component.Component;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
- * The callback interface for receiving global team synchronization events.
+ * @since 2.4.2
  */
-@FunctionalInterface
-public interface TeamAddCallback {
-    Event<TeamAddCallback> EVENT = EventFactory.createArrayBacked(TeamAddCallback.class, (t) -> {}, listeners -> (team) -> {
-        for (TeamAddCallback callback : listeners) {
-            callback.onTeamAdded(team);
-        }
-    });
+@ApiStatus.Experimental
+public interface ScoreboardComponentFactoryRegistry {
+    /**
+     * Registers a {@link TeamComponentFactory}.
+     *
+     * @param factory the factory to use to create components of the given type
+     */
+    <C extends Component> void register(ComponentKey<C> type, TeamComponentFactory<? extends C> factory);
 
     /**
-     * Called when a team's data is sent to all players
+     * Registers a {@link ScoreboardComponentFactory}.
+     *
+     * @param factory the factory to use to create components of the given type
      */
-    void onTeamAdded(Team team);
+    <C extends Component> void register(ComponentKey<C> type, ScoreboardComponentFactory<? extends C> factory);
 }

@@ -20,12 +20,27 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-@ApiStatus.Internal
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
-package dev.onyxstudios.cca.api.v3.scoreboard.util.sync;
+package dev.onyxstudios.cca.api.v3.scoreboard;
 
-import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.ApiStatus;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+/**
+ * Entrypoint getting invoked to register <em>static</em> team component factories.
+ *
+ * <p>The entrypoint is exposed as {@code cardinal-components-scoreboard} in the mod json and runs for any environment.
+ * It usually executes right before the first {@link net.minecraft.scoreboard.Scoreboard} instance is created.
+ *
+ * @since 2.4.2
+ */
+@ApiStatus.Experimental
+public interface ScoreboardComponentInitializer {
+    /**
+     * Called to register component factories for statically declared component types.
+     *
+     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
+     * must not be registered outside of this method.
+     *
+     * @param registry a {@link ScoreboardComponentFactoryRegistry} for <em>statically declared</em> components
+     */
+    void registerScoreboardComponentFactories(ScoreboardComponentFactoryRegistry registry);
+}

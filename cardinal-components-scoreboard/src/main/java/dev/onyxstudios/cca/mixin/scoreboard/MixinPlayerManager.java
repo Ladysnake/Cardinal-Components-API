@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.mixin.scoreboard;
 
-import dev.onyxstudios.cca.api.v3.scoreboard.event.ScoreboardSyncCallback;
+import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardSyncCallback;
 import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;

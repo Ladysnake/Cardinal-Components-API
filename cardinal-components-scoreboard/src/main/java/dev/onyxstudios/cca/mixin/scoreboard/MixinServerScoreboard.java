@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.mixin.scoreboard;
 
-import dev.onyxstudios.cca.api.v3.scoreboard.event.TeamAddCallback;
+import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
 import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.scoreboard.Team;
 import org.spongepowered.asm.mixin.Mixin;

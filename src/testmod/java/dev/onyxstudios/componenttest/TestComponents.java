@@ -36,8 +36,8 @@ import dev.onyxstudios.cca.api.v3.component.util.GenericComponentFactoryRegistry
 import dev.onyxstudios.cca.api.v3.component.util.GenericComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.component.world.WorldComponentInitializer;
-import dev.onyxstudios.cca.api.v3.scoreboard.component.ScoreboardComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.scoreboard.component.ScoreboardComponentInitializer;
+import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
 import dev.onyxstudios.componenttest.vita.*;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
