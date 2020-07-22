@@ -1,6 +1,6 @@
 {
     "required": true,
-    "minVersion": "0.7.11",
+    "minVersion": "0.8",
     "compatibilityLevel": "JAVA_8",
     "package": "dev.onyxstudios.cca.mixin.item",
     "plugin": "dev.onyxstudios.cca.mixin.CardinalItemMixinPlugin",

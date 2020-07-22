@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "package": "dev.onyxstudios.cca.mixin.scoreboard",
+  "mixins": [
+    "MixinPlayerManager",
+    "MixinScoreboard",
+    "MixinScoreboardState",
+    "MixinServerScoreboard",
+    "MixinTeam",
+    "ServerScoreboardAccessor",
+    "TeamAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
