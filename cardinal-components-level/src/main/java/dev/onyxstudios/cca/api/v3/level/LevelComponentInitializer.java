@@ -20,16 +20,28 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.util;
+package dev.onyxstudios.cca.api.v3.level;
 
-import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
+import net.minecraft.world.WorldProperties;
+import org.jetbrains.annotations.ApiStatus;
 
-public class ContainerGenerationException extends StaticComponentLoadingException {
-    public ContainerGenerationException(String message) {
-        super(message);
-    }
-
-    public ContainerGenerationException(String message, Throwable cause) {
-        super(message, cause);
-    }
+/**
+ * Entrypoint getting invoked to register <em>static</em> item component factories.
+ *
+ * <p>The entrypoint is exposed as {@code cardinal-components-level} in the mod json and runs for any environment.
+ * It usually executes right before the first {@linkplain WorldProperties save properties object} gets loaded.
+ *
+ * @since 2.4.0
+ */
+@ApiStatus.Experimental
+public interface LevelComponentInitializer {
+    /**
+     * Called to register component factories for statically declared component types.
+     *
+     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
+     * must not be registered outside of this method.
+     *
+     * @param registry a {@link LevelComponentFactoryRegistry} for <em>statically declared</em> components
+     */
+    void registerLevelComponentFactories(LevelComponentFactoryRegistry registry);
 }

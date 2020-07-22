@@ -26,7 +26,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.util.PlayerComponent;
+import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import nerdhub.cardinal.components.api.ComponentType;

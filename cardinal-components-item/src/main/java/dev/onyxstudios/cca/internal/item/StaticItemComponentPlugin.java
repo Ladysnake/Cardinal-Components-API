@@ -24,10 +24,10 @@ package dev.onyxstudios.cca.internal.item;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactory;
-import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactoryV2;
-import dev.onyxstudios.cca.api.v3.component.item.ItemComponentInitializer;
+import dev.onyxstudios.cca.api.v3.item.ItemComponentFactory;
+import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryV2;
+import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;

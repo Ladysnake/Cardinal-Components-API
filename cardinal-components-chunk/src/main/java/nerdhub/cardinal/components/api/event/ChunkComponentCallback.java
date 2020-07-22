@@ -22,7 +22,7 @@
  */
 package nerdhub.cardinal.components.api.event;
 
-import dev.onyxstudios.cca.api.v3.component.chunk.ChunkComponentFactory;
+import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactory;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;

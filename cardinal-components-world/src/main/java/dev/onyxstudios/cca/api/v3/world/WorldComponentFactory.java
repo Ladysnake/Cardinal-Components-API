@@ -20,21 +20,32 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.chunk;
+package dev.onyxstudios.cca.api.v3.world;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.ApiStatus;
 
+import javax.annotation.Nonnull;
+
 /**
+ * Applied to a method to declare it as a component factory for {@linkplain World worlds}.
+ *
+ * <p>When invoked, the factory must return a {@link Component} of the right type.
+ *
  * @since 2.4.0
  */
 @ApiStatus.Experimental
-public interface ChunkComponentFactoryRegistry {
+@FunctionalInterface
+public interface WorldComponentFactory<C extends Component> {
     /**
-     * Registers a {@link ChunkComponentFactory}.
+     * Initialize components for the given world.
      *
-     * @param factory the factory to use to create components of the given type
+     * <p>The component returned by this method will be available
+     * on the world as soon as all component factories have been invoked.
+     *
+     * @param world the world being constructed
      */
-    <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, ChunkComponentFactory<C> factory);
+    @Nonnull
+    C createForWorld(World world);
 }

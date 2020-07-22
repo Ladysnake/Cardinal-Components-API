@@ -24,7 +24,7 @@ package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.api.v3.component.util.ComponentContainerMetafactory;
+import dev.onyxstudios.cca.api.v3.util.ComponentContainerMetafactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.componenttest.vita.Vita;
 import nerdhub.cardinal.components.api.ComponentRegistry;
