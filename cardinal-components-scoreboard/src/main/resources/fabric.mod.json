@@ -1,0 +1,40 @@
+{
+    "schemaVersion": 1,
+    "environment": "*",
+    "id": "cardinal-components-scoreboard",
+    "name": "Cardinal Components API (scoreboard)",
+    "description": "dynamically exposing components",
+    "version": "${version}",
+    "side": "universal",
+    "entrypoints": {
+        "main": [
+            "dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking::init"
+        ],
+        "client": [
+            "dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking::initClient"
+        ]
+    },
+    "custom": {
+        "modmenu:api": true,
+        "modmenu:parent": "cardinal-components"
+    },
+    "depends": {
+        "fabric-api-base": "*",
+        "cardinal-components-base": "*"
+    },
+    "authors": [
+        "Pyrofab"
+    ],
+    "contact": {
+        "homepage": "https://minecraft.curseforge.com/projects/318449",
+        "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
+        "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
+    },
+    "license": "MIT",
+    "mixins": [
+        {
+            "environment": "*",
+            "config": "mixins.cardinal_components_scoreboard.json"
+        }
+    ]
+}

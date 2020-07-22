@@ -33,6 +33,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -43,6 +44,7 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
 public class VitalityStickItem extends Item {
     public VitalityStickItem(Settings settings) {
@@ -74,6 +76,15 @@ public class VitalityStickItem extends Item {
         // The entity may not have the component, but the stack always does.
         TestComponents.VITA.maybeGet(target)
                 .ifPresent(v -> v.transferTo(Vita.get(stack), 1));
+
+        AbstractTeam team = holder.getScoreboardTeam();
+        if (team != null) {
+            Optional<Vita> vita = TestComponents.VITA.maybeGet(target.getScoreboardTeam());
+            if (!vita.isPresent()) {
+                vita = TestComponents.VITA.maybeGet(target);
+            }
+            vita.ifPresent(v -> v.transferTo(Vita.get(team), 1));
+        }
         return true;
     }
 

@@ -80,8 +80,8 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
 
     private final Class<? super F> componentFactoryType;
     private final Map<Identifier, F> componentFactories = new LinkedHashMap<>();
-    private final Class<T> providerClass;
-    private final String implSuffix;
+    protected final Class<T> providerClass;
+    protected final String implSuffix;
     private Class<? extends DynamicContainerFactory<T, ?>> containerFactoryClass;
 
     protected StaticComponentPluginBase(String likelyInitTrigger, Class<T> providerClass, Class<? super F> componentFactoryType, String implSuffix) {
@@ -504,10 +504,14 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
 
         try {
             Class<? extends ComponentContainer<?>> containerCls = spinComponentContainer(this.componentFactoryType, Component.class, this.componentFactories, this.implSuffix);
-            this.containerFactoryClass = spinContainerFactory(this.implSuffix, DynamicContainerFactory.class, containerCls, ComponentCallback.class, 1, this.providerClass);
+            this.containerFactoryClass = this.spinContainerFactory(containerCls);
         } catch (IOException e) {
             throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + this.providerClass, e);
         }
+    }
+
+    protected Class<? extends DynamicContainerFactory<T, ?>> spinContainerFactory(Class<? extends ComponentContainer<?>> containerCls) throws IOException {
+        return spinContainerFactory(this.implSuffix, DynamicContainerFactory.class, containerCls, ComponentCallback.class, 1, this.providerClass);
     }
 
     public static <I> void processInitializers(Collection<EntrypointContainer<I>> entrypoints, Consumer<I> action) {

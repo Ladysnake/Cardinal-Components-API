@@ -67,7 +67,7 @@ public abstract class LazyDispatcher {
     @ApiStatus.OverrideOnly
     protected abstract void init();
 
-    protected void checkLoading(Class<?> ownerClass, String methodName) {
+    public void checkLoading(Class<?> ownerClass, String methodName) {
         if (!this.loading) {
             throw new IllegalStateException(ownerClass.getSimpleName() + "#" + methodName + " called at the wrong time");
         }
