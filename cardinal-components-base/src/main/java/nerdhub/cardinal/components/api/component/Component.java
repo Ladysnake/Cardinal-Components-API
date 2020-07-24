@@ -58,6 +58,7 @@ public interface Component extends NbtSerializable {
     /**
      * Used to compare two instances of components for equality.
      */
+    // TODO deprecate in favor of Object#equals
     default boolean isComponentEqual(Component other) {
         return this.equals(other);
     }

@@ -40,6 +40,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,8 +49,10 @@ import java.util.Objects;
 
 public final class StaticItemComponentPlugin extends LazyDispatcher implements ItemComponentFactoryRegistry {
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
-    public static final String EMPTY_IMPL_SUFFIX = "ItemStackImpl_Empty";
-    public static final String WILDARD_IMPL_SUFFIX = "ItemStackImpl_All";
+    public static final String WILDCARD_IMPL_SUFFIX = "ItemStackImpl_All";
+    private static final boolean DEV = Boolean.getBoolean("fabric.development");
+    // TODO enable by default when Component#isComponentEqual is gone
+    private static final boolean ENABLE_CHECKS = Boolean.getBoolean("cca.debug.verifyequals");
 
     private StaticItemComponentPlugin() {
         super("creating an ItemStack");
@@ -83,8 +86,8 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         Map<Identifier, ItemComponentFactoryV2<?>> wildcardMap = this.componentFactories.getOrDefault(null, Collections.emptyMap());
 
         try {
-            Class<? extends ComponentContainer<CopyableComponent<?>>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, CopyableComponent.class, wildcardMap, WILDARD_IMPL_SUFFIX);
-            this.wildcardFactoryClass = StaticComponentPluginBase.spinContainerFactory(WILDARD_IMPL_SUFFIX, ItemComponentContainerFactory.class, containerCls, ItemComponentCallbackV2.class, 2, Item.class, ItemStack.class);
+            Class<? extends ComponentContainer<CopyableComponent<?>>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, CopyableComponent.class, wildcardMap, WILDCARD_IMPL_SUFFIX);
+            this.wildcardFactoryClass = StaticComponentPluginBase.spinContainerFactory(WILDCARD_IMPL_SUFFIX, ItemComponentContainerFactory.class, containerCls, ItemComponentCallbackV2.class, 2, Item.class, ItemStack.class);
         } catch (IOException e) {
             throw new StaticComponentLoadingException("Failed to generate the fallback component container for item stacks", e);
         }
@@ -133,6 +136,40 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + (itemId == null ? "every item" : "item '" + itemId + "'") + ": " + factory + " and " + previousFactory);
         }
-        specializedMap.put(type.getId(), (item, stack) -> Objects.requireNonNull(((ItemComponentFactoryV2<?>) factory).createForStack(item, stack), "Component factory "+ factory + " for " + type.getId() + " returned null on " + stack));
+        ItemComponentFactoryV2<CopyableComponent<?>> nonnullFactory = (item, stack) -> Objects.requireNonNull(
+            ((ItemComponentFactoryV2<?>) factory).createForStack(item, stack),
+            "Component factory " + factory + " for " + type.getId() + " returned null on " + stack
+        );
+        ItemComponentFactoryV2<CopyableComponent<?>> finalFactory;
+
+        if (DEV && ENABLE_CHECKS) {
+            finalFactory = new ItemComponentFactoryV2<CopyableComponent<?>>() {
+                private boolean checked;
+
+                @Nonnull
+                @Override
+                public CopyableComponent<?> createForStack(Item item, ItemStack stack) {
+                    CopyableComponent<?> component = nonnullFactory.createForStack(item, stack);
+
+                    if (!this.checked) {
+                        try {
+                            if (component.getClass().getMethod("equals", Object.class).getDeclaringClass() == Object.class) {
+                                throw new IllegalStateException("Component implementation " + component.getClass().getTypeName() + " attached to " + stack + " does not override Object#equals");
+                            }
+                        } catch (NoSuchMethodException e) {
+                            throw new AssertionError("Object#equals not found ?!");
+                        }
+
+                        this.checked = true;
+                    }
+
+                    return component;
+                }
+            };
+        } else {
+            finalFactory = nonnullFactory;
+        }
+
+        specializedMap.put(type.getId(), finalFactory);
     }
 }
