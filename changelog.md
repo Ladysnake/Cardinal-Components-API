@@ -7,6 +7,7 @@ Version 2.5.0
 Additions
 - Added reworked `ComponentProvider` and `ComponentContainer` interfaces to the V3 API
     - Refactored a lot of internal code to use the new types
+- Added `ComponentV3` and `ComponentRegistryV3` interfaces for early V3 adopters
 
 Fixes
 - Fixed item components not being copied by the smithing table

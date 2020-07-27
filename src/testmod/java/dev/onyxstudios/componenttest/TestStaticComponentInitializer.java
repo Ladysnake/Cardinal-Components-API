@@ -40,7 +40,7 @@ public final class TestStaticComponentInitializer implements StaticComponentInit
     public static final Identifier ALT_VITA_ID = new Identifier("componenttest", "alt-vita");
 
     @Override
-    public Collection<Identifier> getSupportedComponentTypes() {
+    public Collection<Identifier> getSupportedComponentKeys() {
         List<Identifier> ret = new ArrayList<>(Collections.singleton(ALT_VITA_ID));
         for (int i = 0; i < 128; i++) {
             ret.add(new Identifier("-.-", "-random/test." + i));
