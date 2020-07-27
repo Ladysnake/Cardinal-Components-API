@@ -106,6 +106,7 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
      * @param implNameSuffix       a unique suffix for the generated class
      * @return the generated container class
      */
+    // TODO move to a publicly available builder
     public static <I, C extends Component> Class<? extends ComponentContainer<C>> spinComponentContainer(Class<? super I> componentFactoryType, Class<? super C> componentClass, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
 

@@ -92,7 +92,7 @@ public final class CcaBootstrap extends LazyDispatcher {
 
             for (EntrypointContainer<StaticComponentInitializer> staticInitializer : this.staticComponentInitializers) {
                 try {
-                    staticComponentTypes.addAll(staticInitializer.getEntrypoint().getSupportedComponentTypes());
+                    staticComponentTypes.addAll(staticInitializer.getEntrypoint().getSupportedComponentKeys());
                 } catch (Throwable e) {
                     ModMetadata badMod = staticInitializer.getProvider().getMetadata();
                     throw new StaticComponentLoadingException(String.format("Exception while querying %s (%s) for supported static component types", badMod.getName(), badMod.getId()), e);
