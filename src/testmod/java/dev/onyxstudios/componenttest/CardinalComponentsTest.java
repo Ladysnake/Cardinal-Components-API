@@ -26,6 +26,7 @@ import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.util.ComponentContainerMetafactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
+import dev.onyxstudios.componenttest.vita.BaseVita;
 import dev.onyxstudios.componenttest.vita.Vita;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.Component;
@@ -51,6 +52,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.util.UUID;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class CardinalComponentsTest {
 
@@ -80,6 +82,15 @@ public class CardinalComponentsTest {
 
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
 
+        ComponentContainer.FactoryBuilder<Integer, Component> factoryBuilder = ComponentContainer.factoryBuilder(Integer.class)
+            .component(TestComponents.VITA, BaseVita::new);
+        Function<Integer, ComponentContainer<Component>> containerFactory = factoryBuilder.build();
+        LOGGER.info(containerFactory.apply(3));
+        LOGGER.info(containerFactory.apply(5));
+        try {
+            factoryBuilder.build();
+            assert false : "Component container factory builders are single use";
+        } catch (IllegalStateException ignored) { }
         try {
             ComponentRegistry.INSTANCE.registerStatic(TestComponents.OLD_VITA.getId(), TestComponents.OLD_VITA.getComponentClass());
             assert false : "Static components must be registered through mod metadata or plugin";
