@@ -33,7 +33,6 @@ import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -145,26 +144,9 @@ public final class CcaBootstrap extends LazyDispatcher {
             get.visitCode();
             get.visitVarInsn(Opcodes.ALOAD, 1);
             // stack: object
-            get.visitInsn(Opcodes.DUP);
-            // stack: object object
-            Label label = new Label();
-            get.visitJumpInsn(Opcodes.IFNULL, label);
-            // stack: object
             get.visitTypeInsn(Opcodes.CHECKCAST, CcaAsmHelper.STATIC_COMPONENT_CONTAINER);
             // stack: generatedComponentContainer
             get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, CcaAsmHelper.getStaticStorageGetterName(componentId), CcaAsmHelper.STATIC_CONTAINER_GETTER_DESC, true);
-            // stack: component
-            get.visitInsn(Opcodes.ARETURN);
-            // if the native component container is null, we use the classic runtime way
-            get.visitLabel(label);
-            // stack: object(null)
-            get.visitInsn(Opcodes.POP); // pop the useless duplicated null
-            // empty stack
-            get.visitVarInsn(Opcodes.ALOAD, 1);
-            // stack: componentProvider
-            get.visitVarInsn(Opcodes.ALOAD, 0);
-            // stack: componentProvider <this>
-            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_PROVIDER, "getComponent", "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)L" + CcaAsmHelper.COMPONENT +";", true);
             // stack: component
             get.visitInsn(Opcodes.ARETURN);
             get.visitEnd();
