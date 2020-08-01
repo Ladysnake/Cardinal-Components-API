@@ -23,7 +23,7 @@
 @ApiStatus.Internal
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package nerdhub.cardinal.components;
+package dev.onyxstudios.cca.internal.block;
 
 import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.ApiStatus;
