@@ -23,10 +23,12 @@
 package dev.onyxstudios.cca.mixin.block.common;
 
 import com.google.common.collect.ImmutableSet;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.BlockComponentProvider;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -39,9 +41,16 @@ import java.util.Collections;
 import java.util.Set;
 
 @Mixin(AbstractBlock.class)
-public abstract class MixinBlock implements BlockComponentProvider {
+public abstract class MixinBlock implements dev.onyxstudios.cca.internal.block.BlockComponentProvider, BlockComponentProvider {
+    private static final ComponentContainer<?> EMPTY_CONTAINER = ComponentContainer.factoryBuilder(Object.class).build().apply(null);
 
     @Shadow public abstract boolean hasBlockEntity();
+
+    @Override
+    public ComponentContainer<?> getComponents(BlockState state, BlockView world, BlockPos pos, @Nullable Direction side) {
+        // TODO
+        return EMPTY_CONTAINER;
+    }
 
     @Override
     public <T extends Component> boolean hasComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {

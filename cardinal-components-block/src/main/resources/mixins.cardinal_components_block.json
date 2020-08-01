@@ -1,12 +1,13 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "compatibilityLevel": "JAVA_8",
-    "package": "dev.onyxstudios.cca.mixin",
-    "mixins": [
-        "block.common.MixinBlock"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "package": "dev.onyxstudios.cca.mixin.block",
+  "mixins": [
+    "common.MixinBlock",
+    "common.MixinBlockEntity"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }
