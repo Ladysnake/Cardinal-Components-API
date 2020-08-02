@@ -28,6 +28,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @since 2.5.0
@@ -42,7 +43,7 @@ public interface BlockComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends BlockComponent> void registerFor(Identifier blockId, Direction side, ComponentKey<? super C> key, BlockComponentFactory<C> factory);
+    <C extends Component> void registerFor(Identifier blockId, @Nullable Direction side, ComponentKey<? super C> key, BlockComponentFactory<C> factory);
 
     /**
      * Registers a {@link BlockEntityComponentFactory} for all instances of a given {@code BlockEntity} class.

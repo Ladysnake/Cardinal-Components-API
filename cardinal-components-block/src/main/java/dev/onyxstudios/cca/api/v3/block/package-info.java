@@ -20,22 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 package dev.onyxstudios.cca.api.v3.block;
 
-import nerdhub.cardinal.components.api.component.Component;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
-import org.jetbrains.annotations.Nullable;
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-/**
- * A component factory for blocks in a World.
- *
- * <p>When invoked, the factory must return a {@link Component} of the right type.
- *
- * @since 2.5.0
- */
-@FunctionalInterface
-public interface BlockComponentFactory<C extends Component> {
-    @Nullable C create(BlockState state, BlockView world, BlockPos pos);
-}
+import javax.annotation.ParametersAreNonnullByDefault;

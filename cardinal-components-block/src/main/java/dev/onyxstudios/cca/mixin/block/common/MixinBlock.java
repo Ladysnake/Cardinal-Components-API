@@ -24,32 +24,38 @@ package dev.onyxstudios.cca.mixin.block.common;
 
 import com.google.common.collect.ImmutableSet;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.internal.block.BlockComponentContainerFactory;
+import dev.onyxstudios.cca.internal.block.CardinalBlockInternals;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.BlockComponentProvider;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
-@Mixin(AbstractBlock.class)
-public abstract class MixinBlock implements dev.onyxstudios.cca.internal.block.BlockComponentProvider, BlockComponentProvider {
-    private static final ComponentContainer<?> EMPTY_CONTAINER = ComponentContainer.factoryBuilder(Object.class).build().apply(null);
+@Mixin(Block.class)
+public abstract class MixinBlock extends AbstractBlock implements dev.onyxstudios.cca.internal.block.BlockComponentProvider, BlockComponentProvider {
+    private final Map<Direction, BlockComponentContainerFactory> containerFactories = new Reference2ObjectOpenHashMap<>();
 
-    @Shadow public abstract boolean hasBlockEntity();
+    public MixinBlock(Settings settings) {
+        super(settings);
+    }
 
     @Override
     public ComponentContainer<?> getComponents(BlockState state, BlockView world, BlockPos pos, @Nullable Direction side) {
-        // TODO
-        return EMPTY_CONTAINER;
+        BlockComponentContainerFactory factory = this.containerFactories.computeIfAbsent(side, k -> CardinalBlockInternals.createBlockContainerFactory((Block) (Object) this, k));
+        return factory.create(state, world, pos);
     }
 
     @Override

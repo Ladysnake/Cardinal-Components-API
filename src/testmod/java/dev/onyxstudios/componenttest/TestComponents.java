@@ -23,6 +23,8 @@
 package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
+import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
@@ -32,12 +34,12 @@ import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
 import dev.onyxstudios.cca.api.v3.level.LevelComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.level.LevelComponentInitializer;
+import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
 import dev.onyxstudios.cca.api.v3.util.GenericComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.util.GenericComponentInitializer;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
-import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
 import dev.onyxstudios.componenttest.vita.*;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
@@ -45,13 +47,17 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.CollisionView;
+import net.minecraft.world.chunk.Chunk;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
 public final class TestComponents implements
     EntityComponentInitializer,
     ChunkComponentInitializer,
+    BlockComponentInitializer,
     LevelComponentInitializer,
     WorldComponentInitializer,
     GenericComponentInitializer,
@@ -83,6 +89,17 @@ public final class TestComponents implements
     @Override
     public void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry) {
         registry.register(VITA, ChunkVita::new);
+    }
+
+    @Override
+    public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
+        registry.registerFor(CardinalComponentsTest.id("vita_condenser"), null, VITA,
+            (state, world, pos) -> {
+                if (world instanceof CollisionView)
+                    return VITA.get(Objects.requireNonNull(((CollisionView) world).getExistingChunk(pos.getX() >> 4, pos.getZ() >> 4)));
+                if (world instanceof Chunk) return VITA.get(world);
+                return null;
+            });
     }
 
     @Override

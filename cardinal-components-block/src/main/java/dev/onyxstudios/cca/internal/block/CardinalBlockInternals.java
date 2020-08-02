@@ -23,44 +23,56 @@
 package dev.onyxstudios.cca.internal.block;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public final class CardinalBlockInternals {
-    private static final Map<Key, DynamicContainerFactory<BlockEntity, ?>> containerFactories = new HashMap<>();
+    private static final Map<Class<? extends BlockEntity>, Map<Direction, DynamicContainerFactory<BlockEntity, Component>>> entityContainerFactories = new HashMap<>();
+    private static final Object factoryMutex = new Object();
 
     public static ComponentContainer<?> createComponents(BlockEntity blockEntity, @Nullable Direction side) {
-        return containerFactories.get(new Key(blockEntity.getClass(), side)).create(blockEntity);
+        Class<? extends BlockEntity> entityClass = blockEntity.getClass();
+        Map<Direction, DynamicContainerFactory<BlockEntity, Component>> sided = entityContainerFactories.computeIfAbsent(entityClass, k -> new Reference2ObjectOpenHashMap<>());
+        DynamicContainerFactory<BlockEntity, Component> existing = sided.get(side);
+        if (existing != null) {
+            return existing.create(blockEntity);
+        }
+        synchronized (factoryMutex) {
+            // computeIfAbsent and not put, because the factory may have been generated while waiting
+            return sided.computeIfAbsent(side, s -> {
+                Class<?> cl = entityClass;
+                Class<? extends BlockEntity> parentWithStaticComponents = null;
+
+                while (BlockEntity.class.isAssignableFrom(cl)) {
+                    Class<? extends BlockEntity> c = cl.asSubclass(BlockEntity.class);
+                    if (parentWithStaticComponents == null && StaticBlockEntityComponentPlugin.INSTANCE.requiresStaticFactory(c, s)) {   // try to find a specialized ASM factory
+                        parentWithStaticComponents = c;
+                    }
+                    cl = c.getSuperclass();
+                }
+                assert parentWithStaticComponents != null;
+                Class<? extends DynamicContainerFactory<BlockEntity,Component>> factoryClass = StaticBlockEntityComponentPlugin.INSTANCE.spinDedicatedFactory(
+                    new StaticBlockEntityComponentPlugin.Key(parentWithStaticComponents, s)
+                );
+
+                return ComponentsInternals.createFactory(factoryClass);
+            }).create(blockEntity);
+        }
     }
 
-    private static final class Key {
-        private final Class<? extends BlockEntity> clazz;
-        @Nullable
-        private final Direction side;
-
-        public Key(Class<? extends BlockEntity> clazz, @Nullable Direction side) {
-            this.clazz = clazz;
-            this.side = side;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || this.getClass() != o.getClass()) return false;
-            Key key = (Key) o;
-            return this.clazz.equals(key.clazz) &&
-                this.side == key.side;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.clazz, this.side);
-        }
+    public static BlockComponentContainerFactory createBlockContainerFactory(Block block, @Nullable Direction side) {
+        Identifier blockId = Registry.BLOCK.getId(block);
+        return ComponentsInternals.createFactory(StaticBlockComponentPlugin.INSTANCE.getFactoryClass(blockId, side));
     }
 }

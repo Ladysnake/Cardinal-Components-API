@@ -20,22 +20,14 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.block;
+package dev.onyxstudios.cca.internal.block;
 
-import nerdhub.cardinal.components.api.component.Component;
+import dev.onyxstudios.cca.api.v3.block.BlockComponent;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
-import org.jetbrains.annotations.Nullable;
 
-/**
- * A component factory for blocks in a World.
- *
- * <p>When invoked, the factory must return a {@link Component} of the right type.
- *
- * @since 2.5.0
- */
-@FunctionalInterface
-public interface BlockComponentFactory<C extends Component> {
-    @Nullable C create(BlockState state, BlockView world, BlockPos pos);
+public interface BlockComponentContainerFactory {
+    ComponentContainer<BlockComponent> create(BlockState state, BlockView world, BlockPos pos);
 }
