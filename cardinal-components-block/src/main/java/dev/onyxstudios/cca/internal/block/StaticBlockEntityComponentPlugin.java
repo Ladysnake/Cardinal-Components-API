@@ -45,9 +45,9 @@ public final class StaticBlockEntityComponentPlugin {
         super();
     }
 
-    private static String getSuffix(Class<?> entityClass) {
-        String simpleName = entityClass.getSimpleName();
-        return String.format("BlockEntityImpl_%s_%s", simpleName, Integer.toHexString(entityClass.getName().hashCode()));
+    private static String getSuffix(Key key) {
+        String simpleName = key.clazz.getSimpleName();
+        return String.format("BlockEntityImpl_%s_%s_%s", simpleName, key.side, Integer.toHexString(key.clazz.getName().hashCode()));
     }
 
     private final Map<Key, Map</*ComponentType*/Identifier, BlockEntityComponentFactory<?, ?>>> componentFactories = new HashMap<>();
@@ -73,7 +73,7 @@ public final class StaticBlockEntityComponentPlugin {
                 this.componentFactories.getOrDefault(new Key(type, key.side), Collections.emptyMap()).forEach(compiled::putIfAbsent);
             }
 
-            String implSuffix = getSuffix(entityClass);
+            String implSuffix = getSuffix(k);
 
             try {
                 Class<? extends ComponentContainer<?>> containerCls;
