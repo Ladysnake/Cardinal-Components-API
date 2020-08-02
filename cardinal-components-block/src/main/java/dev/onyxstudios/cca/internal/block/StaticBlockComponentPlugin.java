@@ -29,6 +29,8 @@ import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
@@ -40,10 +42,8 @@ import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public final class StaticBlockComponentPlugin extends LazyDispatcher implements BlockComponentFactoryRegistry {
     public static final StaticBlockComponentPlugin INSTANCE = new StaticBlockComponentPlugin();
@@ -57,9 +57,15 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         return "BlockImpl_" + CcaAsmHelper.getJavaIdentifierName(blockId);
     }
 
-    private final Map<Key, Map</*ComponentType*/Identifier, BlockComponentFactory<?>>> componentFactories = new HashMap<>();
+    private final Map<Identifier, Set<ComponentKey<?>>> keysPerBlock = new HashMap<>();
+    private final Map<Key, Map<ComponentKey<?>, BlockComponentFactory<?>>> componentFactories = new HashMap<>();
     private final Map<Key, Class<? extends BlockComponentContainerFactory>> factoryClasses = new HashMap<>();
     private Class<? extends BlockComponentContainerFactory> wildcardFactoryClass;
+
+    public Set<ComponentKey<?>> getAvailableKeys(Identifier blockId) {
+        this.ensureInitialized();
+        return this.keysPerBlock.getOrDefault(blockId, Collections.emptySet());
+    }
 
     public Class<? extends BlockComponentContainerFactory> getFactoryClass(Identifier blockId, @Nullable Direction side) {
         this.ensureInitialized();
@@ -78,23 +84,26 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
             initializer -> initializer.registerBlockComponentFactories(this)
         );
 
-        Map<Identifier, BlockComponentFactory<?>> wildcardMap = this.componentFactories.getOrDefault(new Key(null, null), Collections.emptyMap());
+        Map<ComponentKey<?>, BlockComponentFactory<?>> wildcardMap = this.componentFactories.getOrDefault(new Key(null, null), Collections.emptyMap());
 
         try {
-            Class<? extends ComponentContainer<BlockComponent>> containerCls = StaticComponentPluginBase.spinComponentContainer(BlockComponentFactory.class, BlockComponent.class, wildcardMap, WILDCARD_IMPL_SUFFIX);
+            Class<? extends ComponentContainer<BlockComponent>> containerCls = StaticComponentPluginBase.spinComponentContainer(BlockComponentFactory.class, BlockComponent.class, wildcardMap.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getId(), Map.Entry::getValue)), WILDCARD_IMPL_SUFFIX);
             this.wildcardFactoryClass = StaticComponentPluginBase.spinContainerFactory(WILDCARD_IMPL_SUFFIX, BlockComponentContainerFactory.class, containerCls, null, 0, BlockState.class, BlockView.class, BlockPos.class);
         } catch (IOException e) {
             throw new StaticComponentLoadingException("Failed to generate the fallback component container for block stacks", e);
         }
 
-        for (Map.Entry<Key, Map<Identifier, BlockComponentFactory<?>>> entry : this.componentFactories.entrySet()) {
+        for (Map.Entry<Key, Map<ComponentKey<?>, BlockComponentFactory<?>>> entry : this.componentFactories.entrySet()) {
             if (entry.getKey().blockId == null) continue;
 
             try {
-                Map<Identifier, BlockComponentFactory<?>> compiled = new HashMap<>(entry.getValue());
+                Map<ComponentKey<?>, BlockComponentFactory<?>> compiled = new HashMap<>(entry.getValue());
                 wildcardMap.forEach(compiled::putIfAbsent);
                 String implSuffix = getSuffix(entry.getKey().blockId);
-                Class<? extends ComponentContainer<BlockComponent>> containerCls = StaticComponentPluginBase.spinComponentContainer(BlockComponentFactory.class, BlockComponent.class, compiled, implSuffix);
+                if (!compiled.isEmpty()) {
+                    this.keysPerBlock.put(entry.getKey().blockId, new ReferenceOpenHashSet<>(compiled.keySet()));
+                }
+                Class<? extends ComponentContainer<BlockComponent>> containerCls = StaticComponentPluginBase.spinComponentContainer(BlockComponentFactory.class, BlockComponent.class, compiled.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getId(), Map.Entry::getValue)), implSuffix);
                 this.factoryClasses.put(entry.getKey(), StaticComponentPluginBase.spinContainerFactory(implSuffix, BlockComponentContainerFactory.class, containerCls, null, 0, BlockState.class, BlockView.class, BlockPos.class));
             } catch (IOException e) {
                 throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entry.getKey().blockId, e);
@@ -110,12 +119,12 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     @Override
     public <C extends Component> void registerFor(@Nullable Identifier blockId, @Nullable Direction side, ComponentKey<? super C> type, BlockComponentFactory<C> factory) {
         this.checkLoading(BlockComponentFactoryRegistry.class, "register");
-        Map<Identifier, BlockComponentFactory<?>> specializedMap = this.componentFactories.computeIfAbsent(new Key(blockId, side), t -> new HashMap<>());
-        BlockComponentFactory<?> previousFactory = specializedMap.get(type.getId());
+        Map<ComponentKey<?>, BlockComponentFactory<?>> specializedMap = this.componentFactories.computeIfAbsent(new Key(blockId, side), t -> new Reference2ObjectOpenHashMap<>());
+        BlockComponentFactory<?> previousFactory = specializedMap.get(type);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + (blockId == null ? "every block" : "block '" + blockId + "'") + ": " + factory + " and " + previousFactory);
         }
-        specializedMap.put(type.getId(), factory);
+        specializedMap.put(type, factory);
     }
 
     private static final class Key {

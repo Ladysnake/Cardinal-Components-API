@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.cca.api.v3.block;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.block.BlockComponentProvider;
 import dev.onyxstudios.cca.internal.block.BlockEntityComponentProvider;
@@ -96,7 +95,6 @@ public final class BlockComponents {
 
     private static <C extends Component> @Nullable C getFromBlock(ComponentKey<C> key, BlockView world, BlockPos pos, @Nullable Direction side, BlockState state) {
         BlockComponentProvider blockProvider = ((BlockComponentProvider) state.getBlock());
-        ComponentContainer<?> components = blockProvider.getComponents(state, world, pos, side);
-        return key.getInternal(components);
+        return blockProvider.getComponent(key, state, world, pos, side);
     }
 }

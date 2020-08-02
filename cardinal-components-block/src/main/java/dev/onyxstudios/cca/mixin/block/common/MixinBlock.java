@@ -23,9 +23,10 @@
 package dev.onyxstudios.cca.mixin.block.common;
 
 import com.google.common.collect.ImmutableSet;
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.block.BlockComponentContainerFactory;
 import dev.onyxstudios.cca.internal.block.CardinalBlockInternals;
+import dev.onyxstudios.cca.internal.block.StaticBlockComponentPlugin;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.BlockComponentProvider;
@@ -34,10 +35,13 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -46,6 +50,9 @@ import java.util.Set;
 
 @Mixin(Block.class)
 public abstract class MixinBlock extends AbstractBlock implements dev.onyxstudios.cca.internal.block.BlockComponentProvider, BlockComponentProvider {
+    @Unique
+    private Set<ComponentKey<?>> availableKeys = null;
+    @Unique
     private final Map<Direction, BlockComponentContainerFactory> containerFactories = new Reference2ObjectOpenHashMap<>();
 
     public MixinBlock(Settings settings) {
@@ -53,9 +60,17 @@ public abstract class MixinBlock extends AbstractBlock implements dev.onyxstudio
     }
 
     @Override
-    public ComponentContainer<?> getComponents(BlockState state, BlockView world, BlockPos pos, @Nullable Direction side) {
+    public <C extends Component> C getComponent(ComponentKey<C> key, BlockState state, BlockView world, BlockPos pos, @Nullable Direction side) {
+        if (this.availableKeys == null) {
+            Block self = (Block) (Object) this;
+            Identifier blockId = Registry.BLOCK.getId(self);
+            //noinspection ConstantConditions
+            if (Registry.BLOCK.get(blockId) != self) return null;   // checks that the block is registered
+            this.availableKeys = StaticBlockComponentPlugin.INSTANCE.getAvailableKeys(blockId);
+        }
+        if (!this.availableKeys.contains(key)) return null;
         BlockComponentContainerFactory factory = this.containerFactories.computeIfAbsent(side, k -> CardinalBlockInternals.createBlockContainerFactory((Block) (Object) this, k));
-        return factory.create(state, world, pos);
+        return key.getInternal(factory.create(state, world, pos));
     }
 
     @Override

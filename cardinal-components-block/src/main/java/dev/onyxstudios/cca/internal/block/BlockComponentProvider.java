@@ -22,7 +22,8 @@
  */
 package dev.onyxstudios.cca.internal.block;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -33,5 +34,6 @@ import javax.annotation.Nullable;
 
 @ApiStatus.Experimental
 public interface BlockComponentProvider {
-    ComponentContainer<?> getComponents(BlockState state, BlockView world, BlockPos pos, @Nullable Direction side);
+    @Nullable
+    <C extends Component> C getComponent(ComponentKey<C> key, BlockState state, BlockView world, BlockPos pos, @Nullable Direction side);
 }

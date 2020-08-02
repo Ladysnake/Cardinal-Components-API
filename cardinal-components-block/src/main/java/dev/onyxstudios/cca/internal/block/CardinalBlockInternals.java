@@ -43,12 +43,18 @@ public final class CardinalBlockInternals {
 
     public static ComponentContainer<?> createComponents(BlockEntity blockEntity, @Nullable Direction side) {
         Class<? extends BlockEntity> entityClass = blockEntity.getClass();
-        Map<Direction, DynamicContainerFactory<BlockEntity, Component>> sided = entityContainerFactories.computeIfAbsent(entityClass, k -> new Reference2ObjectOpenHashMap<>());
-        DynamicContainerFactory<BlockEntity, Component> existing = sided.get(side);
-        if (existing != null) {
-            return existing.create(blockEntity);
+        Map<Direction, DynamicContainerFactory<BlockEntity, Component>> sided = entityContainerFactories.get(entityClass);
+        if (sided != null) {
+            DynamicContainerFactory<BlockEntity, Component> existing = sided.get(side);
+            if (existing != null) {
+                return existing.create(blockEntity);
+            }
         }
         synchronized (factoryMutex) {
+            if (sided == null) {
+                // computeIfAbsent and not put, because the factory may have been generated while waiting
+                sided = entityContainerFactories.computeIfAbsent(entityClass, k -> new Reference2ObjectOpenHashMap<>());
+            }
             // computeIfAbsent and not put, because the factory may have been generated while waiting
             return sided.computeIfAbsent(side, s -> {
                 Class<?> cl = entityClass;
