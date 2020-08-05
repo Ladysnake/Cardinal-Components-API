@@ -42,10 +42,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Predicate;
 
 public final class StaticItemComponentPlugin extends LazyDispatcher implements ItemComponentFactoryRegistry {
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
@@ -62,16 +60,30 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         return "ItemStackImpl_" + CcaAsmHelper.getJavaIdentifierName(itemId);
     }
 
+    private final List<PredicatedComponentFactory<?>> dynamicFactories = new ArrayList<>();
     private final Map<@Nullable Identifier, Map</*ComponentType*/Identifier, ItemComponentFactoryV2<?>>> componentFactories = new HashMap<>();
-    private final Map<Identifier, Class<? extends ItemComponentContainerFactory>> factoryClasses = new HashMap<>();
     private Class<? extends ItemComponentContainerFactory> wildcardFactoryClass;
 
-    public Class<? extends ItemComponentContainerFactory> getFactoryClass(Identifier itemId) {
+    public Class<? extends ItemComponentContainerFactory> getFactoryClass(Item item, Identifier itemId) {
         this.ensureInitialized();
-        Class<? extends ItemComponentContainerFactory> specificFactory = this.factoryClasses.get(itemId);
-        if (specificFactory != null) {
-            return specificFactory;
+        Objects.requireNonNull(item);
+
+        for (PredicatedComponentFactory<?> dynamicFactory : this.dynamicFactories) {
+            dynamicFactory.tryRegister(item, itemId);
         }
+
+        if (this.componentFactories.containsKey(itemId)) {
+            try {
+                Map<Identifier, ItemComponentFactoryV2<?>> compiled = new HashMap<>(this.componentFactories.get(itemId));
+                this.getWildcard().forEach(compiled::putIfAbsent);
+                String implSuffix = getSuffix(itemId);
+                Class<? extends ComponentContainer<CopyableComponent<?>>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, CopyableComponent.class, compiled, implSuffix);
+                return StaticComponentPluginBase.spinContainerFactory(implSuffix, ItemComponentContainerFactory.class, containerCls, ItemComponentCallbackV2.class, 2, Item.class, ItemStack.class);
+            } catch (IOException e) {
+                throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + itemId, e);
+            }
+        }
+
         assert this.wildcardFactoryClass != null;
         return this.wildcardFactoryClass;
     }
@@ -83,28 +95,16 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
             initializer -> initializer.registerItemComponentFactories(this)
         );
 
-        Map<Identifier, ItemComponentFactoryV2<?>> wildcardMap = this.componentFactories.getOrDefault(null, Collections.emptyMap());
-
         try {
-            Class<? extends ComponentContainer<CopyableComponent<?>>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, CopyableComponent.class, wildcardMap, WILDCARD_IMPL_SUFFIX);
+            Class<? extends ComponentContainer<CopyableComponent<?>>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, CopyableComponent.class, this.getWildcard(), WILDCARD_IMPL_SUFFIX);
             this.wildcardFactoryClass = StaticComponentPluginBase.spinContainerFactory(WILDCARD_IMPL_SUFFIX, ItemComponentContainerFactory.class, containerCls, ItemComponentCallbackV2.class, 2, Item.class, ItemStack.class);
         } catch (IOException e) {
             throw new StaticComponentLoadingException("Failed to generate the fallback component container for item stacks", e);
         }
+    }
 
-        for (Map.Entry<Identifier, Map<Identifier, ItemComponentFactoryV2<?>>> entry : this.componentFactories.entrySet()) {
-            if (entry.getKey() == null) continue;
-
-            try {
-                Map<Identifier, ItemComponentFactoryV2<?>> compiled = new HashMap<>(entry.getValue());
-                wildcardMap.forEach(compiled::putIfAbsent);
-                String implSuffix = getSuffix(entry.getKey());
-                Class<? extends ComponentContainer<CopyableComponent<?>>> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, CopyableComponent.class, compiled, implSuffix);
-                this.factoryClasses.put(entry.getKey(), StaticComponentPluginBase.spinContainerFactory(implSuffix, ItemComponentContainerFactory.class, containerCls, ItemComponentCallbackV2.class, 2, Item.class, ItemStack.class));
-            } catch (IOException e) {
-                throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entry.getKey(), e);
-            }
-        }
+    private Map<Identifier, ItemComponentFactoryV2<?>> getWildcard() {
+        return this.componentFactories.getOrDefault(null, Collections.emptyMap());
     }
 
     @Override
@@ -129,8 +129,17 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         this.register(itemId, type, factory);
     }
 
+    @Override
+    public <C extends CopyableComponent<?>> void registerFor(Predicate<Item> test, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory) {
+        this.dynamicFactories.add(new PredicatedComponentFactory<>(test, type, factory));
+    }
+
     private <C extends CopyableComponent<?>> void register(@Nullable Identifier itemId, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory) {
         this.checkLoading(ItemComponentFactoryRegistry.class, "register");
+        this.register0(itemId, type, factory);
+    }
+
+    private <C extends CopyableComponent<?>> void register0(@Nullable Identifier itemId, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory) {
         Map<Identifier, ItemComponentFactoryV2<?>> specializedMap = this.componentFactories.computeIfAbsent(itemId, t -> new HashMap<>());
         ItemComponentFactoryV2<?> previousFactory = specializedMap.get(type.getId());
         if (previousFactory != null) {
@@ -171,5 +180,23 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         }
 
         specializedMap.put(type.getId(), finalFactory);
+    }
+
+    private final class PredicatedComponentFactory<C extends CopyableComponent<?>> {
+        private final Predicate<Item> predicate;
+        private final ComponentKey<? super C> type;
+        private final ItemComponentFactoryV2<C> factory;
+
+        public PredicatedComponentFactory(Predicate<Item> predicate, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory) {
+            this.type = type;
+            this.factory = factory;
+            this.predicate = predicate;
+        }
+
+        public void tryRegister(Item item, Identifier id) {
+            if (this.predicate.test(item)) {
+                StaticItemComponentPlugin.this.register0(id, this.type, this.factory);
+            }
+        }
     }
 }

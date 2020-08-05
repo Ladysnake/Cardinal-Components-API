@@ -73,7 +73,7 @@ public final class CardinalItemInternals {
      */
     public static ItemComponentContainerFactory createItemStackContainerFactory(Item item) {
         Identifier itemId = Registry.ITEM.getId(item);
-        Class<? extends ItemComponentContainerFactory> factoryClass = StaticItemComponentPlugin.INSTANCE.getFactoryClass(itemId);
+        Class<? extends ItemComponentContainerFactory> factoryClass = StaticItemComponentPlugin.INSTANCE.getFactoryClass(item, itemId);
         return ComponentsInternals.createFactory(factoryClass, WILDCARD_ITEM_EVENT_V2, ((ItemCaller) item).cardinal_getItemComponentEventV2());
     }
 
