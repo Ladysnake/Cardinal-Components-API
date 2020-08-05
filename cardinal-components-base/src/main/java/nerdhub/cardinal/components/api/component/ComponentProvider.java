@@ -24,6 +24,8 @@ package nerdhub.cardinal.components.api.component;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import nerdhub.cardinal.components.api.ComponentType;
+
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.AbstractTeam;
@@ -50,6 +52,14 @@ public interface ComponentProvider extends dev.onyxstudios.cca.api.v3.component.
     @SuppressWarnings("ConstantConditions")
     static ComponentProvider fromItemStack(ItemStack stack) {
         return (ComponentProvider) (Object) stack;
+    }
+
+    /**
+     * Convenience method to retrieve a ComponentProvider from a given {@link BlockEntity}.
+     * Requires the <tt>cardinal-components-block</tt> module.
+     */
+    static ComponentProvider fromBlockEntity(BlockEntity blockEntity) {
+        return (ComponentProvider) blockEntity;
     }
 
     /**

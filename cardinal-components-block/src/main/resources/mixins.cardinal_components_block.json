@@ -4,7 +4,8 @@
     "compatibilityLevel": "JAVA_8",
     "package": "dev.onyxstudios.cca.mixin",
     "mixins": [
-        "block.common.MixinBlock"
+        "block.common.MixinBlock",
+        "block.common.MixinBlockEntity"
     ],
     "injectors": {
         "defaultRequire": 1

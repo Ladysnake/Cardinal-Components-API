@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.api.component;
 
+import dev.onyxstudios.cca.internal.block.CardinalBlockInternals;
 import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -40,7 +41,17 @@ public interface BlockComponentProvider {
     }
 
     static BlockComponentProvider get(Block block) {
-        return (BlockComponentProvider) block;
+        return CardinalBlockInternals.getProvider(block);
+    }
+
+    /**
+     * Inject an additional provider onto a block,
+     * for the sake of adding compatibility for external blocks without using mixin.
+     * @param block The block to inject onto.
+     * @param provider The block component provider to inject.
+     */
+    static void addSecondaryProvider(Block block, BlockComponentProvider provider) {
+        CardinalBlockInternals.addSecondaryProvider(block, provider);
     }
 
     /**

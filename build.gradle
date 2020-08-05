@@ -45,6 +45,7 @@ allprojects {
         modApi "net.fabricmc:fabric-loader:${rootProject.loader_version}"
         modApi fabricApi.module("fabric-api-base", rootProject.fabric_api_version)
         modImplementation fabricApi.module("fabric-networking-v0", rootProject.fabric_api_version)
+        modImplementation fabricApi.module("fabric-networking-blockentity-v0", rootProject.fabric_api_version)
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.0-M1"
         compileOnly "com.google.code.findbugs:jsr305:3.0.2"
