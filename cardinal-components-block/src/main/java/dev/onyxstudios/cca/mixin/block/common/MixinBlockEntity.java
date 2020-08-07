@@ -38,57 +38,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.annotation.Nullable;
-
 @Mixin(BlockEntity.class)
 public abstract class MixinBlockEntity implements BlockEntityComponentProvider {
-    // ideally, we should generate those container classes to avoid extra RAM use
     @Unique
-    private ComponentContainer<?> defaultComponents;
-    @Unique
-    private ComponentContainer<?> northComponents;
-    @Unique
-    private ComponentContainer<?> southComponents;
-    @Unique
-    private ComponentContainer<?> eastComponents;
-    @Unique
-    private ComponentContainer<?> westComponents;
-    @Unique
-    private ComponentContainer<?> upComponents;
-    @Unique
-    private ComponentContainer<?> downComponents;
+    private ComponentContainer<?> components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(BlockEntityType<?> type, CallbackInfo ci) {
         BlockEntity self = (BlockEntity) (Object) this;
-        this.defaultComponents = CardinalBlockInternals.createComponents(self, null);
-        this.northComponents = CardinalBlockInternals.createComponents(self, Direction.NORTH);
-        this.southComponents = CardinalBlockInternals.createComponents(self, Direction.SOUTH);
-        this.eastComponents = CardinalBlockInternals.createComponents(self, Direction.EAST);
-        this.westComponents = CardinalBlockInternals.createComponents(self, Direction.WEST);
-        this.upComponents = CardinalBlockInternals.createComponents(self, Direction.UP);
-        this.downComponents = CardinalBlockInternals.createComponents(self, Direction.DOWN);
+        this.components = CardinalBlockInternals.createComponents(self);
     }
 
     @Override
-    public final ComponentContainer<?> getComponentContainer(@Nullable Direction side) {
-        if (side == null) return this.defaultComponents;
-        switch (side) {
-            case DOWN:
-                return this.downComponents;
-            case UP:
-                return this.upComponents;
-            case NORTH:
-                return this.northComponents;
-            case SOUTH:
-                return this.southComponents;
-            case WEST:
-                return this.westComponents;
-            case EAST:
-                return this.eastComponents;
-            default:
-                throw new IllegalStateException("Unexpected Direction value " + side);
-        }
+    public final ComponentContainer<?> getComponentContainer() {
+        return this.components;
     }
 
     @Inject(method = "fromTag", at = @At("RETURN"))
@@ -96,12 +59,12 @@ public abstract class MixinBlockEntity implements BlockEntityComponentProvider {
         CompoundTag components = tag.getCompound("cardinal_components");
 
         if (components.contains("core" ,NbtType.COMPOUND)) {
-            this.defaultComponents.fromTag(components.getCompound("core"));
+            this.components.fromTag(components.getCompound("core"));
         }
 
         for (Direction side : Direction.values()) {
             if (components.contains(side.asString(), NbtType.COMPOUND)) {
-                this.getComponentContainer(side).fromTag(components.getCompound(side.asString()));
+                this.getComponentContainer().fromTag(components.getCompound(side.asString()));
             }
         }
     }
@@ -109,14 +72,14 @@ public abstract class MixinBlockEntity implements BlockEntityComponentProvider {
     @Inject(method = "toTag", at = @At("RETURN"))
     private void saveComponents(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
         CompoundTag components = new CompoundTag();
-        CompoundTag coreTag = this.defaultComponents.toTag(new CompoundTag());
+        CompoundTag coreTag = this.components.toTag(new CompoundTag());
 
         if (!coreTag.isEmpty()) {
             components.put("core", coreTag);
         }
 
         for (Direction side : Direction.values()) {
-            CompoundTag sideTag = this.getComponentContainer(side).toTag(new CompoundTag());
+            CompoundTag sideTag = this.getComponentContainer().toTag(new CompoundTag());
             if (!sideTag.isEmpty()) {
                 components.put(side.asString(), sideTag);
             }

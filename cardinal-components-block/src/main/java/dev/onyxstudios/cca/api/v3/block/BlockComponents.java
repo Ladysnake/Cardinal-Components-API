@@ -81,20 +81,19 @@ public final class BlockComponents {
 
         if (be != null) {
             if (side != null) {
-                C res = key.getInternal(be.getComponentContainer(side));
+                C res = key.getInternal(be.getComponentContainer());
 
                 if (res != null) {
                     return res;
                 }
             }
 
-            return key.getInternal(be.getComponentContainer(null));
+            return key.getInternal(be.getComponentContainer());
         }
         return null;
     }
 
     private static <C extends Component> @Nullable C getFromBlock(ComponentKey<C> key, BlockView world, BlockPos pos, @Nullable Direction side, BlockState state) {
-        BlockComponentProvider blockProvider = ((BlockComponentProvider) state.getBlock());
-        return blockProvider.getComponent(key, state, world, pos, side);
+        return ((BlockComponentProvider) state.getBlock()).getComponent(key, state, world, pos, side);
     }
 }

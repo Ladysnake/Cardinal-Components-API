@@ -23,10 +23,7 @@
 package dev.onyxstudios.cca.internal.block;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.ApiStatus;
-
-import javax.annotation.Nullable;
 
 public interface BlockEntityComponentProvider {
 
@@ -34,5 +31,5 @@ public interface BlockEntityComponentProvider {
      * @return a runtime-generated component container storing the components for a given side
      */
     @ApiStatus.Experimental
-    ComponentContainer<?> getComponentContainer(@Nullable Direction side);
+    ComponentContainer<?> getComponentContainer();
 }

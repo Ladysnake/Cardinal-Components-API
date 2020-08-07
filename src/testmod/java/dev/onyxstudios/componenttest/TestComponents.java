@@ -68,7 +68,8 @@ public final class TestComponents implements
     public static final Identifier CUSTOM_PROVIDER_2 = new Identifier("componenttest:custom/2");
     public static final Identifier CUSTOM_PROVIDER_3 = new Identifier("componenttest:custom/3");
 
-    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>>() {};
+    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>>() {
+    };
 
     public static final ComponentKey<Vita> VITA = ComponentRegistry.INSTANCE.registerStatic(CardinalComponentsTest.id("vita"), Vita.class);
     public static final ComponentKey<Vita> ALT_VITA = ComponentRegistry.INSTANCE.registerStatic(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
@@ -93,8 +94,8 @@ public final class TestComponents implements
 
     @Override
     public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
-        registry.registerFor(CardinalComponentsTest.id("vita_condenser"), null, VITA,
-            (state, world, pos) -> {
+        registry.registerFor(CardinalComponentsTest.id("vita_condenser"), VITA,
+            (state, world, pos, side) -> {
                 if (world instanceof CollisionView)
                     return VITA.get(Objects.requireNonNull(((CollisionView) world).getExistingChunk(pos.getX() >> 4, pos.getZ() >> 4)));
                 if (world instanceof Chunk) return VITA.get(world);

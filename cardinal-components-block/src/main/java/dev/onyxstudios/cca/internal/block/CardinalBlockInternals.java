@@ -22,63 +22,56 @@
  */
 package dev.onyxstudios.cca.internal.block;
 
+import dev.onyxstudios.cca.api.v3.block.BlockComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
 public final class CardinalBlockInternals {
-    private static final Map<Class<? extends BlockEntity>, Map<Direction, DynamicContainerFactory<BlockEntity, Component>>> entityContainerFactories = new HashMap<>();
+    private static final Map<Class<? extends BlockEntity>, DynamicContainerFactory<BlockEntity, Component>> entityContainerFactories = new HashMap<>();
     private static final Object factoryMutex = new Object();
 
-    public static ComponentContainer<?> createComponents(BlockEntity blockEntity, @Nullable Direction side) {
+    public static ComponentContainer<?> createComponents(BlockEntity blockEntity) {
         Class<? extends BlockEntity> entityClass = blockEntity.getClass();
-        Map<Direction, DynamicContainerFactory<BlockEntity, Component>> sided = entityContainerFactories.get(entityClass);
-        if (sided != null) {
-            DynamicContainerFactory<BlockEntity, Component> existing = sided.get(side);
-            if (existing != null) {
-                return existing.create(blockEntity);
-            }
+        DynamicContainerFactory<BlockEntity, Component> existing = entityContainerFactories.get(entityClass);
+
+        if (existing != null) {
+            return existing.create(blockEntity);
         }
-        synchronized (factoryMutex) {
-            if (sided == null) {
-                // computeIfAbsent and not put, because the factory may have been generated while waiting
-                sided = entityContainerFactories.computeIfAbsent(entityClass, k -> new Reference2ObjectOpenHashMap<>());
-            }
+
+        synchronized (factoryMutex) {   // can be called from both client and server thread
             // computeIfAbsent and not put, because the factory may have been generated while waiting
-            return sided.computeIfAbsent(side, s -> {
-                Class<?> cl = entityClass;
+            return entityContainerFactories.computeIfAbsent(entityClass, clazz -> {
+                Class<?> cl = clazz;
                 Class<? extends BlockEntity> parentWithStaticComponents = null;
 
                 while (BlockEntity.class.isAssignableFrom(cl)) {
                     Class<? extends BlockEntity> c = cl.asSubclass(BlockEntity.class);
-                    if (parentWithStaticComponents == null && StaticBlockEntityComponentPlugin.INSTANCE.requiresStaticFactory(c, s)) {   // try to find a specialized ASM factory
+                    if (parentWithStaticComponents == null && StaticBlockComponentPlugin.INSTANCE.requiresStaticFactory(c)) {   // try to find a specialized ASM factory
                         parentWithStaticComponents = c;
                     }
                     cl = c.getSuperclass();
                 }
                 assert parentWithStaticComponents != null;
-                Class<? extends DynamicContainerFactory<BlockEntity,Component>> factoryClass = StaticBlockEntityComponentPlugin.INSTANCE.spinDedicatedFactory(
-                    new StaticBlockEntityComponentPlugin.Key(parentWithStaticComponents, s)
-                );
+                Class<? extends DynamicContainerFactory<BlockEntity,Component>> factoryClass = StaticBlockComponentPlugin.INSTANCE.spinDedicatedFactory(parentWithStaticComponents);
 
                 return ComponentsInternals.createFactory(factoryClass);
             }).create(blockEntity);
         }
     }
 
-    public static BlockComponentContainerFactory createBlockContainerFactory(Block block, @Nullable Direction side) {
+    public static <C extends Component> BlockComponentFactory<? extends C> createBlockContainerFactory(Block block, ComponentKey<C> key) {
         Identifier blockId = Registry.BLOCK.getId(block);
-        return ComponentsInternals.createFactory(StaticBlockComponentPlugin.INSTANCE.getFactoryClass(blockId, side));
+        @SuppressWarnings("unchecked") BlockComponentFactory<? extends C> ret = (BlockComponentFactory<? extends C>) StaticBlockComponentPlugin.INSTANCE.getBlockComponentFactory(blockId, key);
+        return ret;
     }
 }

@@ -25,6 +25,7 @@ package dev.onyxstudios.cca.api.v3.block;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,5 +38,5 @@ import org.jetbrains.annotations.Nullable;
  */
 @FunctionalInterface
 public interface BlockComponentFactory<C extends Component> {
-    @Nullable C create(BlockState state, BlockView world, BlockPos pos);
+    @Nullable C create(BlockState state, BlockView world, BlockPos pos, @Nullable Direction side);
 }
