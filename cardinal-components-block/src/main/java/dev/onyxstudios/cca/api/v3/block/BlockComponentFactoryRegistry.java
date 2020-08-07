@@ -35,13 +35,15 @@ import org.jetbrains.annotations.ApiStatus;
 public interface BlockComponentFactoryRegistry {
 
     /**
-     * Registers a {@link BlockComponentFactory} for a specific block.
+     * Registers a {@link BlockComponentProvider} for a specific block.
      *
      * @param blockId  the id of an item to target
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
+     * @see BlockComponent
+     * @see BlockComponents
      */
-    <C extends Component> void registerFor(Identifier blockId, ComponentKey<? super C> key, BlockComponentFactory<C> factory);
+    <C extends Component> void registerFor(Identifier blockId, ComponentKey<? super C> key, BlockComponentProvider<C> factory);
 
     /**
      * Registers a {@link BlockEntityComponentFactory} for all instances of a given {@code BlockEntity} class.

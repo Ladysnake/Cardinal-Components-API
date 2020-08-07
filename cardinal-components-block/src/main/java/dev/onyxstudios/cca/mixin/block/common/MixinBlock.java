@@ -23,11 +23,11 @@
 package dev.onyxstudios.cca.mixin.block.common;
 
 import com.google.common.collect.ImmutableSet;
-import dev.onyxstudios.cca.api.v3.block.BlockComponentFactory;
+import dev.onyxstudios.cca.api.v3.block.BlockComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.internal.block.InternalBlockComponentProvider;
 import dev.onyxstudios.cca.internal.block.StaticBlockComponentPlugin;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.BlockComponentProvider;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -46,9 +46,9 @@ import java.util.Map;
 import java.util.Set;
 
 @Mixin(Block.class)
-public abstract class MixinBlock extends AbstractBlock implements dev.onyxstudios.cca.internal.block.BlockComponentProvider, BlockComponentProvider {
+public abstract class MixinBlock extends AbstractBlock implements InternalBlockComponentProvider, nerdhub.cardinal.components.api.component.BlockComponentProvider {
     @Unique
-    private Map<ComponentKey<?>, BlockComponentFactory<?>> containerFactories = null;
+    private Map<ComponentKey<?>, BlockComponentProvider<?>> containerFactories = null;
 
     public MixinBlock(Settings settings) {
         super(settings);
@@ -61,16 +61,16 @@ public abstract class MixinBlock extends AbstractBlock implements dev.onyxstudio
             this.containerFactories = StaticBlockComponentPlugin.INSTANCE.getComponentFactories(Registry.BLOCK.getId((Block) (Object) this));
         }
 
-        @SuppressWarnings("unchecked") BlockComponentFactory<? extends C> factory = (BlockComponentFactory<? extends C>) this.containerFactories.get(key);
+        @SuppressWarnings("unchecked") BlockComponentProvider<? extends C> factory = (BlockComponentProvider<? extends C>) this.containerFactories.get(key);
 
-        return factory == null ? null : factory.create(state, world, pos, side);
+        return factory == null ? null : factory.get(state, world, pos, side);
     }
 
     @Override
     public <T extends Component> boolean hasComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
         if (!this.hasBlockEntity()) return false;
         BlockEntity be = blockView.getBlockEntity(pos);
-        return be instanceof BlockComponentProvider && ((BlockComponentProvider) be).hasComponent(blockView, pos, type, side);
+        return be instanceof nerdhub.cardinal.components.api.component.BlockComponentProvider && ((nerdhub.cardinal.components.api.component.BlockComponentProvider) be).hasComponent(blockView, pos, type, side);
     }
 
     @Nullable
@@ -78,13 +78,13 @@ public abstract class MixinBlock extends AbstractBlock implements dev.onyxstudio
     public <T extends Component> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
         if (!this.hasBlockEntity()) return null;
         BlockEntity be = blockView.getBlockEntity(pos);
-        return be instanceof BlockComponentProvider ? ((BlockComponentProvider) be).getComponent(blockView, pos, type, side) : null;
+        return be instanceof nerdhub.cardinal.components.api.component.BlockComponentProvider ? ((nerdhub.cardinal.components.api.component.BlockComponentProvider) be).getComponent(blockView, pos, type, side) : null;
     }
 
     @Override
     public Set<ComponentType<?>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side) {
         if (!this.hasBlockEntity()) return Collections.emptySet();
         BlockEntity be = blockView.getBlockEntity(pos);
-        return be instanceof BlockComponentProvider ? ((BlockComponentProvider) be).getComponentTypes(blockView, pos, side) : ImmutableSet.of();
+        return be instanceof nerdhub.cardinal.components.api.component.BlockComponentProvider ? ((nerdhub.cardinal.components.api.component.BlockComponentProvider) be).getComponentTypes(blockView, pos, side) : ImmutableSet.of();
     }
 }

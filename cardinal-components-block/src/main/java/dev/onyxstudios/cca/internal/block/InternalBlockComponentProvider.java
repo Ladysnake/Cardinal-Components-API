@@ -33,7 +33,7 @@ import org.jetbrains.annotations.ApiStatus;
 import javax.annotation.Nullable;
 
 @ApiStatus.Experimental
-public interface BlockComponentProvider {
+public interface InternalBlockComponentProvider {
     @Nullable
     <C extends Component> C getComponent(ComponentKey<C> key, BlockState state, BlockView world, BlockPos pos, @Nullable Direction side);
 }

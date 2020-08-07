@@ -23,8 +23,7 @@
 package dev.onyxstudios.cca.api.v3.block;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.internal.block.BlockComponentProvider;
-import dev.onyxstudios.cca.internal.block.BlockEntityComponentProvider;
+import dev.onyxstudios.cca.internal.block.InternalBlockComponentProvider;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -34,6 +33,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * This class consists exclusively of static methods that return a {@link Component} by querying some block context.
+ */
 public final class BlockComponents {
 
     public static <C extends Component> @Nullable C get(ComponentKey<C> key, BlockEntity blockEntity) {
@@ -51,7 +53,7 @@ public final class BlockComponents {
             }
         }
 
-        return getFromBlockEntity(key, blockEntity, side);
+        return key.getNullable(blockEntity);
     }
 
     public static <C extends Component> @Nullable C get(ComponentKey<C> key, BlockView world, BlockPos pos) {
@@ -73,27 +75,14 @@ public final class BlockComponents {
             return res;
         }
 
-        return getFromBlockEntity(key, world.getBlockEntity(pos), side);
+        return getFromBlockEntity(key, world.getBlockEntity(pos));
     }
 
-    private static <C extends Component> @Nullable C getFromBlockEntity(ComponentKey<C> key, @Nullable BlockEntity blockEntity, @Nullable Direction side) {
-        BlockEntityComponentProvider be = (BlockEntityComponentProvider) blockEntity;
-
-        if (be != null) {
-            if (side != null) {
-                C res = key.getInternal(be.getComponentContainer());
-
-                if (res != null) {
-                    return res;
-                }
-            }
-
-            return key.getInternal(be.getComponentContainer());
-        }
-        return null;
+    private static <C extends Component> @Nullable C getFromBlockEntity(ComponentKey<C> key, @Nullable BlockEntity blockEntity) {
+        return blockEntity != null ? key.getNullable(blockEntity) : null;
     }
 
     private static <C extends Component> @Nullable C getFromBlock(ComponentKey<C> key, BlockView world, BlockPos pos, @Nullable Direction side, BlockState state) {
-        return ((BlockComponentProvider) state.getBlock()).getComponent(key, state, world, pos, side);
+        return ((InternalBlockComponentProvider) state.getBlock()).getComponent(key, state, world, pos, side);
     }
 }
