@@ -22,16 +22,11 @@
  */
 package dev.onyxstudios.cca.internal.block;
 
-import dev.onyxstudios.cca.api.v3.block.BlockComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import nerdhub.cardinal.components.api.component.Component;
-import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +51,7 @@ public final class CardinalBlockInternals {
 
                 while (BlockEntity.class.isAssignableFrom(cl)) {
                     Class<? extends BlockEntity> c = cl.asSubclass(BlockEntity.class);
+
                     if (parentWithStaticComponents == null && StaticBlockComponentPlugin.INSTANCE.requiresStaticFactory(c)) {   // try to find a specialized ASM factory
                         parentWithStaticComponents = c;
                     }
@@ -67,11 +63,5 @@ public final class CardinalBlockInternals {
                 return ComponentsInternals.createFactory(factoryClass);
             }).create(blockEntity);
         }
-    }
-
-    public static <C extends Component> BlockComponentFactory<? extends C> createBlockContainerFactory(Block block, ComponentKey<C> key) {
-        Identifier blockId = Registry.BLOCK.getId(block);
-        @SuppressWarnings("unchecked") BlockComponentFactory<? extends C> ret = (BlockComponentFactory<? extends C>) StaticBlockComponentPlugin.INSTANCE.getBlockComponentFactory(blockId, key);
-        return ret;
     }
 }

@@ -25,8 +25,7 @@ package dev.onyxstudios.cca.mixin.block.common;
 import com.google.common.collect.ImmutableSet;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.internal.block.CardinalBlockInternals;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import dev.onyxstudios.cca.internal.block.StaticBlockComponentPlugin;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.BlockComponentProvider;
 import nerdhub.cardinal.components.api.component.Component;
@@ -36,6 +35,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -48,16 +48,22 @@ import java.util.Set;
 @Mixin(Block.class)
 public abstract class MixinBlock extends AbstractBlock implements dev.onyxstudios.cca.internal.block.BlockComponentProvider, BlockComponentProvider {
     @Unique
-    private final Map<ComponentKey<?>, BlockComponentFactory<?>> containerFactories = new Reference2ObjectOpenHashMap<>();
+    private Map<ComponentKey<?>, BlockComponentFactory<?>> containerFactories = null;
 
     public MixinBlock(Settings settings) {
         super(settings);
     }
 
+    @Nullable
     @Override
     public <C extends Component> C getComponent(ComponentKey<C> key, BlockState state, BlockView world, BlockPos pos, @Nullable Direction side) {
-        @SuppressWarnings("unchecked") BlockComponentFactory<? extends C> factory = (BlockComponentFactory<? extends C>) this.containerFactories.computeIfAbsent(key, k -> CardinalBlockInternals.createBlockContainerFactory((Block) (Object) this, key));
-        return factory.create(state, world, pos, side);
+        if (this.containerFactories == null) {
+            this.containerFactories = StaticBlockComponentPlugin.INSTANCE.getComponentFactories(Registry.BLOCK.getId((Block) (Object) this));
+        }
+
+        @SuppressWarnings("unchecked") BlockComponentFactory<? extends C> factory = (BlockComponentFactory<? extends C>) this.containerFactories.get(key);
+
+        return factory == null ? null : factory.create(state, world, pos, side);
     }
 
     @Override

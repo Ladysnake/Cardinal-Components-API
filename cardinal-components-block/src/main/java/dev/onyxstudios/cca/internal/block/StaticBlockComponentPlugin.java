@@ -44,7 +44,6 @@ import java.util.*;
 
 public final class StaticBlockComponentPlugin extends LazyDispatcher implements BlockComponentFactoryRegistry {
     public static final StaticBlockComponentPlugin INSTANCE = new StaticBlockComponentPlugin();
-    private static final BlockComponentFactory<?> emptyComponentFactory = (state, world, pos, side) -> null;
 
     private static String getSuffix(Class<? extends BlockEntity> key) {
         String simpleName = key.getSimpleName();
@@ -56,12 +55,12 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     }
 
     private final Map<Identifier, Map<ComponentKey<?>, BlockComponentFactory<?>>> blockComponentFactories = new HashMap<>();
-    private final Map<Class<? extends BlockEntity>, Map</*ComponentType*/Identifier, BlockEntityComponentFactory<?, ?>>> beComponentFactories = new HashMap<>();
-    private final Map<Class<? extends BlockEntity>, Class<? extends DynamicContainerFactory<BlockEntity, Component>>> factoryClasses = new HashMap<>();
+    private final Map<Class<? extends BlockEntity>, Map</*ComponentType*/Identifier, BlockEntityComponentFactory<?, ?>>> beComponentFactories = new Reference2ObjectOpenHashMap<>();
+    private final Map<Class<? extends BlockEntity>, Class<? extends DynamicContainerFactory<BlockEntity, Component>>> factoryClasses = new Reference2ObjectOpenHashMap<>();
 
-    public BlockComponentFactory<?> getBlockComponentFactory(Identifier blockId, ComponentKey<?> key) {
+    public Map<ComponentKey<?>, BlockComponentFactory<?>> getComponentFactories(Identifier blockId) {
         this.ensureInitialized();
-        return this.blockComponentFactories.getOrDefault(blockId, this.getWildcard()).getOrDefault(key, emptyComponentFactory);
+        return this.blockComponentFactories.getOrDefault(blockId, this.getWildcard());
     }
 
     private Map<ComponentKey<?>, BlockComponentFactory<?>> getWildcard() {
@@ -136,5 +135,9 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
             FabricLoader.getInstance().getEntrypointContainers("cardinal-components-block", BlockComponentInitializer.class),
             initializer -> initializer.registerBlockComponentFactories(this)
         );
+        Map<ComponentKey<?>, BlockComponentFactory<?>> wildcard = this.getWildcard();
+        this.blockComponentFactories.forEach((id, map) -> {
+            if (id != null) wildcard.forEach(map::putIfAbsent);
+        });
     }
 }
