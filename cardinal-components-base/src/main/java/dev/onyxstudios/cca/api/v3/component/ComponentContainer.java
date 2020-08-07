@@ -29,6 +29,7 @@ import nerdhub.cardinal.components.api.util.NbtSerializable;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -87,6 +88,7 @@ public interface ComponentContainer<C extends Component> extends NbtSerializable
         return new FactoryBuilder<>(singleArgClass, storedComponentClass);
     }
 
+    @Unmodifiable
     Set<ComponentKey<?>> keys();
 
     Class<C> getComponentClass();
