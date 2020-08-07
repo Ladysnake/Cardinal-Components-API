@@ -43,10 +43,12 @@ import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
 import dev.onyxstudios.componenttest.vita.*;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
+import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.CollisionView;
 import net.minecraft.world.chunk.Chunk;
 
@@ -101,6 +103,12 @@ public final class TestComponents implements
                 if (world instanceof Chunk) return VITA.get(world);
                 return null;
             });
+        registry.registerFor(EndPortalBlockEntity.class, VITA, BlockEntityVita::new);
+        registry.registerFor(
+            new Identifier("end_gateway"),
+            VITA,
+            (state, world, pos, side) -> side != Direction.UP ? VITA.maybeGet(world.getBlockEntity(pos)).orElse(null) : null
+        );
     }
 
     @Override
