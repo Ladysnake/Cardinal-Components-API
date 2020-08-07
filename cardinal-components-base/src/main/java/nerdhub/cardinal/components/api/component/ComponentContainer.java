@@ -24,10 +24,12 @@ package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.util.NbtSerializable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A container for components.
@@ -95,6 +97,10 @@ public interface ComponentContainer<C extends Component> extends Map<ComponentTy
     @Nullable
     @Override
     C put(@Nonnull ComponentType<?> key, @Nonnull C value);
+
+    @UnmodifiableView
+    @Override
+    Set<ComponentType<?>> keySet();
 
     @Deprecated
     @Override default C remove(Object key) {
