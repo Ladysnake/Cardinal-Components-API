@@ -6,6 +6,11 @@
     "description": "dynamically exposing components",
     "version": "${version}",
     "side": "universal",
+    "entrypoints": {
+        "client": [
+            "dev.onyxstudios.cca.internal.CardinalComponentsBlock::initClient"
+        ]
+    },
     "custom": {
         "modmenu:api": true,
         "modmenu:parent": "cardinal-components"

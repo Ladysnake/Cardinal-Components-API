@@ -23,14 +23,12 @@
 package dev.onyxstudios.cca.mixin.block.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.block.BlockEntityComponentProvider;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.block.CardinalBlockInternals;
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,52 +36,31 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import javax.annotation.Nonnull;
+
 @Mixin(BlockEntity.class)
-public abstract class MixinBlockEntity implements BlockEntityComponentProvider {
+public class MixinBlockEntity implements InternalComponentProvider {
     @Unique
     private ComponentContainer<?> components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(BlockEntityType<?> type, CallbackInfo ci) {
-        BlockEntity self = (BlockEntity) (Object) this;
-        this.components = CardinalBlockInternals.createComponents(self);
-    }
-
-    @Override
-    public final ComponentContainer<?> getComponentContainer() {
-        return this.components;
-    }
-
-    @Inject(method = "fromTag", at = @At("RETURN"))
-    private void loadComponents(BlockState state, CompoundTag tag, CallbackInfo ci) {
-        CompoundTag components = tag.getCompound("cardinal_components");
-
-        if (components.contains("core" ,NbtType.COMPOUND)) {
-            this.components.fromTag(components.getCompound("core"));
-        }
-
-        for (Direction side : Direction.values()) {
-            if (components.contains(side.asString(), NbtType.COMPOUND)) {
-                this.getComponentContainer().fromTag(components.getCompound(side.asString()));
-            }
-        }
+        this.components = CardinalBlockInternals.createComponents((BlockEntity) (Object) this);
     }
 
     @Inject(method = "toTag", at = @At("RETURN"))
-    private void saveComponents(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
-        CompoundTag components = new CompoundTag();
-        CompoundTag coreTag = this.components.toTag(new CompoundTag());
+    private void toTag(CompoundTag inputTag, CallbackInfoReturnable<CompoundTag> cir) {
+        this.components.toTag(cir.getReturnValue());
+    }
 
-        if (!coreTag.isEmpty()) {
-            components.put("core", coreTag);
-        }
+    @Inject(method = "fromTag", at = @At(value = "RETURN"))
+    private void fromTag(BlockState state, CompoundTag tag, CallbackInfo ci) {
+        this.components.fromTag(tag);
+    }
 
-        for (Direction side : Direction.values()) {
-            CompoundTag sideTag = this.getComponentContainer().toTag(new CompoundTag());
-            if (!sideTag.isEmpty()) {
-                components.put(side.asString(), sideTag);
-            }
-        }
-        tag.put("cardinal_components", components);
+    @Nonnull
+    @Override
+    public ComponentContainer<?> getComponentContainer() {
+        return this.components;
     }
 }
