@@ -37,7 +37,7 @@ public interface BlockComponentFactoryRegistry {
     /**
      * Registers a {@link BlockComponentProvider} for a specific block.
      *
-     * @param blockId  the id of an item to target
+     * @param blockId  the id of a block to target
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      * @see BlockComponent

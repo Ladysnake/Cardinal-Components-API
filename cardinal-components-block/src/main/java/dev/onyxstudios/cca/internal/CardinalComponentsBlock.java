@@ -33,6 +33,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
+@SuppressWarnings("unused") // entrypoint
 public class CardinalComponentsBlock {
     // Safe to put in the same class as no client-only class is directly referenced
     public static void initClient() {

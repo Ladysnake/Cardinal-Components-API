@@ -86,9 +86,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
             String implSuffix = getSuffix(entityClass);
 
             try {
-                Class<? extends ComponentContainer<?>> containerCls;
-
-                containerCls = StaticComponentPluginBase.spinComponentContainer(BlockEntityComponentFactory.class, Component.class, compiled, implSuffix);
+                Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.spinComponentContainer(BlockEntityComponentFactory.class, Component.class, compiled, implSuffix);
 
                 return StaticComponentPluginBase.spinContainerFactory(
                     implSuffix,
