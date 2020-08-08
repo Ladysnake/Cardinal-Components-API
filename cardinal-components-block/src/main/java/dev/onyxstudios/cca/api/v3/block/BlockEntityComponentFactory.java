@@ -37,7 +37,7 @@ import org.jetbrains.annotations.ApiStatus;
 @FunctionalInterface
 public interface BlockEntityComponentFactory<C extends Component, BE extends BlockEntity> {
     /**
-     * Create a component of type {@code C} for the given {@code BlockEntity}.
+     * Create a component of type {@code C} for the given {@link BlockEntity}.
      *
      * <p>The component returned by this method will be available
      * on the {@code blockEntity} as soon as all component factories have been invoked.

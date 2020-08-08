@@ -46,7 +46,7 @@ public interface BlockComponentFactoryRegistry {
     <C extends Component> void registerFor(Identifier blockId, ComponentKey<? super C> key, BlockComponentProvider<C> factory);
 
     /**
-     * Registers a {@link BlockEntityComponentFactory} for all instances of a given {@code BlockEntity} class.
+     * Registers a {@link BlockEntityComponentFactory} for all instances of a given {@link BlockEntity} class.
      *
      * <p>Callers of this method should always use the most specific block entity
      * type for their use. For example, a factory which goal is to attach a component
