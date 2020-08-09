@@ -151,6 +151,14 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         getComponentClass.visitInsn(Opcodes.ARETURN);
         getComponentClass.visitEnd();
 
+/*      TODO V3 enable empty check optimization when dynamic components are no more
+        MethodVisitor hasComponents = classNode.visitMethod(Opcodes.ACC_PUBLIC, "hasComponents", "()Z", null, null);
+        hasComponents.visitCode();
+        hasComponents.visitLdcInsn(!componentFactories.isEmpty());
+        getComponentClass.visitInsn(Opcodes.IRETURN);
+        getComponentClass.visitEnd();
+*/
+
         MethodVisitor init = classNode.visitMethod(Opcodes.ACC_PUBLIC, "<init>", ctorDesc, null, null);
         init.visitCode();
         init.visitVarInsn(Opcodes.ALOAD, 0);
