@@ -33,7 +33,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Objects;
 
@@ -47,9 +46,8 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
         this.setVitality(vita);
         World world = Objects.requireNonNull(MinecraftClient.getInstance().player).world;
         // Very bad shortcut to get a dimension's name
-        DimensionType dimension = world.getDimension();
         Text worldName = new LiteralText(
-            Objects.requireNonNull(dimension == DimensionType.getOverworldDimensionType() ? "Overworld" : "Alien World")
+            Objects.requireNonNull(world.getRegistryKey() == World.OVERWORLD ? "Overworld" : "Alien World")
         );
         Text worldVita = new TranslatableText(
                 "componenttest:title.world_vitality",

@@ -23,8 +23,8 @@
 package nerdhub.cardinal.components.api.util;
 
 import com.mojang.serialization.Dynamic;
-import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import org.jetbrains.annotations.ApiStatus;
 
 public interface NbtSerializable {

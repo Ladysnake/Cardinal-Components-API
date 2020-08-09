@@ -43,7 +43,7 @@ public abstract class MixinChunkHolder {
             at = @At(
                     value = "FIELD",
                     opcode = Opcodes.PUTFIELD,
-                    target = "Lnet/minecraft/server/world/ChunkHolder;field_25803:Z",
+                    target = "Lnet/minecraft/server/world/ChunkHolder;pendingBlockUpdates:Z",
                     ordinal = 0,
                     shift = At.Shift.AFTER
             )
