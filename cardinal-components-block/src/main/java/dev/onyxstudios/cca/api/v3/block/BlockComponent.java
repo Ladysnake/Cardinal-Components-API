@@ -20,29 +20,23 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.vita;
+package dev.onyxstudios.cca.api.v3.block;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
+import dev.onyxstudios.cca.api.v3.component.ComponentV3;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundTag;
 
-public class EntityVita extends BaseVita {
-    protected LivingEntity owner;
-
-    public EntityVita(LivingEntity owner, int baseVitality) {
-        this.owner = owner;
-        this.vitality = baseVitality;
+/**
+ * A helper interface for components that entirely rely on contextual information like {@link BlockState}s.
+ */
+public interface BlockComponent extends ComponentV3 {
+    @Override
+    default void readFromNbt(CompoundTag tag) {
+        throw new UnsupportedOperationException("Block components do not support serialization");
     }
 
     @Override
-    public void setVitality(int value) {
-        super.setVitality(value);
-        if (!this.owner.world.isClient) {
-            if (this.getVitality() == 0) {
-                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
-            } else if (this.getVitality() > 10) {
-                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1000));
-            }
-        }
+    default void writeToNbt(CompoundTag tag) {
+        throw new UnsupportedOperationException("Block components do not support serialization");
     }
 }

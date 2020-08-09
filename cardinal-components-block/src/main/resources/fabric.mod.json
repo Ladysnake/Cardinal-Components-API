@@ -6,6 +6,14 @@
     "description": "dynamically exposing components",
     "version": "${version}",
     "side": "universal",
+    "entrypoints": {
+        "main": [
+            "dev.onyxstudios.cca.internal.CardinalComponentsBlock::init"
+        ],
+        "client": [
+            "dev.onyxstudios.cca.internal.CardinalComponentsBlock::initClient"
+        ]
+    },
     "custom": {
         "modmenu:api": true,
         "modmenu:parent": "cardinal-components"
@@ -20,7 +28,9 @@
             "contact": {
                 "homepage": "https://twitter.com/UpcraftLP"
             }
-        }
+        },
+        "Pyrofab",
+        "B0undaryBreaker"
     ],
     "contact": {
         "homepage": "https://minecraft.curseforge.com/projects/318449",

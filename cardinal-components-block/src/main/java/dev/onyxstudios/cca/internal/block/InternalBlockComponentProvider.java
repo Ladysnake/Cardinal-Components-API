@@ -20,29 +20,20 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.vita;
+package dev.onyxstudios.cca.internal.block;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.BlockView;
+import org.jetbrains.annotations.ApiStatus;
 
-public class EntityVita extends BaseVita {
-    protected LivingEntity owner;
+import javax.annotation.Nullable;
 
-    public EntityVita(LivingEntity owner, int baseVitality) {
-        this.owner = owner;
-        this.vitality = baseVitality;
-    }
-
-    @Override
-    public void setVitality(int value) {
-        super.setVitality(value);
-        if (!this.owner.world.isClient) {
-            if (this.getVitality() == 0) {
-                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
-            } else if (this.getVitality() > 10) {
-                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1000));
-            }
-        }
-    }
+@ApiStatus.Experimental
+public interface InternalBlockComponentProvider {
+    @Nullable
+    <C extends Component> C getComponent(ComponentKey<C> key, BlockState state, BlockView world, BlockPos pos, @Nullable Direction side);
 }

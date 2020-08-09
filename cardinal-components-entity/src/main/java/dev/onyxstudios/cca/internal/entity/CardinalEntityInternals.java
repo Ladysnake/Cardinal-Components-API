@@ -75,10 +75,12 @@ public final class CardinalEntityInternals {
     public static ComponentContainer<?> createEntityComponentContainer(Entity entity) {
         Class<? extends Entity> entityClass = entity.getClass();
         DynamicContainerFactory<Entity, Component> existing = entityContainerFactories.get(entityClass);
+
         if (existing != null) {
             return existing.create(entity);
         }
-        synchronized (factoryMutex) {
+
+        synchronized (factoryMutex) {   // can be called from both client and server thread, see #
             // computeIfAbsent and not put, because the factory may have been generated while waiting
             return entityContainerFactories.computeIfAbsent(entityClass, cl -> {
                 List<Event<?>> events = new ArrayList<>();

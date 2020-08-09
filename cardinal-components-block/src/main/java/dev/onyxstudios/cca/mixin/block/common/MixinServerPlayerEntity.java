@@ -20,29 +20,20 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.vita;
+package dev.onyxstudios.cca.mixin.block.common;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
+import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncCallback;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public class EntityVita extends BaseVita {
-    protected LivingEntity owner;
-
-    public EntityVita(LivingEntity owner, int baseVitality) {
-        this.owner = owner;
-        this.vitality = baseVitality;
-    }
-
-    @Override
-    public void setVitality(int value) {
-        super.setVitality(value);
-        if (!this.owner.world.isClient) {
-            if (this.getVitality() == 0) {
-                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
-            } else if (this.getVitality() > 10) {
-                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1000));
-            }
-        }
+@Mixin(ServerPlayerEntity.class)
+public abstract class MixinServerPlayerEntity {
+    @Inject(method = "sendBlockEntityUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;toUpdatePacket()Lnet/minecraft/network/packet/s2c/play/BlockEntityUpdateS2CPacket;"))
+    private void syncBlockEntity(BlockEntity blockEntity, CallbackInfo ci) {
+        BlockEntitySyncCallback.EVENT.invoker().onBlockEntitySync((ServerPlayerEntity)(Object) this, blockEntity);
     }
 }

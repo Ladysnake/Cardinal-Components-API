@@ -43,13 +43,13 @@ import java.util.Optional;
  */
 @ApiStatus.Experimental
 @ApiStatus.NonExtendable
-public abstract class ComponentKey<T extends Component> {
+public abstract class ComponentKey<C extends Component> {
 
     public final Identifier getId() {
         return this.id;
     }
 
-    public final Class<T> getComponentClass() {
+    public final Class<C> getComponentClass() {
         return this.componentClass;
     }
 
@@ -63,7 +63,7 @@ public abstract class ComponentKey<T extends Component> {
      */
     // overridden by generated types
     @ApiStatus.Experimental
-    public abstract <V> @Nullable T getNullable(V provider);
+    public abstract <V> @Nullable C getNullable(V provider);
 
     /**
      * @param provider a component provider
@@ -73,7 +73,7 @@ public abstract class ComponentKey<T extends Component> {
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      * @see #maybeGet(Object)
      */
-    public abstract <V> T get(V provider);
+    public abstract <V> C get(V provider);
 
     /**
      * @param provider a component provider
@@ -82,7 +82,7 @@ public abstract class ComponentKey<T extends Component> {
      * {@code Optional} if {@code provider} does not have such a component.
      * @see #get(Object)
      */
-    public abstract <V> Optional<T> maybeGet(@Nullable V provider);
+    public abstract <V> Optional<C> maybeGet(@Nullable V provider);
 
     @ApiStatus.Experimental
     public <V> boolean isProvidedBy(V provider) {
@@ -96,7 +96,7 @@ public abstract class ComponentKey<T extends Component> {
 
     /* ------------ internal members ------------- */
 
-    private final Class<T> componentClass;
+    private final Class<C> componentClass;
     private final Identifier id;
 
     /**
@@ -105,7 +105,7 @@ public abstract class ComponentKey<T extends Component> {
      * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
      */
     @ApiStatus.Internal
-    protected ComponentKey(Identifier id, Class<T> componentClass) {
+    protected ComponentKey(Identifier id, Class<C> componentClass) {
         if (!CcaBootstrap.INSTANCE.isGenerated(this.getClass())) throw new IllegalStateException();
         this.componentClass = componentClass;
         this.id = id;
@@ -120,10 +120,10 @@ public abstract class ComponentKey<T extends Component> {
      */
     // overridden by generated types
     @ApiStatus.Internal
-    public abstract @Nullable T getInternal(ComponentContainer<?> container);
+    public abstract @Nullable C getInternal(ComponentContainer<?> container);
 
     @ApiStatus.Internal
-    public <C extends Component> C getFromContainer(ComponentContainer<C> container) {
+    public <D extends Component> D getFromContainer(ComponentContainer<D> container) {
         return Objects.requireNonNull(container.getComponentClass().cast(this.getInternal(container)));
     }
 }
