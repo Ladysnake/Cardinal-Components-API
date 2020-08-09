@@ -5,7 +5,10 @@
   "package": "dev.onyxstudios.cca.mixin.block",
   "mixins": [
     "common.MixinBlock",
-    "common.MixinBlockEntity"
+    "common.MixinBlockEntity",
+    "common.MixinChunkHolder",
+    "common.MixinServerPlayerEntity",
+    "common.MixinThreadedAnvilChunkStorage"
   ],
   "injectors": {
     "defaultRequire": 1

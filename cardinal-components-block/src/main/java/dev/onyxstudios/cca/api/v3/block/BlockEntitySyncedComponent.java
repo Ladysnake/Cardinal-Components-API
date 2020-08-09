@@ -22,9 +22,11 @@
  */
 package dev.onyxstudios.cca.api.v3.block;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
+import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import nerdhub.cardinal.components.api.util.sync.BaseSyncedComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
@@ -43,7 +45,7 @@ public interface BlockEntitySyncedComponent extends BaseSyncedComponent {
      * {@link CustomPayloadS2CPacket} channel for default entity component synchronization.
      *
      * <p> Packets emitted on this channel must begin with, in order, the {@link BlockEntity#getType() BE type} (as an identifier),
-     * the {@link BlockEntity#getPos() position} (as 3 consecutive XYZ int values),
+     * the {@link BlockEntity#getPos() position} (using {@link PacketByteBuf#writeBlockPos(BlockPos)}),
      * and the {@link ComponentType#getId() component's type} (as an Identifier).
      *
      * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
@@ -63,14 +65,16 @@ public interface BlockEntitySyncedComponent extends BaseSyncedComponent {
     }
 
     @Override
+    default ComponentType<?> getComponentType() {
+        return TypeAwareComponent.lookupComponentType(ComponentProvider.fromBlockEntity(this.getBlockEntity()), this);
+    }
+
+    @Override
     default void syncWith(ServerPlayerEntity player) {
         BlockEntity holder = this.getBlockEntity();
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeIdentifier(BlockEntityType.getId(holder.getType()));
-        BlockPos pos = holder.getPos();
-        buf.writeInt(pos.getX());
-        buf.writeInt(pos.getY());
-        buf.writeInt(pos.getZ());
+        buf.writeBlockPos(holder.getPos());
         buf.writeIdentifier(this.getComponentType().getId());
         this.writeToPacket(buf);
         ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, PACKET_ID, buf);

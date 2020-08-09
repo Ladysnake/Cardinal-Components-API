@@ -22,45 +22,18 @@
  */
 package dev.onyxstudios.cca.mixin.block.common;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import dev.onyxstudios.cca.internal.block.CardinalBlockInternals;
-import net.minecraft.block.BlockState;
+import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncCallback;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.annotation.Nonnull;
-
-@Mixin(BlockEntity.class)
-public abstract class MixinBlockEntity implements InternalComponentProvider {
-    @Unique
-    private ComponentContainer<?> components;
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(BlockEntityType<?> type, CallbackInfo ci) {
-        this.components = CardinalBlockInternals.createComponents((BlockEntity) (Object) this);
-    }
-
-    @Inject(method = "toTag", at = @At("RETURN"))
-    private void toTag(CompoundTag inputTag, CallbackInfoReturnable<CompoundTag> cir) {
-        this.components.toTag(cir.getReturnValue());
-    }
-
-    @Inject(method = "fromTag", at = @At(value = "RETURN"))
-    private void fromTag(BlockState state, CompoundTag tag, CallbackInfo ci) {
-        this.components.fromTag(tag);
-    }
-
-    @Nonnull
-    @Override
-    public ComponentContainer<?> getComponentContainer() {
-        return this.components;
+@Mixin(ServerPlayerEntity.class)
+public abstract class MixinServerPlayerEntity {
+    @Inject(method = "sendBlockEntityUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;toUpdatePacket()Lnet/minecraft/network/packet/s2c/play/BlockEntityUpdateS2CPacket;"))
+    private void syncBlockEntity(BlockEntity blockEntity, CallbackInfo ci) {
+        BlockEntitySyncCallback.EVENT.invoker().onBlockEntitySync((ServerPlayerEntity)(Object) this, blockEntity);
     }
 }

@@ -7,6 +7,9 @@
     "version": "${version}",
     "side": "universal",
     "entrypoints": {
+        "main": [
+            "dev.onyxstudios.cca.internal.CardinalComponentsBlock::init"
+        ],
         "client": [
             "dev.onyxstudios.cca.internal.CardinalComponentsBlock::initClient"
         ]
