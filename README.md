@@ -18,7 +18,7 @@ Latest versions of Cardinal Components API are available on Bintray:
 repositories {
     maven {
         name = "Ladysnake Libs"
-        url = 'https://dl.bintray.com/ladysnake/libs'
+        url = "https://dl.bintray.com/ladysnake/libs"
     }
 }
 
