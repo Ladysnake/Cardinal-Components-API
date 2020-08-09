@@ -91,6 +91,8 @@ public interface ComponentContainer<C extends Component> extends NbtSerializable
     @Unmodifiable
     Set<ComponentKey<?>> keys();
 
+    boolean hasComponents();
+
     Class<C> getComponentClass();
 
     /**

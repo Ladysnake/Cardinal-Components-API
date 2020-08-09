@@ -63,6 +63,11 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
     }
 
     @Override
+    public boolean hasComponents() {
+        return !this.isEmpty();
+    }
+
+    @Override
     public Class<C> getComponentClass() {
         throw new UnsupportedOperationException();
     }
