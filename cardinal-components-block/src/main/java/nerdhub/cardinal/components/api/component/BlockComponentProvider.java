@@ -57,7 +57,7 @@ public interface BlockComponentProvider {
     <T extends Component> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side);
 
     default <T extends Component> Optional<T> optionally(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
-        return Optional.ofNullable(getComponent(blockView, pos, type, side));
+        return Optional.ofNullable(this.getComponent(blockView, pos, type, side));
     }
 
     /**

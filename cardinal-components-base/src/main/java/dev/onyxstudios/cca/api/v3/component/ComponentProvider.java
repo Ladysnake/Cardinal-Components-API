@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -37,6 +38,14 @@ import javax.annotation.Nullable;
  */
 @ApiStatus.Experimental
 public interface ComponentProvider {
+
+    /**
+     * Convenience method to retrieve ComponentProvider from a given {@link BlockEntity}
+     * Requires the <tt>cardinal-components-block</tt> module.
+     */
+    static ComponentProvider fromBlockEntity(BlockEntity blockEntity) {
+        return (ComponentProvider) blockEntity;
+    }
 
     /**
      * Convenience method to retrieve ComponentProvider from a given {@link ItemStack}

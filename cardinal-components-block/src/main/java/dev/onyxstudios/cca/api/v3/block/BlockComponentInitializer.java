@@ -20,29 +20,28 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.vita;
+package dev.onyxstudios.cca.api.v3.block;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.block.entity.BlockEntity;
+import org.jetbrains.annotations.ApiStatus;
 
-public class EntityVita extends BaseVita {
-    protected LivingEntity owner;
-
-    public EntityVita(LivingEntity owner, int baseVitality) {
-        this.owner = owner;
-        this.vitality = baseVitality;
-    }
-
-    @Override
-    public void setVitality(int value) {
-        super.setVitality(value);
-        if (!this.owner.world.isClient) {
-            if (this.getVitality() == 0) {
-                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
-            } else if (this.getVitality() > 10) {
-                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1000));
-            }
-        }
-    }
+/**
+ * Entrypoint getting invoked to register <em>static</em> block component factories.
+ *
+ * <p>The entrypoint is exposed as {@code cardinal-components-block} in the mod json and runs for any environment.
+ * It usually executes right before the first {@link BlockEntity} instance is created.
+ *
+ * @since 2.5.0
+ */
+@ApiStatus.Experimental
+public interface BlockComponentInitializer {
+    /**
+     * Called to register component factories for statically declared component types.
+     *
+     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
+     * must not be registered outside of this method.
+     *
+     * @param registry a {@link BlockComponentFactoryRegistry} for <em>statically declared</em> components
+     */
+    void registerBlockComponentFactories(BlockComponentFactoryRegistry registry);
 }
