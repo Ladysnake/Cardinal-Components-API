@@ -27,29 +27,13 @@ import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.entity.Entity;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.function.Predicate;
+
 /**
  * @since 2.4.0
  */
 @ApiStatus.Experimental
 public interface EntityComponentFactoryRegistry {
-    /**
-     * Registers an {@link EntityComponentFactory}.
-     *
-     * <p> Callers of this method should always use the most specific entity
-     * type for their use. For example, a factory which goal is to attach a component
-     * to players should pass {@code PlayerEntity.class} as a parameter,
-     * not one of its superclasses. This limits the need for entity-dependant
-     * checks, as well as the amount of redundant callback invocations.
-     * For these reasons, when registering factories for various entity types,
-     * it is often better to register a separate specialized callback for each type
-     * than a single generic callback with additional checks.
-     *
-     * @param target  a class object representing the type of entities targeted by the factory
-     * @param factory the factory to use to create components of the given type
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    <C extends Component, E extends Entity> void register(ComponentKey<C> type, Class<E> target, EntityComponentFactory<C, E> factory);
 
     /**
      * Registers an {@link EntityComponentFactory} for all instances of a given entity class.
@@ -67,5 +51,15 @@ public interface EntityComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      */
     <C extends Component, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> type, EntityComponentFactory<C, E> factory);
+
+    /**
+     * Registers an {@link EntityComponentFactory} for all instances of classes that pass the {@code test}.
+     *
+     * @param test  a predicate testing whether the class can have the component attached to its instances
+     * @param type the type of components to attach
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
+     */
+    <C extends Component> void registerFor(Predicate<Class<? extends Entity>> test, ComponentKey<C> type, EntityComponentFactory<C, Entity> factory);
 
 }

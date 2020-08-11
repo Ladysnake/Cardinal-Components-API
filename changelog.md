@@ -2,7 +2,7 @@
 Version 2.5.0
 ------------------------------------------------------
 **This release breaks compatibility between modules of different versions.**
-- Updated `cardinal-components-level` and `cardinal-components-chunk` to 1.16.2
+- Updated `cardinal-components-level`, `cardinal-components-world` and `cardinal-components-chunk` to 1.16.2
 
 Additions
 - Added a new API for block components (see PR #42)
