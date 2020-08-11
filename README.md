@@ -18,7 +18,7 @@ Latest versions of Cardinal Components API are available on Bintray:
 repositories {
     maven {
         name = "Ladysnake Libs"
-        url = 'https://dl.bintray.com/ladysnake/libs'
+        url = "https://dl.bintray.com/ladysnake/libs"
     }
 }
 
@@ -33,7 +33,7 @@ dependencies {
 You can find the current version of the API in the [releases](https://github.com/OnyxStudios/Cardinal-Components-API/releases) tab of the repository on Github.
 
 Cardinal Components API is split into several modules. To depend on the all-encompassing master jar, use the dependency string
-`io.github.OnyxStudios.Cardinal-Components-API:<VERSION>`. That artifact bundles every module, but you often do not need all of them for a project. Individual module names can be found [below](#modules).
+`io.github.onyxstudios:Cardinal-Components-API:<VERSION>`. That artifact bundles every module, but you often do not need all of them for a project. Individual module names can be found [below](#modules).
 
 Example:
 ```gradle
