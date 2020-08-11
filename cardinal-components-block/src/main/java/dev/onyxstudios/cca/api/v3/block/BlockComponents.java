@@ -31,11 +31,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * This class consists exclusively of static methods that return a {@link Component} by querying some block context.
  */
+@ApiStatus.Experimental
 public final class BlockComponents {
 
     public static <C extends Component> @Nullable C get(ComponentKey<C> key, BlockEntity blockEntity) {

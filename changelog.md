@@ -5,14 +5,22 @@ Version 2.5.0
 - Updated `cardinal-components-level`, `cardinal-components-world` and `cardinal-components-chunk` to 1.16.2
 
 Additions
-- Added a new API for block components (see PR #42)
+- Added a new [API for block components](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Block) (see PR #42)
+- Added a new API for scoreboard components (see PR #36)
 - Added reworked `ComponentProvider` and `ComponentContainer` interfaces to the V3 API
     - Refactored a lot of internal code to use the new types
 - Added `ComponentV3` and `ComponentRegistryV3` interfaces for early V3 adopters
-- Added a factory builder to the `ComponentContainer` interface
+- Added a factory builder to the `ComponentContainer` interface for third-party `ComponentProvider` implementations
+- Added alternatives to `registerFor` methods taking a predicate, for fine-tuned registration
+
+Changes
+- The NBT serialized form of `ComponentContainer` is now more space-efficient.
+    - Instances serialized before this update should get converted as they load.
+- Removed experimental deprecated method `EntityComponentFactoryRegistry#register` (use `registerFor`)
 
 Fixes
 - Fixed item components not being copied by the smithing table
+- Removed the `Internal` annotation from new API packages
 
 ------------------------------------------------------
 Version 2.4.2
