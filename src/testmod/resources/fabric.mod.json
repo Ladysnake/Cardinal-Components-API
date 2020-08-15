@@ -16,6 +16,9 @@
         "cardinal-components:static-init": [
             "dev.onyxstudios.componenttest.TestStaticComponentInitializer"
         ],
+        "cardinal-components-block": [
+            "dev.onyxstudios.componenttest.TestComponents"
+        ],
         "cardinal-components-chunk": [
             "dev.onyxstudios.componenttest.TestComponents"
         ],
@@ -26,6 +29,9 @@
             "dev.onyxstudios.componenttest.TestComponents"
         ],
         "cardinal-components-level": [
+            "dev.onyxstudios.componenttest.TestComponents"
+        ],
+        "cardinal-components-scoreboard": [
             "dev.onyxstudios.componenttest.TestComponents"
         ],
         "cardinal-components-util": [

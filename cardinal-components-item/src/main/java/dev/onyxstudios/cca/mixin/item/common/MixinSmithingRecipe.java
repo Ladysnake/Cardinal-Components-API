@@ -26,22 +26,15 @@ import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.SmithingRecipe;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(SmithingRecipe.class)
 public abstract class MixinSmithingRecipe {
-    @Shadow
-    @Final
-    private ItemStack result;
-
-    @Inject(method = "craft", at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/CompoundTag;copy()Lnet/minecraft/nbt/CompoundTag;"), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void craft(Inventory inv, CallbackInfoReturnable<ItemStack> ci, ItemStack result) {
-        CardinalItemInternals.copyComponents(this.result, result);
+    @Inject(method = "craft", at = @At(value = "RETURN"))
+    private void craft(Inventory inv, CallbackInfoReturnable<ItemStack> ci) {
+        CardinalItemInternals.copyComponents(inv.getStack(0), ci.getReturnValue());
     }
 }

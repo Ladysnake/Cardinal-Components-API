@@ -22,11 +22,11 @@
  */
 package dev.onyxstudios.cca.mixin.chunk.common;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ChunkComponentCallback;
 import net.minecraft.util.Lazy;
@@ -55,7 +55,7 @@ public abstract class MixinProtoChunk implements Chunk, InternalComponentProvide
 
     @Nonnull
     @Override
-    public Object getStaticComponentContainer() {
+    public dev.onyxstudios.cca.api.v3.component.ComponentContainer<?> getComponentContainer() {
         return this.components;
     }
 }

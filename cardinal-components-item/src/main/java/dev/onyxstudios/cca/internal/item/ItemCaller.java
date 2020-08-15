@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.item;
 
-import nerdhub.cardinal.components.api.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;

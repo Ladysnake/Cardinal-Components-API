@@ -22,12 +22,8 @@
  */
 package dev.onyxstudios.componenttest;
 
+import dev.onyxstudios.cca.api.v3.block.BlockComponents;
 import dev.onyxstudios.componenttest.vita.Vita;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.BlockComponentProvider;
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.api.util.provider.EmptyComponentProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,18 +33,13 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.CollisionView;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.ApiStatus;
 
-import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 
-public class VitalityCondenser extends Block implements BlockComponentProvider {
+public class VitalityCondenser extends Block {
     public VitalityCondenser(Settings settings) {
         super(settings);
     }
@@ -57,10 +48,7 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
     @ApiStatus.OverrideOnly
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
-        Vita.get(world).transferTo(
-                TestComponents.VITA.get(this.getChunkProvider(world, pos)),
-                1
-        );
+        Vita.get(world).transferTo(Vita.get(world.getChunk(pos)), 1);
     }
 
     @SuppressWarnings("deprecation")
@@ -70,31 +58,8 @@ public class VitalityCondenser extends Block implements BlockComponentProvider {
         // only on client side, to confirm that sync works
         if (world.isClient) {
             player.sendMessage(new TranslatableText("componenttest:action.chunk_vitality",
-                    Vita.get(this.getChunkProvider(world, pos)).getVitality()), true);
+                Objects.requireNonNull(BlockComponents.get(TestComponents.VITA, world, pos)).getVitality()), true);
         }
         return ActionResult.SUCCESS;
-    }
-
-    @Override
-    public <T extends Component> boolean hasComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
-        return getChunkProvider(blockView, pos).hasComponent(type);
-    }
-
-    @Nullable
-    @Override
-    public <T extends Component> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
-        return getChunkProvider(blockView, pos).getComponent(type);
-    }
-
-    @Override
-    public Set<ComponentType<?>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side) {
-        return getChunkProvider(blockView, pos).getComponentTypes();
-    }
-
-    private ComponentProvider getChunkProvider(BlockView blockView, BlockPos pos) {
-        if (blockView instanceof CollisionView) {
-            return ComponentProvider.fromChunk(((WorldView) blockView).getChunk(pos));
-        }
-        return EmptyComponentProvider.instance();
     }
 }

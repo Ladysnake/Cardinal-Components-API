@@ -22,44 +22,31 @@
  */
 package dev.onyxstudios.cca.mixin.item.common;
 
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
+import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
+import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import javax.annotation.Nullable;
 
 @Mixin(PacketByteBuf.class)
 public abstract class MixinPacketByteBuf {
 
-    @Nullable
-    @ModifyVariable(method = "writeItemStack", at = @At(value = "LOAD"))
-    private CompoundTag markModdedStack(@Nullable CompoundTag tag, ItemStack stack) {
-        //noinspection ConstantConditions
-        ComponentContainer<?> componentContainer = ((InternalComponentProvider) (Object) stack).getComponentContainer();
-        if (componentContainer.isEmpty()) {
-            return tag;
-        }
-        CompoundTag newTag = tag == null ? new CompoundTag() : tag.copy();
-        newTag.put("cca_synced_components", componentContainer.toTag(new CompoundTag()));
-        return newTag;
-    }
-
+    /**
+     * @see MixinWritePacketByteBuf
+     * @see MixinWritePacketByteBufOF
+     */
     @Inject(method = "readItemStack", at = @At(value = "RETURN", ordinal = 1))
     private void readStack(CallbackInfoReturnable<ItemStack> cir) {
         ItemStack stack = cir.getReturnValue();
+        CompoundTag syncedComponents = stack.getSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS);
 
-        CompoundTag syncedComponents = stack.getSubTag("cca_synced_components");
         if (syncedComponents != null) {
-            //noinspection ConstantConditions
-            ((InternalComponentProvider) ((Object) stack)).getComponentContainer().fromTag(syncedComponents);
-            stack.removeSubTag("cca_synced_components");
+            InternalStackComponentProvider.get(stack).getComponentContainer().fromTag(syncedComponents);
+            stack.removeSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS);
         }
     }
 }

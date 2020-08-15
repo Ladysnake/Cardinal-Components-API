@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.mixin.chunk.common;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ProtoChunk;
@@ -44,8 +45,7 @@ public abstract class MixinReadOnlyChunk extends ProtoChunk implements InternalC
 
     @Nonnull
     @Override
-    public Object getStaticComponentContainer() {
-        return ((InternalComponentProvider)this.wrapped).getStaticComponentContainer();
+    public ComponentContainer<?> getComponentContainer() {
+        return ((InternalComponentProvider) this.wrapped).getComponentContainer();
     }
-
 }

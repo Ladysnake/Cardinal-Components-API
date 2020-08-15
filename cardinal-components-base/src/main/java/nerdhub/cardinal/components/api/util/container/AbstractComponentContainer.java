@@ -22,6 +22,8 @@
  */
 package nerdhub.cardinal.components.api.util.container;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
@@ -30,9 +32,11 @@ import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 
 import javax.annotation.Nullable;
 import java.util.AbstractMap;
+import java.util.Set;
 
 /**
  * This class provides a skeletal implementation of the {@code ComponentContainer} interface,
@@ -51,6 +55,22 @@ import java.util.AbstractMap;
  * @see FastComponentContainer
  */
 public abstract class AbstractComponentContainer<C extends Component> extends AbstractMap<ComponentType<?>, C> implements ComponentContainer<C> {
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Set<ComponentKey<?>> keys() {
+        return (Set<ComponentKey<?>>) (Set<?>) this.keySet();
+    }
+
+    @Override
+    public boolean hasComponents() {
+        return !this.isEmpty();
+    }
+
+    @Override
+    public Class<C> getComponentClass() {
+        throw new UnsupportedOperationException();
+    }
 
     @SuppressWarnings("deprecation")    // overriding the deprecated method to avoid the compiler's warning...
     @Deprecated
@@ -83,6 +103,8 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
         return null;
     }
 
+    @Override
+    public abstract C put(ComponentType<?> key, C value);
     /**
      * {@inheritDoc}
      *
@@ -107,6 +129,23 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
                     }
                 }
             }
+        } else if (tag.contains("cardinal_components", NbtType.COMPOUND)) {
+            CompoundTag componentMap = tag.getCompound("cardinal_components");
+            for (String keyId : componentMap.getKeys()) {
+                try {
+                    ComponentKey<?> key = ComponentRegistry.INSTANCE.get(new Identifier(keyId));
+                    if (key != null) {
+                        Component component = key.getInternal(this);
+                        if (component != null) {
+                            component.fromTag(componentMap.getCompound(keyId));
+                        }
+                    } else {
+                        ComponentsInternals.LOGGER.warn("Failed to deserialize component: unregistered key " + keyId);
+                    }
+                } catch (InvalidIdentifierException e) {
+                    ComponentsInternals.LOGGER.warn("Failed to deserialize component: invalid id " + keyId);
+                }
+            }
         }
     }
 
@@ -115,21 +154,24 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
      *
      * @implSpec This implementation first checks if the container is empty; if so it
      * returns immediately. Then, it iterates over this container's mappings, and creates
-     * a compound tag for each component. The component type's identifier is stored
-     * in that tag using the "componentId" key. The tag is then passed to the component's
+     * a compound tag for each component. The tag is then passed to the component's
      * {@link Component#toTag(CompoundTag)} method. Every such serialized component is appended
-     * to a {@code ListTag}, that is added to the given tag using the "cardinal_components" key.
+     * to a {@code CompoundTag}, using the component type's identifier as the key.
+     * The serialized map is finally appended to the passed in tag using the "cardinal_components" key.
      */
     @Override
     public CompoundTag toTag(CompoundTag tag) {
         if(!this.isEmpty()) {
-            ListTag componentList = new ListTag();
-            this.forEach((type, component) -> {
+            CompoundTag componentMap = new CompoundTag();
+            for (ComponentKey<?> type : this.keySet()) {
+                C component = type.getFromContainer(this);
                 CompoundTag componentTag = new CompoundTag();
-                componentTag.putString("componentId", type.getId().toString());
-                componentList.add(component.toTag(componentTag));
-            });
-            tag.put("cardinal_components", componentList);
+                component.toTag(componentTag);
+                if (!componentTag.isEmpty()) {
+                    componentMap.put(type.getId().toString(), componentTag);
+                }
+            }
+            tag.put("cardinal_components", componentMap);
         }
         return tag;
     }

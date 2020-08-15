@@ -22,6 +22,8 @@
  */
 package nerdhub.cardinal.components.api.util.provider;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
@@ -35,6 +37,7 @@ import java.util.Set;
  */
 public final class EmptyComponentProvider implements ComponentProvider {
     private static final ComponentProvider EMPTY_PROVIDER = new EmptyComponentProvider();
+    private static final ComponentContainer<?> EMPTY_CONTAINER = StaticComponentPluginBase.createEmptyContainer(Component.class, "EmptyProviderImpl");
 
     public static ComponentProvider instance() {
         return EMPTY_PROVIDER;
@@ -65,6 +68,12 @@ public final class EmptyComponentProvider implements ComponentProvider {
      */
     public Set<ComponentType<?>> getComponentTypes() {
         return Collections.emptySet();
+    }
+
+    @Nullable
+    @Override
+    public ComponentContainer<?> getComponentContainer() {
+        return EMPTY_CONTAINER;
     }
 
     private EmptyComponentProvider() {}

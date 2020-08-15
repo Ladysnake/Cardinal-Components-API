@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.api;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import nerdhub.cardinal.components.api.component.Component;
@@ -41,7 +42,7 @@ import java.util.stream.Stream;
  * @see ComponentType
  */
 @ApiStatus.NonExtendable
-public interface ComponentRegistry {
+public interface ComponentRegistry extends ComponentRegistryV3 {
     /**
      * The component registry
      */
@@ -75,7 +76,7 @@ public interface ComponentRegistry {
      * a shared {@link ComponentType} representation.
      *
      * <p>The {@code componentId} must be declared statically, either in a mod's {@code fabric.mod.json} metadata
-     * (as a string array custom value element), or through {@link StaticComponentInitializer#getSupportedComponentTypes()}.
+     * (as a string array custom value element), or through {@link StaticComponentInitializer#getSupportedComponentKeys()}.
      * For example, if {@code componentId}'s value is {@code "foo:bar"}, at least one of the loaded
      * {@code fabric.mod.json} definitions must either declare a {@code "cardinal-components:static-init"} entrypoint,
      * or include the following:

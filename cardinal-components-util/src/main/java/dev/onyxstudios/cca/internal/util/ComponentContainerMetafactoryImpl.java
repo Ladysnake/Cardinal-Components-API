@@ -25,11 +25,11 @@ package dev.onyxstudios.cca.internal.util;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.Parameter;
 import com.google.common.reflect.TypeToken;
-import dev.onyxstudios.cca.api.v3.component.util.ContainerGenerationException;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.util.ContainerGenerationException;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
 
@@ -48,17 +48,21 @@ public final class ComponentContainerMetafactoryImpl {
         TypeToken<?>[] declaredArgumentTypes = containerFactorySam.getParameters().stream().map(Parameter::getType).toArray(TypeToken<?>[]::new);
         Invokable<F, ?> componentFactorySam = componentFactoryType.method(CcaAsmHelper.findSam(componentFactoryType.getRawType()));
         TypeToken<?>[] actualArgumentTypes = componentFactorySam.getParameters().stream().map(Parameter::getType).toArray(TypeToken<?>[]::new);
+
         if (containerFactorySam.getReturnType().getRawType() != ComponentContainer.class) {
             throw new ContainerGenerationException("Declared return type of SAM " + containerFactorySam + " is not " + ComponentContainer.class.getSimpleName());
         }
+
         if (actualArgumentTypes.length != declaredArgumentTypes.length) {
             throw new ContainerGenerationException("Actual and declared argument type lists differ in length: " + Arrays.stream(actualArgumentTypes).map(TypeToken::getRawType).map(Class::getSimpleName).collect(Collectors.joining(", ", "[", "]")) + ", " + Arrays.stream(declaredArgumentTypes).map(TypeToken::getRawType).map(Class::getSimpleName).collect(Collectors.joining(", ", "[", "]")) + " (component factory type: " + componentFactoryType + ", container factory type: " + containerFactoryType + ")");
         }
+
         for (int i = 0; i < declaredArgumentTypes.length; i++) {
             if (!declaredArgumentTypes[i].isSupertypeOf(actualArgumentTypes[i])) {
                 throw new ContainerGenerationException(actualArgumentTypes[i] + " is not a valid specialization of declared argument " + declaredArgumentTypes[i]);
             }
         }
+
         try {
             Class<? extends R> containerFactoryClass = StaticGenericComponentPlugin.INSTANCE.spinSingleArgContainerFactory(componentFactoryType, genericTypeId, containerFactoryType.getRawType(), callbackType, events.length, Arrays.stream(actualArgumentTypes).map(TypeToken::getRawType).toArray(Class<?>[]::new));
             return ComponentsInternals.createFactory(containerFactoryClass, events);

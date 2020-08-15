@@ -22,11 +22,13 @@
  */
 package dev.onyxstudios.cca.internal.level;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.WorldSyncCallback;
 import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
@@ -36,16 +38,21 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
+import java.util.Objects;
+
 public final class ComponentsLevelNetworking {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             if (FabricLoader.getInstance().isModLoaded("cardinal-components-world")) {
                 WorldSyncCallback.EVENT.register((player, world) -> {
-                    ComponentProvider.fromLevel(world.getLevelProperties()).forEachComponent((componentType, component) -> {
-                                    if (component instanceof SyncedComponent) {
-                                        ((SyncedComponent) component).syncWith(player);
-                                    }
-                                });
+                    ComponentContainer<?> container = Objects.requireNonNull(ComponentProvider.fromLevel(world.getLevelProperties()).getComponentContainer());
+
+                    for (ComponentKey<?> key : container.keys()) {
+                        Component component = key.getFromContainer(container);
+                        if (component instanceof SyncedComponent) {
+                            ((SyncedComponent) component).syncWith(player);
+                        }
+                    }
                 });
             }
         }

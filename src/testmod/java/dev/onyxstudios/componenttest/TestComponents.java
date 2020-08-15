@@ -23,43 +23,55 @@
 package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
+import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
+import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.chunk.ChunkComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.chunk.ChunkComponentInitializer;
-import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.entity.EntityComponentInitializer;
-import dev.onyxstudios.cca.api.v3.component.item.ItemComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.item.ItemComponentInitializer;
-import dev.onyxstudios.cca.api.v3.component.level.LevelComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.level.LevelComponentInitializer;
-import dev.onyxstudios.cca.api.v3.component.util.GenericComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.util.GenericComponentInitializer;
-import dev.onyxstudios.cca.api.v3.component.world.WorldComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.world.WorldComponentInitializer;
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
+import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
+import dev.onyxstudios.cca.api.v3.level.LevelComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.level.LevelComponentInitializer;
+import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
+import dev.onyxstudios.cca.api.v3.util.GenericComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.util.GenericComponentInitializer;
+import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
 import dev.onyxstudios.componenttest.vita.*;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
+import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.CollisionView;
+import net.minecraft.world.chunk.Chunk;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
 public final class TestComponents implements
     EntityComponentInitializer,
     ChunkComponentInitializer,
+    BlockComponentInitializer,
     LevelComponentInitializer,
     WorldComponentInitializer,
     GenericComponentInitializer,
-    ItemComponentInitializer {
+    ItemComponentInitializer,
+    ScoreboardComponentInitializer {
 
     public static final Identifier CUSTOM_PROVIDER_1 = new Identifier("componenttest:custom/1");
     public static final Identifier CUSTOM_PROVIDER_2 = new Identifier("componenttest:custom/2");
     public static final Identifier CUSTOM_PROVIDER_3 = new Identifier("componenttest:custom/3");
 
-    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>>() {};
+    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>>() {
+    };
 
     public static final ComponentKey<Vita> VITA = ComponentRegistry.INSTANCE.registerStatic(CardinalComponentsTest.id("vita"), Vita.class);
     public static final ComponentKey<Vita> ALT_VITA = ComponentRegistry.INSTANCE.registerStatic(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
@@ -80,6 +92,23 @@ public final class TestComponents implements
     @Override
     public void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry) {
         registry.register(VITA, ChunkVita::new);
+    }
+
+    @Override
+    public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
+        registry.registerFor(CardinalComponentsTest.id("vita_condenser"), VITA,
+            (state, world, pos, side) -> {
+                if (world instanceof CollisionView)
+                    return VITA.get(Objects.requireNonNull(((CollisionView) world).getExistingChunk(pos.getX() >> 4, pos.getZ() >> 4)));
+                if (world instanceof Chunk) return VITA.get(world);
+                return null;
+            });
+        registry.registerFor(EndPortalBlockEntity.class, VITA, BlockEntityVita::new);
+        registry.registerFor(
+            new Identifier("end_gateway"),
+            VITA,
+            (state, world, pos, side) -> side != Direction.UP ? VITA.maybeGet(world.getBlockEntity(pos)).orElse(null) : null
+        );
     }
 
     @Override
@@ -105,5 +134,10 @@ public final class TestComponents implements
         registry.registerForAll(ALT_VITA, (item, stack) -> new BaseVita(stack.getCount()));
         registry.registerFor(new Identifier("diamond_chestplate"), ALT_VITA, stack -> new BaseVita(3));
         registry.registerFor(CardinalComponentsTest.VITA_STICK_ID, VITA, stack -> new BaseVita());
+    }
+
+    @Override
+    public void registerScoreboardComponentFactories(ScoreboardComponentFactoryRegistry registry) {
+        registry.register(VITA, TeamVita::new);
     }
 }

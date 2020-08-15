@@ -33,7 +33,6 @@ import nerdhub.cardinal.components.api.component.Component;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.BiConsumer;
 
 /**
  * A {@link Component} container with a fast, small-footprint implementation
@@ -48,6 +47,7 @@ import java.util.function.BiConsumer;
  * that naturally encapsulates the container.
  *
  */
+// TODO merge with superclass
 public class FastComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
     private final BitSet containedTypes;
     private final Int2ObjectOpenHashMap<C> vals;
@@ -116,12 +116,6 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
     // overridden by generated subclasses
     protected boolean canBeAssigned(ComponentType<?> key) {
         return !this.containsKey(key);
-    }
-
-    @Override   // overridden by generated subclasses
-    public void forEach(BiConsumer<? super ComponentType<?>, ? super C> action) {
-        this.vals.int2ObjectEntrySet().fastForEach((e) ->
-            action.accept(ComponentRegistryImpl.byRawId(e.getIntKey()), e.getValue()));
     }
 
     // Views
