@@ -22,10 +22,10 @@
  */
 package dev.onyxstudios.cca.internal.chunk;
 
+import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactory;
+import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.chunk.ChunkComponentFactory;
-import dev.onyxstudios.cca.api.v3.component.chunk.ChunkComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;

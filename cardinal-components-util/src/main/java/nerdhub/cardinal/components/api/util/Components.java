@@ -59,7 +59,7 @@ public final class Components {
         Set<ComponentType<?>> types = accessor.getComponentTypes();
         if(types.size() == other.getComponentTypes().size()) {
             for(ComponentType<? extends Component> type : types) {
-                if(!other.hasComponent(type) || !type.get(accessor).isComponentEqual(type.get(other))) {
+                if(!type.isProvidedBy(other) || !type.get(accessor).isComponentEqual(type.get(other))) {
                     return false;
                 }
             }

@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.api.v3.component;
 
 import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -40,22 +39,22 @@ import java.util.Collections;
  * signatures in the same class.
  *
  * <p>The entrypoint is exposed as {@code "cardinal-components:static-init"} in the mod json
- * and runs for any environment. It usually executes right before the first {@link ComponentType}
+ * and runs for any environment. It usually executes right before the first {@link ComponentKey}
  * is created, but can be triggered at any time by another module.
  */
 @ApiStatus.Experimental
 public interface StaticComponentInitializer {
     /**
-     * @return the identifiers of the {@link ComponentType}s this initializer supports
+     * @return the identifiers of the {@link ComponentKey}s this initializer supports
      */
-    default Collection<Identifier> getSupportedComponentTypes() {
+    default Collection<Identifier> getSupportedComponentKeys() {
         return Collections.emptySet();
     }
 
     /**
      * Called when static component bootstrap is finished.
      *
-     * <p>It is safe to register {@link ComponentType}s in this method.
+     * <p>It is safe to register {@link ComponentKey}s in this method.
      */
     default void finalizeStaticBootstrap() {
         // NO-OP

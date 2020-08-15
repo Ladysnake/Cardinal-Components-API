@@ -22,12 +22,12 @@
  */
 package dev.onyxstudios.cca.mixin.chunk.common;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ChunkComponentCallback;
 import net.minecraft.util.Lazy;
@@ -58,20 +58,19 @@ public abstract class MixinWorldChunk implements Chunk, InternalComponentProvide
 
     @Nonnull
     @Override
-    public Object getStaticComponentContainer() {
+    public ComponentContainer<?> getComponentContainer() {
         return this.components;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/world/chunk/ProtoChunk;)V", at = @At("RETURN"))
-    private void copyFromProto(World world, ProtoChunk proto, CallbackInfo ci) {
-        ComponentContainer<?> ourComponents = this.getComponentContainer();
-        ComponentContainer<?> theirComponents = ((InternalComponentProvider)proto).getComponentContainer();
-        theirComponents.forEach((type, component) -> {
-            Component other = ourComponents.get(type);
-            if (other != null) {
-                ((CopyableComponent)other).copyFrom(component);
+    private <C extends CopyableComponent<C>> void copyFromProto(World world, ProtoChunk proto, CallbackInfo ci) {
+        for (ComponentKey<?> key : this.components.keys()) {
+            @SuppressWarnings("unchecked") C theirs = (C) key.getNullable(proto);
+
+            if (theirs != null) {
+                @SuppressWarnings("unchecked") C ours = (C) key.get(this);
+                ours.copyFrom(theirs);
             }
-        });
+        }
     }
 }

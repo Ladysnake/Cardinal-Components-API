@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.world.chunk.WorldChunk;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -40,9 +41,10 @@ public abstract class MixinChunkHolder {
     @Inject(
             method = "flushUpdates",
             at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/server/world/ChunkHolder;sendPacketToPlayersWatching(Lnet/minecraft/network/Packet;Z)V",
-                    ordinal = 3,
+                    value = "FIELD",
+                    opcode = Opcodes.PUTFIELD,
+                    target = "Lnet/minecraft/server/world/ChunkHolder;pendingBlockUpdates:Z",
+                    ordinal = 0,
                     shift = At.Shift.AFTER
             )
     )

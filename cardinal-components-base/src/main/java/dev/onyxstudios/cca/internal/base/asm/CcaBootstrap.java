@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import nerdhub.cardinal.components.api.ComponentType;
@@ -32,7 +33,6 @@ import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -46,7 +46,7 @@ import java.util.*;
 public final class CcaBootstrap extends LazyDispatcher {
 
     public static final String COMPONENT_TYPE_INIT_DESC = Type.getMethodDescriptor(Type.VOID_TYPE, Type.getObjectType(CcaAsmHelper.IDENTIFIER), Type.getType(Class.class), Type.INT_TYPE);
-    public static final String COMPONENT_TYPE_GET0_DESC = "(L" + CcaAsmHelper.COMPONENT_PROVIDER + ";)L" + CcaAsmHelper.COMPONENT + ";";
+    public static final String COMPONENT_TYPE_GET0_DESC = "(L" + CcaAsmHelper.COMPONENT_CONTAINER + ";)L" + CcaAsmHelper.COMPONENT + ";";
     public static final String STATIC_INIT_ENTRYPOINT = "cardinal-components:static-init";
     public static final CcaBootstrap INSTANCE = new CcaBootstrap();
 
@@ -91,7 +91,7 @@ public final class CcaBootstrap extends LazyDispatcher {
 
             for (EntrypointContainer<StaticComponentInitializer> staticInitializer : this.staticComponentInitializers) {
                 try {
-                    staticComponentTypes.addAll(staticInitializer.getEntrypoint().getSupportedComponentTypes());
+                    staticComponentTypes.addAll(staticInitializer.getEntrypoint().getSupportedComponentKeys());
                 } catch (Throwable e) {
                     ModMetadata badMod = staticInitializer.getProvider().getMetadata();
                     throw new StaticComponentLoadingException(String.format("Exception while querying %s (%s) for supported static component types", badMod.getName(), badMod.getId()), e);
@@ -114,7 +114,7 @@ public final class CcaBootstrap extends LazyDispatcher {
 
     /**
      * Defines a {@link ComponentType} subclass for every statically declared component, as well as
-     * a global {@link nerdhub.cardinal.components.api.component.ComponentProvider} specialized interface
+     * a global {@link ComponentProvider} specialized interface
      * that declares a direct getter for every {@link ComponentType} that has been scanned by plugins.
      *
      * @param staticComponentTypes the set of all statically declared {@link ComponentType} ids
@@ -140,32 +140,13 @@ public final class CcaBootstrap extends LazyDispatcher {
             init.visitInsn(Opcodes.RETURN);
             init.visitEnd();
 
-            MethodVisitor get = componentTypeWriter.visitMethod(Opcodes.ACC_PROTECTED, "getNullable", COMPONENT_TYPE_GET0_DESC, null, null);
+            MethodVisitor get = componentTypeWriter.visitMethod(Opcodes.ACC_PROTECTED, "getInternal", COMPONENT_TYPE_GET0_DESC, null, null);
             get.visitCode();
             get.visitVarInsn(Opcodes.ALOAD, 1);
-            // stack: componentProvider
-            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_PROVIDER, "getStaticComponentContainer", "()Ljava/lang/Object;", true);
-            // stack: object
-            get.visitInsn(Opcodes.DUP);
-            // stack: object object
-            Label label = new Label();
-            get.visitJumpInsn(Opcodes.IFNULL, label);
             // stack: object
             get.visitTypeInsn(Opcodes.CHECKCAST, CcaAsmHelper.STATIC_COMPONENT_CONTAINER);
             // stack: generatedComponentContainer
             get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, CcaAsmHelper.getStaticStorageGetterName(componentId), CcaAsmHelper.STATIC_CONTAINER_GETTER_DESC, true);
-            // stack: component
-            get.visitInsn(Opcodes.ARETURN);
-            // if the native component container is null, we use the classic runtime way
-            get.visitLabel(label);
-            // stack: object(null)
-            get.visitInsn(Opcodes.POP); // pop the useless duplicated null
-            // empty stack
-            get.visitVarInsn(Opcodes.ALOAD, 1);
-            // stack: componentProvider
-            get.visitVarInsn(Opcodes.ALOAD, 0);
-            // stack: componentProvider <this>
-            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_PROVIDER, "getComponent", "(L" + CcaAsmHelper.COMPONENT_TYPE + ";)L" + CcaAsmHelper.COMPONENT +";", true);
             // stack: component
             get.visitInsn(Opcodes.ARETURN);
             get.visitEnd();
@@ -189,7 +170,7 @@ public final class CcaBootstrap extends LazyDispatcher {
             // stack: <this>
             CcaAsmHelper.stackStaticComponentType(methodWriter, componentId);
             // stack: <this> componentType
-            methodWriter.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_CONTAINER, "get", CcaAsmHelper.GET_DESC, true);
+            methodWriter.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_CONTAINER, "get", CcaAsmHelper.COMPONENT_CONTAINER$GET_DESC, true);
             // stack: component
             methodWriter.visitInsn(Opcodes.ARETURN);
             methodWriter.visitEnd();

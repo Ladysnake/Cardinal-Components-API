@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.world;
 
-import nerdhub.cardinal.components.api.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.PersistentState;
 

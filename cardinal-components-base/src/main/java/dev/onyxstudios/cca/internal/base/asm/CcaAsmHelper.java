@@ -22,12 +22,12 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
@@ -62,7 +62,7 @@ public final class CcaAsmHelper {
     // methods
     public static final String BY_RAW_ID_DESC;
     public static final String BY_RAW_ID;
-    public static final String GET_DESC;
+    public static final String COMPONENT_CONTAINER$GET_DESC;
     // generated references
     public static final String STATIC_COMPONENT_CONTAINER = "dev/onyxstudios/cca/_generated_/GeneratedComponentContainer";
     public static final String STATIC_CONTAINER_GETTER_DESC = "()Lnerdhub/cardinal/components/api/component/Component;";
@@ -74,7 +74,7 @@ public final class CcaAsmHelper {
             Method byRawId = ComponentRegistryImpl.class.getMethod("byRawId", int.class);
             BY_RAW_ID_DESC = Type.getMethodDescriptor(byRawId);
             BY_RAW_ID = byRawId.getName();
-            GET_DESC = Type.getMethodDescriptor(ComponentContainer.class.getMethod("get", ComponentType.class));
+            COMPONENT_CONTAINER$GET_DESC = Type.getMethodDescriptor(nerdhub.cardinal.components.api.component.ComponentContainer.class.getMethod("get", ComponentType.class));
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException("Failed to find one or more method descriptors", e);
         }

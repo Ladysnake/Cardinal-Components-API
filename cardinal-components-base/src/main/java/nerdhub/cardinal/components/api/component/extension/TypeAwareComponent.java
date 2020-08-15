@@ -22,10 +22,14 @@
  */
 package nerdhub.cardinal.components.api.component.extension;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import org.jetbrains.annotations.ApiStatus;
+
+import java.util.Set;
 
 /**
  * A component that is aware of its {@code ComponentType}.
@@ -58,12 +62,16 @@ public interface TypeAwareComponent extends Component {
     @SuppressWarnings("unchecked")
     @ApiStatus.Experimental
     static <C extends Component> ComponentType<? super C> lookupComponentType(ComponentProvider holder, C component) {
-        ComponentType<? super C> selfType = null;
-        for (ComponentType<?> componentType : holder.getComponentTypes()) {
+        ComponentKey<? super C> selfType = null;
+        ComponentContainer<?> container = holder.getComponentContainer();
+        Set<? extends ComponentKey<?>> keys = container == null
+            ? ((nerdhub.cardinal.components.api.component.ComponentProvider) holder).getComponentTypes()
+            : container.keys();
+        for (ComponentKey<?> componentType : keys) {
             if (componentType.getNullable(holder) == component) {
                 if (selfType == null) {
                     // unchecked cast but safe because of ComponentType#getNullable's contract
-                    selfType = (ComponentType<? super C>) componentType;
+                    selfType = (ComponentKey<? super C>) componentType;
                 } else {
                     throw new IllegalStateException("Component " + component + " is attached to the same provider under 2 or more types");
                 }
@@ -72,6 +80,6 @@ public interface TypeAwareComponent extends Component {
         if (selfType == null) {
             throw new IllegalStateException("getComponentProvider() returned invalid value");
         }
-        return selfType;
+        return (ComponentType<? super C>) selfType;
     }
 }

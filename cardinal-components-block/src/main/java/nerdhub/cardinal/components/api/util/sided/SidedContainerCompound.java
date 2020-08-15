@@ -39,7 +39,7 @@ import javax.annotation.Nullable;
  * side information, and will return only elements attached to the {@code null} side.
  */
 public interface SidedContainerCompound extends NbtSerializable {
-    ComponentContainer get(@Nullable Direction side);
+    ComponentContainer<?> get(@Nullable Direction side);
 
     void fromTag(CompoundTag serialized);
 

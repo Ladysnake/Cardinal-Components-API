@@ -22,14 +22,17 @@
  */
 package nerdhub.cardinal.components.api.component;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.scoreboard.AbstractTeam;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.level.LevelProperties;
-import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -38,7 +41,7 @@ import java.util.function.BiConsumer;
 /**
  * used to access an object's components.
  */
-public interface ComponentProvider {
+public interface ComponentProvider extends dev.onyxstudios.cca.api.v3.component.ComponentProvider {
 
     /**
      * Convenience method to retrieve ComponentProvider from a given {@link ItemStack}
@@ -82,6 +85,22 @@ public interface ComponentProvider {
     }
 
     /**
+     * Convenience method to retrieve a ComponentProvider from given {@link Team}.
+     * Requires the <tt>cardinal-components-scoreboard</tt> module.
+     */
+    static ComponentProvider fromTeam(AbstractTeam team) {
+        return (ComponentProvider) team;
+    }
+
+    /**
+     * Convenience method to retrieve a ComponentProvider from given {@link Scoreboard}.
+     * Requires the <tt>cardinal-components-scoreboard</tt> module.
+     */
+    static ComponentProvider fromScoreboard(Scoreboard scoreboard) {
+        return (ComponentProvider) scoreboard;
+    }
+
+    /**
      * if this method returns {@code true}, then {@link #getComponent(ComponentType)} <strong>must not</strong> return {@code null} for the same {@link ComponentType}
      */
     boolean hasComponent(ComponentType<?> type);
@@ -104,17 +123,13 @@ public interface ComponentProvider {
 
     default void forEachComponent(BiConsumer<ComponentType<?>, Component> op) {
         for (ComponentType<?> type : this.getComponentTypes()) {
-            op.accept(type, this.getComponent(type));
+            op.accept(type, type.get(this));
         }
     }
 
-    /**
-     * @return a runtime-generated component container storing statically declared components,
-     * or {@code null} if this container does not support static components.
-     */
     @Nullable
-    @ApiStatus.OverrideOnly
-    default Object getStaticComponentContainer() {
+    @Override
+    default ComponentContainer<?> getComponentContainer() {
         return null;
     }
 }

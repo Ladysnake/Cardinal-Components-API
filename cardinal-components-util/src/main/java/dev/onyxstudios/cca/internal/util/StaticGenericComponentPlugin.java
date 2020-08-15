@@ -23,14 +23,15 @@
 package dev.onyxstudios.cca.internal.util;
 
 import com.google.common.reflect.TypeToken;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.util.GenericComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.component.util.GenericComponentInitializer;
+import dev.onyxstudios.cca.api.v3.util.GenericComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.util.GenericComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
@@ -73,7 +74,7 @@ public final class StaticGenericComponentPlugin extends LazyDispatcher implement
             @SuppressWarnings("unchecked") I i = (I) object;
             resolved.put(entry.getKey(), i);
         }
-        Class<? extends ComponentContainer<?>> containerClass = StaticComponentPluginBase.spinComponentContainer(componentFactoryType.getRawType(), resolved, getSuffix(genericTypeId));
+        Class<? extends ComponentContainer<?>> containerClass = StaticComponentPluginBase.spinComponentContainer(componentFactoryType.getRawType(), Component.class, resolved, getSuffix(genericTypeId));
         this.claimedFactories.add(genericTypeId);
         return containerClass;
     }

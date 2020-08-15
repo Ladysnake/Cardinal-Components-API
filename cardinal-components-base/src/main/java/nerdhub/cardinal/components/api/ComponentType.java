@@ -22,10 +22,11 @@
  */
 package nerdhub.cardinal.components.api;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
@@ -65,36 +66,38 @@ public class ComponentType<T extends Component> extends ComponentKey<T> {
         return this.rawId;
     }
 
-    /**
-     * @param provider a component provider
-     * @return the attached component of this type, or
-     * {@code null} if the provider does not support this type of component
-     * @see #get(Object)
-     * @see #maybeGet(Object)
-     */
-    // overridden by generated types
-    // TODO V3 replace argument with ComponentContainer when it is safe to pass those around
-    @ApiStatus.Internal
-    @ApiStatus.Experimental
-    public @Nullable T getNullable(ComponentProvider provider) {
-        return provider.getComponent(this);
+    @Nullable
+    @Override
+    public T getInternal(ComponentContainer<?> container) {
+        return ((nerdhub.cardinal.components.api.component.ComponentContainer<?>) container).get(this);
+    }
+
+    @Nullable
+    private T getInternal(ComponentProvider provider) {
+        ComponentContainer<?> container = provider.getComponentContainer();
+
+        if (container != null) {
+            return this.getInternal(container);
+        } else {
+            return ((nerdhub.cardinal.components.api.component.ComponentProvider) provider).getComponent(this);
+        }
     }
 
     /* ------------- public methods -------------- */
 
     /**
-     * @deprecated use {@code ObjectPath.fromFunction(}{@link #getNullable(ComponentProvider) this::getNullable}{@code )}
+     * @deprecated use {@code ObjectPath.fromFunction(}{@link #getNullable(Object) this::getNullable}{@code )}
      * (from the cardinal-components-util module)
      */
     @Deprecated
     public final Function<ComponentProvider, T> asComponentPath() {
-        return this::getNullable;
+        return this::getInternal;
     }
 
     @Nullable
     @Override
     public <V> T getNullable(V provider) {
-        return this.getNullable((ComponentProvider) provider);
+        return this.getInternal((ComponentProvider) provider);
     }
 
     /**
@@ -106,7 +109,7 @@ public class ComponentType<T extends Component> extends ComponentKey<T> {
      * @see #maybeGet(Object)
      */
     public final <V> T get(V provider) {
-        T component = this.getNullable((ComponentProvider) provider);
+        T component = this.getInternal((ComponentProvider) provider);
         assert component == null || this.getComponentClass().isInstance(component);
         if (component == null) {
             try {
@@ -129,7 +132,7 @@ public class ComponentType<T extends Component> extends ComponentKey<T> {
      */
     public final <V> Optional<T> maybeGet(@Nullable V provider) {
         if (provider instanceof ComponentProvider) {
-            return Optional.ofNullable(this.getNullable((ComponentProvider) provider));
+            return Optional.ofNullable(this.getInternal((ComponentProvider) provider));
         }
         return Optional.empty();
     }

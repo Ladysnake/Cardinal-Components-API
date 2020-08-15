@@ -25,12 +25,12 @@ package dev.onyxstudios.cca.api.v3.component;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -43,13 +43,13 @@ import java.util.Optional;
  */
 @ApiStatus.Experimental
 @ApiStatus.NonExtendable
-public abstract class ComponentKey<T extends Component> {
+public abstract class ComponentKey<C extends Component> {
 
     public final Identifier getId() {
         return this.id;
     }
 
-    public final Class<T> getComponentClass() {
+    public final Class<C> getComponentClass() {
         return this.componentClass;
     }
 
@@ -63,7 +63,7 @@ public abstract class ComponentKey<T extends Component> {
      */
     // overridden by generated types
     @ApiStatus.Experimental
-    public abstract <V> @Nullable T getNullable(V provider);
+    public abstract <V> @Nullable C getNullable(V provider);
 
     /**
      * @param provider a component provider
@@ -73,7 +73,7 @@ public abstract class ComponentKey<T extends Component> {
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      * @see #maybeGet(Object)
      */
-    public abstract <V> T get(V provider);
+    public abstract <V> C get(V provider);
 
     /**
      * @param provider a component provider
@@ -82,7 +82,12 @@ public abstract class ComponentKey<T extends Component> {
      * {@code Optional} if {@code provider} does not have such a component.
      * @see #get(Object)
      */
-    public abstract <V> Optional<T> maybeGet(@Nullable V provider);
+    public abstract <V> Optional<C> maybeGet(@Nullable V provider);
+
+    @ApiStatus.Experimental
+    public <V> boolean isProvidedBy(V provider) {
+        return this.getNullable(provider) != null;
+    }
 
     @Override
     public final String toString() {
@@ -91,7 +96,7 @@ public abstract class ComponentKey<T extends Component> {
 
     /* ------------ internal members ------------- */
 
-    private final Class<T> componentClass;
+    private final Class<C> componentClass;
     private final Identifier id;
 
     /**
@@ -100,9 +105,25 @@ public abstract class ComponentKey<T extends Component> {
      * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
      */
     @ApiStatus.Internal
-    protected ComponentKey(Identifier id, Class<T> componentClass) {
+    protected ComponentKey(Identifier id, Class<C> componentClass) {
         if (!CcaBootstrap.INSTANCE.isGenerated(this.getClass())) throw new IllegalStateException();
         this.componentClass = componentClass;
         this.id = id;
+    }
+
+    /**
+     * @param container a component container
+     * @return the attached component of this type, or
+     * {@code null} if the container does not support this type of component
+     * @see #get(Object)
+     * @see #maybeGet(Object)
+     */
+    // overridden by generated types
+    @ApiStatus.Internal
+    public abstract @Nullable C getInternal(ComponentContainer<?> container);
+
+    @ApiStatus.Internal
+    public <D extends Component> D getFromContainer(ComponentContainer<D> container) {
+        return Objects.requireNonNull(container.getComponentClass().cast(this.getInternal(container)));
     }
 }

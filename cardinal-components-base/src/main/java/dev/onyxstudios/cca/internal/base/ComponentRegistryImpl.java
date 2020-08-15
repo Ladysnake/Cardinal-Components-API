@@ -24,6 +24,8 @@ package dev.onyxstudios.cca.internal.base;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentV3;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -139,6 +141,11 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
             return raw2Types[rawId];
         }
         return null;
+    }
+
+    @Override
+    public <C extends ComponentV3> ComponentKey<C> getOrCreate(Identifier componentId, Class<C> componentClass) {
+        return this.registerStatic(componentId, componentClass);
     }
 
     @Nullable

@@ -36,7 +36,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(CauldronBlock.class)
-public class MixinCauldronBlock {
+public abstract class MixinCauldronBlock {
     @ModifyVariable(
         method = "onUse",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;hasTag()Z", ordinal = 0),

@@ -22,51 +22,32 @@
  */
 package dev.onyxstudios.cca.mixin.chunk.common;
 
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.source.BiomeArray;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
-import java.util.function.BiConsumer;
+import javax.annotation.Nonnull;
 
 @Mixin(EmptyChunk.class)
-public abstract class MixinEmptyChunk extends WorldChunk implements ComponentProvider {
+public abstract class MixinEmptyChunk extends WorldChunk implements InternalComponentProvider {
+    @Unique
+    private static final ComponentContainer<CopyableComponent<?>> EMPTY_COMPONENTS = StaticComponentPluginBase.createEmptyContainer(CopyableComponent.class, "EmptyChunkImpl");
+
     public MixinEmptyChunk(World world, ChunkPos pos, BiomeArray biomes) {
         super(world, pos, biomes);
     }
 
+    @Nonnull
     @Override
-    public boolean hasComponent(ComponentType<?> type) {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public <C extends Component> C getComponent(ComponentType<C> type) {
-        return null;
-    }
-
-    @Override
-    public Set<ComponentType<?>> getComponentTypes() {
-        return Collections.emptySet();
-    }
-
-    @Override
-    public void forEachComponent(BiConsumer<ComponentType<?>, Component> op) {
-        // NO-OP
-    }
-
-    @Nullable
-    @Override
-    public Object getStaticComponentContainer() {
-        return null;
+    public ComponentContainer<?> getComponentContainer() {
+        return EMPTY_COMPONENTS;
     }
 }

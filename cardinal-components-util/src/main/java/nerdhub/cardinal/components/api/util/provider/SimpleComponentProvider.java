@@ -46,7 +46,7 @@ public class SimpleComponentProvider implements ComponentProvider {
      */
     @Override
     public boolean hasComponent(ComponentType<?> type) {
-        return backing.containsKey(type);
+        return this.backing.containsKey(type);
     }
 
     /**
@@ -60,7 +60,7 @@ public class SimpleComponentProvider implements ComponentProvider {
     @Nullable
     @Override
     public <C extends Component> C getComponent(ComponentType<C> type) {
-        return backing.get(type);
+        return this.backing.get(type);
     }
 
     /**
@@ -68,7 +68,13 @@ public class SimpleComponentProvider implements ComponentProvider {
      */
     @Override
     public Set<ComponentType<?>> getComponentTypes() {
-        return Collections.unmodifiableSet(backing.keySet());
+        return Collections.unmodifiableSet(this.backing.keySet());
+    }
+
+    @Nullable
+    @Override
+    public dev.onyxstudios.cca.api.v3.component.ComponentContainer<?> getComponentContainer() {
+        return this.backing;
     }
 }
 
