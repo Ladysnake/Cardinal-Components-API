@@ -23,13 +23,13 @@
 package nerdhub.cardinal.components.api.util.sync;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.internal.world.ComponentsWorldNetworking;
 import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
-import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -38,6 +38,7 @@ import net.minecraft.world.World;
 
 /**
  * Default implementations of {@link SyncedComponent} methods, specialized for world components
+ * @see dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent
  */
 public interface WorldSyncedComponent extends BaseSyncedComponent {
     /**
@@ -49,7 +50,7 @@ public interface WorldSyncedComponent extends BaseSyncedComponent {
      * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
      * called on the game thread.
      */
-    Identifier PACKET_ID = new Identifier("cardinal-components", "world_sync");
+    Identifier PACKET_ID = ComponentsWorldNetworking.PACKET_ID;
 
     World getWorld();
 
@@ -67,9 +68,7 @@ public interface WorldSyncedComponent extends BaseSyncedComponent {
 
     @Override
     default void sync() {
-        if (!this.getWorld().isClient) {
-            PlayerStream.world(this.getWorld()).map(ServerPlayerEntity.class::cast).forEach(this::syncWith);
-        }
+        ComponentProvider.fromWorld(this.getWorld()).getRecipientsForComponentSync().forEachRemaining(this::syncWith);
     }
 
     @Override

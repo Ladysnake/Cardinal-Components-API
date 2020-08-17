@@ -25,6 +25,12 @@ package dev.onyxstudios.cca.api.v3.component;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.scoreboard.AbstractTeam;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.Team;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.chunk.Chunk;
@@ -32,6 +38,8 @@ import net.minecraft.world.level.LevelProperties;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * used to access an object's components.
@@ -48,12 +56,11 @@ public interface ComponentProvider {
     }
 
     /**
-     * Convenience method to retrieve ComponentProvider from a given {@link ItemStack}
-     * Requires the <tt>cardinal-components-item</tt> module.
+     * Convenience method to retrieve a ComponentProvider from given {@link Chunk}.
+     * Requires the <tt>cardinal-components-chunk</tt> module.
      */
-    @SuppressWarnings("ConstantConditions")
-    static ComponentProvider fromItemStack(ItemStack stack) {
-        return (ComponentProvider) (Object) stack;
+    static ComponentProvider fromChunk(Chunk chunk) {
+        return (ComponentProvider) chunk;
     }
 
     /**
@@ -65,11 +72,12 @@ public interface ComponentProvider {
     }
 
     /**
-     * Convenience method to retrieve a ComponentProvider from a given {@link World}.
-     * Requires the <tt>cardinal-components-world</tt> module.
+     * Convenience method to retrieve ComponentProvider from a given {@link ItemStack}
+     * Requires the <tt>cardinal-components-item</tt> module.
      */
-    static ComponentProvider fromWorld(World world) {
-        return (ComponentProvider) world;
+    @SuppressWarnings("ConstantConditions")
+    static ComponentProvider fromItemStack(ItemStack stack) {
+        return (ComponentProvider) (Object) stack;
     }
 
     /**
@@ -81,11 +89,27 @@ public interface ComponentProvider {
     }
 
     /**
-     * Convenience method to retrieve a ComponentProvider from given {@link Chunk}.
-     * Requires the <tt>cardinal-components-chunk</tt> module.
+     * Convenience method to retrieve a ComponentProvider from given {@link Scoreboard}.
+     * Requires the <tt>cardinal-components-scoreboard</tt> module.
      */
-    static ComponentProvider fromChunk(Chunk chunk) {
-        return (ComponentProvider) chunk;
+    static ComponentProvider fromScoreboard(Scoreboard scoreboard) {
+        return (ComponentProvider) scoreboard;
+    }
+
+    /**
+     * Convenience method to retrieve a ComponentProvider from given {@link Team}.
+     * Requires the <tt>cardinal-components-scoreboard</tt> module.
+     */
+    static ComponentProvider fromTeam(AbstractTeam team) {
+        return (ComponentProvider) team;
+    }
+
+    /**
+     * Convenience method to retrieve a ComponentProvider from a given {@link World}.
+     * Requires the <tt>cardinal-components-world</tt> module.
+     */
+    static ComponentProvider fromWorld(World world) {
+        return (ComponentProvider) world;
     }
 
     /**
@@ -95,4 +119,14 @@ public interface ComponentProvider {
     @ApiStatus.Experimental
     @Nullable   // TODO mark NonNull when dynamic containers are gone
     ComponentContainer<?> getComponentContainer();
+
+    default Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
+        return Collections.emptyIterator();
+    }
+
+    @Nullable
+    @ApiStatus.Experimental
+    default <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient) {
+        return null;
+    }
 }

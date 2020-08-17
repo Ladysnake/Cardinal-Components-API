@@ -22,10 +22,10 @@
  */
 package dev.onyxstudios.cca.internal.level;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
@@ -38,20 +38,15 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-import java.util.Objects;
-
 public final class ComponentsLevelNetworking {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             if (FabricLoader.getInstance().isModLoaded("cardinal-components-world")) {
                 WorldSyncCallback.EVENT.register((player, world) -> {
-                    ComponentContainer<?> container = Objects.requireNonNull(ComponentProvider.fromLevel(world.getLevelProperties()).getComponentContainer());
+                    ComponentProvider provider = ComponentProvider.fromLevel(world.getLevelProperties());
 
-                    for (ComponentKey<?> key : container.keys()) {
-                        Component component = key.getFromContainer(container);
-                        if (component instanceof SyncedComponent) {
-                            ((SyncedComponent) component).syncWith(player);
-                        }
+                    for (ComponentKey<?> key : ((InternalComponentProvider) provider).getComponentContainer().keys()) {
+                        key.syncWith(player, provider);
                     }
                 });
             }
@@ -73,6 +68,7 @@ public final class ComponentsLevelNetworking {
                         try {
                             assert MinecraftClient.getInstance().world != null;
                             Component c = componentType.get(MinecraftClient.getInstance().world.getLevelProperties());
+
                             if (c instanceof SyncedComponent) {
                                 ((SyncedComponent) c).processPacket(context, copy);
                             }

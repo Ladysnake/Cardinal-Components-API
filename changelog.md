@@ -1,4 +1,9 @@
 ------------------------------------------------------
+Version 2.5.1
+------------------------------------------------------
+- Overhauled component synchronization for V3 API
+
+------------------------------------------------------
 Version 2.5.0
 ------------------------------------------------------
 **This release breaks compatibility between modules of different versions.**
