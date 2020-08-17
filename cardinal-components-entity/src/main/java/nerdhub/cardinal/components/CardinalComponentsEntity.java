@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components;
 
+import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
@@ -33,11 +34,12 @@ import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
 import nerdhub.cardinal.components.api.event.TrackingStartCallback;
 import nerdhub.cardinal.components.api.util.EntityComponents;
-import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
+import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
@@ -45,6 +47,17 @@ import net.minecraft.world.GameRules;
 import java.util.Set;
 
 public final class CardinalComponentsEntity {
+    /**
+     * {@link CustomPayloadS2CPacket} channel for default entity component synchronization.
+     *
+     * <p> Packets emitted on this channel must begin with, in order, the {@link Entity#getEntityId() entity id} (as an int),
+     * and the {@link ComponentType#getId() component's type} (as an Identifier).
+     *
+     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * called on the game thread.
+     */
+    public static final Identifier PACKET_ID = new Identifier("cardinal-components", "entity_sync");
+
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
@@ -69,19 +82,17 @@ public final class CardinalComponentsEntity {
     }
 
     private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {
-        for (ComponentKey<?> key : ((InternalComponentProvider) tracked).getComponentContainer().keys()) {
-            Component component = key.getNullable(tracked);
+        InternalComponentProvider provider = (InternalComponentProvider) tracked;
 
-            if (component instanceof SyncedComponent) {
-                ((SyncedComponent) component).syncWith(player);
-            }
+        for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
+            key.syncWith(player, provider);
         }
     }
 
     // Safe to put in the same class as no client-only class is directly referenced
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            ClientSidePacketRegistry.INSTANCE.register(EntitySyncedComponent.PACKET_ID, (context, buffer) -> {
+            ClientSidePacketRegistry.INSTANCE.register(PACKET_ID, (context, buffer) -> {
                 try {
                     int entityId = buffer.readInt();
                     Identifier componentTypeId = buffer.readIdentifier();
@@ -93,8 +104,13 @@ public final class CardinalComponentsEntity {
                     context.getTaskQueue().execute(() -> {
                         try {
                             componentType.maybeGet(context.getPlayer().world.getEntityById(entityId))
-                                .filter(c -> c instanceof SyncedComponent)
-                                .ifPresent(c -> ((SyncedComponent) c).processPacket(context, copy));
+                                .ifPresent(c -> {
+                                    if (c instanceof AutoSyncedComponent) {
+                                        ((AutoSyncedComponent) c).readFromPacket(copy);
+                                    } else if (c instanceof SyncedComponent) {
+                                        ((SyncedComponent) c).processPacket(context, copy);
+                                    }
+                                });
                         } finally {
                             copy.release();
                         }

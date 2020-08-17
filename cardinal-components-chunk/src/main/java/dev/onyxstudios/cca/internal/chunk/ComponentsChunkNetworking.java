@@ -22,34 +22,29 @@
  */
 package dev.onyxstudios.cca.internal.chunk;
 
+import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.ChunkSyncCallback;
-import nerdhub.cardinal.components.api.util.sync.ChunkSyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-import java.util.Set;
-
 public final class ComponentsChunkNetworking {
+    public static final Identifier PACKET_ID = new Identifier("cardinal-components", "chunk_sync");
+
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             ChunkSyncCallback.EVENT.register((player, tracked) -> {
-                Set<ComponentKey<?>> keys = ((InternalComponentProvider) tracked).getComponentContainer().keys();
+                InternalComponentProvider provider = (InternalComponentProvider) tracked;
 
-                for (ComponentKey<?> key : keys) {
-                    Component component = key.getNullable(tracked);
-
-                    if (component instanceof SyncedComponent) {
-                        ((SyncedComponent) component).syncWith(player);
-                    }
+                for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
+                    key.syncWith(player, provider);
                 }
             });
         }
@@ -58,7 +53,7 @@ public final class ComponentsChunkNetworking {
     // Safe to put in the same class as no client-only class is directly referenced
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            ClientSidePacketRegistry.INSTANCE.register(ChunkSyncedComponent.PACKET_ID, (context, buffer) -> {
+            ClientSidePacketRegistry.INSTANCE.register(PACKET_ID, (context, buffer) -> {
                 try {
                     int chunkX = buffer.readInt();
                     int chunkZ = buffer.readInt();
@@ -72,8 +67,13 @@ public final class ComponentsChunkNetworking {
                         try {
                             // Note: on the client, unloaded chunks return EmptyChunk
                             componentType.maybeGet(context.getPlayer().world.getChunk(chunkX, chunkZ))
-                                .filter(c -> c instanceof SyncedComponent)
-                                .ifPresent(c -> ((SyncedComponent) c).processPacket(context, copy));
+                                .ifPresent(c -> {
+                                    if (c instanceof AutoSyncedComponent) {
+                                        ((AutoSyncedComponent) c).readFromPacket(copy);
+                                    } else if (c instanceof SyncedComponent) {
+                                        ((SyncedComponent) c).processPacket(context, copy);
+                                    }
+                                });
                         } finally {
                             copy.release();
                         }

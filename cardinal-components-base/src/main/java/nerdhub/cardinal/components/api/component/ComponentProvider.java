@@ -26,9 +26,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.scoreboard.AbstractTeam;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.Team;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.chunk.Chunk;
@@ -82,22 +79,6 @@ public interface ComponentProvider extends dev.onyxstudios.cca.api.v3.component.
      */
     static ComponentProvider fromChunk(Chunk chunk) {
         return (ComponentProvider) chunk;
-    }
-
-    /**
-     * Convenience method to retrieve a ComponentProvider from given {@link Team}.
-     * Requires the <tt>cardinal-components-scoreboard</tt> module.
-     */
-    static ComponentProvider fromTeam(AbstractTeam team) {
-        return (ComponentProvider) team;
-    }
-
-    /**
-     * Convenience method to retrieve a ComponentProvider from given {@link Scoreboard}.
-     * Requires the <tt>cardinal-components-scoreboard</tt> module.
-     */
-    static ComponentProvider fromScoreboard(Scoreboard scoreboard) {
-        return (ComponentProvider) scoreboard;
     }
 
     /**

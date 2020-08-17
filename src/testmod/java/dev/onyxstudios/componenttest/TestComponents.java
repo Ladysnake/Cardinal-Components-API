@@ -103,7 +103,7 @@ public final class TestComponents implements
                 if (world instanceof Chunk) return VITA.get(world);
                 return null;
             });
-        registry.registerFor(EndPortalBlockEntity.class, VITA, BlockEntityVita::new);
+        registry.registerFor(EndPortalBlockEntity.class, VITA, SyncedVita::new);
         registry.registerFor(
             new Identifier("end_gateway"),
             VITA,

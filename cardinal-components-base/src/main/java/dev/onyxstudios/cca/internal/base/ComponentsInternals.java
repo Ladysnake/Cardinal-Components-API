@@ -60,7 +60,7 @@ public final class ComponentsInternals {
     }
 
     @SuppressWarnings("unchecked")
-    public static <E extends ComponentCallback<P, ? super C>, T extends Component, P, C extends T> E createCallback(Event<E> event, ComponentType<T> type, Function<P,C> factory) {
+    public static <E extends ComponentCallback<P, ? super C>, T extends Component, P, C extends T> E createCallback(Event<E> event, ComponentType<T> type, Function<P, C> factory) {
         try {
             return (E) FACTORY_CACHE.computeIfAbsent(event, ComponentsInternals::createCallbackFactory).invoke(type, factory);
         } catch (Throwable t) {

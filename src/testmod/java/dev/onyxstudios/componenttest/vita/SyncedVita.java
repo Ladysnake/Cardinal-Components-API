@@ -22,24 +22,19 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncedComponent;
-import net.minecraft.block.entity.BlockEntity;
+import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
+import dev.onyxstudios.componenttest.TestComponents;
 
-public class BlockEntityVita extends BaseVita implements BlockEntitySyncedComponent {
-    private final BlockEntity owner;
+public class SyncedVita extends BaseVita implements AutoSyncedComponent {
+    private final Object owner;
 
-    public BlockEntityVita(BlockEntity owner) {
+    public SyncedVita(Object owner) {
         this.owner = owner;
     }
 
     @Override
     public void setVitality(int value) {
         super.setVitality(value);
-        this.sync();
-    }
-
-    @Override
-    public BlockEntity getBlockEntity() {
-        return this.owner;
+        TestComponents.VITA.sync(this.owner);
     }
 }

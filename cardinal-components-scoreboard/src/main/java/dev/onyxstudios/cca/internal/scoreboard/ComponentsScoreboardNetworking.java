@@ -22,59 +22,81 @@
  */
 package dev.onyxstudios.cca.internal.scoreboard;
 
+import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardSyncCallback;
-import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardSyncedComponent;
 import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
-import dev.onyxstudios.cca.api.v3.scoreboard.TeamSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Identifier;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public final class ComponentsScoreboardNetworking {
+    /**
+     * {@link CustomPayloadS2CPacket} channel for default scoreboard component synchronization.
+     *
+     * <p> Packets emitted on this channel must begin with the {@link Identifier} for the component's type.
+     *
+     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * called on the game thread.
+     */
+    public static final Identifier SCOREBOARD_PACKET_ID = new Identifier("cardinal-components", "scoreboard_sync");
+    /**
+     * {@link CustomPayloadS2CPacket} channel for default team component synchronization.
+     *
+     * <p> Packets emitted on this channel must begin with, in order, the team's name as a {@link String},
+     * and the {@link Identifier} for the component's type.
+     *
+     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * called on the game thread.
+     */
+    public static final Identifier TEAM_PACKET_ID = new Identifier("cardinal-components", "team_sync");
+
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             ScoreboardSyncCallback.EVENT.register((player, tracked) -> {
-                BiConsumer<ComponentType<?>, Component> sync = (componentType, component) -> {
-                    if (component instanceof SyncedComponent) {
-                        ((SyncedComponent) component).syncWith(player);
-                    }
-                };
-                ComponentProvider.fromScoreboard(tracked).forEachComponent(sync);
+                for (ComponentKey<?> key : ((InternalComponentProvider) tracked).getComponentContainer().keys()) {
+                    key.syncWith(player, ComponentProvider.fromScoreboard(tracked));
+                }
+
                 for (Team team : tracked.getTeams()) {
-                    ComponentProvider.fromTeam(team).forEachComponent(sync);
+                    ComponentProvider provider = ComponentProvider.fromTeam(team);
+
+                    for (ComponentKey<?> key : ((InternalComponentProvider) provider).getComponentContainer().keys()) {
+                        key.syncWith(player, provider);
+                    }
                 }
             });
-            TeamAddCallback.EVENT.register((tracked) -> ComponentProvider.fromTeam(tracked)
-                .forEachComponent((componentType, component) -> {
-                    if (component instanceof SyncedComponent) {
-                        ((SyncedComponent) component).sync();
-                    }
-                }));
+            TeamAddCallback.EVENT.register((tracked) -> {
+                for (ComponentKey<?> key : ((InternalComponentProvider) ComponentProvider.fromTeam(tracked)).getComponentContainer().keys()) {
+                    key.sync(tracked);
+                }
+            });
         }
     }
 
     // Safe to put in the same class as no client-only class is directly referenced
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            registerScoreboardSync(TeamSyncedComponent.PACKET_ID, (ctx, buf) -> {
+            registerScoreboardSync(TEAM_PACKET_ID, (ctx, buf) -> {
                 String teamName = buf.readString();
                 return (componentType) -> componentType.maybeGet(ctx.getPlayer().world.getScoreboard().getTeam(teamName));
             });
-            registerScoreboardSync(ScoreboardSyncedComponent.PACKET_ID,
+            registerScoreboardSync(SCOREBOARD_PACKET_ID,
                 (ctx, buf) -> (componentType) -> componentType.maybeGet(ctx.getPlayer().world.getScoreboard())
             );
         }
@@ -92,8 +114,8 @@ public final class ComponentsScoreboardNetworking {
                     context.getTaskQueue().execute(() -> {
                         try {
                             getter.apply(componentType)
-                                .filter(c -> c instanceof SyncedComponent)
-                                .ifPresent(c -> ((SyncedComponent) c).processPacket(context, copy));
+                                .filter(c -> c instanceof AutoSyncedComponent)
+                                .ifPresent(c -> ((AutoSyncedComponent) c).readFromPacket(copy));
                         } finally {
                             copy.release();
                         }

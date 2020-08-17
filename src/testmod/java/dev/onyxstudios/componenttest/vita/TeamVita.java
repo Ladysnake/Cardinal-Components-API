@@ -22,20 +22,20 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.scoreboard.TeamSyncedComponent;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.server.network.ServerPlayerEntity;
 
-public class TeamVita extends BaseVita implements TeamSyncedComponent {
+public class TeamVita extends SyncedVita {
     private final Team team;
 
     public TeamVita(Team team) {
-        super();
+        super(team);
         this.team = team;
     }
 
     @Override
-    public Team getTeam() {
-        return this.team;
+    public boolean shouldSyncWith(ServerPlayerEntity player) {
+        return player.getScoreboardTeam() == this.team;
     }
 
     @Override
