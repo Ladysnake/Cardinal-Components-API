@@ -61,7 +61,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     }
 
     private final List<PredicatedComponentFactory<?>> dynamicFactories = new ArrayList<>();
-    private final Map<@Nullable Identifier, Map</*ComponentType*/Identifier, ItemComponentFactoryV2<?>>> componentFactories = new HashMap<>();
+    private final Map<@Nullable Identifier, Map<ComponentKey<?>, ItemComponentFactoryV2<?>>> componentFactories = new HashMap<>();
     private Class<? extends ItemComponentContainerFactory> wildcardFactoryClass;
 
     public Class<? extends ItemComponentContainerFactory> getFactoryClass(Item item, Identifier itemId) {
@@ -74,7 +74,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
 
         if (this.componentFactories.containsKey(itemId)) {
             try {
-                Map<Identifier, ItemComponentFactoryV2<?>> compiled = new HashMap<>(this.componentFactories.get(itemId));
+                Map<ComponentKey<?>, ItemComponentFactoryV2<?>> compiled = new HashMap<>(this.componentFactories.get(itemId));
                 this.getWildcard().forEach(compiled::putIfAbsent);
                 String implSuffix = getSuffix(itemId);
                 Class<? extends ComponentContainer> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, compiled, implSuffix);
@@ -103,7 +103,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         }
     }
 
-    private Map<Identifier, ItemComponentFactoryV2<?>> getWildcard() {
+    private Map<ComponentKey<?>, ItemComponentFactoryV2<?>> getWildcard() {
         return this.componentFactories.getOrDefault(null, Collections.emptyMap());
     }
 
@@ -140,8 +140,8 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     }
 
     private <C extends Component> void register0(@Nullable Identifier itemId, ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory) {
-        Map<Identifier, ItemComponentFactoryV2<?>> specializedMap = this.componentFactories.computeIfAbsent(itemId, t -> new HashMap<>());
-        ItemComponentFactoryV2<?> previousFactory = specializedMap.get(type.getId());
+        Map<ComponentKey<?>, ItemComponentFactoryV2<?>> specializedMap = this.componentFactories.computeIfAbsent(itemId, t -> new HashMap<>());
+        ItemComponentFactoryV2<?> previousFactory = specializedMap.get(type);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + (itemId == null ? "every item" : "item '" + itemId + "'") + ": " + factory + " and " + previousFactory);
         }
@@ -179,7 +179,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
             finalFactory = nonnullFactory;
         }
 
-        specializedMap.put(type.getId(), finalFactory);
+        specializedMap.put(type, finalFactory);
     }
 
     private final class PredicatedComponentFactory<C extends Component> {

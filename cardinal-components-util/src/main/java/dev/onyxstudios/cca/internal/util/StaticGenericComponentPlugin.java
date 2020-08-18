@@ -53,7 +53,7 @@ public final class StaticGenericComponentPlugin extends LazyDispatcher implement
         return "GenericImpl_" + CcaAsmHelper.getJavaIdentifierName(itemId);
     }
 
-    private final Map<Identifier, Map</*ComponentType*/Identifier, OwnedObject<?>>> componentFactories = new HashMap<>();
+    private final Map<Identifier, Map<ComponentKey<?>, OwnedObject<?>>> componentFactories = new HashMap<>();
     private final Set<Identifier> claimedFactories = new LinkedHashSet<>();
 
     private <I> Class<? extends ComponentContainer> spinComponentContainer(TypeToken<I> componentFactoryType, Identifier genericTypeId) throws IOException {
@@ -62,9 +62,9 @@ public final class StaticGenericComponentPlugin extends LazyDispatcher implement
         if (this.claimedFactories.contains(genericTypeId)) {
             throw new IllegalStateException("A component container factory for " + genericTypeId + " already exists.");
         }
-        Map<Identifier, OwnedObject<?>> componentFactories = this.componentFactories.getOrDefault(genericTypeId, Collections.emptyMap());
-        Map<Identifier, I> resolved = new LinkedHashMap<>();
-        for (Map.Entry<Identifier, OwnedObject<?>> entry : componentFactories.entrySet()) {
+        Map<ComponentKey<?>, OwnedObject<?>> componentFactories = this.componentFactories.getOrDefault(genericTypeId, Collections.emptyMap());
+        Map<ComponentKey<?>, I> resolved = new LinkedHashMap<>();
+        for (Map.Entry<ComponentKey<?>, OwnedObject<?>> entry : componentFactories.entrySet()) {
             Object object = entry.getValue().object;
             if (!componentFactoryType.isSupertypeOf(entry.getValue().type)) {
                 ModMetadata blamed = entry.getValue().owner.getMetadata();
@@ -102,12 +102,12 @@ public final class StaticGenericComponentPlugin extends LazyDispatcher implement
     @Override
     public <F> void register(ComponentKey<?> type, Identifier providerId, TypeToken<F> factoryType, F factory) {
         this.checkLoading(GenericComponentFactoryRegistry.class, "register");
-        Map<Identifier, OwnedObject<?>> specializedMap = this.componentFactories.computeIfAbsent(providerId, t -> new HashMap<>());
-        Object previousFactory = specializedMap.get(type.getId());
+        Map<ComponentKey<?>, OwnedObject<?>> specializedMap = this.componentFactories.computeIfAbsent(providerId, t -> new HashMap<>());
+        Object previousFactory = specializedMap.get(type);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on provider '" + providerId + "': " + factory + " and " + previousFactory);
         }
-        specializedMap.put(type.getId(), new OwnedObject<>(this.currentProvider, factoryType, factory));
+        specializedMap.put(type, new OwnedObject<>(this.currentProvider, factoryType, factory));
     }
 
     private static class OwnedObject<T> {

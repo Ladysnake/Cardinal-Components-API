@@ -25,7 +25,6 @@ package dev.onyxstudios.cca.internal.base.asm;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -56,7 +55,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher {
@@ -78,7 +76,7 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
     }
 
     private final Class<? super F> componentFactoryType;
-    private final Map<Identifier, F> componentFactories = new LinkedHashMap<>();
+    private final Map<ComponentKey<?>, F> componentFactories = new LinkedHashMap<>();
     protected final Class<T> providerClass;
     protected final String implSuffix;
     private Class<? extends DynamicContainerFactory<T>> containerFactoryClass;
@@ -94,7 +92,7 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
     @Deprecated
     @SuppressWarnings("unused")
     public static <I, C extends Component> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Class<? super C> componentClass, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
-        return spinComponentContainer(componentFactoryType, componentFactories, implNameSuffix);
+        return spinComponentContainer(componentFactoryType, componentFactories.entrySet().stream().collect(Collectors.toMap(entry -> ComponentRegistry.INSTANCE.get(entry.getKey()), Map.Entry::getValue)), implNameSuffix);
     }
 
     /**
@@ -112,7 +110,7 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
      * @return the generated container class
      */
     // TODO move to a publicly available builder
-    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
+    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, String implNameSuffix) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
 
         checkValidJavaIdentifier(implNameSuffix);
@@ -164,7 +162,8 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         init.visitVarInsn(Opcodes.ILOAD, 1);
         init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "<init>", FAST_COMPONENT_CONTAINER_CTOR_DESC, false);
 
-        for (Identifier identifier : componentFactories.keySet()) {
+        for (ComponentKey<?> key : componentFactories.keySet()) {
+            Identifier identifier = key.getId();
             String fieldName = CcaAsmHelper.getJavaIdentifierName(identifier);
             String factoryFieldName = getFactoryFieldName(identifier);
             /* field declaration */
@@ -235,17 +234,17 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         Class<? extends ComponentContainer> ret = CcaAsmHelper.generateClass(classNode).asSubclass(ComponentContainer.class);
 
         try {
-            // TODO properly initialize the static component key set
             Field keySet = ret.getDeclaredField("componentKeys");
             keySet.setAccessible(true);
-            keySet.set(null, new ReferenceArraySet<ComponentKey<?>>());
+            // TODO use a custom class with baked in immutability + BitSet contains + array iterator
+            keySet.set(null, Collections.unmodifiableSet(new ReferenceArraySet<>(componentFactories.keySet())));
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new StaticComponentLoadingException("Failed to initialize the set of component keys for " + ret, e);
         }
 
-        for (Map.Entry<Identifier, I> entry : componentFactories.entrySet()) {
+        for (Map.Entry<ComponentKey<?>, I> entry : componentFactories.entrySet()) {
             try {
-                Field factoryField = ret.getDeclaredField(getFactoryFieldName(entry.getKey()));
+                Field factoryField = ret.getDeclaredField(getFactoryFieldName(entry.getKey().getId()));
                 factoryField.setAccessible(true);
                 factoryField.set(null, entry.getValue());
             } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -256,7 +255,7 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
     }
 
     // TODO remove when dynamic components are gone
-    private static void generateLookupMethods(Set<Identifier> components, String containerImplName, ClassNode classNode, String componentFieldDescriptor) {
+    private static void generateLookupMethods(Set<ComponentKey<?>> components, String containerImplName, ClassNode classNode, String componentFieldDescriptor) {
         MethodVisitor canBeAssigned = classNode.visitMethod(Opcodes.ACC_PROTECTED, "canBeAssigned", CAN_BE_ASSIGNED_DESC, null, null);
         MethodVisitor get = classNode.visitMethod(Opcodes.ACC_PUBLIC, "get", CcaAsmHelper.COMPONENT_CONTAINER$GET_DESC, null, null);
         canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
@@ -272,8 +271,8 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         Label noAssign = new Label();
         Label defaultGetCase = new Label();
         Int2ObjectSortedMap<Identifier> raw2Id = components.stream().collect(Collectors.toMap(
-            ((ComponentRegistryImpl) ComponentRegistry.INSTANCE)::assignRawId,
-            Function.identity(), (r, r2) -> {
+            ComponentKey::getRawId,
+            ComponentKey::getId, (r, r2) -> {
                 throw new IllegalStateException("Duplicate key " + r + ", " + r2);
             }, Int2ObjectRBTreeMap::new
         ));
@@ -544,7 +543,13 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
 
     protected abstract void dispatchRegistration(I entrypoint);
 
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     protected void register(Identifier componentId, F factory) {
-        this.componentFactories.put(componentId, factory);
+        this.register(Objects.requireNonNull(ComponentRegistry.INSTANCE.get(componentId)), factory);
+    }
+
+    protected void register(ComponentKey<?> key, F factory) {
+        this.componentFactories.put(key, factory);
     }
 }

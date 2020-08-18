@@ -28,7 +28,6 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.util.NbtSerializable;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Unmodifiable;
@@ -105,7 +104,7 @@ public interface ComponentContainer extends NbtSerializable {
 
         private boolean built;
         private final Class<T> argClass;
-        private final Map<Identifier, Function<T, ? extends Component>> factories;
+        private final Map<ComponentKey<?>, Function<T, ? extends Component>> factories;
 
         FactoryBuilder(Class<T> argClass) {
             this.argClass = argClass;
@@ -113,7 +112,7 @@ public interface ComponentContainer extends NbtSerializable {
         }
 
         public <C extends Component> FactoryBuilder<T> component(ComponentKey<C> key, Function<T, ? extends C> factory) {
-            this.factories.put(key.getId(), factory);
+            this.factories.put(key, factory);
             return this;
         }
 

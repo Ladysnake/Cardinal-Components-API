@@ -35,6 +35,7 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnegative;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -125,8 +126,10 @@ public abstract class ComponentKey<C extends Component> {
 
     /* ------------ internal members ------------- */
 
-    private final Class<C> componentClass;
+
     private final Identifier id;
+    private final Class<C> componentClass;
+    private final int rawId;
 
     /**
      * Constructs a new immutable ComponentType
@@ -134,7 +137,8 @@ public abstract class ComponentKey<C extends Component> {
      * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
      */
     @ApiStatus.Internal
-    protected ComponentKey(Identifier id, Class<C> componentClass) {
+    protected ComponentKey(Identifier id, Class<C> componentClass, int rawId) {
+        this.rawId = rawId;
         if (!CcaBootstrap.INSTANCE.isGenerated(this.getClass())) throw new IllegalStateException();
         this.componentClass = componentClass;
         this.id = id;
@@ -150,6 +154,12 @@ public abstract class ComponentKey<C extends Component> {
     // overridden by generated types
     @ApiStatus.Internal
     public abstract @Nullable C getInternal(ComponentContainer container);
+
+    @Nonnegative
+    @ApiStatus.Internal
+    public final int getRawId() {
+        return this.rawId;
+    }
 
     @ApiStatus.Internal
     public C getFromContainer(ComponentContainer container) {
