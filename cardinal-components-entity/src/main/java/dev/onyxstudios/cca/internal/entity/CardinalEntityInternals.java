@@ -29,7 +29,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
@@ -41,6 +40,8 @@ import net.minecraft.entity.Entity;
 import java.util.*;
 
 public final class CardinalEntityInternals {
+
+    public static final RespawnCopyStrategy<Component> DEFAULT_COPY_STRATEGY = CardinalEntityInternals::defaultCopyStrategy;
 
     private CardinalEntityInternals() { throw new AssertionError(); }
 
@@ -102,13 +103,13 @@ public final class CardinalEntityInternals {
         }
     }
 
-    public static <C extends Component> void registerRespawnCopyStrat(ComponentType<C> type, RespawnCopyStrategy<? super C> strategy) {
+    public static <C extends Component> void registerRespawnCopyStrat(ComponentKey<? super C> type, RespawnCopyStrategy<? super C> strategy) {
         RESPAWN_COPY_STRATEGIES.put(type, strategy);
     }
 
     @SuppressWarnings("unchecked")
     public static <C extends Component> RespawnCopyStrategy<C> getRespawnCopyStrat(ComponentKey<C> type) {
-        return (RespawnCopyStrategy<C>) RESPAWN_COPY_STRATEGIES.getOrDefault(type, CardinalEntityInternals::defaultCopyStrategy);
+        return (RespawnCopyStrategy<C>) RESPAWN_COPY_STRATEGIES.getOrDefault(type, DEFAULT_COPY_STRATEGY);
     }
 
     private static void defaultCopyStrategy(Component from, Component to, boolean lossless, boolean keepInventory) {

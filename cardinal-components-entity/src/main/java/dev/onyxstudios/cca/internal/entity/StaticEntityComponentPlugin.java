@@ -33,8 +33,10 @@ import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 
 import java.io.IOException;
 import java.util.*;
@@ -105,7 +107,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     }
 
     @Override
-    public <C extends Component, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> type, EntityComponentFactory<C, E> factory) {
+    public <C extends Component, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> type, EntityComponentFactory<? extends C, E> factory) {
         this.checkLoading(EntityComponentFactoryRegistry.class, "register");
         this.register0(target, type, factory);
     }
@@ -115,14 +117,25 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         this.dynamicFactories.add(new PredicatedComponentFactory<>(test, type, factory));
     }
 
-    private <C extends Component, E extends Entity> void register0(Class<? extends E> target, ComponentKey<? super C> type, EntityComponentFactory<C, E> factory) {
+    @Override
+    public <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, EntityComponentFactory<P, PlayerEntity> factory) {
+        this.registerForPlayers(key, factory, CardinalEntityInternals.DEFAULT_COPY_STRATEGY);
+    }
+
+    @Override
+    public <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, EntityComponentFactory<P, PlayerEntity> factory, RespawnCopyStrategy<? super P> respawnStrategy) {
+        this.registerFor(PlayerEntity.class, key, factory);
+        CardinalEntityInternals.registerRespawnCopyStrat(key, respawnStrategy);
+    }
+
+    private <C extends Component, E extends Entity> void register0(Class<? extends E> target, ComponentKey<? super C> key, EntityComponentFactory<C, E> factory) {
         Map<ComponentKey<?>, EntityComponentFactory<?, ?>> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
-        EntityComponentFactory<?, ?> previousFactory = specializedMap.get(type);
+        EntityComponentFactory<?, ?> previousFactory = specializedMap.get(key);
         if (previousFactory != null) {
-            throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + target + ": " + factory + " and " + previousFactory);
+            throw new StaticComponentLoadingException("Duplicate factory declarations for " + key.getId() + " on " + target + ": " + factory + " and " + previousFactory);
         }
-        EntityComponentFactory<Component, E> checked = entity -> Objects.requireNonNull(((EntityComponentFactory<?, E>) factory).createForEntity(entity), "Component factory "+ factory + " for " + type.getId() + " returned null on " + target.getSimpleName());
-        specializedMap.put(type, checked);
+        EntityComponentFactory<Component, E> checked = entity -> Objects.requireNonNull(((EntityComponentFactory<?, E>) factory).createForEntity(entity), "Component factory "+ factory + " for " + key.getId() + " returned null on " + target.getSimpleName());
+        specializedMap.put(key, checked);
     }
 
     static class Key {
