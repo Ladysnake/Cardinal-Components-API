@@ -128,6 +128,11 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         CardinalEntityInternals.registerRespawnCopyStrat(key, respawnStrategy);
     }
 
+    @Override
+    public <C extends Component> void setRespawnCopyStrategy(ComponentKey<C> type, RespawnCopyStrategy<? super C> strategy) {
+        CardinalEntityInternals.registerRespawnCopyStrat(type, strategy);
+    }
+
     private <C extends Component, E extends Entity> void register0(Class<? extends E> target, ComponentKey<? super C> key, EntityComponentFactory<C, E> factory) {
         Map<ComponentKey<?>, EntityComponentFactory<?, ?>> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
         EntityComponentFactory<?, ?> previousFactory = specializedMap.get(key);

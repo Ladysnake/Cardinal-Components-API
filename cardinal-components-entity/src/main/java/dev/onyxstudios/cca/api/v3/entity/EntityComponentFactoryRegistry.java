@@ -24,6 +24,7 @@ package dev.onyxstudios.cca.api.v3.entity;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -83,5 +84,21 @@ public interface EntityComponentFactoryRegistry {
      * @since 2.5.1
      */
     <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, EntityComponentFactory<P, PlayerEntity> factory, RespawnCopyStrategy<? super P> respawnStrategy);
+
+    /**
+     * Set the respawn copy strategy used for components of a given type.
+     *
+     * <p> When a player is cloned as part of the respawn process, its components are copied using
+     * a {@link RespawnCopyStrategy}. By default, the strategy used is {@link RespawnCopyStrategy#LOSSLESS_ONLY}.
+     * Calling this method allows one to customize the copy process.
+     *
+     * @param key      the representation of the registered type
+     * @param strategy a copy strategy to use when copying components between player instances
+     * @param <C>      the type of components affected
+     *
+     * @see PlayerCopyCallback
+     */
+    @ApiStatus.Experimental
+    <C extends Component> void setRespawnCopyStrategy(ComponentKey<C> key, RespawnCopyStrategy<? super C> strategy);
 
 }
