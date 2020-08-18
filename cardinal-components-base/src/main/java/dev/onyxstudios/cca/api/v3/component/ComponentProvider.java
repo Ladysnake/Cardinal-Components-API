@@ -118,7 +118,7 @@ public interface ComponentProvider {
      */
     @ApiStatus.Experimental
     @Nullable   // TODO mark NonNull when dynamic containers are gone
-    ComponentContainer<?> getComponentContainer();
+    ComponentContainer getComponentContainer();
 
     default Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
         return Collections.emptyIterator();

@@ -26,7 +26,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
 import dev.onyxstudios.cca.internal.item.ItemComponentContainerFactory;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;
 import net.fabricmc.fabric.api.event.Event;
@@ -52,7 +51,7 @@ public abstract class MixinItem implements ItemCaller {
     }
 
     @Override
-    public ComponentContainer<CopyableComponent<?>> cardinal_createComponents(ItemStack stack) {
+    public ComponentContainer cardinal_createComponents(ItemStack stack) {
         // assert stack.getItem() == this;
         if (this.cardinal_containerFactory == null) {
             this.cardinal_containerFactory = CardinalItemInternals.createItemStackContainerFactory((Item) (Object) this);

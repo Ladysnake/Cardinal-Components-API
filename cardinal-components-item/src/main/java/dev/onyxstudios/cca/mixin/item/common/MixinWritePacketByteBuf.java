@@ -39,7 +39,7 @@ public abstract class MixinWritePacketByteBuf {
     @Nullable
     @ModifyVariable(method = "writeItemStack(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/network/PacketByteBuf;", at = @At(value = "LOAD"))
     private CompoundTag writeItemStack(@Nullable CompoundTag tag, ItemStack stack) {
-        ComponentContainer<?> componentContainer = InternalStackComponentProvider.get(stack).getComponentContainer();
+        ComponentContainer componentContainer = InternalStackComponentProvider.get(stack).getComponentContainer();
 
         if (componentContainer.keys().isEmpty()) {
             return tag;

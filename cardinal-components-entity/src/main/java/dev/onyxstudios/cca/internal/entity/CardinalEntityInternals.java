@@ -45,7 +45,7 @@ public final class CardinalEntityInternals {
     private CardinalEntityInternals() { throw new AssertionError(); }
 
     private static final Map<Class<? extends Entity>, Event<?>> ENTITY_EVENTS = Collections.synchronizedMap(new HashMap<>());
-    private static final Map<Class<? extends Entity>, DynamicContainerFactory<Entity, Component>> entityContainerFactories = new HashMap<>();
+    private static final Map<Class<? extends Entity>, DynamicContainerFactory<Entity>> entityContainerFactories = new HashMap<>();
     private static final Map<ComponentKey<?>, RespawnCopyStrategy<?>> RESPAWN_COPY_STRATEGIES = new HashMap<>();
     private static final Object factoryMutex = new Object();
 
@@ -72,9 +72,9 @@ public final class CardinalEntityInternals {
      * and every superclass, in order from least specific (Entity) to most specific ({@code clazz}).
      */
     @SuppressWarnings("unchecked")
-    public static ComponentContainer<?> createEntityComponentContainer(Entity entity) {
+    public static ComponentContainer createEntityComponentContainer(Entity entity) {
         Class<? extends Entity> entityClass = entity.getClass();
-        DynamicContainerFactory<Entity, Component> existing = entityContainerFactories.get(entityClass);
+        DynamicContainerFactory<Entity> existing = entityContainerFactories.get(entityClass);
 
         if (existing != null) {
             return existing.create(entity);
@@ -95,7 +95,7 @@ public final class CardinalEntityInternals {
                     c = (Class<? extends Entity>) c.getSuperclass();
                 }
                 assert parentWithStaticComponents != null;
-                Class<? extends DynamicContainerFactory<Entity,Component>> factoryClass = (Class<? extends DynamicContainerFactory<Entity, Component>>) StaticEntityComponentPlugin.INSTANCE.spinDedicatedFactory(new StaticEntityComponentPlugin.Key(events.size(), parentWithStaticComponents));
+                Class<? extends DynamicContainerFactory<Entity>> factoryClass = (Class<? extends DynamicContainerFactory<Entity>>) StaticEntityComponentPlugin.INSTANCE.spinDedicatedFactory(new StaticEntityComponentPlugin.Key(events.size(), parentWithStaticComponents));
 
                 return ComponentsInternals.createFactory(factoryClass, Lists.reverse(events).toArray(new Event[0]));
             }).create(entity);

@@ -149,11 +149,11 @@ public abstract class ComponentKey<C extends Component> {
      */
     // overridden by generated types
     @ApiStatus.Internal
-    public abstract @Nullable C getInternal(ComponentContainer<?> container);
+    public abstract @Nullable C getInternal(ComponentContainer container);
 
     @ApiStatus.Internal
-    public <D extends Component> D getFromContainer(ComponentContainer<D> container) {
-        return Objects.requireNonNull(container.getComponentClass().cast(this.getInternal(container)));
+    public C getFromContainer(ComponentContainer container) {
+        return Objects.requireNonNull(this.getInternal(container));
     }
 
     @ApiStatus.Internal

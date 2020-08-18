@@ -73,7 +73,7 @@ public class SimpleComponentProvider implements ComponentProvider {
 
     @Nullable
     @Override
-    public dev.onyxstudios.cca.api.v3.component.ComponentContainer<?> getComponentContainer() {
+    public dev.onyxstudios.cca.api.v3.component.ComponentContainer getComponentContainer() {
         return this.backing;
     }
 }

@@ -110,7 +110,7 @@ public interface ComponentProvider extends dev.onyxstudios.cca.api.v3.component.
 
     @Nullable
     @Override
-    default ComponentContainer<?> getComponentContainer() {
+    default ComponentContainer getComponentContainer() {
         return null;
     }
 }

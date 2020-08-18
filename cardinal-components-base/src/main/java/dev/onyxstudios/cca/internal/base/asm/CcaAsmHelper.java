@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.internal.base.asm;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
@@ -55,7 +54,6 @@ public final class CcaAsmHelper {
     public static final String COMPONENT = Type.getInternalName(Component.class);
     public static final String COMPONENT_CONTAINER = Type.getInternalName(ComponentContainer.class);
     public static final String COMPONENT_TYPE = Type.getInternalName(ComponentType.class);
-    public static final String COMPONENT_PROVIDER = Type.getInternalName(ComponentProvider.class);
     public static final String DYNAMIC_COMPONENT_CONTAINER_IMPL = Type.getInternalName(FastComponentContainer.class);
     public static final String IDENTIFIER = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960").replace('.', '/');
     public static final String EVENT = Type.getInternalName(Event.class);

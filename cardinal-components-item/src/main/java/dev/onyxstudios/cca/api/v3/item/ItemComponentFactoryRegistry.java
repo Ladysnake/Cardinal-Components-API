@@ -23,7 +23,7 @@
 package dev.onyxstudios.cca.api.v3.item;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
@@ -42,7 +42,7 @@ public interface ItemComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends CopyableComponent<?>> void registerFor(Identifier itemId, ComponentKey<? super C> type, ItemComponentFactory<C> factory);
+    <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ItemComponentFactory<? extends C> factory);
 
     /**
      * Registers an {@link ItemComponentFactoryV2} for stacks of a specific item.
@@ -51,7 +51,7 @@ public interface ItemComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends CopyableComponent<?>> void registerFor(Identifier itemId, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory);
+    <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory);
 
     /**
      * Registers an {@link ItemComponentFactoryV2} for stacks of specific items, based on a predicate.
@@ -60,7 +60,7 @@ public interface ItemComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends CopyableComponent<?>> void registerFor(Predicate<Item> test, ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory);
+    <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory);
 
     /**
      * Registers an {@link ItemComponentFactory} for every item.
@@ -74,7 +74,7 @@ public interface ItemComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends CopyableComponent<?>> void registerForAll(ComponentKey<? super C> type, ItemComponentFactory<C> factory);
+    <C extends Component> void registerForAll(ComponentKey<C> type, ItemComponentFactory<? extends C> factory);
 
     /**
      * Registers an {@link ItemComponentFactoryV2} for every item.
@@ -88,5 +88,5 @@ public interface ItemComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends CopyableComponent<?>> void registerForAll(ComponentKey<? super C> type, ItemComponentFactoryV2<C> factory);
+    <C extends Component> void registerForAll(ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory);
 }

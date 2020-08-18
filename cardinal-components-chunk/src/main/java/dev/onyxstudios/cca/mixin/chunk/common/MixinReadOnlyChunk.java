@@ -45,7 +45,7 @@ public abstract class MixinReadOnlyChunk extends ProtoChunk implements InternalC
 
     @Nonnull
     @Override
-    public ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return ((InternalComponentProvider) this.wrapped).getComponentContainer();
     }
 }

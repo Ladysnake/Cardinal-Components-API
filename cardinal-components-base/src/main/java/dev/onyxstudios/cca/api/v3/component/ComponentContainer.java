@@ -25,7 +25,9 @@ package dev.onyxstudios.cca.api.v3.component;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.util.NbtSerializable;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -41,21 +43,12 @@ import java.util.function.Function;
 /**
  * An opaque container for components.
  *
- * <p>Component values obey 2 constraints.
- * <ul>
- *     <li>Every component in a {@code ComponentContainer<C>} is an instance of {@code C}</li>
- *     <li>A component mapped to a {@code ComponentType<T>} is also an instance of {@code T}</li>
- * </ul>
- * Both type constraints should generally be interfaces, to allow multiple inheritance.<br><br>
- *
- * <p>{@code ComponentContainer}s are <em>unmodifiable</em>. After initialization, no component
+ * <p>{@code ComponentContainer}s are <strong>unmodifiable</strong>. After initialization, no component
  * can be added, replaced, or deleted. Component instances themselves can be mutated by third parties.
- *
- * @param <C> The upper bound for components stored in this container
  */
 @ApiStatus.NonExtendable
 @ApiStatus.Experimental
-public interface ComponentContainer<C extends Component> extends NbtSerializable {
+public interface ComponentContainer extends NbtSerializable {
 
     /**
      * Create a builder to configure a {@link ComponentContainer} factory.
@@ -78,13 +71,8 @@ public interface ComponentContainer<C extends Component> extends NbtSerializable
      * @return a new container factory builder
      */
     @Contract(value = "_ -> new", pure = true)
-    static <T> FactoryBuilder<T, Component> factoryBuilder(Class<T> singleArgClass) {
-        return factoryBuilder(singleArgClass, Component.class);
-    }
-
-    @Contract(value = "_,_ -> new", pure = true)
-    static <T, C extends Component> FactoryBuilder<T, C> factoryBuilder(Class<T> singleArgClass, Class<C> storedComponentClass) {
-        return new FactoryBuilder<>(singleArgClass, storedComponentClass);
+    static <T> FactoryBuilder<T> factoryBuilder(Class<T> singleArgClass) {
+        return new FactoryBuilder<>(singleArgClass);
     }
 
     @Unmodifiable
@@ -92,40 +80,53 @@ public interface ComponentContainer<C extends Component> extends NbtSerializable
 
     boolean hasComponents();
 
-    Class<C> getComponentClass();
+    default void copyFrom(ComponentContainer other) {
+        for (ComponentKey<?> key : this.keys()) {
+            Component theirs = key.getInternal(other);
+            Component ours = key.getInternal(this);
+            assert ours != null;
+
+            if (theirs != null && !ours.equals(theirs)) {
+                if (ours instanceof CopyableComponent) {
+                    @SuppressWarnings("unchecked") CopyableComponent<Component> copyable = (CopyableComponent<Component>) ours;
+                    copyable.copyFrom(theirs);
+                } else {
+                    ours.fromTag(theirs.toTag(new CompoundTag()));
+                }
+            }
+        }
+    }
 
     /**
      * @param <T> the type of the resulting factory's single argument
-     * @param <C> the common supertype of all components in the container.
      */
-    final class FactoryBuilder<T, C extends Component> {
+    final class FactoryBuilder<T> {
         private static int counter;
 
         private boolean built;
         private final Class<T> argClass;
-        private final Class<? super C> storedComponentType;
-        private final Map<Identifier, Function<T, ? extends C>> factories;
+        private final Map<Identifier, Function<T, ? extends Component>> factories;
 
-        public FactoryBuilder(Class<T> argClass, Class<C> storedComponentType) {
+        FactoryBuilder(Class<T> argClass) {
             this.argClass = argClass;
-            this.storedComponentType = storedComponentType;
             this.factories = new HashMap<>();
         }
 
-        public <D extends C> FactoryBuilder<T, C> component(ComponentKey<? super D> key, Function<T, D> factory) {
+        public <C extends Component> FactoryBuilder<T> component(ComponentKey<C> key, Function<T, ? extends C> factory) {
             this.factories.put(key.getId(), factory);
             return this;
         }
 
-        public Function<T, ComponentContainer<C>> build() {
+        public Function<T, ComponentContainer> build() {
             if (this.built) throw new IllegalStateException("Cannot build more than one container factory with the same builder");
+
             try {
                 this.built = true;
                 String implNameSuffix = "Custom$" + counter++;
-                Class<? extends ComponentContainer<C>> containerClass = StaticComponentPluginBase.spinComponentContainer(
-                    Function.class, this.storedComponentType, this.factories, implNameSuffix
+                Class<? extends ComponentContainer> containerClass = StaticComponentPluginBase.spinComponentContainer(
+                    Function.class, this.factories, implNameSuffix
                 );
-                Class<? extends Function<T, ComponentContainer<C>>> factoryClass = StaticComponentPluginBase.spinContainerFactory(
+                Class<? extends Function<T, ComponentContainer>> factoryClass = StaticComponentPluginBase.spinContainerFactory(
                     implNameSuffix, Function.class, containerClass, null, 0, this.argClass
                 );
                 return ComponentsInternals.createFactory(factoryClass);

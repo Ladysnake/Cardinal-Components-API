@@ -31,7 +31,6 @@ import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
@@ -57,7 +56,7 @@ public final class StaticGenericComponentPlugin extends LazyDispatcher implement
     private final Map<Identifier, Map</*ComponentType*/Identifier, OwnedObject<?>>> componentFactories = new HashMap<>();
     private final Set<Identifier> claimedFactories = new LinkedHashSet<>();
 
-    private <I> Class<? extends ComponentContainer<?>> spinComponentContainer(TypeToken<I> componentFactoryType, Identifier genericTypeId) throws IOException {
+    private <I> Class<? extends ComponentContainer> spinComponentContainer(TypeToken<I> componentFactoryType, Identifier genericTypeId) throws IOException {
         this.ensureInitialized();
 
         if (this.claimedFactories.contains(genericTypeId)) {
@@ -74,14 +73,14 @@ public final class StaticGenericComponentPlugin extends LazyDispatcher implement
             @SuppressWarnings("unchecked") I i = (I) object;
             resolved.put(entry.getKey(), i);
         }
-        Class<? extends ComponentContainer<?>> containerClass = StaticComponentPluginBase.spinComponentContainer(componentFactoryType.getRawType(), Component.class, resolved, getSuffix(genericTypeId));
+        Class<? extends ComponentContainer> containerClass = StaticComponentPluginBase.spinComponentContainer(componentFactoryType.getRawType(), resolved, getSuffix(genericTypeId));
         this.claimedFactories.add(genericTypeId);
         return containerClass;
     }
 
     <R> Class<? extends R> spinSingleArgContainerFactory(TypeToken<?> componentFactoryType, Identifier genericProviderId, Class<? super R> containerFactoryType, @Nullable Class<?> componentCallbackType, int eventCount, Class<?>[] actualFactoryArgs) throws IOException {
         this.ensureInitialized();
-        Class<? extends ComponentContainer<?>> containerClass = this.spinComponentContainer(componentFactoryType, genericProviderId);
+        Class<? extends ComponentContainer> containerClass = this.spinComponentContainer(componentFactoryType, genericProviderId);
         return StaticComponentPluginBase.spinContainerFactory(getSuffix(genericProviderId), containerFactoryType, containerClass, componentCallbackType, eventCount, actualFactoryArgs);
     }
 

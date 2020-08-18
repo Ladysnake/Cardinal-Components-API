@@ -30,7 +30,6 @@ import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking;
 import dev.onyxstudios.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
-import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -51,10 +50,10 @@ import java.util.Iterator;
 @Mixin(Scoreboard.class)
 public abstract class MixinScoreboard implements InternalComponentProvider {
     @Unique
-    private static final Lazy<DynamicContainerFactory<Scoreboard, Component>> componentsContainerFactory
+    private static final Lazy<DynamicContainerFactory<Scoreboard>> componentsContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticScoreboardComponentPlugin.INSTANCE.getContainerFactoryClass()));
     @Unique
-    private ComponentContainer<Component> components;
+    private ComponentContainer components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
@@ -63,7 +62,7 @@ public abstract class MixinScoreboard implements InternalComponentProvider {
 
     @Nonnull
     @Override
-    public ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return this.components;
     }
 

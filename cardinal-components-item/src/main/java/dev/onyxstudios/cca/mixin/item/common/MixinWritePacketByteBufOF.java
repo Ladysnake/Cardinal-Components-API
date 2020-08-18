@@ -36,7 +36,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public abstract class MixinWritePacketByteBufOF {
     @ModifyVariable(method = "writeItemStack", at = @At("HEAD"), argsOnly = true)
     private ItemStack writeItemStackOptifine(ItemStack stack) {
-        ComponentContainer<?> componentContainer = InternalStackComponentProvider.get(stack).getComponentContainer();
+        ComponentContainer componentContainer = InternalStackComponentProvider.get(stack).getComponentContainer();
 
         if (!componentContainer.keys().isEmpty()) {
             ItemStack copy = stack.copy();

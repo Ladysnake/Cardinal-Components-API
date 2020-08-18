@@ -27,7 +27,6 @@ import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.LevelComponentCallback;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.Lazy;
@@ -45,10 +44,10 @@ import javax.annotation.Nonnull;
 @Mixin(ClientWorld.Properties.class)
 public abstract class MixinClientWorldProperties implements MutableWorldProperties, InternalComponentProvider {
     @Unique
-    private static final Lazy<DynamicContainerFactory<WorldProperties,Component>> componentContainerFactory
+    private static final Lazy<DynamicContainerFactory<WorldProperties>> componentContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getContainerFactoryClass(), LevelComponentCallback.EVENT));
     @Unique
-    private ComponentContainer<?> components;
+    private ComponentContainer components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(Difficulty difficulty, boolean hardcore, boolean flatWorld, CallbackInfo ci) {
@@ -57,7 +56,7 @@ public abstract class MixinClientWorldProperties implements MutableWorldProperti
 
     @Nonnull
     @Override
-    public ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return this.components;
     }
 }

@@ -28,7 +28,7 @@ import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.world.chunk.Chunk;
@@ -56,13 +56,12 @@ public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<
     }
 
     @Override
-    public Class<? extends DynamicContainerFactory<Chunk, CopyableComponent<?>>> getContainerFactoryClass() {
-        @SuppressWarnings("unchecked") Class<? extends DynamicContainerFactory<Chunk, CopyableComponent<?>>> ret = (Class<? extends DynamicContainerFactory<Chunk, CopyableComponent<?>>>) super.getContainerFactoryClass();
-        return ret;
+    public Class<? extends DynamicContainerFactory<Chunk>> getContainerFactoryClass() {
+        return super.getContainerFactoryClass();
     }
 
     @Override
-    public <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, ChunkComponentFactory<C> factory) {
+    public <C extends Component> void register(ComponentKey<C> type, ChunkComponentFactory<? extends C> factory) {
         this.checkLoading(ChunkComponentFactoryRegistry.class, "register");
         super.register(type.getId(), (chunk) -> Objects.requireNonNull(((ChunkComponentFactory<?>) factory).createForChunk(chunk), "Component factory "+ factory + " for " + type.getId() + " returned null on " + chunk.getClass().getSimpleName()));
     }
