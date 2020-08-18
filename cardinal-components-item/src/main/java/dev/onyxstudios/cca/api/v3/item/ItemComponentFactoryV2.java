@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.api.v3.item;
 
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
@@ -40,7 +39,7 @@ import javax.annotation.Nonnull;
  */
 @ApiStatus.Experimental
 @FunctionalInterface
-public interface ItemComponentFactoryV2<C extends CopyableComponent<?>> {
+public interface ItemComponentFactoryV2<C extends Component> {
     /**
      * Initialize components for the given stack.
      *

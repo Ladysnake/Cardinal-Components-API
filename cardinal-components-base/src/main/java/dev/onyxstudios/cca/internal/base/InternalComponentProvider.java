@@ -61,5 +61,5 @@ public interface InternalComponentProvider extends ComponentProvider, nerdhub.ca
 
     @Override
     @Nonnull
-    ComponentContainer<?> getComponentContainer();
+    ComponentContainer getComponentContainer();
 }

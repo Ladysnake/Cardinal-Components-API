@@ -42,7 +42,7 @@ public interface CopyableComponent<C extends Component> extends TypeAwareCompone
      * between implementations, and is generally slower than a direct copy.
      * Implementing classes can nearly always provide a better implementation.
      */
-    default void copyFrom(C other) {
+    default void copyFrom(C other) {    // TODO 3.0 make abstract as the interface is no longer mandatory
         this.fromTag(other.toTag(new CompoundTag()));
     }
 }

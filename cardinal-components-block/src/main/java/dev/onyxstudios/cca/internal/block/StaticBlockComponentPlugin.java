@@ -56,7 +56,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     private Map<ComponentKey<?>, BlockComponentProvider<?>> wildcard;
     private final Map<Identifier, Map<ComponentKey<?>, BlockComponentProvider<?>>> blockComponentFactories = new HashMap<>();
     private final Map<Class<? extends BlockEntity>, Map</*ComponentType*/Identifier, BlockEntityComponentFactory<?, ?>>> beComponentFactories = new Reference2ObjectOpenHashMap<>();
-    private final Map<Class<? extends BlockEntity>, Class<? extends DynamicContainerFactory<BlockEntity, Component>>> factoryClasses = new Reference2ObjectOpenHashMap<>();
+    private final Map<Class<? extends BlockEntity>, Class<? extends DynamicContainerFactory<BlockEntity>>> factoryClasses = new Reference2ObjectOpenHashMap<>();
 
     public Map<ComponentKey<?>, BlockComponentProvider<?>> getComponentFactories(Identifier blockId) {
         this.ensureInitialized();
@@ -69,7 +69,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         return entityClass == BlockEntity.class || this.beComponentFactories.containsKey(entityClass);
     }
 
-    public Class<? extends DynamicContainerFactory<BlockEntity, Component>> spinDedicatedFactory(Class<? extends BlockEntity> key) {
+    public Class<? extends DynamicContainerFactory<BlockEntity>> spinDedicatedFactory(Class<? extends BlockEntity> key) {
         StaticBlockComponentPlugin.INSTANCE.ensureInitialized();
 
         // we need a cache as this method is called for a given class each time one of its subclasses is loaded.
@@ -86,7 +86,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
             String implSuffix = getSuffix(entityClass);
 
             try {
-                Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.spinComponentContainer(BlockEntityComponentFactory.class, Component.class, compiled, implSuffix);
+                Class<? extends ComponentContainer> containerCls = StaticComponentPluginBase.spinComponentContainer(BlockEntityComponentFactory.class, compiled, implSuffix);
 
                 return StaticComponentPluginBase.spinContainerFactory(
                     implSuffix,

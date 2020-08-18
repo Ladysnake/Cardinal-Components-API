@@ -41,6 +41,7 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -61,7 +62,6 @@ import java.util.stream.Collectors;
 public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher {
     private static final String FAST_COMPONENT_CONTAINER_CTOR_DESC;
     private static final String CAN_BE_ASSIGNED_DESC;
-    private static final String GET_COMPONENT_CLASS_DESC;
 
     private static final String EVENT_DESC = Type.getDescriptor(Event.class);
     private static final String EVENT$INVOKER_DESC;
@@ -72,7 +72,6 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
             FAST_COMPONENT_CONTAINER_CTOR_DESC = Type.getConstructorDescriptor(FastComponentContainer.class.getConstructor(int.class));
             CAN_BE_ASSIGNED_DESC = Type.getMethodDescriptor(FastComponentContainer.class.getDeclaredMethod("canBeAssigned", ComponentType.class));
             EVENT$INVOKER_DESC = Type.getMethodDescriptor(Event.class.getMethod("invoker"));
-            GET_COMPONENT_CLASS_DESC = Type.getMethodDescriptor(ComponentContainer.class.getMethod("getComponentClass"));
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException("Failed to find one or more method descriptors", e);
         }
@@ -82,13 +81,20 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
     private final Map<Identifier, F> componentFactories = new LinkedHashMap<>();
     protected final Class<T> providerClass;
     protected final String implSuffix;
-    private Class<? extends DynamicContainerFactory<T, ?>> containerFactoryClass;
+    private Class<? extends DynamicContainerFactory<T>> containerFactoryClass;
 
     protected StaticComponentPluginBase(String likelyInitTrigger, Class<T> providerClass, Class<? super F> componentFactoryType, String implSuffix) {
         super(likelyInitTrigger);
         this.componentFactoryType = componentFactoryType;
         this.providerClass = providerClass;
         this.implSuffix = implSuffix;
+    }
+
+    @ApiStatus.ScheduledForRemoval
+    @Deprecated
+    @SuppressWarnings("unused")
+    public static <I, C extends Component> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Class<? super C> componentClass, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
+        return spinComponentContainer(componentFactoryType, componentFactories, implNameSuffix);
     }
 
     /**
@@ -101,13 +107,12 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
      * constructors. That number corresponds to the expected dynamic size of the container (see {@link FastComponentContainer}).
      *
      * @param componentFactoryType the interface implemented by the component factories used to initialize this container
-     * @param componentClass       the supertype of contained components
      * @param componentFactories   a map of {@link ComponentType} ids to factories for components of that type
      * @param implNameSuffix       a unique suffix for the generated class
      * @return the generated container class
      */
     // TODO move to a publicly available builder
-    public static <I, C extends Component> Class<? extends ComponentContainer<C>> spinComponentContainer(Class<? super I> componentFactoryType, Class<? super C> componentClass, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
+    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
 
         checkValidJavaIdentifier(implNameSuffix);
@@ -144,12 +149,6 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         keySet.visitInsn(Opcodes.ARETURN);
         keySet.visitEnd();
 */
-
-        MethodVisitor getComponentClass = classNode.visitMethod(Opcodes.ACC_PUBLIC, "getComponentClass", GET_COMPONENT_CLASS_DESC, null, null);
-        getComponentClass.visitCode();
-        getComponentClass.visitLdcInsn(Type.getType(componentClass));
-        getComponentClass.visitInsn(Opcodes.ARETURN);
-        getComponentClass.visitEnd();
 
 /*      TODO V3 enable empty check optimization when dynamic components are no more
         MethodVisitor hasComponents = classNode.visitMethod(Opcodes.ACC_PUBLIC, "hasComponents", "()Z", null, null);
@@ -233,7 +232,7 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
             generateLookupMethods(componentFactories.keySet(), containerImplName, classNode, componentFieldDescriptor);
         }
 
-        @SuppressWarnings("unchecked") Class<? extends ComponentContainer<C>> ret = (Class<? extends ComponentContainer<C>>) CcaAsmHelper.generateClass(classNode);
+        Class<? extends ComponentContainer> ret = CcaAsmHelper.generateClass(classNode).asSubclass(ComponentContainer.class);
 
         try {
             // TODO properly initialize the static component key set
@@ -334,7 +333,7 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
      * @param containerImpl        the type of containers that is to be instantiated by the generated factory
      * @param actualFactoryParams  the actual type of the arguments taken by the {@link ComponentContainer} constructor
      */
-    public static <I> Class<? extends I> spinContainerFactory(String implNameSuffix, Class<? super I> containerFactoryType, Class<? extends ComponentContainer<?>> containerImpl, @Nullable Class<?> componentCallbackType, int eventCount, Class<?>... actualFactoryParams) throws IOException {
+    public static <I> Class<? extends I> spinContainerFactory(String implNameSuffix, Class<? super I> containerFactoryType, Class<? extends ComponentContainer> containerImpl, @Nullable Class<?> componentCallbackType, int eventCount, Class<?>... actualFactoryParams) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
 
         checkValidJavaIdentifier(implNameSuffix);
@@ -492,16 +491,23 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         method.visitFieldInsn(Opcodes.GETFIELD, containerImplName, fieldName, fieldDescriptor);
     }
 
-    public static <C extends Component> ComponentContainer<C> createEmptyContainer(Class<? super C> componentClass, String implSuffix) {
+    public static ComponentContainer createEmptyContainer(String implSuffix) {
         try {
-            Class<? extends ComponentContainer<C>> containerCls = spinComponentContainer(Runnable.class, componentClass, Collections.emptyMap(), implSuffix);
+            Class<? extends ComponentContainer> containerCls = spinComponentContainer(Runnable.class, Collections.emptyMap(), implSuffix);
             return containerCls.getConstructor(int.class).newInstance(0);
         } catch (IOException | ReflectiveOperationException e) {
             throw new StaticComponentLoadingException("Failed to generate empty component container", e);
         }
     }
 
-    public Class<? extends DynamicContainerFactory<T, ?>> getContainerFactoryClass() {
+    @SuppressWarnings("unused")
+    @ApiStatus.ScheduledForRemoval
+    @Deprecated
+    public static <C extends Component> ComponentContainer createEmptyContainer(Class<? super C> componentClass, String implSuffix) {
+        return createEmptyContainer(implSuffix);
+    }
+
+    public Class<? extends DynamicContainerFactory<T>> getContainerFactoryClass() {
         this.ensureInitialized();
 
         return this.containerFactoryClass;
@@ -512,14 +518,14 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         processInitializers(this.getEntrypoints(), this::dispatchRegistration);
 
         try {
-            Class<? extends ComponentContainer<?>> containerCls = spinComponentContainer(this.componentFactoryType, Component.class, this.componentFactories, this.implSuffix);
+            Class<? extends ComponentContainer> containerCls = spinComponentContainer(this.componentFactoryType, this.componentFactories, this.implSuffix);
             this.containerFactoryClass = this.spinContainerFactory(containerCls);
         } catch (IOException e) {
             throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + this.providerClass, e);
         }
     }
 
-    protected Class<? extends DynamicContainerFactory<T, ?>> spinContainerFactory(Class<? extends ComponentContainer<?>> containerCls) throws IOException {
+    protected Class<? extends DynamicContainerFactory<T>> spinContainerFactory(Class<? extends ComponentContainer> containerCls) throws IOException {
         return spinContainerFactory(this.implSuffix, DynamicContainerFactory.class, containerCls, ComponentCallback.class, 1, this.providerClass);
     }
 

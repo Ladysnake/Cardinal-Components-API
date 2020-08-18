@@ -64,7 +64,7 @@ public abstract class MixinBlockEntity implements InternalComponentProvider {
     public abstract BlockEntityType<?> getType();
 
     @Unique
-    private ComponentContainer<?> components;
+    private ComponentContainer components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(BlockEntityType<?> type, CallbackInfo ci) {
@@ -83,7 +83,7 @@ public abstract class MixinBlockEntity implements InternalComponentProvider {
 
     @Nonnull
     @Override
-    public ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return this.components;
     }
 

@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.internal.item;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;
 import net.fabricmc.fabric.api.event.Event;
@@ -33,5 +32,5 @@ public interface ItemCaller {
 	Event<ItemComponentCallback> cardinal_getItemComponentEvent();
 	Event<ItemComponentCallbackV2> cardinal_getItemComponentEventV2();
 
-	ComponentContainer<CopyableComponent<?>> cardinal_createComponents(ItemStack stack);
+	ComponentContainer cardinal_createComponents(ItemStack stack);
 }

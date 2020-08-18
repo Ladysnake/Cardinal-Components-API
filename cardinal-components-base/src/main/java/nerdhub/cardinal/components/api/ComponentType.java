@@ -68,13 +68,13 @@ public class ComponentType<T extends Component> extends ComponentKey<T> {
 
     @Nullable
     @Override
-    public T getInternal(ComponentContainer<?> container) {
+    public T getInternal(ComponentContainer container) {
         return ((nerdhub.cardinal.components.api.component.ComponentContainer<?>) container).get(this);
     }
 
     @Nullable
     private T getInternal(ComponentProvider provider) {
-        ComponentContainer<?> container = provider.getComponentContainer();
+        ComponentContainer container = provider.getComponentContainer();
 
         if (container != null) {
             return this.getInternal(container);

@@ -53,7 +53,7 @@ import java.util.Iterator;
 @Mixin(Entity.class)
 public abstract class MixinEntity implements InternalComponentProvider {
     @Unique
-    private ComponentContainer<?> components;
+    private ComponentContainer components;
 
     @Shadow
     public abstract EntityType<?> getType();
@@ -81,7 +81,7 @@ public abstract class MixinEntity implements InternalComponentProvider {
 
     @Nonnull
     @Override
-    public ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return this.components;
     }
 

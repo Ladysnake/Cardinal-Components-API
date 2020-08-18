@@ -55,15 +55,15 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     }
 
     private final Map<Class<? extends Entity>, Map</*ComponentType*/Identifier, EntityComponentFactory<?, ?>>> componentFactories = new HashMap<>();
-    private final Map<Class<? extends Entity>, Class<? extends ComponentContainer<?>>> containerClasses = new HashMap<>();
-    private final Map<Key, Class<? extends DynamicContainerFactory<?,?>>> factoryClasses = new HashMap<>();
+    private final Map<Class<? extends Entity>, Class<? extends ComponentContainer>> containerClasses = new HashMap<>();
+    private final Map<Key, Class<? extends DynamicContainerFactory<?>>> factoryClasses = new HashMap<>();
 
     public boolean requiresStaticFactory(Class<? extends Entity> entityClass) {
         this.ensureInitialized();
         return entityClass == Entity.class || this.componentFactories.containsKey(entityClass);
     }
 
-    public Class<? extends DynamicContainerFactory<?,? extends Component>> spinDedicatedFactory(Key key) {
+    public Class<? extends DynamicContainerFactory<?>> spinDedicatedFactory(Key key) {
         this.ensureInitialized();
 
         // we need a cache as this method is called for a given class each time one of its subclasses is loaded.
@@ -85,9 +85,9 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
             String implSuffix = getSuffix(entityClass);
 
             try {
-                Class<? extends ComponentContainer<?>> containerCls = this.containerClasses.get(entityClass);
+                Class<? extends ComponentContainer> containerCls = this.containerClasses.get(entityClass);
                 if (containerCls == null) {
-                    containerCls = StaticComponentPluginBase.spinComponentContainer(EntityComponentFactory.class, Component.class, compiled, implSuffix);
+                    containerCls = StaticComponentPluginBase.spinComponentContainer(EntityComponentFactory.class, compiled, implSuffix);
                     this.containerClasses.put(entityClass, containerCls);
                 }
                 return StaticComponentPluginBase.spinContainerFactory(implSuffix + "_" + k.eventCount, DynamicContainerFactory.class, containerCls, EntityComponentCallback.class, k.eventCount, entityClass);

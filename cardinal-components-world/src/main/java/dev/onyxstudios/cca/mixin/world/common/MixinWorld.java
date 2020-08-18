@@ -41,11 +41,11 @@ import javax.annotation.Nonnull;
 @Mixin(World.class)
 public abstract class MixinWorld implements InternalComponentProvider {
     @Unique
-    private static final Lazy<? extends DynamicContainerFactory<World,?>> componentContainerFactory
+    private static final Lazy<? extends DynamicContainerFactory<World>> componentContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticWorldComponentPlugin.INSTANCE.getContainerFactoryClass(), WorldComponentCallback.EVENT));
 
     @Unique
-    protected ComponentContainer<?> components;
+    protected ComponentContainer components;
 
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
@@ -54,7 +54,7 @@ public abstract class MixinWorld implements InternalComponentProvider {
 
     @Nonnull
     @Override
-    public ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return this.components;
     }
 }

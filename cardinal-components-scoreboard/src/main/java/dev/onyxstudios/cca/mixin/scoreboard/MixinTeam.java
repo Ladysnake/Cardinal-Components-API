@@ -31,7 +31,6 @@ import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking;
 import dev.onyxstudios.cca.internal.scoreboard.StaticTeamComponentPlugin;
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Scoreboard;
@@ -59,10 +58,10 @@ public abstract class MixinTeam implements InternalComponentProvider, TeamAccess
     @Final
     private Scoreboard scoreboard;
     @Unique
-    private static final Lazy<DynamicContainerFactory<Team, Component>> componentsContainerFactory
+    private static final Lazy<DynamicContainerFactory<Team>> componentsContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticTeamComponentPlugin.INSTANCE.getContainerFactoryClass()));
     @Unique
-    private ComponentContainer<Component> components;
+    private ComponentContainer components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
@@ -71,7 +70,7 @@ public abstract class MixinTeam implements InternalComponentProvider, TeamAccess
 
     @Nonnull
     @Override
-    public ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return this.components;
     }
 

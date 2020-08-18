@@ -25,19 +25,18 @@ package dev.onyxstudios.cca.internal.block;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.entity.BlockEntity;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public final class CardinalBlockInternals {
-    private static final Map<Class<? extends BlockEntity>, DynamicContainerFactory<BlockEntity, Component>> entityContainerFactories = new HashMap<>();
+    private static final Map<Class<? extends BlockEntity>, DynamicContainerFactory<BlockEntity>> entityContainerFactories = new HashMap<>();
     private static final Object factoryMutex = new Object();
 
-    public static ComponentContainer<?> createComponents(BlockEntity blockEntity) {
+    public static ComponentContainer createComponents(BlockEntity blockEntity) {
         Class<? extends BlockEntity> entityClass = blockEntity.getClass();
-        DynamicContainerFactory<BlockEntity, Component> existing = entityContainerFactories.get(entityClass);
+        DynamicContainerFactory<BlockEntity> existing = entityContainerFactories.get(entityClass);
 
         if (existing != null) {
             return existing.create(blockEntity);
@@ -58,7 +57,7 @@ public final class CardinalBlockInternals {
                     cl = c.getSuperclass();
                 }
                 assert parentWithStaticComponents != null;
-                Class<? extends DynamicContainerFactory<BlockEntity,Component>> factoryClass = StaticBlockComponentPlugin.INSTANCE.spinDedicatedFactory(parentWithStaticComponents);
+                Class<? extends DynamicContainerFactory<BlockEntity>> factoryClass = StaticBlockComponentPlugin.INSTANCE.spinDedicatedFactory(parentWithStaticComponents);
 
                 return ComponentsInternals.createFactory(factoryClass);
             }).create(blockEntity);

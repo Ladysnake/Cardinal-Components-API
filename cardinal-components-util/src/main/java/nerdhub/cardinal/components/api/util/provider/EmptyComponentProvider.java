@@ -37,7 +37,7 @@ import java.util.Set;
  */
 public final class EmptyComponentProvider implements ComponentProvider {
     private static final ComponentProvider EMPTY_PROVIDER = new EmptyComponentProvider();
-    private static final ComponentContainer<?> EMPTY_CONTAINER = StaticComponentPluginBase.createEmptyContainer(Component.class, "EmptyProviderImpl");
+    private static final ComponentContainer EMPTY_CONTAINER = StaticComponentPluginBase.createEmptyContainer("EmptyProviderImpl");
 
     public static ComponentProvider instance() {
         return EMPTY_PROVIDER;
@@ -72,7 +72,7 @@ public final class EmptyComponentProvider implements ComponentProvider {
 
     @Nullable
     @Override
-    public ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return EMPTY_CONTAINER;
     }
 

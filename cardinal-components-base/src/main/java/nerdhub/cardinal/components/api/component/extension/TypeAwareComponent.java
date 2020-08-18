@@ -63,7 +63,7 @@ public interface TypeAwareComponent extends Component {
     @ApiStatus.Experimental
     static <C extends Component> ComponentType<? super C> lookupComponentType(ComponentProvider holder, C component) {
         ComponentKey<? super C> selfType = null;
-        ComponentContainer<?> container = holder.getComponentContainer();
+        ComponentContainer container = holder.getComponentContainer();
         Set<? extends ComponentKey<?>> keys = container == null
             ? ((nerdhub.cardinal.components.api.component.ComponentProvider) holder).getComponentTypes()
             : container.keys();

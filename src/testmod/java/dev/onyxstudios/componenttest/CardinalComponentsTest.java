@@ -82,9 +82,9 @@ public class CardinalComponentsTest {
 
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
 
-        ComponentContainer.FactoryBuilder<Integer, Component> factoryBuilder = ComponentContainer.factoryBuilder(Integer.class)
+        ComponentContainer.FactoryBuilder<Integer> factoryBuilder = ComponentContainer.factoryBuilder(Integer.class)
             .component(TestComponents.VITA, BaseVita::new);
-        Function<Integer, ComponentContainer<Component>> containerFactory = factoryBuilder.build();
+        Function<Integer, ComponentContainer> containerFactory = factoryBuilder.build();
         LOGGER.info(containerFactory.apply(3));
         LOGGER.info(containerFactory.apply(5));
         try {
@@ -114,7 +114,7 @@ public class CardinalComponentsTest {
         try {
             LOGGER.info(ComponentContainerMetafactory.metafactory(
                 TestComponents.CUSTOM_PROVIDER_2,
-                new TypeToken<BiFunction<UUID, PlayerEntity, ? extends ComponentContainer<?>>>() {},
+                new TypeToken<BiFunction<UUID, PlayerEntity, ? extends ComponentContainer>>() {},
                 new TypeToken<BiFunction<UUID, PlayerEntity, ? extends SyncedComponent>>() {}
             ).apply(UUID.randomUUID(), null));
             assert false : "Registered factory does not return " + SyncedComponent.class;
@@ -122,7 +122,7 @@ public class CardinalComponentsTest {
 
         LOGGER.info(ComponentContainerMetafactory.metafactory(
             TestComponents.CUSTOM_PROVIDER_2,
-            new TypeToken<BiFunction<UUID, PlayerEntity, ComponentContainer<? extends CopyableComponent<?>>>>() {},
+            new TypeToken<BiFunction<UUID, PlayerEntity, ComponentContainer>>() {},
             new TypeToken<BiFunction<UUID, PlayerEntity, ? extends CopyableComponent<?>>>() {}
         ).apply(UUID.randomUUID(), null));
 
@@ -142,7 +142,7 @@ public class CardinalComponentsTest {
     }
 
     public interface TestContainerFactory {
-        ComponentContainer<?> create(UUID u, @Nullable PlayerEntity p);
+        ComponentContainer create(UUID u, @Nullable PlayerEntity p);
     }
 
     public interface TestCallback {
