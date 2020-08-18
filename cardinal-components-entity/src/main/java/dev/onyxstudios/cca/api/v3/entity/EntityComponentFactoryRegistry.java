@@ -24,7 +24,9 @@ package dev.onyxstudios.cca.api.v3.entity;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Predicate;
@@ -50,16 +52,36 @@ public interface EntityComponentFactoryRegistry {
      * @param target  a class object representing the type of entities targeted by the factory
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> type, EntityComponentFactory<C, E> factory);
+    <C extends Component, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> key, EntityComponentFactory<? extends C, E> factory);
 
     /**
      * Registers an {@link EntityComponentFactory} for all instances of classes that pass the {@code test}.
      *
      * @param test  a predicate testing whether the class can have the component attached to its instances
-     * @param type the type of components to attach
-     * @param factory the factory to use to create components of the given type
+     * @param key the key of components to attach
+     * @param factory the factory to use to create components of the given key
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends Component> void registerFor(Predicate<Class<? extends Entity>> test, ComponentKey<C> type, EntityComponentFactory<C, Entity> factory);
+    <C extends Component> void registerFor(Predicate<Class<? extends Entity>> test, ComponentKey<C> key, EntityComponentFactory<C, Entity> factory);
+
+    /**
+     * Registers an {@link EntityComponentFactory} for all {@link PlayerEntity} instances.
+     *
+     * @param key the key of components to attach
+     * @param factory the factory to use to create components of the given key
+     * @throws NullPointerException if any of the arguments is {@code null}
+     * @since 2.5.1
+     */
+    <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, EntityComponentFactory<P, PlayerEntity> factory);
+
+    /**
+     * Registers an {@link EntityComponentFactory} for all {@link PlayerEntity} instances, with a specific {@link RespawnCopyStrategy}.
+     *
+     * @param key the key of components to attach
+     * @param factory the factory to use to create components of the given key
+     * @throws NullPointerException if any of the arguments is {@code null}
+     * @since 2.5.1
+     */
+    <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, EntityComponentFactory<P, PlayerEntity> factory, RespawnCopyStrategy<? super P> respawnStrategy);
 
 }
