@@ -2,6 +2,10 @@
 Version 2.5.1
 ------------------------------------------------------
 - Overhauled component synchronization for V3 API
+    - There is no longer specialized synchronized component interfaces for each type of provider
+    - This is a *breaking change* for Team and Block V3 (experimental) APIs
+- Added dedicated static registration methods for player components in `cardinal-components-entity`
+- V3 `ComponentContainer`s are no longer generic
 
 ------------------------------------------------------
 Version 2.5.0
