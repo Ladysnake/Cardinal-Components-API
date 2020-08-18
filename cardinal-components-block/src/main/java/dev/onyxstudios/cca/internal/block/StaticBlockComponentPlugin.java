@@ -55,7 +55,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
 
     private Map<ComponentKey<?>, BlockComponentProvider<?>> wildcard;
     private final Map<Identifier, Map<ComponentKey<?>, BlockComponentProvider<?>>> blockComponentFactories = new HashMap<>();
-    private final Map<Class<? extends BlockEntity>, Map</*ComponentType*/Identifier, BlockEntityComponentFactory<?, ?>>> beComponentFactories = new Reference2ObjectOpenHashMap<>();
+    private final Map<Class<? extends BlockEntity>, Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>>> beComponentFactories = new Reference2ObjectOpenHashMap<>();
     private final Map<Class<? extends BlockEntity>, Class<? extends DynamicContainerFactory<BlockEntity>>> factoryClasses = new Reference2ObjectOpenHashMap<>();
 
     public Map<ComponentKey<?>, BlockComponentProvider<?>> getComponentFactories(Identifier blockId) {
@@ -75,7 +75,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         // we need a cache as this method is called for a given class each time one of its subclasses is loaded.
         return this.factoryClasses.computeIfAbsent(key, entityClass -> {
 
-            Map<Identifier, BlockEntityComponentFactory<?, ?>> compiled = new LinkedHashMap<>(this.beComponentFactories.getOrDefault(key, Collections.emptyMap()));
+            Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>> compiled = new LinkedHashMap<>(this.beComponentFactories.getOrDefault(key, Collections.emptyMap()));
             Class<? extends BlockEntity> type = entityClass;
 
             while (type != BlockEntity.class) {
@@ -104,13 +104,13 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
 
     public <C extends Component, E extends BlockEntity> void registerFor(Class<E> target, ComponentKey<C> type, BlockEntityComponentFactory<C, E> factory) {
         this.checkLoading(BlockComponentFactoryRegistry.class, "register");
-        Map<Identifier, BlockEntityComponentFactory<?, ?>> specializedMap = this.beComponentFactories.computeIfAbsent(target, t -> new HashMap<>());
-        BlockEntityComponentFactory<?, ?> previousFactory = specializedMap.get(type.getId());
+        Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>> specializedMap = this.beComponentFactories.computeIfAbsent(target, t -> new HashMap<>());
+        BlockEntityComponentFactory<?, ?> previousFactory = specializedMap.get(type);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + target + ": " + factory + " and " + previousFactory);
         }
         BlockEntityComponentFactory<Component, E> checked = entity -> Objects.requireNonNull(((BlockEntityComponentFactory<?, E>) factory).createForBlockEntity(entity), "Component factory " + factory + " for " + type.getId() + " returned null on " + entity.getClass().getSimpleName());
-        specializedMap.put(type.getId(), checked);
+        specializedMap.put(type, checked);
     }
 
     @Override
