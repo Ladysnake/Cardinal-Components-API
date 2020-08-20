@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.api.v3.world;
 
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -35,7 +34,6 @@ import javax.annotation.Nonnull;
  *
  * @since 2.4.0
  */
-@ApiStatus.Experimental
 @FunctionalInterface
 public interface WorldComponentFactory<C extends Component> {
     /**

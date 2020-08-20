@@ -36,7 +36,6 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @since 2.5.0
  */
-@ApiStatus.Experimental // Will be renamed to Component eventually
 public interface ComponentV3 extends Component {
 
     /**

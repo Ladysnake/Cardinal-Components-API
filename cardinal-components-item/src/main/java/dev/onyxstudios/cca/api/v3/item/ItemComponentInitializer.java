@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.api.v3.item;
 
 import net.minecraft.item.ItemStack;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> item component factories.
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @since 2.4.0
  */
-@ApiStatus.Experimental
 public interface ItemComponentInitializer {
     /**
      * Called to register component factories for statically declared component types.
