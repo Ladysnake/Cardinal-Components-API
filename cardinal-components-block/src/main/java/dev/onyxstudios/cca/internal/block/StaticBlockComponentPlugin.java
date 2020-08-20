@@ -30,6 +30,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
+import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -86,7 +87,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
             String implSuffix = getSuffix(entityClass);
 
             try {
-                Class<? extends ComponentContainer> containerCls = StaticComponentPluginBase.spinComponentContainer(BlockEntityComponentFactory.class, compiled, implSuffix);
+                Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(BlockEntityComponentFactory.class, compiled, implSuffix);
 
                 return StaticComponentPluginBase.spinContainerFactory(
                     implSuffix,

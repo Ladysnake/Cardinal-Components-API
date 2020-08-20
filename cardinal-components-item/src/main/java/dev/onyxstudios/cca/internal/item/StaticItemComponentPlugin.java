@@ -77,7 +77,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
                 Map<ComponentKey<?>, ItemComponentFactoryV2<?>> compiled = new HashMap<>(this.componentFactories.get(itemId));
                 this.getWildcard().forEach(compiled::putIfAbsent);
                 String implSuffix = getSuffix(itemId);
-                Class<? extends ComponentContainer> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, compiled, implSuffix);
+                Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(ItemComponentFactoryV2.class, compiled, implSuffix);
                 return StaticComponentPluginBase.spinContainerFactory(implSuffix, ItemComponentContainerFactory.class, containerCls, ItemComponentCallbackV2.class, 2, Item.class, ItemStack.class);
             } catch (IOException e) {
                 throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + itemId, e);
@@ -96,7 +96,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         );
 
         try {
-            Class<? extends ComponentContainer> containerCls = StaticComponentPluginBase.spinComponentContainer(ItemComponentFactoryV2.class, this.getWildcard(), WILDCARD_IMPL_SUFFIX);
+            Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(ItemComponentFactoryV2.class, this.getWildcard(), WILDCARD_IMPL_SUFFIX);
             this.wildcardFactoryClass = StaticComponentPluginBase.spinContainerFactory(WILDCARD_IMPL_SUFFIX, ItemComponentContainerFactory.class, containerCls, ItemComponentCallbackV2.class, 2, Item.class, ItemStack.class);
         } catch (IOException e) {
             throw new StaticComponentLoadingException("Failed to generate the fallback component container for item stacks", e);
@@ -163,7 +163,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
                     if (!this.checked) {
                         try {
                             if (component.getClass().getMethod("equals", Object.class).getDeclaringClass() == Object.class) {
-                                throw new IllegalStateException("Component implementation " + component.getClass().getTypeName() + " attached to " + stack + " does not override Object#equals");
+                                throw new IllegalStateException("Component implementation " + component.getClass().getTypeName() + " attached to " + stack + " does not override Object#equals!");
                             }
                         } catch (NoSuchMethodException e) {
                             throw new AssertionError("Object#equals not found ?!");

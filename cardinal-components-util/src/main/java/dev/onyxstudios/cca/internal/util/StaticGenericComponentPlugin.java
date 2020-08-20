@@ -73,7 +73,7 @@ public final class StaticGenericComponentPlugin extends LazyDispatcher implement
             @SuppressWarnings("unchecked") I i = (I) object;
             resolved.put(entry.getKey(), i);
         }
-        Class<? extends ComponentContainer> containerClass = StaticComponentPluginBase.spinComponentContainer(componentFactoryType.getRawType(), resolved, getSuffix(genericTypeId));
+        Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(componentFactoryType.getRawType(), resolved, getSuffix(genericTypeId));
         this.claimedFactories.add(genericTypeId);
         return containerClass;
     }
