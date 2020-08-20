@@ -52,7 +52,6 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.util.UUID;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class CardinalComponentsTest {
 
@@ -82,11 +81,11 @@ public class CardinalComponentsTest {
 
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
 
-        ComponentContainer.FactoryBuilder<Integer> factoryBuilder = ComponentContainer.factoryBuilder(Integer.class)
+        ComponentContainer.Factory.Builder<Integer> factoryBuilder = ComponentContainer.Factory.builder(Integer.class)
             .component(TestComponents.VITA, BaseVita::new);
-        Function<Integer, ComponentContainer> containerFactory = factoryBuilder.build();
-        LOGGER.info(containerFactory.apply(3));
-        LOGGER.info(containerFactory.apply(5));
+        ComponentContainer.Factory<Integer> containerFactory = factoryBuilder.build();
+        LOGGER.info(containerFactory.createContainer(3));
+        LOGGER.info(containerFactory.createContainer(5));
         try {
             factoryBuilder.build();
             assert false : "Component container factory builders are single use";

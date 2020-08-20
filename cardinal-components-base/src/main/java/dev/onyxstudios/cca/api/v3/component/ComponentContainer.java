@@ -50,31 +50,6 @@ import java.util.function.Function;
 @ApiStatus.Experimental
 public interface ComponentContainer extends NbtSerializable {
 
-    /**
-     * Create a builder to configure a {@link ComponentContainer} factory.
-     *
-     * <p>Example code:
-     * <pre>{@code
-     * private static final Function<ItemStack, ComponentContainer<Component>> CONTAINER_FACTORY =
-     *      ComponentContainer.factoryBuilder(ItemStack.class)
-     *          .component(MY_COMPONENT_KEY, MyComponent::new)
-     *          .component(OTHER_COMPONENT_KEY, stack -> new OtherComponent())
-     *          .build();
-     *
-     * public static ComponentContainer<Component> createContainer(ItemStack stack) {
-     *      return CONTAINER_FACTORY.apply(stack);
-     * }
-     * }</pre>
-     *
-     * @param singleArgClass the class object representing the single argument the resulting factory will accept
-     * @param <T>            the type of the resulting factory's single argument
-     * @return a new container factory builder
-     */
-    @Contract(value = "_ -> new", pure = true)
-    static <T> FactoryBuilder<T> factoryBuilder(Class<T> singleArgClass) {
-        return new FactoryBuilder<>(singleArgClass);
-    }
-
     @Unmodifiable
     Set<ComponentKey<?>> keys();
 
@@ -98,40 +73,89 @@ public interface ComponentContainer extends NbtSerializable {
     }
 
     /**
-     * @param <T> the type of the resulting factory's single argument
+     * A factory for {@link ComponentContainer}s.
+     *
+     * <p>Instances should be configured through a {@link Builder}.
+     *
+     * @param <T> the type of the input to the factory
+     * @see Factory#builder(Class)
      */
-    final class FactoryBuilder<T> {
-        private static int counter;
-
-        private boolean built;
-        private final Class<T> argClass;
-        private final Map<ComponentKey<?>, Function<T, ? extends Component>> factories;
-
-        FactoryBuilder(Class<T> argClass) {
-            this.argClass = argClass;
-            this.factories = new HashMap<>();
+    @ApiStatus.NonExtendable
+    interface Factory<T> {
+        /**
+         * Create a builder to configure a {@link ComponentContainer} factory.
+         *
+         * <p>Example code:
+         * <pre>{@code
+         * private static final ComponentContainer.Factory<ItemStack> CONTAINER_FACTORY =
+         *      ComponentContainer.Factory.builder(ItemStack.class)
+         *          .component(MY_COMPONENT_KEY, MyComponent::new)
+         *          .component(OTHER_COMPONENT_KEY, stack -> new OtherComponent())
+         *          .build();
+         *
+         * public static ComponentContainer createContainer(ItemStack stack) {
+         *      return CONTAINER_FACTORY.create(stack);
+         * }
+         * }</pre>
+         *
+         * @param singleArgClass the class object representing the single argument the resulting factory will accept
+         * @param <T>            the type of the resulting factory's input
+         * @return a new container factory builder
+         */
+        @Contract(value = "_ -> new", pure = true)
+        static <T> Builder<T> builder(Class<T> singleArgClass) {
+            return new Builder<>(singleArgClass);
         }
 
-        public <C extends Component> FactoryBuilder<T> component(ComponentKey<C> key, Function<T, ? extends C> factory) {
-            this.factories.put(key, factory);
-            return this;
-        }
+        /**
+         * Instantiates a new {@link ComponentContainer} and populates it with components.
+         *
+         * @param t the factory argument
+         * @return a new {@link ComponentContainer}
+         */
+        @Contract("_ -> new")
+        ComponentContainer createContainer(T t);
 
-        public Function<T, ComponentContainer> build() {
-            if (this.built) throw new IllegalStateException("Cannot build more than one container factory with the same builder");
 
-            try {
-                this.built = true;
-                String implNameSuffix = "Custom$" + counter++;
-                Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(
-                    Function.class, this.factories, implNameSuffix
-                );
-                Class<? extends Function<T, ComponentContainer>> factoryClass = StaticComponentPluginBase.spinContainerFactory(
-                    implNameSuffix, Function.class, containerClass, null, 0, this.argClass
-                );
-                return ComponentsInternals.createFactory(factoryClass);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
+        /**
+         * @param <T> the type of the resulting factory's single argument
+         * @see Factory#builder(Class)
+         */
+        final class Builder<T> {
+            private static int counter;
+
+            private boolean built;
+            private final Class<T> argClass;
+            private final Map<ComponentKey<?>, Function<T, ? extends Component>> factories;
+
+            Builder(Class<T> argClass) {
+                this.argClass = argClass;
+                this.factories = new HashMap<>();
+            }
+
+            public <C extends Component> Builder<T> component(ComponentKey<C> key, Function<T, ? extends C> factory) {
+                this.factories.put(key, factory);
+                return this;
+            }
+
+            public Factory<T> build() {
+                if (this.built) {
+                    throw new IllegalStateException("Cannot build more than one container factory with the same builder");
+                }
+
+                try {
+                    this.built = true;
+                    String implNameSuffix = "Custom$" + counter++;
+                    Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(
+                        Function.class, this.factories, implNameSuffix
+                    );
+                    Class<? extends Factory<T>> factoryClass = StaticComponentPluginBase.spinContainerFactory(
+                        implNameSuffix, Factory.class, containerClass, null, 0, this.argClass
+                    );
+                    return ComponentsInternals.createFactory(factoryClass);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
             }
         }
     }
