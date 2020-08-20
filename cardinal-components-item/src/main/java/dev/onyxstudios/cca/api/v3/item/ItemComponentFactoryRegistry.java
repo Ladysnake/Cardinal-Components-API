@@ -26,14 +26,12 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Predicate;
 
 /**
  * @since 2.4.0
  */
-@ApiStatus.Experimental
 public interface ItemComponentFactoryRegistry {
     /**
      * Registers an {@link ItemComponentFactory} for stacks of a specific item.

@@ -48,7 +48,6 @@ import java.util.Optional;
  *
  * @see ComponentRegistry
  */
-@ApiStatus.Experimental
 @ApiStatus.NonExtendable
 public abstract class ComponentKey<C extends Component> {
 

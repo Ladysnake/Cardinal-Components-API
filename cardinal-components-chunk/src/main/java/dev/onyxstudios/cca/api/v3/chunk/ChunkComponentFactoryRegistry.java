@@ -24,12 +24,10 @@ package dev.onyxstudios.cca.api.v3.chunk;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.component.Component;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * @since 2.4.0
  */
-@ApiStatus.Experimental
 public interface ChunkComponentFactoryRegistry {
     /**
      * Registers a {@link ChunkComponentFactory}.

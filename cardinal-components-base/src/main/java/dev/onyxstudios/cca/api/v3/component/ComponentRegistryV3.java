@@ -38,7 +38,6 @@ import java.util.stream.Stream;
  * @see ComponentKey
  * @since 2.5.0
  */
-@ApiStatus.Experimental // will be renamed to ComponentRegistry
 @ApiStatus.NonExtendable
 public interface ComponentRegistryV3 {
     /**

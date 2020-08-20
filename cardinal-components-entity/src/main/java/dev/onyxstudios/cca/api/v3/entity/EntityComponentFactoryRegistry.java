@@ -35,7 +35,6 @@ import java.util.function.Predicate;
 /**
  * @since 2.4.0
  */
-@ApiStatus.Experimental
 public interface EntityComponentFactoryRegistry {
 
     /**
