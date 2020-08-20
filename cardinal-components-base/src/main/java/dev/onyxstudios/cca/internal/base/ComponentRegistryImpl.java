@@ -25,6 +25,7 @@ package dev.onyxstudios.cca.internal.base;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.component.ComponentV3;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -42,11 +43,11 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public final class ComponentRegistryImpl implements ComponentRegistry {
+public final class ComponentRegistryImpl implements ComponentRegistry, ComponentRegistryV3 {
 
     // used by generated classes
     public static ComponentType<?> byRawId(@Nonnegative int rawId) {
-        ComponentRegistryImpl registry = (ComponentRegistryImpl) INSTANCE;
+        ComponentRegistryImpl registry = (ComponentRegistryImpl) ComponentRegistry.INSTANCE;
         ComponentType<?> ret = registry.get(rawId);
         if (ret == null) {
             for (Object2IntMap.Entry<Identifier> entry : registry.id2Raw.object2IntEntrySet()) {
@@ -114,6 +115,7 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
         return this.size;
     }
 
+    // TODO V3 remove pre-assignment mechanisms
     public synchronized int assignRawId(Identifier componentId) {
         int existing = this.id2Raw.getInt(componentId);
         if (existing >= 0) {
@@ -154,8 +156,9 @@ public final class ComponentRegistryImpl implements ComponentRegistry {
         return this.get(this.id2Raw.getInt(id));
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})    // unchecked magic to override 2 conflicting type signatures
     @Override
-    public Stream<ComponentType<?>> stream() {
+    public Stream stream() {
         return Arrays.stream(this.raw2Types).filter(Objects::nonNull);
     }
 
