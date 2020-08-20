@@ -146,7 +146,7 @@ public final class CcaBootstrap extends LazyDispatcher {
             // stack: object
             get.visitTypeInsn(Opcodes.CHECKCAST, CcaAsmHelper.STATIC_COMPONENT_CONTAINER);
             // stack: generatedComponentContainer
-            get.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, CcaAsmHelper.getStaticStorageGetterName(componentId), CcaAsmHelper.STATIC_CONTAINER_GETTER_DESC, true);
+            get.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, CcaAsmHelper.getStaticStorageGetterName(componentId), CcaAsmHelper.STATIC_CONTAINER_GETTER_DESC, false);
             // stack: component
             get.visitInsn(Opcodes.ARETURN);
             get.visitEnd();
@@ -162,15 +162,27 @@ public final class CcaBootstrap extends LazyDispatcher {
      */
     private void spinStaticContainerItf(Set<Identifier> staticComponentTypes) throws IOException {
         ClassNode staticContainerWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
-        staticContainerWriter.visit(Opcodes.V1_8, Opcodes.ACC_ABSTRACT | Opcodes.ACC_PUBLIC | Opcodes.ACC_INTERFACE, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, null, "java/lang/Object", new String[]{CcaAsmHelper.COMPONENT_CONTAINER});
+        staticContainerWriter.visit(Opcodes.V1_8, Opcodes.ACC_ABSTRACT | Opcodes.ACC_PUBLIC, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, null, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, null);
+
+        MethodVisitor init = staticContainerWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", CcaAsmHelper.FAST_COMPONENT_CONTAINER_CTOR_DESC, null, null);
+        init.visitCode();
+        init.visitVarInsn(Opcodes.ALOAD, 0);
+        init.visitVarInsn(Opcodes.ILOAD, 1);
+        init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "<init>", CcaAsmHelper.FAST_COMPONENT_CONTAINER_CTOR_DESC, false);
+        init.visitInsn(Opcodes.RETURN);
+        init.visitEnd();
 
         for (Identifier componentId : staticComponentTypes) {
             MethodVisitor methodWriter = staticContainerWriter.visitMethod(Opcodes.ACC_PUBLIC, CcaAsmHelper.getStaticStorageGetterName(componentId), CcaAsmHelper.STATIC_CONTAINER_GETTER_DESC, null, null);
+            /* TODO return null by default when dynamic containers are gone
+            methodWriter.visitInsn(Opcodes.ACONST_NULL);
+            methodWriter.visitInsn(Opcodes.ARETURN);
+             */
             methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
             // stack: <this>
             CcaAsmHelper.stackStaticComponentType(methodWriter, componentId);
             // stack: <this> componentType
-            methodWriter.visitMethodInsn(Opcodes.INVOKEINTERFACE, CcaAsmHelper.COMPONENT_CONTAINER, "get", CcaAsmHelper.COMPONENT_CONTAINER$GET_DESC, true);
+            methodWriter.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, "get", CcaAsmHelper.COMPONENT_CONTAINER$GET_DESC, false);
             // stack: component
             methodWriter.visitInsn(Opcodes.ARETURN);
             methodWriter.visitEnd();

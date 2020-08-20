@@ -23,6 +23,7 @@
 package dev.onyxstudios.cca.api.v3.component;
 
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
@@ -122,7 +123,7 @@ public interface ComponentContainer extends NbtSerializable {
             try {
                 this.built = true;
                 String implNameSuffix = "Custom$" + counter++;
-                Class<? extends ComponentContainer> containerClass = StaticComponentPluginBase.spinComponentContainer(
+                Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(
                     Function.class, this.factories, implNameSuffix
                 );
                 Class<? extends Function<T, ComponentContainer>> factoryClass = StaticComponentPluginBase.spinContainerFactory(
