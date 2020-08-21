@@ -76,7 +76,7 @@ The next step is to choose an identifier for your component, and to declare it i
 ```
 
 Components can be provided by objects of various classes, depending on which modules you installed.
-The most common providers are entities, item stacks, worlds and chunks, but more are available.
+The most common providers are [entities](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Entity), [item stacks](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Item), [worlds](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-World) and [chunks](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Chunk), but more are available.
 To interact with them, you need to **register a component key**, using `ComponentRegistryV3#getOrCreate`;
 the resulting `ComponentKey` instance has the query methods you need. We also need to **attach our
 component** to some providers (here, to players and worlds):
