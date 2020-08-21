@@ -67,11 +67,6 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
         return !this.isEmpty();
     }
 
-    @Override
-    public Class<C> getComponentClass() {
-        throw new UnsupportedOperationException();
-    }
-
     @SuppressWarnings("deprecation")    // overriding the deprecated method to avoid the compiler's warning...
     @Deprecated
     @Override
@@ -164,7 +159,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
         if(!this.isEmpty()) {
             CompoundTag componentMap = new CompoundTag();
             for (ComponentKey<?> type : this.keySet()) {
-                C component = type.getFromContainer(this);
+                Component component = type.getFromContainer(this);
                 CompoundTag componentTag = new CompoundTag();
                 component.toTag(componentTag);
                 if (!componentTag.isEmpty()) {

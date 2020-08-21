@@ -1,4 +1,17 @@
 ------------------------------------------------------
+Version 2.5.1
+------------------------------------------------------
+- Basic V3 interfaces are no longer experimental
+    - This is a good time to start using them!
+- Overhauled component synchronization for V3 API
+    - There is no longer specialized synchronized component interfaces for each type of provider
+    - This is a *breaking change* for Team and Block V3 (experimental) APIs
+- Added dedicated static registration methods for player components in `cardinal-components-entity`
+- V3 `ComponentContainer`s are no longer generic
+- Added a dedicated `ComponentContainer` factory interface replacing use of `Function`,
+  and moved the existing builder to it
+
+------------------------------------------------------
 Version 2.5.0
 ------------------------------------------------------
 **This release breaks compatibility between modules of different versions.**

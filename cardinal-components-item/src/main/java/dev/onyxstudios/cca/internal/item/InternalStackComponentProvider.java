@@ -32,5 +32,5 @@ public interface InternalStackComponentProvider extends InternalComponentProvide
         return (InternalStackComponentProvider) (Object) stack;
     }
 
-    ComponentContainer<?> getActualComponentContainer();
+    ComponentContainer getActualComponentContainer();
 }

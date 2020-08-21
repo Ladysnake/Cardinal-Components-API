@@ -22,12 +22,21 @@
  */
 package dev.onyxstudios.cca.mixin.entity.common;
 
+import com.google.common.collect.Iterators;
+import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
+import nerdhub.cardinal.components.CardinalComponentsEntity;
+import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -37,14 +46,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.Iterator;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity implements InternalComponentProvider {
     @Unique
-    private ComponentContainer<?> components;
+    private ComponentContainer components;
 
     @Shadow
     public abstract EntityType<?> getType();
+
+    @Shadow
+    public World world;
+
+    @Shadow
+    public abstract int getEntityId();
 
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void initDataTracker(CallbackInfo ci) {
@@ -63,7 +81,31 @@ public abstract class MixinEntity implements InternalComponentProvider {
 
     @Nonnull
     @Override
-    public dev.onyxstudios.cca.api.v3.component.ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return this.components;
     }
+
+    @Override
+    public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
+        Entity holder = (Entity) (Object) this;
+        if (!this.world.isClient) {
+            Iterator<ServerPlayerEntity> watchers = PlayerStream.watching(holder).map(ServerPlayerEntity.class::cast).iterator();
+            //noinspection ConstantConditions
+            if (holder instanceof ServerPlayerEntity && ((ServerPlayerEntity) holder).networkHandler != null) {
+                return Iterators.concat(Iterators.singletonIterator((ServerPlayerEntity)holder), watchers);
+            }
+            return watchers;
+        }
+        return Collections.emptyIterator();
+    }
+
+    @Nullable
+    @Override
+    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient) {
+        buf.writeInt(this.getEntityId());
+        buf.writeIdentifier(key.getId());
+        component.writeToPacket(buf, recipient);
+        return new CustomPayloadS2CPacket(CardinalComponentsEntity.PACKET_ID, buf);
+    }
+
 }

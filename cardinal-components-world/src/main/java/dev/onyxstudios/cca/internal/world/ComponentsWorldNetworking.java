@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.world;
 
+import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
@@ -34,22 +35,17 @@ import nerdhub.cardinal.components.api.util.sync.WorldSyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-import java.util.Set;
-
 public final class ComponentsWorldNetworking {
+    public static final Identifier PACKET_ID = new Identifier("cardinal-components", "world_sync");
+
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             WorldSyncCallback.EVENT.register((player, world) -> {
-                Set<ComponentKey<?>> keys = ((InternalComponentProvider)world).getComponentContainer().keys();
-                for (ComponentKey<?> key : keys) {
-                    Component component = key.getNullable(world);
-
-                    if (component instanceof SyncedComponent) {
-                        ((SyncedComponent) component).syncWith(player);
-                    }
+                InternalComponentProvider provider = (InternalComponentProvider) world;
+                for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
+                    key.syncWith(player, provider);
                 }
             });
         }
@@ -66,17 +62,19 @@ public final class ComponentsWorldNetworking {
                     return;
                 }
 
-                PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                buffer.retain();
+
                 context.getTaskQueue().execute(() -> {
                     try {
                         assert MinecraftClient.getInstance().world != null;
                         Component c = componentType.get(MinecraftClient.getInstance().world);
-
-                        if (c instanceof SyncedComponent) {
-                            ((SyncedComponent) c).processPacket(context, copy);
+                        if (c instanceof AutoSyncedComponent) {
+                            ((AutoSyncedComponent) c).readFromPacket(buffer);
+                        } else if (c instanceof SyncedComponent) {
+                            ((SyncedComponent) c).processPacket(context, buffer);
                         }
                     } finally {
-                        copy.release();
+                        buffer.release();
                     }
                 });
             } catch (Exception e) {

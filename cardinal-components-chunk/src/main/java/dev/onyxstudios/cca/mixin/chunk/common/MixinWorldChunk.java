@@ -22,34 +22,50 @@
  */
 package dev.onyxstudios.cca.mixin.chunk.common;
 
+import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ChunkComponentCallback;
+import net.fabricmc.fabric.api.server.PlayerStream;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Lazy;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.Iterator;
 
 @Mixin(WorldChunk.class)
 public abstract class MixinWorldChunk implements Chunk, InternalComponentProvider {
+    @Shadow
+    public abstract World getWorld();
+
+    @Shadow
+    public abstract ChunkPos getPos();
+
     @Unique
-    private static final Lazy<DynamicContainerFactory<Chunk, CopyableComponent<?>>> componentsContainerFactory
+    private static final Lazy<DynamicContainerFactory<Chunk>> componentsContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticChunkComponentPlugin.INSTANCE.getContainerFactoryClass(), ChunkComponentCallback.EVENT));
     @Unique
-    private ComponentContainer<CopyableComponent<?>> components;
+    private ComponentContainer components;
 
     @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/world/biome/source/BiomeArray;Lnet/minecraft/world/chunk/UpgradeData;Lnet/minecraft/world/TickScheduler;Lnet/minecraft/world/TickScheduler;J[Lnet/minecraft/world/chunk/ChunkSection;Ljava/util/function/Consumer;)V", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
@@ -58,19 +74,30 @@ public abstract class MixinWorldChunk implements Chunk, InternalComponentProvide
 
     @Nonnull
     @Override
-    public ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return this.components;
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/world/chunk/ProtoChunk;)V", at = @At("RETURN"))
-    private <C extends CopyableComponent<C>> void copyFromProto(World world, ProtoChunk proto, CallbackInfo ci) {
-        for (ComponentKey<?> key : this.components.keys()) {
-            @SuppressWarnings("unchecked") C theirs = (C) key.getNullable(proto);
-
-            if (theirs != null) {
-                @SuppressWarnings("unchecked") C ours = (C) key.get(this);
-                ours.copyFrom(theirs);
-            }
+    @Override
+    public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
+        if (!this.getWorld().isClient()) {
+            return PlayerStream.watching(this.getWorld(), this.getPos()).map(ServerPlayerEntity.class::cast).iterator();
         }
+        return Collections.emptyIterator();
+    }
+
+    @Override
+    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient) {
+        ChunkPos pos = this.getPos();
+        buf.writeInt(pos.x);
+        buf.writeInt(pos.z);
+        buf.writeIdentifier(key.getId());
+        component.writeToPacket(buf, recipient);
+        return new CustomPayloadS2CPacket(ComponentsChunkNetworking.PACKET_ID, buf);
+    }
+
+    @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/world/chunk/ProtoChunk;)V", at = @At("RETURN"))
+    private void copyFromProto(World world, ProtoChunk proto, CallbackInfo ci) {
+        this.components.copyFrom(((InternalComponentProvider) ComponentProvider.fromWorld(world)).getComponentContainer());
     }
 }

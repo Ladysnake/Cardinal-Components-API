@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.api.util.sync;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking;
 import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
@@ -31,14 +32,12 @@ import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import nerdhub.cardinal.components.api.util.ChunkComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
-import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.WorldChunk;
 
 /**
  * Default implementations of {@link SyncedComponent} methods, specialized for chunk components
@@ -53,7 +52,7 @@ public interface ChunkSyncedComponent<C extends Component> extends ChunkComponen
      * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
      * called on the game thread.
      */
-    Identifier PACKET_ID = new Identifier("cardinal-components", "chunk_sync");
+    Identifier PACKET_ID = ComponentsChunkNetworking.PACKET_ID;
 
     Chunk getChunk();
 
@@ -71,12 +70,7 @@ public interface ChunkSyncedComponent<C extends Component> extends ChunkComponen
 
     @Override
     default void sync() {
-        if (this.getChunk() instanceof WorldChunk) {
-            WorldChunk chunk = (WorldChunk) this.getChunk();
-            if (!chunk.getWorld().isClient) {
-                PlayerStream.watching(chunk.getWorld(), chunk.getPos()).map(ServerPlayerEntity.class::cast).forEach(this::syncWith);
-            }
-        }
+        ComponentProvider.fromChunk(this.getChunk()).getRecipientsForComponentSync().forEachRemaining(this::syncWith);
     }
 
     @Override

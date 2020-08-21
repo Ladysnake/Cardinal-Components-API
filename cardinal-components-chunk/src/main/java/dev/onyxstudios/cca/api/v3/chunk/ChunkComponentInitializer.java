@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.api.v3.chunk;
 
 import net.minecraft.world.chunk.Chunk;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> chunk component factories.
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @since 2.4.0
  */
-@ApiStatus.Experimental
 public interface ChunkComponentInitializer {
     /**
      * Called to register component factories for statically declared component types.

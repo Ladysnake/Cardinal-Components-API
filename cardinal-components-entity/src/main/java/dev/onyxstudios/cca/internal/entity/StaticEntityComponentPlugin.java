@@ -29,13 +29,15 @@ import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
+import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.Identifier;
+import net.minecraft.entity.player.PlayerEntity;
 
 import java.io.IOException;
 import java.util.*;
@@ -54,16 +56,16 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         return String.format("EntityImpl_%s_%s", simpleName, Integer.toHexString(entityClass.getName().hashCode()));
     }
 
-    private final Map<Class<? extends Entity>, Map</*ComponentType*/Identifier, EntityComponentFactory<?, ?>>> componentFactories = new HashMap<>();
-    private final Map<Class<? extends Entity>, Class<? extends ComponentContainer<?>>> containerClasses = new HashMap<>();
-    private final Map<Key, Class<? extends DynamicContainerFactory<?,?>>> factoryClasses = new HashMap<>();
+    private final Map<Class<? extends Entity>, Map<ComponentKey<?>, EntityComponentFactory<?, ?>>> componentFactories = new HashMap<>();
+    private final Map<Class<? extends Entity>, Class<? extends ComponentContainer>> containerClasses = new HashMap<>();
+    private final Map<Key, Class<? extends DynamicContainerFactory<?>>> factoryClasses = new HashMap<>();
 
     public boolean requiresStaticFactory(Class<? extends Entity> entityClass) {
         this.ensureInitialized();
         return entityClass == Entity.class || this.componentFactories.containsKey(entityClass);
     }
 
-    public Class<? extends DynamicContainerFactory<?,? extends Component>> spinDedicatedFactory(Key key) {
+    public Class<? extends DynamicContainerFactory<?>> spinDedicatedFactory(Key key) {
         this.ensureInitialized();
 
         // we need a cache as this method is called for a given class each time one of its subclasses is loaded.
@@ -74,7 +76,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
 
             Class<? extends Entity> entityClass = k.entityClass;
 
-            Map<Identifier, EntityComponentFactory<?, ?>> compiled = new LinkedHashMap<>(this.componentFactories.getOrDefault(entityClass, Collections.emptyMap()));
+            Map<ComponentKey<?>, EntityComponentFactory<?, ?>> compiled = new LinkedHashMap<>(this.componentFactories.getOrDefault(entityClass, Collections.emptyMap()));
             Class<?> type = entityClass;
 
             while (type != Entity.class) {
@@ -85,9 +87,9 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
             String implSuffix = getSuffix(entityClass);
 
             try {
-                Class<? extends ComponentContainer<?>> containerCls = this.containerClasses.get(entityClass);
+                Class<? extends ComponentContainer> containerCls = this.containerClasses.get(entityClass);
                 if (containerCls == null) {
-                    containerCls = StaticComponentPluginBase.spinComponentContainer(EntityComponentFactory.class, Component.class, compiled, implSuffix);
+                    containerCls = CcaAsmHelper.spinComponentContainer(EntityComponentFactory.class, compiled, implSuffix);
                     this.containerClasses.put(entityClass, containerCls);
                 }
                 return StaticComponentPluginBase.spinContainerFactory(implSuffix + "_" + k.eventCount, DynamicContainerFactory.class, containerCls, EntityComponentCallback.class, k.eventCount, entityClass);
@@ -106,7 +108,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     }
 
     @Override
-    public <C extends Component, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> type, EntityComponentFactory<C, E> factory) {
+    public <C extends Component, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> type, EntityComponentFactory<? extends C, E> factory) {
         this.checkLoading(EntityComponentFactoryRegistry.class, "register");
         this.register0(target, type, factory);
     }
@@ -116,14 +118,30 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         this.dynamicFactories.add(new PredicatedComponentFactory<>(test, type, factory));
     }
 
-    private <C extends Component, E extends Entity> void register0(Class<? extends E> target, ComponentKey<? super C> type, EntityComponentFactory<C, E> factory) {
-        Map<Identifier, EntityComponentFactory<?, ?>> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
-        EntityComponentFactory<?, ?> previousFactory = specializedMap.get(type.getId());
+    @Override
+    public <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, EntityComponentFactory<P, PlayerEntity> factory) {
+        this.registerForPlayers(key, factory, CardinalEntityInternals.DEFAULT_COPY_STRATEGY);
+    }
+
+    @Override
+    public <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, EntityComponentFactory<P, PlayerEntity> factory, RespawnCopyStrategy<? super P> respawnStrategy) {
+        this.registerFor(PlayerEntity.class, key, factory);
+        CardinalEntityInternals.registerRespawnCopyStrat(key, respawnStrategy);
+    }
+
+    @Override
+    public <C extends Component> void setRespawnCopyStrategy(ComponentKey<C> type, RespawnCopyStrategy<? super C> strategy) {
+        CardinalEntityInternals.registerRespawnCopyStrat(type, strategy);
+    }
+
+    private <C extends Component, E extends Entity> void register0(Class<? extends E> target, ComponentKey<? super C> key, EntityComponentFactory<C, E> factory) {
+        Map<ComponentKey<?>, EntityComponentFactory<?, ?>> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
+        EntityComponentFactory<?, ?> previousFactory = specializedMap.get(key);
         if (previousFactory != null) {
-            throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + target + ": " + factory + " and " + previousFactory);
+            throw new StaticComponentLoadingException("Duplicate factory declarations for " + key.getId() + " on " + target + ": " + factory + " and " + previousFactory);
         }
-        EntityComponentFactory<Component, E> checked = entity -> Objects.requireNonNull(((EntityComponentFactory<?, E>) factory).createForEntity(entity), "Component factory "+ factory + " for " + type.getId() + " returned null on " + target.getSimpleName());
-        specializedMap.put(type.getId(), checked);
+        EntityComponentFactory<Component, E> checked = entity -> Objects.requireNonNull(((EntityComponentFactory<?, E>) factory).createForEntity(entity), "Component factory "+ factory + " for " + key.getId() + " returned null on " + target.getSimpleName());
+        specializedMap.put(key, checked);
     }
 
     static class Key {

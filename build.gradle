@@ -134,6 +134,8 @@ dependencies {
     testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
 
     include fabricApi.module("fabric-api-base", fabric_api_version)
+    include fabricApi.module("fabric-networking-v0", fabric_api_version)
+
     afterEvaluate {
         subprojects.each {
             api it

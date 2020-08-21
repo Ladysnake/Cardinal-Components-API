@@ -23,12 +23,19 @@
 package dev.onyxstudios.cca.api.v3.component;
 
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
+import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
+import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.minecraft.network.Packet;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnegative;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,7 +48,6 @@ import java.util.Optional;
  *
  * @see ComponentRegistry
  */
-@ApiStatus.Experimental
 @ApiStatus.NonExtendable
 public abstract class ComponentKey<C extends Component> {
 
@@ -89,6 +95,29 @@ public abstract class ComponentKey<C extends Component> {
         return this.getNullable(provider) != null;
     }
 
+    /**
+     * Attempts to synchronize the component attached to the given provider.
+     *
+     * <p>This method has no visible effect if the given provider does not support synchronization, or
+     * the associated component does not implement an adequate synchronization interface.
+     *
+     * @param provider a component provider
+     * @param <V>      the class of the component provider
+     * @throws NoSuchElementException if the provider does not provide this type of component
+     * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
+     */
+    @ApiStatus.Experimental
+    public <V> void sync(V provider) {
+        ComponentProvider prov = (ComponentProvider) provider;
+        C c = this.get(prov);
+
+        if (c instanceof AutoSyncedComponent) {
+            prov.getRecipientsForComponentSync().forEachRemaining(player -> this.syncWith(player, prov));
+        } else if (c instanceof SyncedComponent) {
+            ((SyncedComponent) c).sync();
+        }
+    }
+
     @Override
     public final String toString() {
         return this.getClass().getSimpleName() + "[\"" + this.id + "\"]";
@@ -96,8 +125,10 @@ public abstract class ComponentKey<C extends Component> {
 
     /* ------------ internal members ------------- */
 
-    private final Class<C> componentClass;
+
     private final Identifier id;
+    private final Class<C> componentClass;
+    private final int rawId;
 
     /**
      * Constructs a new immutable ComponentType
@@ -105,7 +136,8 @@ public abstract class ComponentKey<C extends Component> {
      * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
      */
     @ApiStatus.Internal
-    protected ComponentKey(Identifier id, Class<C> componentClass) {
+    protected ComponentKey(Identifier id, Class<C> componentClass, int rawId) {
+        this.rawId = rawId;
         if (!CcaBootstrap.INSTANCE.isGenerated(this.getClass())) throw new IllegalStateException();
         this.componentClass = componentClass;
         this.id = id;
@@ -120,10 +152,33 @@ public abstract class ComponentKey<C extends Component> {
      */
     // overridden by generated types
     @ApiStatus.Internal
-    public abstract @Nullable C getInternal(ComponentContainer<?> container);
+    public abstract @Nullable C getInternal(ComponentContainer container);
+
+    @Nonnegative
+    @ApiStatus.Internal
+    public final int getRawId() {
+        return this.rawId;
+    }
 
     @ApiStatus.Internal
-    public <D extends Component> D getFromContainer(ComponentContainer<D> container) {
-        return Objects.requireNonNull(container.getComponentClass().cast(this.getInternal(container)));
+    public C getFromContainer(ComponentContainer container) {
+        return Objects.requireNonNull(this.getInternal(container));
+    }
+
+    @ApiStatus.Internal
+    public void syncWith(ServerPlayerEntity player, ComponentProvider provider) {
+        C c = this.get(provider);
+
+        if (c instanceof AutoSyncedComponent && ((AutoSyncedComponent) c).shouldSyncWith(player)) {
+            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+            // can't cast to (C & AutoSyncedComponent), but the guarantees are there
+            @SuppressWarnings({"unchecked", "rawtypes"}) Packet<?> packet = provider.toComponentPacket(buf, (ComponentKey) this, (AutoSyncedComponent) c, player);
+
+            if (packet != null) {
+                ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, packet);
+            }
+        } else if (c instanceof SyncedComponent) {
+            ((SyncedComponent) c).syncWith(player);
+        }
     }
 }

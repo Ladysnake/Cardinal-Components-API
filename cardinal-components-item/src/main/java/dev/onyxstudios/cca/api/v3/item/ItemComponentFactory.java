@@ -23,10 +23,8 @@
 package dev.onyxstudios.cca.api.v3.item;
 
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -38,9 +36,8 @@ import javax.annotation.Nonnull;
  *
  * @since 2.4.0
  */
-@ApiStatus.Experimental
 @FunctionalInterface
-public interface ItemComponentFactory<C extends CopyableComponent<?>> extends ItemComponentFactoryV2<C> {
+public interface ItemComponentFactory<C extends Component> extends ItemComponentFactoryV2<C> {
     @Nonnull
     @Override
     default C createForStack(Item item, ItemStack stack) {

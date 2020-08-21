@@ -26,6 +26,7 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
+import java.util.stream.Stream;
 
 /**
  * A registry for components.
@@ -37,13 +38,12 @@ import javax.annotation.Nullable;
  * @see ComponentKey
  * @since 2.5.0
  */
-@ApiStatus.Experimental // will be renamed to ComponentRegistry
 @ApiStatus.NonExtendable
 public interface ComponentRegistryV3 {
     /**
      * The component registry
      */
-    ComponentRegistryV3 INSTANCE = nerdhub.cardinal.components.api.ComponentRegistry.INSTANCE;
+    ComponentRegistryV3 INSTANCE = (ComponentRegistryV3) nerdhub.cardinal.components.api.ComponentRegistry.INSTANCE;
 
     /**
      * Get a component key for the given identifier and class, or create one if it does not exist.
@@ -87,11 +87,10 @@ public interface ComponentRegistryV3 {
     @Nullable
     ComponentKey<?> get(Identifier id);
 
-    /*
+    /**
      * Return a sequential stream with this registry at its source.
      *
      * @return a sequential {@code Stream} over the component types of this registry.
      */
-    // TODO add when ComponentRegistry gets replaced
-    // Stream<ComponentKey<?>> stream();
+     Stream<ComponentKey<?>> stream();
 }

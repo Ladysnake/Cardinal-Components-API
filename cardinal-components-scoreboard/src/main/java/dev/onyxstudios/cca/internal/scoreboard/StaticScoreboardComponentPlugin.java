@@ -59,20 +59,19 @@ public final class StaticScoreboardComponentPlugin extends StaticComponentPlugin
     }
 
     @Override
-    protected Class<? extends DynamicContainerFactory<Scoreboard, ?>> spinContainerFactory(Class<? extends ComponentContainer<?>> containerCls) throws IOException {
+    protected Class<? extends DynamicContainerFactory<Scoreboard>> spinContainerFactory(Class<? extends ComponentContainer> containerCls) throws IOException {
         return spinContainerFactory(this.implSuffix, DynamicContainerFactory.class, containerCls, null, 0, this.providerClass);
     }
 
     @Override
-    public Class<? extends DynamicContainerFactory<Scoreboard, Component>> getContainerFactoryClass() {
-        @SuppressWarnings("unchecked") Class<? extends DynamicContainerFactory<Scoreboard, Component>> ret = (Class<? extends DynamicContainerFactory<Scoreboard, Component>>) super.getContainerFactoryClass();
-        return ret;
+    public Class<? extends DynamicContainerFactory<Scoreboard>> getContainerFactoryClass() {
+        return super.getContainerFactoryClass();
     }
 
     @Override
     public <C extends Component> void register(ComponentKey<C> type, ScoreboardComponentFactory<? extends C> factory) {
         this.checkLoading(ScoreboardComponentFactoryRegistry.class, "register");
-        super.register(type.getId(), (team) -> Objects.requireNonNull(((ScoreboardComponentFactory<?>) factory).createForScoreboard(team), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
+        super.register(type, (team) -> Objects.requireNonNull(((ScoreboardComponentFactory<?>) factory).createForScoreboard(team), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
     }
 
     @Override

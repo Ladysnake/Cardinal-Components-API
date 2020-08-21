@@ -27,7 +27,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;
 import net.fabricmc.fabric.api.event.Event;
@@ -78,20 +77,9 @@ public final class CardinalItemInternals {
     }
 
     public static void copyComponents(ItemStack original, ItemStack copy) {
-        ComponentContainer<?> originalComponents = InternalStackComponentProvider.get(original).getActualComponentContainer();
-        ComponentContainer<?> copiedComponents = InternalStackComponentProvider.get(copy).getActualComponentContainer();
-
-        for (ComponentKey<?> key : copiedComponents.keys()) {
-            copyComponent(key, (CopyableComponent<?>) key.getFromContainer(copiedComponents), originalComponents);
-        }
-    }
-
-    private static <C extends Component> void copyComponent(ComponentKey<?> type, CopyableComponent<C> component, ComponentContainer<?> from) {
-        @SuppressWarnings("unchecked") C fromComponent = (C) type.getInternal(from);
-
-        if (fromComponent != null) {
-            component.copyFrom(fromComponent);
-        }
+        ComponentContainer originalComponents = InternalStackComponentProvider.get(original).getActualComponentContainer();
+        ComponentContainer copiedComponents = InternalStackComponentProvider.get(copy).getActualComponentContainer();
+        copiedComponents.copyFrom(originalComponents);
     }
 
     public static boolean areComponentsIncompatible(ItemStack stack1, ItemStack stack2) {

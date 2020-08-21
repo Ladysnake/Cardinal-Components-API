@@ -55,15 +55,14 @@ public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<
         entrypoint.registerLevelComponentFactories(this);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Class<? extends DynamicContainerFactory<WorldProperties, Component>> getContainerFactoryClass() {
-        return (Class<? extends DynamicContainerFactory<WorldProperties, Component>>) super.getContainerFactoryClass();
+    public Class<? extends DynamicContainerFactory<WorldProperties>> getContainerFactoryClass() {
+        return super.getContainerFactoryClass();
     }
 
     @Override
     public <C extends Component> void register(ComponentKey<C> type, LevelComponentFactory<C> factory) {
         this.checkLoading(LevelComponentFactoryRegistry.class, "register");
-        super.register(type.getId(), (props) -> Objects.requireNonNull(((LevelComponentFactory<?>) factory).createForSave(props), "Component factory "+ factory + " for " + type.getId() + " returned null on " + props));
+        super.register(type, (props) -> Objects.requireNonNull(((LevelComponentFactory<?>) factory).createForSave(props), "Component factory "+ factory + " for " + type.getId() + " returned null on " + props));
     }
 }

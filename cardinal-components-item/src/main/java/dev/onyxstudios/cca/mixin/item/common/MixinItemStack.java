@@ -27,7 +27,6 @@ import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -47,9 +46,9 @@ import javax.annotation.Nonnull;
 @Mixin(value = ItemStack.class)
 public abstract class MixinItemStack implements InternalStackComponentProvider {
     @Unique
-    private static final ComponentContainer<CopyableComponent<?>> EMPTY_COMPONENTS = StaticComponentPluginBase.createEmptyContainer(CopyableComponent.class, "EmptyItemImpl");
+    private static final ComponentContainer EMPTY_COMPONENTS = StaticComponentPluginBase.createEmptyContainer("EmptyItemImpl");
 
-    private ComponentContainer<CopyableComponent<?>> components;
+    private ComponentContainer components;
 
     @Inject(method = "areTagsEqual", at = @At("RETURN"), cancellable = true)
     private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
@@ -118,13 +117,13 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
 
     @Nonnull
     @Override
-    public ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return this.empty ? EMPTY_COMPONENTS : this.components;
     }
 
     @Nonnull
     @Override
-    public ComponentContainer<?> getActualComponentContainer() {
+    public ComponentContainer getActualComponentContainer() {
         return this.components;
     }
 }
