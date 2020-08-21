@@ -33,7 +33,6 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnegative;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
@@ -46,8 +45,6 @@ import java.util.function.Function;
 @ApiStatus.NonExtendable
 public class ComponentType<T extends Component> extends ComponentKey<T> {
 
-    private final int rawId;
-
     /* ------------ internal methods ------------- */
 
     /**
@@ -56,25 +53,18 @@ public class ComponentType<T extends Component> extends ComponentKey<T> {
      * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
      */
     protected ComponentType(Identifier id, Class<T> componentClass, int rawId) {
-        super(id, componentClass);
-        this.rawId = rawId;
-    }
-
-    @Nonnegative
-    @ApiStatus.Internal
-    public final int getRawId() {
-        return this.rawId;
+        super(id, componentClass, rawId);
     }
 
     @Nullable
     @Override
-    public T getInternal(ComponentContainer<?> container) {
+    public T getInternal(ComponentContainer container) {
         return ((nerdhub.cardinal.components.api.component.ComponentContainer<?>) container).get(this);
     }
 
     @Nullable
     private T getInternal(ComponentProvider provider) {
-        ComponentContainer<?> container = provider.getComponentContainer();
+        ComponentContainer container = provider.getComponentContainer();
 
         if (container != null) {
             return this.getInternal(container);

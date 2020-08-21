@@ -30,6 +30,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
+import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -55,8 +56,8 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
 
     private Map<ComponentKey<?>, BlockComponentProvider<?>> wildcard;
     private final Map<Identifier, Map<ComponentKey<?>, BlockComponentProvider<?>>> blockComponentFactories = new HashMap<>();
-    private final Map<Class<? extends BlockEntity>, Map</*ComponentType*/Identifier, BlockEntityComponentFactory<?, ?>>> beComponentFactories = new Reference2ObjectOpenHashMap<>();
-    private final Map<Class<? extends BlockEntity>, Class<? extends DynamicContainerFactory<BlockEntity, Component>>> factoryClasses = new Reference2ObjectOpenHashMap<>();
+    private final Map<Class<? extends BlockEntity>, Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>>> beComponentFactories = new Reference2ObjectOpenHashMap<>();
+    private final Map<Class<? extends BlockEntity>, Class<? extends DynamicContainerFactory<BlockEntity>>> factoryClasses = new Reference2ObjectOpenHashMap<>();
 
     public Map<ComponentKey<?>, BlockComponentProvider<?>> getComponentFactories(Identifier blockId) {
         this.ensureInitialized();
@@ -69,13 +70,13 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         return entityClass == BlockEntity.class || this.beComponentFactories.containsKey(entityClass);
     }
 
-    public Class<? extends DynamicContainerFactory<BlockEntity, Component>> spinDedicatedFactory(Class<? extends BlockEntity> key) {
+    public Class<? extends DynamicContainerFactory<BlockEntity>> spinDedicatedFactory(Class<? extends BlockEntity> key) {
         StaticBlockComponentPlugin.INSTANCE.ensureInitialized();
 
         // we need a cache as this method is called for a given class each time one of its subclasses is loaded.
         return this.factoryClasses.computeIfAbsent(key, entityClass -> {
 
-            Map<Identifier, BlockEntityComponentFactory<?, ?>> compiled = new LinkedHashMap<>(this.beComponentFactories.getOrDefault(key, Collections.emptyMap()));
+            Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>> compiled = new LinkedHashMap<>(this.beComponentFactories.getOrDefault(key, Collections.emptyMap()));
             Class<? extends BlockEntity> type = entityClass;
 
             while (type != BlockEntity.class) {
@@ -86,7 +87,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
             String implSuffix = getSuffix(entityClass);
 
             try {
-                Class<? extends ComponentContainer<?>> containerCls = StaticComponentPluginBase.spinComponentContainer(BlockEntityComponentFactory.class, Component.class, compiled, implSuffix);
+                Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(BlockEntityComponentFactory.class, compiled, implSuffix);
 
                 return StaticComponentPluginBase.spinContainerFactory(
                     implSuffix,
@@ -104,13 +105,13 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
 
     public <C extends Component, E extends BlockEntity> void registerFor(Class<E> target, ComponentKey<C> type, BlockEntityComponentFactory<C, E> factory) {
         this.checkLoading(BlockComponentFactoryRegistry.class, "register");
-        Map<Identifier, BlockEntityComponentFactory<?, ?>> specializedMap = this.beComponentFactories.computeIfAbsent(target, t -> new HashMap<>());
-        BlockEntityComponentFactory<?, ?> previousFactory = specializedMap.get(type.getId());
+        Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>> specializedMap = this.beComponentFactories.computeIfAbsent(target, t -> new HashMap<>());
+        BlockEntityComponentFactory<?, ?> previousFactory = specializedMap.get(type);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + target + ": " + factory + " and " + previousFactory);
         }
         BlockEntityComponentFactory<Component, E> checked = entity -> Objects.requireNonNull(((BlockEntityComponentFactory<?, E>) factory).createForBlockEntity(entity), "Component factory " + factory + " for " + type.getId() + " returned null on " + entity.getClass().getSimpleName());
-        specializedMap.put(type.getId(), checked);
+        specializedMap.put(type, checked);
     }
 
     @Override

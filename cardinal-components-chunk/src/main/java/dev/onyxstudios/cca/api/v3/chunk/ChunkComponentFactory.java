@@ -23,9 +23,7 @@
 package dev.onyxstudios.cca.api.v3.chunk;
 
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.world.chunk.Chunk;
-import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -36,9 +34,8 @@ import javax.annotation.Nonnull;
  *
  * @since 2.4.0
  */
-@ApiStatus.Experimental
 @FunctionalInterface
-public interface ChunkComponentFactory<C extends CopyableComponent<?>> {
+public interface ChunkComponentFactory<C extends Component> {
     /**
      * Initialize components for the given chunk.
      *

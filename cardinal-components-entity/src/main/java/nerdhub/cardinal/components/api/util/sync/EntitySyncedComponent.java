@@ -22,14 +22,14 @@
  */
 package nerdhub.cardinal.components.api.util.sync;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import io.netty.buffer.Unpooled;
+import nerdhub.cardinal.components.CardinalComponentsEntity;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
-import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -49,7 +49,7 @@ public interface EntitySyncedComponent extends BaseSyncedComponent {
      * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
      * called on the game thread.
      */
-    Identifier PACKET_ID = new Identifier("cardinal-components", "entity_sync");
+    Identifier PACKET_ID = CardinalComponentsEntity.PACKET_ID;
 
     Entity getEntity();
 
@@ -67,13 +67,7 @@ public interface EntitySyncedComponent extends BaseSyncedComponent {
 
     @Override
     default void sync() {
-        if (!this.getEntity().world.isClient) {
-            Entity holder = this.getEntity();
-            if (holder instanceof ServerPlayerEntity && ((ServerPlayerEntity) holder).networkHandler != null) {
-                this.syncWith((ServerPlayerEntity) holder);
-            }
-            PlayerStream.watching(holder).map(ServerPlayerEntity.class::cast).forEach(this::syncWith);
-        }
+        ComponentProvider.fromEntity(this.getEntity()).getRecipientsForComponentSync().forEachRemaining(this::syncWith);
     }
 
     @Override

@@ -39,7 +39,7 @@ public abstract class MixinUnmodifiableLevelProperties implements InternalCompon
 
     @Nonnull
     @Override
-    public ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return ((InternalComponentProvider) this.properties).getComponentContainer();
     }
 }

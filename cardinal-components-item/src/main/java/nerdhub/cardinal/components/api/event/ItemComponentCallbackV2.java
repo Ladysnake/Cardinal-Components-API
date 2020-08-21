@@ -26,7 +26,6 @@ import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryV2;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.util.ItemComponent;
@@ -76,10 +75,8 @@ public interface ItemComponentCallbackV2 {
     }
 
     @ApiStatus.Experimental
-    static <C extends Component> void register(ComponentType<C> type, @Nullable Item item, ItemComponentFactoryV2<? extends C> factory) {
-        event(item).register((it, stack, components) -> {
-            components.put(type, factory.createForStack(it, stack));
-        });
+    static <C extends CopyableComponent<?>> void register(ComponentType<? super C> type, @Nullable Item item, ItemComponentFactoryV2<C> factory) {
+        event(item).register((it, stack, components) -> components.put(type, factory.createForStack(it, stack)));
     }
 
     /**

@@ -25,7 +25,6 @@ package dev.onyxstudios.cca.mixin.chunk.common;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.source.BiomeArray;
@@ -39,7 +38,7 @@ import javax.annotation.Nonnull;
 @Mixin(EmptyChunk.class)
 public abstract class MixinEmptyChunk extends WorldChunk implements InternalComponentProvider {
     @Unique
-    private static final ComponentContainer<CopyableComponent<?>> EMPTY_COMPONENTS = StaticComponentPluginBase.createEmptyContainer(CopyableComponent.class, "EmptyChunkImpl");
+    private static final ComponentContainer EMPTY_COMPONENTS = StaticComponentPluginBase.createEmptyContainer("EmptyChunkImpl");
 
     public MixinEmptyChunk(World world, ChunkPos pos, BiomeArray biomes) {
         super(world, pos, biomes);
@@ -47,7 +46,7 @@ public abstract class MixinEmptyChunk extends WorldChunk implements InternalComp
 
     @Nonnull
     @Override
-    public ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return EMPTY_COMPONENTS;
     }
 }

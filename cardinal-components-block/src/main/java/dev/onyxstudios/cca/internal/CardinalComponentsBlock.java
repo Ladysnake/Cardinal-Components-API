@@ -24,42 +24,50 @@ package dev.onyxstudios.cca.internal;
 
 import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncAroundCallback;
 import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncCallback;
-import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
+import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 
 @SuppressWarnings("unused") // entrypoint
 public class CardinalComponentsBlock {
+    /**
+     * {@link CustomPayloadS2CPacket} channel for default entity component synchronization.
+     *
+     * <p> Packets emitted on this channel must begin with, in order, the {@link BlockEntity#getType() BE type} (as an identifier),
+     * the {@link BlockEntity#getPos() position} (using {@link PacketByteBuf#writeBlockPos(BlockPos)}),
+     * and the {@link ComponentType#getId() component's type} (as an Identifier).
+     *
+     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * called on the game thread.
+     */
+    public static final Identifier PACKET_ID = new Identifier("cardinal-components", "block_entity_sync");
+
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             BlockEntitySyncCallback.EVENT.register((player, tracked) -> {
-                for (ComponentKey<?> key : ((InternalComponentProvider) tracked).getComponentContainer().keys()) {
-                    Component component = key.getNullable(tracked);
+                InternalComponentProvider provider = (InternalComponentProvider) tracked;
 
-                    if (component instanceof SyncedComponent) {
-                        ((SyncedComponent) component).syncWith(player);
-                    }
+                for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
+                    key.syncWith(player, provider);
                 }
             });
             BlockEntitySyncAroundCallback.EVENT.register(tracked -> {
                 for (ComponentKey<?> key : ((InternalComponentProvider) tracked).getComponentContainer().keys()) {
-                    Component component = key.getNullable(tracked);
-
-                    if (component instanceof SyncedComponent) {
-                        ((SyncedComponent) component).sync();
-                    }
+                    key.sync(tracked);
                 }
             });
         }
@@ -68,7 +76,7 @@ public class CardinalComponentsBlock {
     // Safe to put in the same class as no client-only class is directly referenced
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            ClientSidePacketRegistry.INSTANCE.register(BlockEntitySyncedComponent.PACKET_ID, (context, buffer) -> {
+            ClientSidePacketRegistry.INSTANCE.register(PACKET_ID, (context, buffer) -> {
                 try {
                     Identifier blockEntityTypeId = buffer.readIdentifier();
                     BlockPos position = buffer.readBlockPos();
@@ -80,14 +88,15 @@ public class CardinalComponentsBlock {
                         return;
                     }
 
-                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                    buffer.retain();
+
                     context.getTaskQueue().execute(() -> {
                         try {
                             componentType.maybeGet(blockEntityType.get(context.getPlayer().world, position))
-                                .filter(c -> c instanceof SyncedComponent)
-                                .ifPresent(c -> ((SyncedComponent) c).processPacket(context, copy));
+                                .filter(c -> c instanceof AutoSyncedComponent)
+                                .ifPresent(c -> ((AutoSyncedComponent) c).readFromPacket(buffer));
                         } finally {
-                            copy.release();
+                            buffer.release();
                         }
                     });
                 } catch (Exception e) {

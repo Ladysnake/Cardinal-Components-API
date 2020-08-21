@@ -34,7 +34,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-// TODO remove when old ComponentProvider goes
+// TODO V3 remove when old ComponentProvider goes
 public interface InternalComponentProvider extends ComponentProvider, nerdhub.cardinal.components.api.component.ComponentProvider {
     @Override
     default boolean hasComponent(ComponentType<?> type) {
@@ -59,6 +59,7 @@ public interface InternalComponentProvider extends ComponentProvider, nerdhub.ca
         }
     }
 
+    @Override
     @Nonnull
-    ComponentContainer<?> getComponentContainer();
+    ComponentContainer getComponentContainer();
 }

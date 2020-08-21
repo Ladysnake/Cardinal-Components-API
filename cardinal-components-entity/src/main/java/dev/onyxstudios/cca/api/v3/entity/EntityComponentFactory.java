@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.api.v3.entity;
 
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.entity.Entity;
-import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -36,7 +35,6 @@ import javax.annotation.Nonnull;
  *
  * @since 2.4.0
  */
-@ApiStatus.Experimental
 @FunctionalInterface
 public interface EntityComponentFactory<C extends Component, E extends Entity> {
     /**

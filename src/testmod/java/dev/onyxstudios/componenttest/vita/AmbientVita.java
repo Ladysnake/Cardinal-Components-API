@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
+import dev.onyxstudios.componenttest.TestComponents;
 import nerdhub.cardinal.components.api.util.sync.BaseSyncedComponent;
 import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
 import nerdhub.cardinal.components.api.util.sync.WorldSyncedComponent;
@@ -84,7 +85,7 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
 
         @Override
         public void syncWithAll(MinecraftServer server) {
-            WorldSyncedComponent.super.sync();
+            TestComponents.VITA.sync(this.world);
         }
     }
 

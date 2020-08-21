@@ -27,7 +27,6 @@ import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.ChunkComponentCallback;
 import net.minecraft.util.Lazy;
 import net.minecraft.world.chunk.Chunk;
@@ -43,10 +42,10 @@ import javax.annotation.Nonnull;
 @Mixin(ProtoChunk.class)
 public abstract class MixinProtoChunk implements Chunk, InternalComponentProvider {
     @Unique
-    private static final Lazy<DynamicContainerFactory<Chunk, CopyableComponent<?>>> componentsContainerFactory
+    private static final Lazy<DynamicContainerFactory<Chunk>> componentsContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticChunkComponentPlugin.INSTANCE.getContainerFactoryClass(), ChunkComponentCallback.EVENT));
     @Unique
-    private ComponentContainer<CopyableComponent<?>> components;
+    private ComponentContainer components;
 
     @Inject(method = "<init>(Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/world/chunk/UpgradeData;[Lnet/minecraft/world/chunk/ChunkSection;Lnet/minecraft/world/ChunkTickScheduler;Lnet/minecraft/world/ChunkTickScheduler;)V", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
@@ -55,7 +54,7 @@ public abstract class MixinProtoChunk implements Chunk, InternalComponentProvide
 
     @Nonnull
     @Override
-    public dev.onyxstudios.cca.api.v3.component.ComponentContainer<?> getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return this.components;
     }
 }

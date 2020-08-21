@@ -85,13 +85,13 @@ public final class TestComponents implements
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerFor(HostileEntity.class, ALT_VITA, e -> new BaseVita());
         registry.registerFor(LivingEntity.class, VITA, TestComponents::createForEntity);
-        registry.registerFor(PlayerEntity.class, VITA, PlayerVita::new);
+        registry.registerForPlayers(VITA, PlayerVita::new);
         registry.registerFor(VitalityZombieEntity.class, VITA, VitalityZombieEntity::createVitaComponent);
     }
 
     @Override
     public void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry) {
-        registry.register(VITA, ChunkVita::new);
+        registry.register(VITA, SyncedVita::new);
     }
 
     @Override
@@ -103,7 +103,7 @@ public final class TestComponents implements
                 if (world instanceof Chunk) return VITA.get(world);
                 return null;
             });
-        registry.registerFor(EndPortalBlockEntity.class, VITA, BlockEntityVita::new);
+        registry.registerFor(EndPortalBlockEntity.class, VITA, SyncedVita::new);
         registry.registerFor(
             new Identifier("end_gateway"),
             VITA,

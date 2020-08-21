@@ -22,7 +22,6 @@
  */
 package nerdhub.cardinal.components.api;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import nerdhub.cardinal.components.api.component.Component;
@@ -42,7 +41,7 @@ import java.util.stream.Stream;
  * @see ComponentType
  */
 @ApiStatus.NonExtendable
-public interface ComponentRegistry extends ComponentRegistryV3 {
+public interface ComponentRegistry {
     /**
      * The component registry
      */

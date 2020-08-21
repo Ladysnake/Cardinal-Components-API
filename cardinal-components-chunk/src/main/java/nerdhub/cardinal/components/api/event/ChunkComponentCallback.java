@@ -24,7 +24,6 @@ package nerdhub.cardinal.components.api.event;
 
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactory;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.fabricmc.fabric.api.event.Event;
@@ -53,7 +52,7 @@ public interface ChunkComponentCallback extends ComponentCallback<Chunk, Copyabl
             });
 
     @ApiStatus.Experimental
-    static <C extends Component> void register(ComponentType<C> type, ChunkComponentFactory<? extends C> factory) {
+    static <C extends CopyableComponent<?>> void register(ComponentType<? super C> type, ChunkComponentFactory<C> factory) {
         EVENT.register((chunk, components) -> components.put(type, factory.createForChunk(chunk)));
     }
 

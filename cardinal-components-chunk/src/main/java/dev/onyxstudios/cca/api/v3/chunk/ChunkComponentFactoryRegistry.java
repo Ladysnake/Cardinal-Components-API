@@ -23,18 +23,16 @@
 package dev.onyxstudios.cca.api.v3.chunk;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import org.jetbrains.annotations.ApiStatus;
+import nerdhub.cardinal.components.api.component.Component;
 
 /**
  * @since 2.4.0
  */
-@ApiStatus.Experimental
 public interface ChunkComponentFactoryRegistry {
     /**
      * Registers a {@link ChunkComponentFactory}.
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends CopyableComponent<?>> void register(ComponentKey<? super C> type, ChunkComponentFactory<C> factory);
+    <C extends Component> void register(ComponentKey<C> type, ChunkComponentFactory<? extends C> factory);
 }

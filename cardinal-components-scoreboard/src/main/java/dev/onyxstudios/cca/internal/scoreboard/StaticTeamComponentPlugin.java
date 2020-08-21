@@ -56,17 +56,16 @@ public final class StaticTeamComponentPlugin extends StaticComponentPluginBase<T
     }
 
     @Override
-    protected Class<? extends DynamicContainerFactory<Team, ?>> spinContainerFactory(Class<? extends ComponentContainer<?>> containerCls) throws IOException {
+    protected Class<? extends DynamicContainerFactory<Team>> spinContainerFactory(Class<? extends ComponentContainer> containerCls) throws IOException {
         return spinContainerFactory(this.implSuffix, DynamicContainerFactory.class, containerCls, null, 0, this.providerClass);
     }
 
     @Override
-    public Class<? extends DynamicContainerFactory<Team, Component>> getContainerFactoryClass() {
-        @SuppressWarnings("unchecked") Class<? extends DynamicContainerFactory<Team, Component>> ret = (Class<? extends DynamicContainerFactory<Team, Component>>) super.getContainerFactoryClass();
-        return ret;
+    public Class<? extends DynamicContainerFactory<Team>> getContainerFactoryClass() {
+        return super.getContainerFactoryClass();
     }
 
     public <C extends Component> void register(ComponentKey<C> type, TeamComponentFactory<? extends C> factory) {
-        super.register(type.getId(), (team) -> Objects.requireNonNull(((TeamComponentFactory<?>) factory).createForTeam(team), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
+        super.register(type, (team) -> Objects.requireNonNull(((TeamComponentFactory<?>) factory).createForTeam(team), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
     }
 }
