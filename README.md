@@ -33,7 +33,7 @@ dependencies {
 You can find the current version of the API in the [releases](https://github.com/OnyxStudios/Cardinal-Components-API/releases) tab of the repository on Github.
 
 Cardinal Components API is split into several modules. To depend on the all-encompassing master jar, use the dependency string
-`io.github.onyxstudios:Cardinal-Components-API:<VERSION>`. That artifact bundles every module, but you often do not need all of them for a project. **Individual module names and descriptions can be found [here](https://github.com/OnyxStudios/Cardinal-Components-API/wiki#modules)**.
+`io.github.onyxstudios:Cardinal-Components-API:<VERSION>`. That artifact bundles every module, but you often do not need all of them for a project. **Individual module names and descriptions can be found [[here]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki#modules)**.
 
 Example:
 ```gradle
