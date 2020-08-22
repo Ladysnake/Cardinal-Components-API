@@ -60,6 +60,7 @@ class RandomIntComponent implements IntComponent {
     @Override public void writeToNbt(CompoundTag tag) { tag.putInt("value", this.value); }
 }
 ```
+If you want your component to be **automatically synchronized with watching clients**, you can also add the `AutoSyncedComponent` interface to your implementation [[More Info]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components).
 
 The next step is to choose an identifier for your component, and to declare it in your `fabric.mod.json`'s custom properties:
 ```json
@@ -78,7 +79,7 @@ The next step is to choose an identifier for your component, and to declare it i
 Components can be provided by objects of various classes, depending on which modules you installed.
 The most common providers are [entities](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Entity), [item stacks](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Item), [worlds](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-World) and [chunks](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Chunk), but more are available.
 To interact with them, you need to **register a component key**, using `ComponentRegistryV3#getOrCreate`;
-the resulting `ComponentKey` instance has the query methods you need. We also need to **attach our
+the resulting `ComponentKey` instance has the query methods you need. You will also need to **attach your
 component** to some providers (here, to players and worlds):
 
 ```java
@@ -114,7 +115,7 @@ Do not forget to declare your component initializer as an entrypoint in your `fa
 }
 ```
 
-**[More information on component registration](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Registering-and-using-a-component)**
+**[[More information on component registration]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Registering-and-using-a-component)**
 
 Now, all that is left is to actually use that component. You can access individual instances of your component by using the dedicated getters on your `ComponentKey`:
 
