@@ -60,7 +60,7 @@ class RandomIntComponent implements IntComponent {
     @Override public void writeToNbt(CompoundTag tag) { tag.putInt("value", this.value); }
 }
 ```
-If you want your component to be **automatically synchronized with watching clients**, you can also add the `AutoSyncedComponent` interface to your implementation [[More Info]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components).
+If you want your component to be **automatically synchronized with watching clients**, you can also add the [`AutoSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/AutoSyncedComponent.java) interface to your implementation **[[More Info]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components)**.
 
 The next step is to choose an identifier for your component, and to declare it in your `fabric.mod.json`'s custom properties:
 ```json
