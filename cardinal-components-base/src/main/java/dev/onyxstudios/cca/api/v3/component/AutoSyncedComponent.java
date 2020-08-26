@@ -32,7 +32,10 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * A {@link Component} that can be written to and read from a {@link PacketByteBuf}.
+ * A {@link Component} implementing this interface will have its data automatically
+ * synchronized with players watching its provider.
+ *
+ * @see ComponentKey#sync(Object)
  */
 public interface AutoSyncedComponent extends ComponentV3 {
     /**
@@ -52,6 +55,15 @@ public interface AutoSyncedComponent extends ComponentV3 {
         return true;
     }
 
+    /**
+     * Returns {@code true} if a synchronization packet for this component
+     * should be immediately sent to {@code player}.
+     *
+     * @param player potential recipient of a synchronization packet
+     * @param syncOp the specific sync operation to be performed, as passed in {@link ComponentKey#sync(Object, int)}
+     * @return {@code true} if synchronization with the {@code player} should occur,
+     * {@code false} otherwise
+     */
     default boolean shouldSyncWith(ServerPlayerEntity player, int syncOp) {
         // calling the deprecated overload for backward compatibility
         return this.shouldSyncWith(player);
