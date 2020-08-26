@@ -30,10 +30,10 @@ import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking;
 import dev.onyxstudios.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
-import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Lazy;
 import org.spongepowered.asm.mixin.Mixin;
@@ -69,7 +69,11 @@ public abstract class MixinScoreboard implements InternalComponentProvider {
     @Override
     public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
         if (this instanceof ServerScoreboardAccessor) {
-            return PlayerStream.all(((ServerScoreboardAccessor) this).getServer()).iterator();
+            MinecraftServer server = ((ServerScoreboardAccessor) this).getServer();
+
+            if (server.getPlayerManager() != null) {
+                return server.getPlayerManager().getPlayerList().iterator();
+            }
         }
         return Collections.emptyIterator();
     }
