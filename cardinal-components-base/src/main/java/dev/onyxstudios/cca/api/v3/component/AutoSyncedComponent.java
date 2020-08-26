@@ -23,26 +23,62 @@
 package dev.onyxstudios.cca.api.v3.component;
 
 import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Util;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A {@link Component} that can be written to and read from a {@link PacketByteBuf}.
  */
 public interface AutoSyncedComponent extends ComponentV3 {
+    /**
+     * The default sync operation.
+     *
+     * <p>When {@link #writeToPacket(PacketByteBuf, ServerPlayerEntity, int)} is called with this value,
+     * all synchronized data should be written to the packet as if the recipient got it for the first time.
+     */
+    int FULL_SYNC = 0;
+
+    /**
+     * @deprecated use/override {@link #shouldSyncWith(ServerPlayerEntity, int)} instead
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     default boolean shouldSyncWith(ServerPlayerEntity player) {
         return true;
+    }
+
+    default boolean shouldSyncWith(ServerPlayerEntity player, int syncOp) {
+        // calling the deprecated overload for backward compatibility
+        return this.shouldSyncWith(player);
+    }
+
+    /**
+     * @deprecated use/override {@link #writeToPacket(PacketByteBuf, ServerPlayerEntity, int)}
+     */
+    @ApiStatus.ScheduledForRemoval
+    @Deprecated
+    default void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
+        buf.writeCompoundTag(Util.make(new CompoundTag(), this::writeToNbt));
     }
 
     /**
      * Writes this component's data to {@code buf}.
      *
-     * <p>The data written to the packet may differ based on the {@code recipient}.
+     * <p>Implementations may choose to change the data written to the packet based on the {@code recipient}
+     * or on the {@code syncOp}, or they may safely ignore both parameters.
+     * A {@code syncOp} value of {@code 0} triggers the base full synchronization behaviour.
+     * Other values have a meaning specific to the component implementation.
+     * Typical uses of this parameter include limiting the amount of data being synced (eg. by identifying a
+     * specific field to write), or triggering different events on the client (similar to {@link World#sendEntityStatus(Entity, byte)})
      *
      * @param buf       the buffer to write the data to
      * @param recipient the player to which the packet will be sent
+     * @param syncOp    the specific sync operation to be performed, as passed in {@link ComponentKey#sync(Object, int)}
      * @implSpec The default implementation writes the whole NBT representation
      * of this component to the buffer using {@link #writeToNbt(CompoundTag)}.
      * @implNote The default implementation should generally be overridden.
@@ -50,10 +86,13 @@ public interface AutoSyncedComponent extends ComponentV3 {
      * information to clients, uses a wasteful data format, and does not support
      * any optimization such as incremental updates. Implementing classes can
      * nearly always provide a better implementation.
+     * @see ComponentKey#sync(Object)
+     * @see ComponentKey#sync(Object, int)
      * @see #readFromPacket(PacketByteBuf)
      */
-    default void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
-        buf.writeCompoundTag(Util.make(new CompoundTag(), this::writeToNbt));
+    default void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient, int syncOp) {
+        // calling the deprecated overload for backward compatibility
+        this.writeToPacket(buf, recipient);
     }
 
     /**

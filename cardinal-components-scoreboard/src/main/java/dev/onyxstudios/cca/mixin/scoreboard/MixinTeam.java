@@ -81,10 +81,10 @@ public abstract class MixinTeam implements InternalComponentProvider, TeamAccess
 
     @Nullable
     @Override
-    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient) {
+    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient, int syncOp) {
         buf.writeString(this.getName());
         buf.writeIdentifier(key.getId());
-        component.writeToPacket(buf, recipient);
+        component.writeToPacket(buf, recipient, syncOp);
         return new CustomPayloadS2CPacket(ComponentsScoreboardNetworking.TEAM_PACKET_ID, buf);
     }
 

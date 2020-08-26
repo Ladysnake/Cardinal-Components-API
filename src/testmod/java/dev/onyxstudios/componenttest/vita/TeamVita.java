@@ -34,7 +34,7 @@ public class TeamVita extends SyncedVita {
     }
 
     @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player) {
+    public boolean shouldSyncWith(ServerPlayerEntity player, int syncOp) {
         return player.getScoreboardTeam() == this.team;
     }
 

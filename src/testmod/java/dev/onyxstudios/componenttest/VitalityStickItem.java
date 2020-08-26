@@ -55,16 +55,17 @@ public class VitalityStickItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
         Vita vita = Vita.get(stack);
-        if (vita.getVitality() > 0 && !world.isClient) {
+        if (!world.isClient) {
             if (player.isSneaking()) {
+                Vita src = vita.getVitality() > 0 ? vita : Vita.get(player);
                 AmbientVita worldVita = (AmbientVita) Vita.get(
                         world.random.nextInt(10) == 0
                                 ? world.getLevelProperties()
                                 : world
                 );
-                vita.transferTo(worldVita, 1);
+                src.transferTo(worldVita, 1);
                 worldVita.syncWithAll(((ServerWorld)world).getServer());
-            } else {
+            } else if (vita.getVitality() > 0) {
                 vita.transferTo(Vita.get(player), vita.getVitality());
             }
         }

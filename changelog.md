@@ -1,4 +1,10 @@
 ------------------------------------------------------
+Version 2.5.2
+------------------------------------------------------
+- Added a `syncOp` parameter to `AutoSyncedComponent` methods, making the interface more flexible
+    - The new parameter can be ignored, or it can be used to implement multiple types of sync without custom packets
+
+------------------------------------------------------
 Version 2.5.1
 ------------------------------------------------------
 - Basic V3 interfaces are no longer experimental
