@@ -126,6 +126,18 @@ public interface ComponentProvider {
 
     @Nullable
     @ApiStatus.Experimental
+    default <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient, int syncOp) {
+        // calling the deprecated overload for backward compatibility
+        return this.toComponentPacket(buf, key, component, recipient);
+    }
+
+    /**
+     * @deprecated use/override {@link #toComponentPacket(PacketByteBuf, ComponentKey, AutoSyncedComponent, ServerPlayerEntity, int)}
+     */
+    @SuppressWarnings("unused")
+    @Nullable
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     default <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient) {
         return null;
     }

@@ -65,9 +65,9 @@ public abstract class MixinServerWorld extends MixinWorld {
 
     @Nullable
     @Override
-    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient) {
+    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient, int syncOp) {
         buf.writeIdentifier(key.getId());
-        component.writeToPacket(buf, recipient);
+        component.writeToPacket(buf, recipient, syncOp);
         return new CustomPayloadS2CPacket(ComponentsWorldNetworking.PACKET_ID, buf);
     }
 }

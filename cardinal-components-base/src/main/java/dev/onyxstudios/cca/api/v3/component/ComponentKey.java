@@ -108,11 +108,32 @@ public abstract class ComponentKey<C extends Component> {
      */
     @ApiStatus.Experimental
     public <V> void sync(V provider) {
+        this.sync(provider, AutoSyncedComponent.FULL_SYNC);
+    }
+
+    /**
+     * Attempts to synchronize the component attached to the given provider.
+     *
+     * <p>The {@code syncOp} parameter is passed to {@link AutoSyncedComponent#writeToPacket(PacketByteBuf, ServerPlayerEntity, int)}.
+     * A value of {@link AutoSyncedComponent#FULL_SYNC} triggers the default behaviour of synchronizing all relevant data with watching players.
+     * Other values have varying behaviour depending on the component type.
+     *
+     * <p>This method has no visible effect if the given provider does not support synchronization, or
+     * the associated component does not implement an adequate synchronization interface.
+     *
+     * @param <V>      the class of the component provider
+     * @param provider a component provider
+     * @param syncOp   the specific sync operation to be performed in {@link AutoSyncedComponent#writeToPacket(PacketByteBuf, ServerPlayerEntity, int)}
+     * @throws NoSuchElementException if the provider does not provide this type of component
+     * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
+     */
+    @ApiStatus.Experimental
+    public <V> void sync(V provider, int syncOp) {
         ComponentProvider prov = (ComponentProvider) provider;
         C c = this.get(prov);
 
         if (c instanceof AutoSyncedComponent) {
-            prov.getRecipientsForComponentSync().forEachRemaining(player -> this.syncWith(player, prov));
+            prov.getRecipientsForComponentSync().forEachRemaining(player -> this.syncWith(player, prov, syncOp));
         } else if (c instanceof SyncedComponent) {
             ((SyncedComponent) c).sync();
         }
@@ -167,12 +188,17 @@ public abstract class ComponentKey<C extends Component> {
 
     @ApiStatus.Internal
     public void syncWith(ServerPlayerEntity player, ComponentProvider provider) {
+        this.syncWith(player, provider, AutoSyncedComponent.FULL_SYNC);
+    }
+
+    @ApiStatus.Internal
+    public void syncWith(ServerPlayerEntity player, ComponentProvider provider, int syncOp) {
         C c = this.get(provider);
 
-        if (c instanceof AutoSyncedComponent && ((AutoSyncedComponent) c).shouldSyncWith(player)) {
+        if (c instanceof AutoSyncedComponent && ((AutoSyncedComponent) c).shouldSyncWith(player, syncOp)) {
             PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             // can't cast to (C & AutoSyncedComponent), but the guarantees are there
-            @SuppressWarnings({"unchecked", "rawtypes"}) Packet<?> packet = provider.toComponentPacket(buf, (ComponentKey) this, (AutoSyncedComponent) c, player);
+            @SuppressWarnings({"unchecked", "rawtypes"}) Packet<?> packet = provider.toComponentPacket(buf, (ComponentKey) this, (AutoSyncedComponent) c, player, syncOp);
 
             if (packet != null) {
                 ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, packet);

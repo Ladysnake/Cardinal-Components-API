@@ -22,38 +22,62 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
+import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
-import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
-import net.minecraft.entity.LivingEntity;
+import dev.onyxstudios.componenttest.TestComponents;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
  * A Vita component attached to players, and automatically synchronized with their owner
  */
-public class PlayerVita extends EntityVita implements EntitySyncedComponent, PlayerComponent<BaseVita> {
+public class PlayerVita extends EntityVita implements AutoSyncedComponent, PlayerComponent<BaseVita> {
+    public static final int INCREASE_VITA = 0b10;
+    public static final int DECREASE_VITA = 0b100;
 
     public PlayerVita(PlayerEntity owner) {
         super(owner, 0);
     }
 
     @Override
-    public void sync() {
-        if (!this.getEntity().world.isClient) {
-            // We only sync with the holder, not with everyone around
-            this.syncWith((ServerPlayerEntity) this.getEntity());
+    public void setVitality(int value) {
+        if (value != this.vitality) {
+            boolean increase = value > this.vitality;
+            super.setVitality(value);
+            TestComponents.VITA.sync(this.owner, increase ? INCREASE_VITA : DECREASE_VITA);
         }
     }
 
     @Override
-    public void setVitality(int value) {
-        super.setVitality(value);
-        this.sync();
+    public boolean shouldSyncWith(ServerPlayerEntity player, int syncOp) {
+        // We only sync the full data with the holder, not with everyone around
+        return player == this.owner || syncOp != FULL_SYNC;
     }
 
     @Override
-    public LivingEntity getEntity() {
-        return this.owner;
+    public void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient, int syncOp) {
+        boolean fullSync = recipient == this.owner;
+        int flags = (fullSync ? 1 : 0) | (syncOp & INCREASE_VITA) | (syncOp & DECREASE_VITA);
+        buf.writeByte(flags);
+        if (fullSync) {
+            buf.writeVarInt(this.vitality);
+        }
+    }
+
+    @Override
+    public void readFromPacket(PacketByteBuf buf) {
+        int flags = buf.readByte();
+        if ((flags & 1) != 0) {
+            this.vitality = buf.readVarInt();
+        }
+        if ((flags & INCREASE_VITA) != 0) {
+            MinecraftClient.getInstance().particleManager.addEmitter(this.owner, ParticleTypes.TOTEM_OF_UNDYING, 30);
+        } else if ((flags & DECREASE_VITA) != 0) {
+            MinecraftClient.getInstance().particleManager.addEmitter(this.owner, ParticleTypes.ASH, 30);
+        }
     }
 
     @Override
