@@ -89,8 +89,8 @@ public final class MyComponents implements EntityComponentInitializer, WorldComp
         
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        // Add the component to every PlayerEntity instance
-        registry.registerForPlayers(MAGIK, player -> new RandomIntComponent());
+        // Add the component to every PlayerEntity instance, and copy it on respawn with keepInventory
+        registry.registerForPlayers(MAGIK, player -> new RandomIntComponent(), RespawnCopyStrategy.INVENTORY);
     }
     
     @Override
