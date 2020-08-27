@@ -12,6 +12,14 @@ objects and behaviours, thereby helping both mod creation and compatibility.*
 Detailed information is available in this repository's [wiki](https://github.com/OnyxStudios/Cardinal-Components-API/wiki).
 The information below is a condensed form of the latter.
 
+## Features
+- Attach your components to a variety of vanilla classes
+- Implement once, have them work (and be saved) everywhere
+- Synchronize your components with a single helper interface
+- Easily configure how your components are copied when a player respawns
+- Customize everything so that it fits your needs
+- All while enjoying the speed of ASM-generated extensions
+
 ## Adding the API to your buildscript:
 Latest versions of Cardinal Components API are available on Bintray:
 ```gradle
