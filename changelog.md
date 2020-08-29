@@ -1,4 +1,9 @@
 ------------------------------------------------------
+Version 2.5.3
+------------------------------------------------------
+- Fixed a crash in cardinal-components-chunk when `cardinal-components-world` was not installed
+
+------------------------------------------------------
 Version 2.5.2
 ------------------------------------------------------
 - Added a `syncOp` parameter to `AutoSyncedComponent` methods, making the interface more flexible
