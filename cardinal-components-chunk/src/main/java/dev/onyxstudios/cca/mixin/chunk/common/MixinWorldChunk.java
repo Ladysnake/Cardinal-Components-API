@@ -98,6 +98,6 @@ public abstract class MixinWorldChunk implements Chunk, InternalComponentProvide
 
     @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/world/chunk/ProtoChunk;)V", at = @At("RETURN"))
     private void copyFromProto(World world, ProtoChunk proto, CallbackInfo ci) {
-        this.components.copyFrom(((InternalComponentProvider) ComponentProvider.fromWorld(world)).getComponentContainer());
+        this.components.copyFrom(((InternalComponentProvider) ComponentProvider.fromChunk(proto)).getComponentContainer());
     }
 }
