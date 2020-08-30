@@ -102,7 +102,7 @@ public final class StaticGenericComponentPlugin extends LazyDispatcher implement
     @Override
     public <F> void register(ComponentKey<?> type, Identifier providerId, TypeToken<F> factoryType, F factory) {
         this.checkLoading(GenericComponentFactoryRegistry.class, "register");
-        Map<ComponentKey<?>, OwnedObject<?>> specializedMap = this.componentFactories.computeIfAbsent(providerId, t -> new HashMap<>());
+        Map<ComponentKey<?>, OwnedObject<?>> specializedMap = this.componentFactories.computeIfAbsent(providerId, t -> new LinkedHashMap<>());
         Object previousFactory = specializedMap.get(type);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on provider '" + providerId + "': " + factory + " and " + previousFactory);

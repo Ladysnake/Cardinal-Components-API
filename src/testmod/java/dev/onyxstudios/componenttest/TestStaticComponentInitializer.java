@@ -22,12 +22,14 @@
  */
 package dev.onyxstudios.componenttest;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.componenttest.vita.BaseVita;
 import dev.onyxstudios.componenttest.vita.Vita;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,6 +55,10 @@ public final class TestStaticComponentInitializer implements StaticComponentInit
         CardinalComponentsTest.LOGGER.info("CCA Bootstrap complete!");
         ComponentType<Vita> altVita = ComponentRegistry.INSTANCE.registerIfAbsent(ALT_VITA_ID, Vita.class);
         CardinalComponentsTest.TestCallback.EVENT.register((uuid, p, components) -> components.put(altVita, new BaseVita()));
+        ComponentContainer.Factory.Builder<@Nullable Void> builder = ComponentContainer.Factory.builder(Void.class);
+        for (int i = 127; i >= 0; i--) {
+            builder.component(ComponentRegistry.INSTANCE.registerStatic(new Identifier("-.-", "-random/test." + i), Vita.class), v -> new BaseVita());
+        }
+        CardinalComponentsTest.LOGGER.info(builder.build().createContainer(null));
     }
-
 }

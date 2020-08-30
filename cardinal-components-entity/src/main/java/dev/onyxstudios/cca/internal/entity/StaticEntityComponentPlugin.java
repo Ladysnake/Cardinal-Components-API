@@ -135,7 +135,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     }
 
     private <C extends Component, E extends Entity> void register0(Class<? extends E> target, ComponentKey<? super C> key, EntityComponentFactory<C, E> factory) {
-        Map<ComponentKey<?>, EntityComponentFactory<?, ?>> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new HashMap<>());
+        Map<ComponentKey<?>, EntityComponentFactory<?, ?>> specializedMap = this.componentFactories.computeIfAbsent(target, t -> new LinkedHashMap<>());
         EntityComponentFactory<?, ?> previousFactory = specializedMap.get(key);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + key.getId() + " on " + target + ": " + factory + " and " + previousFactory);

@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -130,7 +130,7 @@ public interface ComponentContainer extends NbtSerializable {
 
             Builder(Class<T> argClass) {
                 this.argClass = argClass;
-                this.factories = new HashMap<>();
+                this.factories = new LinkedHashMap<>();
             }
 
             public <C extends Component> Builder<T> component(ComponentKey<C> key, Function<T, ? extends C> factory) {
