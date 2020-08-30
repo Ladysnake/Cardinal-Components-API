@@ -31,6 +31,7 @@ import nerdhub.cardinal.components.api.util.NbtSerializable;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
@@ -110,11 +111,14 @@ public interface ComponentContainer extends NbtSerializable {
         /**
          * Instantiates a new {@link ComponentContainer} and populates it with components.
          *
+         * <p>The parameter {@code t} will be passed to every factory registered through {@link Builder#component(ComponentKey, Function)}.
+         *
          * @param t the factory argument
          * @return a new {@link ComponentContainer}
+         * @throws NullPointerException if any of the factories requires a non-null argument
          */
         @Contract("_ -> new")
-        ComponentContainer createContainer(T t);
+        ComponentContainer createContainer(@Nullable T t);
 
 
         /**
