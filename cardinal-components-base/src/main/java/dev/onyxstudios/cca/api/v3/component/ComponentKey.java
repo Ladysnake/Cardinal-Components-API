@@ -106,7 +106,6 @@ public abstract class ComponentKey<C extends Component> {
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
-    @ApiStatus.Experimental
     public <V> void sync(V provider) {
         this.sync(provider, AutoSyncedComponent.FULL_SYNC);
     }
