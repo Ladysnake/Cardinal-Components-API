@@ -207,12 +207,11 @@ public final class CcaAsmHelper {
         String factoryFieldDescriptor = Type.getDescriptor(componentFactoryType);
 
         classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "componentKeys", "Ljava/util/Set;", null, null);
-/*      TODO V3 enable static keyset optimization when dynamic components are no more
-        MethodVisitor keys = classNode.visitMethod(Opcodes.ACC_PUBLIC, "keys", "()Ljava/util/Set;", null, null);
-        keySet.visitFieldInsn(Opcodes.GETSTATIC, containerImplName, "componentKeys", "Ljava/util/Set;");
-        keySet.visitInsn(Opcodes.ARETURN);
-        keySet.visitEnd();
-*/
+//      TODO V3 replace staticKeySet() with keys() when dynamic components are no more
+        MethodVisitor keys = classNode.visitMethod(Opcodes.ACC_PUBLIC, "staticKeySet", "()Ljava/util/Set;", null, null);
+        keys.visitFieldInsn(Opcodes.GETSTATIC, containerImplName, "componentKeys", "Ljava/util/Set;");
+        keys.visitInsn(Opcodes.ARETURN);
+        keys.visitEnd();
 
 /*      TODO V3 enable empty check optimization when dynamic components are no more
         MethodVisitor hasComponents = classNode.visitMethod(Opcodes.ACC_PUBLIC, "hasComponents", "()Z", null, null);

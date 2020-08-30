@@ -23,10 +23,14 @@
 package nerdhub.cardinal.components.api.util.container;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterators;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import it.unimi.dsi.fastutil.Hash;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
@@ -45,12 +49,11 @@ import java.util.*;
  * merely changing the value associated with a key that an instance already contains is not
  * a structural modification.) This is typically accomplished by synchronizing on some object
  * that naturally encapsulates the container.
- *
  */
 // TODO merge with superclass
 public class FastComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
     private final BitSet containedTypes;
-    private final Int2ObjectOpenHashMap<C> vals;
+    private final Int2ObjectLinkedOpenHashMap<C> vals;
 
     public FastComponentContainer() {
         this(Hash.DEFAULT_INITIAL_SIZE);
@@ -61,7 +64,7 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
      */
     public FastComponentContainer(int expected) {
         this.containedTypes = new BitSet(((ComponentRegistryImpl) ComponentRegistry.INSTANCE).size());
-        this.vals = new Int2ObjectOpenHashMap<>(expected, Hash.VERY_FAST_LOAD_FACTOR);
+        this.vals = new Int2ObjectLinkedOpenHashMap<>(expected, Hash.VERY_FAST_LOAD_FACTOR);
     }
 
     @SuppressWarnings("unused") // called by generated subclasses
@@ -110,6 +113,8 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
         Preconditions.checkArgument(key.getComponentClass().isInstance(value), value + " is not of type " + key);
         Preconditions.checkState(this.canBeAssigned(key), "Component type " + key + " was already defined with value " + this.get(key) + ", cannot replace with " + value);
         this.containedTypes.set(key.getRawId());
+        // Invalidate the key set in case it was assigned to the static keys
+        if (this.vals.isEmpty()) this.keySet = null;
         return this.vals.put(key.getRawId(), value);
     }
 
@@ -143,7 +148,12 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
         if (ks != null) {
             return ks;
         }
-        return this.keySet = new KeySet();
+        return this.keySet = this.vals.isEmpty() ? this.staticKeySet() : new KeySet();
+    }
+
+    // Overridden by generated subclasses
+    protected Set<ComponentType<?>> staticKeySet() {
+        return Collections.emptySet();
     }
 
     /**
@@ -176,14 +186,14 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
      */
     @Override
     public Set<Map.Entry<ComponentType<?>, C>> entrySet() {
-        Set<Map.Entry<ComponentType<?>,C>> es = this.entrySet;
+        Set<Map.Entry<ComponentType<?>, C>> es = this.entrySet;
         if (es != null) {
             return es;
         }
         return this.entrySet = new EntrySet();
     }
 
-    private class EntrySet extends AbstractSet<Map.Entry<ComponentType<?>,C>> {
+    private class EntrySet extends AbstractSet<Map.Entry<ComponentType<?>, C>> {
         @Override
         public Iterator<Map.Entry<ComponentType<?>, C>> iterator() {
             return new EntryIterator();
@@ -193,18 +203,21 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
         public boolean contains(Object o) {
             if (!(o instanceof Map.Entry))
                 return false;
-            Map.Entry<?,?> entry = (Map.Entry<?,?>)o;
+            Map.Entry<?, ?> entry = (Map.Entry<?, ?>) o;
             Object key = entry.getKey();
             return key instanceof ComponentType && Objects.equals(entry.getValue(), FastComponentContainer.this.get(key));
         }
+
         @Override
         public boolean remove(Object o) {
             throw new UnsupportedOperationException();
         }
+
         @Override
         public int size() {
             return FastComponentContainer.this.size();
         }
+
         @Override
         public void clear() {
             throw new UnsupportedOperationException();
@@ -214,16 +227,21 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
     private class KeySet extends AbstractSet<ComponentType<?>> {
         @Override
         public Iterator<ComponentType<?>> iterator() {
-            return new KeyIterator();
+            Iterator<ComponentType<?>> i1 = FastComponentContainer.this.staticKeySet().iterator();
+            Iterator<ComponentType<?>> i2 = new KeyIterator();
+            return Iterators.concat(i1, i2);
         }
+
         @Override
         public int size() {
             return FastComponentContainer.this.size();
         }
+
         @Override
         public boolean contains(Object o) {
             return FastComponentContainer.this.containsKey(o);
         }
+
         @Override
         public boolean remove(Object o) {
             throw new UnsupportedOperationException();
@@ -233,95 +251,61 @@ public class FastComponentContainer<C extends Component> extends AbstractCompone
     private class Values extends AbstractCollection<C> {
         @Override
         public Iterator<C> iterator() {
-            return new ValueIterator();
+            @SuppressWarnings("unchecked") Iterator<C> i1 = (Iterator<C>) Iterators.<ComponentType<?>, Component>transform(FastComponentContainer.this.staticKeySet().iterator(), FastComponentContainer.this::get);
+            ObjectIterator<C> i2 = FastComponentContainer.this.vals.values().iterator();
+            return Iterators.concat(i1, i2);
         }
+
         @Override
         public int size() {
             return FastComponentContainer.this.size();
         }
+
         @Override
         public boolean contains(Object o) {
             return FastComponentContainer.this.containsValue(o);
         }
+
         @Override
         public boolean remove(Object o) {
             throw new UnsupportedOperationException();
         }
     }
 
-    private class ValueIterator implements Iterator<C> {
-        private boolean advance = true;
-        private int curId = -1;
-
-        @Override
-        public boolean hasNext() {
-            if (this.advance) {
-                this.curId = FastComponentContainer.this.containedTypes.nextSetBit(this.curId + 1);
-                this.advance = false;
-            }
-            return this.curId >= 0;
-        }
-
-        @Override
-        public C next() {
-            if (!this.hasNext()) {
-                throw new NoSuchElementException();
-            }
-            this.advance = true;
-            ComponentType<?> key = ComponentRegistryImpl.byRawId(this.curId);
-            @SuppressWarnings("unchecked") C value = (C) FastComponentContainer.this.get(key);
-            assert value != null;
-            return value;
-        }
-
-    }
-
     private final class KeyIterator implements Iterator<ComponentType<?>> {
-        private boolean advance = true;
-        private int curId = -1;
+        private final IntIterator wrapped = FastComponentContainer.this.vals.keySet().iterator();
 
         @Override
         public boolean hasNext() {
-            if (this.advance) {
-                this.curId = FastComponentContainer.this.containedTypes.nextSetBit(this.curId + 1);
-                this.advance = false;
-            }
-            return this.curId >= 0;
+            return this.wrapped.hasNext();
         }
 
         @Override
         public ComponentType<?> next() {
-            if (!this.hasNext()) {
-                throw new NoSuchElementException();
-            }
-            this.advance = true;
-            return ComponentRegistryImpl.byRawId(this.curId);
+            return ComponentRegistryImpl.byRawId(this.wrapped.nextInt());
         }
     }
 
     private final class EntryIterator implements Iterator<Entry<ComponentType<?>, C>> {
-        private boolean advance = true;
-        private int curId = -1;
+        private final Iterator<ComponentType<?>> staticWrapped = FastComponentContainer.this.staticKeySet().iterator();
+        private final ObjectBidirectionalIterator<Int2ObjectMap.Entry<C>> dynamicWrapped = FastComponentContainer.this.vals.int2ObjectEntrySet().fastIterator();
 
         @Override
         public boolean hasNext() {
-            if (this.advance) {
-                this.curId = FastComponentContainer.this.containedTypes.nextSetBit(this.curId + 1);
-                this.advance = false;
-            }
-            return this.curId >= 0;
+            return this.staticWrapped.hasNext() || this.dynamicWrapped.hasNext();
         }
 
         @Override
         public Entry next() {
-            if (!this.hasNext()) {
+            if (this.staticWrapped.hasNext()) {
+                @SuppressWarnings("unchecked") ComponentType<? extends C> next = (ComponentType<? extends C>) this.staticWrapped.next();
+                return new Entry(next, next.getFromContainer(FastComponentContainer.this));
+            } else if (this.dynamicWrapped.hasNext()) {
+                Int2ObjectMap.Entry<C> e = this.dynamicWrapped.next();
+                return new Entry(ComponentRegistryImpl.byRawId(e.getIntKey()), e.getValue());
+            } else {
                 throw new NoSuchElementException();
             }
-            this.advance = true;
-            ComponentType<?> key = ComponentRegistryImpl.byRawId(this.curId);
-            @SuppressWarnings("unchecked") C value = (C) FastComponentContainer.this.get(key);
-            assert value != null;
-            return new Entry(key, value);
         }
 
         private final class Entry implements Map.Entry<ComponentType<?>, C> {

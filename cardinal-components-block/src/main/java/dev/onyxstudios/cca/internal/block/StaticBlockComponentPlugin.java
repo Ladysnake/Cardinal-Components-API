@@ -105,7 +105,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
 
     public <C extends Component, E extends BlockEntity> void registerFor(Class<E> target, ComponentKey<C> type, BlockEntityComponentFactory<C, E> factory) {
         this.checkLoading(BlockComponentFactoryRegistry.class, "register");
-        Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>> specializedMap = this.beComponentFactories.computeIfAbsent(target, t -> new HashMap<>());
+        Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>> specializedMap = this.beComponentFactories.computeIfAbsent(target, t -> new LinkedHashMap<>());
         BlockEntityComponentFactory<?, ?> previousFactory = specializedMap.get(type);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + target + ": " + factory + " and " + previousFactory);

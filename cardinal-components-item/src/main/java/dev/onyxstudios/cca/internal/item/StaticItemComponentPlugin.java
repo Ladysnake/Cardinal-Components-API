@@ -74,7 +74,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
 
         if (this.componentFactories.containsKey(itemId)) {
             try {
-                Map<ComponentKey<?>, ItemComponentFactoryV2<?>> compiled = new HashMap<>(this.componentFactories.get(itemId));
+                Map<ComponentKey<?>, ItemComponentFactoryV2<?>> compiled = new LinkedHashMap<>(this.componentFactories.get(itemId));
                 this.getWildcard().forEach(compiled::putIfAbsent);
                 String implSuffix = getSuffix(itemId);
                 Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(ItemComponentFactoryV2.class, compiled, implSuffix);
@@ -140,7 +140,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     }
 
     private <C extends Component> void register0(@Nullable Identifier itemId, ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory) {
-        Map<ComponentKey<?>, ItemComponentFactoryV2<?>> specializedMap = this.componentFactories.computeIfAbsent(itemId, t -> new HashMap<>());
+        Map<ComponentKey<?>, ItemComponentFactoryV2<?>> specializedMap = this.componentFactories.computeIfAbsent(itemId, t -> new LinkedHashMap<>());
         ItemComponentFactoryV2<?> previousFactory = specializedMap.get(type);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + (itemId == null ? "every item" : "item '" + itemId + "'") + ": " + factory + " and " + previousFactory);
