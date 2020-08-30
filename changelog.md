@@ -1,4 +1,12 @@
 ------------------------------------------------------
+Version 2.5.4
+------------------------------------------------------
+- ComponentContainer iteration order is now the same as the factory registration order
+    - This means mods have some (limited) control over the order in which components are de-serialized/synchronized
+- Removed the experimental tag from more methods
+- `ComponentContainer.Factory#createContainer` now accepts `null` arguments (but will NPE if a component factory does not expect it)
+
+------------------------------------------------------
 Version 2.5.3
 ------------------------------------------------------
 - Fixed a crash in cardinal-components-chunk when `cardinal-components-world` was not installed
