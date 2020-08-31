@@ -23,6 +23,7 @@
 package dev.onyxstudios.componenttest;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.componenttest.vita.BaseVita;
 import dev.onyxstudios.componenttest.vita.Vita;
@@ -57,7 +58,7 @@ public final class TestStaticComponentInitializer implements StaticComponentInit
         CardinalComponentsTest.TestCallback.EVENT.register((uuid, p, components) -> components.put(altVita, new BaseVita()));
         ComponentContainer.Factory.Builder<@Nullable Void> builder = ComponentContainer.Factory.builder(Void.class);
         for (int i = 127; i >= 0; i--) {
-            builder.component(ComponentRegistry.INSTANCE.registerStatic(new Identifier("-.-", "-random/test." + i), Vita.class), v -> new BaseVita());
+            builder.component(ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("-.-", "-random/test." + i), Vita.class), v -> new BaseVita());
         }
         CardinalComponentsTest.LOGGER.info(builder.build().createContainer(null));
     }

@@ -22,10 +22,10 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentV3;
 import dev.onyxstudios.componenttest.TestComponents;
-import nerdhub.cardinal.components.api.component.Component;
 
-public interface Vita extends Component {
+public interface Vita extends ComponentV3 {
 
     static <T> Vita get(T provider) {
         return TestComponents.VITA.get(provider);

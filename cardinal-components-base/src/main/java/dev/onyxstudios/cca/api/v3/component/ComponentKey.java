@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.api.v3.component;
 
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
 import io.netty.buffer.Unpooled;
-import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
@@ -45,9 +44,9 @@ import java.util.Optional;
  * A key for retrieving {@link Component} instances from component providers.
  *
  * <p> A {@link ComponentKey} must be registered for every component type through
- * {@link ComponentRegistry#registerIfAbsent(Identifier, Class)}.
+ * {@link ComponentRegistryV3#getOrCreate(Identifier, Class)}.
  *
- * @see ComponentRegistry
+ * @see ComponentRegistryV3
  */
 @ApiStatus.NonExtendable
 public abstract class ComponentKey<C extends Component> {
@@ -158,7 +157,7 @@ public abstract class ComponentKey<C extends Component> {
     /**
      * Constructs a new immutable ComponentType
      *
-     * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
+     * @see ComponentRegistryV3#getOrCreate(Identifier, Class)
      */
     @ApiStatus.Internal
     protected ComponentKey(Identifier id, Class<C> componentClass, int rawId) {
