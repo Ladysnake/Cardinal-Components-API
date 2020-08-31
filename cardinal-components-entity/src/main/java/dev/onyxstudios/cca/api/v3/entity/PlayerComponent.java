@@ -26,6 +26,7 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.world.GameRules;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 
 @ApiStatus.Experimental
 public interface PlayerComponent<C extends Component> extends CopyableComponent<C> {
@@ -37,6 +38,7 @@ public interface PlayerComponent<C extends Component> extends CopyableComponent<
      *                      {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
      * @return {@code true} if {@link #copyForRespawn} should be called for the current respawn situation
      */
+    @Contract(pure = true)
     default boolean shouldCopyForRespawn(boolean lossless, boolean keepInventory) {
         return lossless;
     }

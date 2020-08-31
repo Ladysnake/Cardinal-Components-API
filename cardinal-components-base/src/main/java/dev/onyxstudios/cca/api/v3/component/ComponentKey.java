@@ -33,6 +33,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnegative;
@@ -68,6 +69,7 @@ public abstract class ComponentKey<C extends Component> {
      * @see #maybeGet(Object)
      */
     // overridden by generated types
+    @Contract(pure = true)
     @ApiStatus.Experimental
     public abstract <V> @Nullable C getNullable(V provider);
 
@@ -79,6 +81,7 @@ public abstract class ComponentKey<C extends Component> {
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      * @see #maybeGet(Object)
      */
+    @Contract(pure = true)
     public abstract <V> C get(V provider);
 
     /**
@@ -88,8 +91,10 @@ public abstract class ComponentKey<C extends Component> {
      * {@code Optional} if {@code provider} does not have such a component.
      * @see #get(Object)
      */
+    @Contract(pure = true)
     public abstract <V> Optional<C> maybeGet(@Nullable V provider);
 
+    @Contract(pure = true)
     @ApiStatus.Experimental
     public <V> boolean isProvidedBy(V provider) {
         return this.getNullable(provider) != null;
@@ -171,6 +176,7 @@ public abstract class ComponentKey<C extends Component> {
      * @see #maybeGet(Object)
      */
     // overridden by generated types
+    @Contract(pure = true)
     @ApiStatus.Internal
     public abstract @Nullable C getInternal(ComponentContainer container);
 

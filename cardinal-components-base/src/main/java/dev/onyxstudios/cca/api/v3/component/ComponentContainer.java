@@ -56,6 +56,7 @@ public interface ComponentContainer extends NbtSerializable {
 
     boolean hasComponents();
 
+    @Contract(mutates = "this")
     default void copyFrom(ComponentContainer other) {
         for (ComponentKey<?> key : this.keys()) {
             Component theirs = key.getInternal(other);
@@ -137,6 +138,7 @@ public interface ComponentContainer extends NbtSerializable {
                 this.factories = new LinkedHashMap<>();
             }
 
+            @Contract(mutates = "this")
             public <C extends Component> Builder<T> component(ComponentKey<C> key, Function<T, ? extends C> factory) {
                 this.factories.put(key, factory);
                 return this;
