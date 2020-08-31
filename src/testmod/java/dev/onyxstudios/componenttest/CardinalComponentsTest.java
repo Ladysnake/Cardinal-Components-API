@@ -24,6 +24,7 @@ package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.util.ComponentContainerMetafactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.componenttest.vita.BaseVita;
@@ -91,7 +92,7 @@ public class CardinalComponentsTest {
             assert false : "Component container factory builders are single use";
         } catch (IllegalStateException ignored) { }
         try {
-            ComponentRegistry.INSTANCE.registerStatic(TestComponents.OLD_VITA.getId(), TestComponents.OLD_VITA.getComponentClass());
+            ComponentRegistryV3.INSTANCE.getOrCreate(TestComponents.OLD_VITA.getId(), TestComponents.OLD_VITA.getComponentClass());
             assert false : "Static components must be registered through mod metadata or plugin";
         } catch (IllegalStateException ignored) { }
 

@@ -60,9 +60,9 @@ public class BaseVita implements Vita, ComponentV3, TypeAwareComponent, Copyable
         tag.putInt("vitality", this.vitality);
     }
 
+    @Deprecated
     @Override
     public ComponentType<Vita> getComponentType() {
-        // Hardcoded but could be passed in the constructor
         return (ComponentType<Vita>) TestComponents.VITA;
     }
 
