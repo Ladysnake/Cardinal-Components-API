@@ -24,8 +24,7 @@ package dev.onyxstudios.cca.api.v3.world;
 
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.world.World;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.Contract;
 
 /**
  * Applied to a method to declare it as a component factory for {@linkplain World worlds}.
@@ -44,6 +43,6 @@ public interface WorldComponentFactory<C extends Component> {
      *
      * @param world the world being constructed
      */
-    @Nonnull
+    @Contract(pure = true)
     C createForWorld(World world);
 }
