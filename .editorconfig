@@ -17,3 +17,7 @@ trim_trailing_whitespace = false
 [*.java]
 ij_java_insert_override_annotation = true
 ij_java_method_annotation_wrap = normal
+ij_java_field_annotation_wrap = normal
+ij_java_if_brace_force = if_multiline
+ij_java_for_brace_force = if_multiline
+ij_java_while_brace_force = if_multiline

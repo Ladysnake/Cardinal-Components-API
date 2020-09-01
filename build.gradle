@@ -132,6 +132,8 @@ dependencies {
 //    modRuntime 'com.github.modmuss50:OptiFabric:1.1.0-beta2'
 //    modRuntime 'org.zeroturnaround:zt-zip:1.14' // required dep for optibad
 
+    modRuntime "com.github.qouteall:ImmersivePortalsMod:${ip_version}"
+
     testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
 
     include fabricApi.module("fabric-api-base", fabric_api_version)

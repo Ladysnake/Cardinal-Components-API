@@ -1,3 +1,12 @@
+repositories {
+    maven {
+        name = "JitPack"
+        url = "https://jitpack.io"
+    }
+}
+
 dependencies {
-    compile project(":cardinal-components-base")
+    api project(":cardinal-components-base")
+    implementation project(":chunk-sync-event")
+    include project(":chunk-sync-event")
 }
