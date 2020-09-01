@@ -15,11 +15,11 @@ The information below is a condensed form of the latter.
 
 ## Features\*
 - 🔗 Attach your components to a variety of vanilla classes
-- 🧩 Implement once, have them work (and be saved) everywhere
-- 🔄 Synchronize your components with a single helper interface
-- 👥 Easily configure how your components are copied when a player respawns
-- ⚙️ Customize everything so that it fits your needs
-- ⚡ All while enjoying the blazing speed of ASM-generated extensions
+- 🧩 Implement once, plug anywhere - your data will be saved
+- 📤 Synchronize data with a single helper interface
+- 👥 Choose how your components are copied when a player respawns
+- 🛠️ Fine-tune everything so that it fits your needs
+- ☄️ All while enjoying the blazing speed of ASM-generated extensions
 
 *\*Non exhaustive, refer to the wiki and javadoc for the full list.*
 
