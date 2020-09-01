@@ -42,6 +42,8 @@ import dev.onyxstudios.cca.api.v3.util.GenericComponentInitializer;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
 import dev.onyxstudios.componenttest.vita.*;
+import nerdhub.cardinal.components.api.ComponentRegistry;
+import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
@@ -74,7 +76,7 @@ public final class TestComponents implements
 
     public static final ComponentKey<Vita> VITA = ComponentRegistryV3.INSTANCE.getOrCreate(CardinalComponentsTest.id("vita"), Vita.class);
     public static final ComponentKey<Vita> ALT_VITA = ComponentRegistryV3.INSTANCE.getOrCreate(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
-    public static final ComponentKey<Vita> OLD_VITA = ComponentRegistryV3.INSTANCE.getOrCreate(CardinalComponentsTest.id("old_vita"), Vita.class);
+    public static final ComponentType<Vita> OLD_VITA = ComponentRegistry.INSTANCE.registerIfAbsent(CardinalComponentsTest.id("old_vita"), Vita.class);
 
     private static BaseVita createForEntity(LivingEntity e) {
         return new BaseVita((int) (Math.random() * 10));
