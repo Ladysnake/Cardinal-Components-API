@@ -1,5 +1,6 @@
-# Cardinal-Components-API
-A components API for Fabric that is easy, modular, and extremely fast.  
+# Cardinal Components API
+A components API for Fabric that is easy, modular, and extremely fast.
+
 *Cardinal Components API is a library for Minecraft mods to create data
 components that can be attached to various providers. Those components
 provide a standardized interface for mods to interact with otherwise opaque
@@ -9,16 +10,18 @@ objects and behaviours, thereby helping both mod creation and compatibility.*
 **TL;DR: It allows you to attach data to things**
 
 
-Detailed information is available in this repository's [wiki](https://github.com/OnyxStudios/Cardinal-Components-API/wiki).
+Detailed information is available in this repository's [**wiki**](https://github.com/OnyxStudios/Cardinal-Components-API/wiki).
 The information below is a condensed form of the latter.
 
-## Features
-- Attach your components to a variety of vanilla classes
-- Implement once, have them work (and be saved) everywhere
-- Synchronize your components with a single helper interface
-- Easily configure how your components are copied when a player respawns
-- Customize everything so that it fits your needs
-- All while enjoying the speed of ASM-generated extensions
+## Features\*
+- 🔗 Attach your components to a variety of vanilla classes
+- 🧩 Implement once, have them work (and be saved) everywhere
+- 🔄 Synchronize your components with a single helper interface
+- 👥 Easily configure how your components are copied when a player respawns
+- ⚙️ Customize everything so that it fits your needs
+- ⚡ All while enjoying the blazing speed of ASM-generated extensions
+
+*\*Non exhaustive, refer to the wiki and javadoc for the full list.*
 
 ## Adding the API to your buildscript:
 Latest versions of Cardinal Components API are available on Bintray:
@@ -38,7 +41,7 @@ dependencies {
 }
 ```
 
-You can find the current version of the API in the [releases](https://github.com/OnyxStudios/Cardinal-Components-API/releases) tab of the repository on Github.
+You can find the current version of the API in the [**releases**](https://github.com/OnyxStudios/Cardinal-Components-API/releases) tab of the repository on Github.
 
 Cardinal Components API is split into several modules. To depend on the all-encompassing master jar, use the dependency string
 `io.github.onyxstudios:Cardinal-Components-API:<VERSION>`. That artifact bundles every module, but you often do not need all of them for a project. **Individual module names and descriptions can be found [[here]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki#modules)**.
@@ -68,6 +71,8 @@ class RandomIntComponent implements IntComponent {
     @Override public void writeToNbt(CompoundTag tag) { tag.putInt("value", this.value); }
 }
 ```
+*Note: a component class can be reused for several component types*
+
 If you want your component to be **automatically synchronized with watching clients**, you can also add the [`AutoSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/AutoSyncedComponent.java) interface to your implementation **[[More Info]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components)**.
 
 The next step is to choose an identifier for your component, and to declare it in your `fabric.mod.json`'s custom properties:
@@ -136,7 +141,6 @@ public static void useMagik(Entity provider) { // anything will work, as long as
     // ...
 }
 ```
-*Note: a component class can be reused for several component types*
 
 ## Test Mod
 A test mod for the API is available in this repository, under `src/testmod`. It makes uses of most features from the API.
