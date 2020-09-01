@@ -15,11 +15,11 @@ The information below is a condensed form of the latter.
 
 ## Features\*
 - 🔗 Attach your components to a variety of vanilla classes
-- 🧩 Implement once, plug anywhere - your data will be saved
+- 🧩 Implement once, plug anywhere - your data will be saved automatically
 - 📤 Synchronize data with a single helper interface
 - 👥 Choose how your components are copied when a player respawns
 - 🛠️ Fine-tune everything so that it fits your needs
-- ☄️ All while enjoying the blazing speed of ASM-generated extensions
+- ☄️ And enjoy the blazing speed of ASM-generated extensions
 
 *\*Non exhaustive, refer to the wiki and javadoc for the full list.*
 
@@ -58,7 +58,7 @@ modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-compon
 
 To get started, you only need a class implementing `Component`. It is recommended to have it split into an interface and an implementation, so that internals get properly encapsulated and so that the component itself can be used as an API by other mods.
 
-Minimal code example:
+**Minimal code example:**
 ```java
 public interface IntComponent extends ComponentV3 {
     int getValue();
@@ -73,7 +73,9 @@ class RandomIntComponent implements IntComponent {
 ```
 *Note: a component class can be reused for several component types*
 
-If you want your component to be **automatically synchronized with watching clients**, you can also add the [`AutoSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/AutoSyncedComponent.java) interface to your implementation **[[More Info]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components)**.
+If you want your component to be **automatically synchronized with watching clients**, you can also add the [`AutoSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/AutoSyncedComponent.java) interface to your implementation.
+
+**[[More information on component synchronization]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components)**
 
 The next step is to choose an identifier for your component, and to declare it in your `fabric.mod.json`'s custom properties:
 ```json
