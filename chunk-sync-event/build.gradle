@@ -1,0 +1,10 @@
+repositories {
+    maven {
+        name = "JitPack"
+        url = "https://jitpack.io"
+    }
+}
+
+dependencies {
+    modCompile "com.github.qouteall:ImmersivePortalsMod:${ip_version}"
+}

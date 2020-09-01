@@ -10,6 +10,7 @@ pluginManagement {
 }
 rootProject.name = 'Cardinal-Components-API'
 
+include 'chunk-sync-event'
 include 'cardinal-components-base'
 include 'cardinal-components-block'
 include 'cardinal-components-chunk'
