@@ -26,7 +26,6 @@ import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import dev.onyxstudios.chunksyncevent.InitialChunkSyncCallback;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
@@ -40,8 +39,6 @@ public final class ComponentsChunkNetworking {
     public static final Identifier PACKET_ID = new Identifier("cardinal-components", "chunk_sync");
 
     public static void init() {
-        InitialChunkSyncCallback.EVENT.register((player, chunk) -> ChunkSyncCallback.EVENT.invoker().onChunkSync(player, chunk));
-
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             ChunkSyncCallback.EVENT.register((player, tracked) -> {
                 InternalComponentProvider provider = (InternalComponentProvider) tracked;
