@@ -32,11 +32,11 @@ import net.minecraft.nbt.CompoundTag;
 public interface BlockComponent extends ComponentV3 {
     @Override
     default void readFromNbt(CompoundTag tag) {
-        throw new UnsupportedOperationException("Block components do not support serialization");
+        // NO-OP, block components must be serialized separately
     }
 
     @Override
     default void writeToNbt(CompoundTag tag) {
-        throw new UnsupportedOperationException("Block components do not support serialization");
+        // NO-OP, block components must be serialized separately
     }
 }

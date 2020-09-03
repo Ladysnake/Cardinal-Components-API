@@ -1,4 +1,10 @@
 ------------------------------------------------------
+Version 2.5.5
+------------------------------------------------------
+- Fixed crash between Immersive Portals and the chunk and block modules
+- Documented more methods with annotations
+
+------------------------------------------------------
 Version 2.5.4
 ------------------------------------------------------
 - ComponentContainer iteration order is now the same as the factory registration order
