@@ -20,9 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.chunksyncevent.mixin;
+package dev.onyxstudios.cca.mixin.block.common;
 
-import dev.onyxstudios.chunksyncevent.InitialChunkSyncCallback;
+import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncCallback;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.network.Packet;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
@@ -32,11 +33,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@SuppressWarnings("UnusedMixin")    // added by the mixin plugin
 @Mixin(ThreadedAnvilChunkStorage.class)
 public abstract class MixinThreadedAnvilChunkStorage {
-    @Inject(method = "sendChunkDataPackets", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;sendInitialChunkPackets(Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/network/Packet;Lnet/minecraft/network/Packet;)V", shift = At.Shift.AFTER))
+    @Inject(method = "sendChunkDataPackets", at = @At("RETURN"))
     private void sendChunkDataPackets(ServerPlayerEntity player, Packet<?>[] packets, WorldChunk chunk, CallbackInfo ci) {
-        InitialChunkSyncCallback.EVENT.invoker().onInitialChunkSync(player, chunk);
+        for (BlockEntity be : chunk.getBlockEntities().values()) {
+            BlockEntitySyncCallback.EVENT.invoker().onBlockEntitySync(player, be);
+        }
     }
 }

@@ -9,6 +9,7 @@
       "common.MixinEmptyChunk",
       "common.MixinProtoChunk",
       "common.MixinReadOnlyChunk",
+      "common.MixinThreadedAnvilChunkStorage",
       "common.MixinWorldChunk"
   ],
   "injectors": {

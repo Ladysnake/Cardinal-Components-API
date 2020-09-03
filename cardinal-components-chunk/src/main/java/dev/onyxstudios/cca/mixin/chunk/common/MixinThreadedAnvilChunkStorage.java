@@ -20,19 +20,30 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.chunksyncevent;
+package dev.onyxstudios.cca.mixin.chunk.common;
 
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
+import com.mojang.datafixers.DataFixer;
+import nerdhub.cardinal.components.api.event.ChunkSyncCallback;
+import net.minecraft.network.Packet;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.storage.VersionedChunkStorage;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public interface InitialChunkSyncCallback {
-    Event<InitialChunkSyncCallback> EVENT = EventFactory.createArrayBacked(InitialChunkSyncCallback.class, callbacks -> (player, chunk) -> {
-        for (InitialChunkSyncCallback callback : callbacks) {
-            callback.onInitialChunkSync(player, chunk);
-        }
-    });
+import java.io.File;
 
-    void onInitialChunkSync(ServerPlayerEntity player, WorldChunk chunk);
+@Mixin(ThreadedAnvilChunkStorage.class)
+public abstract class MixinThreadedAnvilChunkStorage extends VersionedChunkStorage {
+    public MixinThreadedAnvilChunkStorage(File file, DataFixer dataFixer, boolean bl) {
+        super(file, dataFixer, bl);
+    }
+
+    @Inject(method = "sendChunkDataPackets", at = @At("RETURN"))
+    private void sendChunkComponentsPackets(ServerPlayerEntity player, Packet<?>[] packets, WorldChunk chunk, CallbackInfo ci) {
+        ChunkSyncCallback.EVENT.invoker().onChunkSync(player, chunk);
+    }
 }

@@ -28,7 +28,6 @@ import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import dev.onyxstudios.chunksyncevent.InitialChunkSyncCallback;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
@@ -58,12 +57,6 @@ public class CardinalComponentsBlock {
     public static final Identifier PACKET_ID = new Identifier("cardinal-components", "block_entity_sync");
 
     public static void init() {
-        InitialChunkSyncCallback.EVENT.register((player, chunk) -> {
-            for (BlockEntity be : chunk.getBlockEntities().values()) {
-                BlockEntitySyncCallback.EVENT.invoker().onBlockEntitySync(player, be);
-            }
-        });
-
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             BlockEntitySyncCallback.EVENT.register((player, tracked) -> {
                 InternalComponentProvider provider = (InternalComponentProvider) tracked;
