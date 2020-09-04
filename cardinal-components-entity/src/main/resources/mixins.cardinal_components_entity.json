@@ -1,14 +1,15 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "compatibilityLevel": "JAVA_8",
-    "package": "dev.onyxstudios.cca.mixin.entity",
-    "mixins": [
-      "common.MixinEntity",
-      "common.MixinPlayerManager",
-      "common.MixinServerPlayerEntity"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "package": "dev.onyxstudios.cca.mixin.entity",
+  "mixins": [
+    "common.MixinEntity",
+    "common.MixinPlayerManager",
+    "common.MixinServerPlayerEntity",
+    "common.MixinServerWorld"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

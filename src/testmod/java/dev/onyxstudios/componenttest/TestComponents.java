@@ -86,7 +86,7 @@ public final class TestComponents implements
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerFor(HostileEntity.class, ALT_VITA, e -> new BaseVita());
         registry.registerFor(LivingEntity.class, VITA, TestComponents::createForEntity);
-        registry.registerForPlayers(VITA, PlayerVita::new);
+        registry.beginRegistration(PlayerEntity.class, VITA).impl(PlayerVita.class).end(PlayerVita::new);
         registry.registerFor(VitalityZombieEntity.class, VITA, VitalityZombieEntity::createVitaComponent);
     }
 

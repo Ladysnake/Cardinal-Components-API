@@ -57,6 +57,8 @@ public interface ComponentContainer extends NbtSerializable {
     @Contract(mutates = "this")
     void copyFrom(ComponentContainer other);
 
+    void tickComponents();
+
     /**
      * A factory for {@link ComponentContainer}s.
      *
