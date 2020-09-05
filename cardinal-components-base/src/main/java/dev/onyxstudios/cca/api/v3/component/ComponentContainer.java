@@ -26,9 +26,7 @@ import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.util.NbtSerializable;
-import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -57,22 +55,7 @@ public interface ComponentContainer extends NbtSerializable {
     boolean hasComponents();
 
     @Contract(mutates = "this")
-    default void copyFrom(ComponentContainer other) {
-        for (ComponentKey<?> key : this.keys()) {
-            Component theirs = key.getInternal(other);
-            Component ours = key.getInternal(this);
-            assert ours != null;
-
-            if (theirs != null && !ours.equals(theirs)) {
-                if (ours instanceof CopyableComponent) {
-                    @SuppressWarnings("unchecked") CopyableComponent<Component> copyable = (CopyableComponent<Component>) ours;
-                    copyable.copyFrom(theirs);
-                } else {
-                    ours.fromTag(theirs.toTag(new CompoundTag()));
-                }
-            }
-        }
-    }
+    void copyFrom(ComponentContainer other);
 
     /**
      * A factory for {@link ComponentContainer}s.
