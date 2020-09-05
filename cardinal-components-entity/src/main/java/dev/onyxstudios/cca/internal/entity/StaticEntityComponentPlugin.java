@@ -46,7 +46,6 @@ import java.util.function.Predicate;
 
 public final class StaticEntityComponentPlugin extends LazyDispatcher implements EntityComponentFactoryRegistry {
     public static final StaticEntityComponentPlugin INSTANCE = new StaticEntityComponentPlugin();
-    private final List<PredicatedComponentFactory<?>> dynamicFactories = new ArrayList<>();
 
     private StaticEntityComponentPlugin() {
         super("instantiating an entity");
@@ -57,6 +56,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         return String.format("EntityImpl_%s_%s", simpleName, Integer.toHexString(entityClass.getName().hashCode()));
     }
 
+    private final List<PredicatedComponentFactory<?>> dynamicFactories = new ArrayList<>();
     private final Map<Class<? extends Entity>, Map<ComponentKey<?>, Class<? extends Component>>> componentImpls = new HashMap<>();
     private final Map<Class<? extends Entity>, Map<ComponentKey<?>, EntityComponentFactory<?, ?>>> componentFactories = new HashMap<>();
     private final Map<Class<? extends Entity>, Class<? extends ComponentContainer>> containerClasses = new HashMap<>();

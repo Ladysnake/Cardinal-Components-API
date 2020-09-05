@@ -92,7 +92,7 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
 
         @Override
         public void clientTick() {
-            if (this.world.getTime() % 200 == 0) {
+            if (this.world.getTime() % 2400 == 0) {
                 CardinalComponentsTest.LOGGER.info("The world still runs, and is now worth {}", this.vitality);
             }
         }

@@ -55,7 +55,7 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
 
     @Override
     public void tick() {
-        if (this.owner.age % 200 == 0) {
+        if (this.owner.age % 1200 == 0) {
             CardinalComponentsTest.LOGGER.info("{} is still alive", this.owner);
         }
     }
