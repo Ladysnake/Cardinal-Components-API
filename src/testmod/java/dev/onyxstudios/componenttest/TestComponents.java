@@ -119,7 +119,7 @@ public final class TestComponents implements
 
     @Override
     public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
-        registry.register(VITA, AmbientVita.WorldVita::new);
+        registry.beginRegistration(VITA).impl(AmbientVita.WorldVita.class).end(AmbientVita.WorldVita::new);
     }
 
     @Override

@@ -72,6 +72,7 @@ public interface EntityComponentFactoryRegistry {
      * @param key    the key of components to attach
      * @throws NullPointerException if any of the arguments is {@code null}
      */
+    @ApiStatus.Experimental
     <C extends Component, E extends Entity> Registration<C, E> beginRegistration(Class<E> target, ComponentKey<C> key);
 
     /**
@@ -111,8 +112,8 @@ public interface EntityComponentFactoryRegistry {
      * @see PlayerCopyCallback
      * @deprecated use {@link Registration#respawnStrategy(RespawnCopyStrategy)}
      */
-    @ApiStatus.Experimental
     @Deprecated
+    @ApiStatus.ScheduledForRemoval
     <C extends Component> void setRespawnCopyStrategy(ComponentKey<C> key, RespawnCopyStrategy<? super C> strategy);
 
     @ApiStatus.Experimental
