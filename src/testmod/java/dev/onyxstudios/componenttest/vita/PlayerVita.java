@@ -23,7 +23,7 @@
 package dev.onyxstudios.componenttest.vita;
 
 import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.component.TickingComponent;
+import dev.onyxstudios.cca.api.v3.component.ServerTickingComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import dev.onyxstudios.componenttest.CardinalComponentsTest;
 import dev.onyxstudios.componenttest.TestComponents;
@@ -36,7 +36,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 /**
  * A Vita component attached to players, and automatically synchronized with their owner
  */
-public class PlayerVita extends EntityVita implements AutoSyncedComponent, TickingComponent, PlayerComponent<BaseVita> {
+public class PlayerVita extends EntityVita implements AutoSyncedComponent, ServerTickingComponent, PlayerComponent<BaseVita> {
     public static final int INCREASE_VITA = 0b10;
     public static final int DECREASE_VITA = 0b100;
 

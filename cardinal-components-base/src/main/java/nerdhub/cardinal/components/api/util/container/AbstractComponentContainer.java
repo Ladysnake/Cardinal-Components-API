@@ -23,7 +23,7 @@
 package nerdhub.cardinal.components.api.util.container;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.TickingComponent;
+import dev.onyxstudios.cca.api.v3.component.ServerTickingComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
@@ -68,8 +68,8 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
     public void tickComponents() {
         for (ComponentKey<?> key : this.keys()) {
             Component c = key.getFromContainer(this);
-            if (c instanceof TickingComponent) {
-                ((TickingComponent) c).tick();
+            if (c instanceof ServerTickingComponent) {
+                ((ServerTickingComponent) c).tick();
             }
         }
     }

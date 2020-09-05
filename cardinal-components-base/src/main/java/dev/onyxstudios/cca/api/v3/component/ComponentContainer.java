@@ -22,6 +22,8 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
+import com.demonwav.mcdev.annotations.CheckEnv;
+import com.demonwav.mcdev.annotations.Env;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
@@ -49,15 +51,19 @@ import java.util.function.Function;
 @ApiStatus.Experimental
 public interface ComponentContainer extends NbtSerializable {
 
-    @Unmodifiable
-    Set<ComponentKey<?>> keys();
+    @Contract(pure = true)
+    @Unmodifiable Set<ComponentKey<?>> keys();
 
+    @Contract(pure = true)
     boolean hasComponents();
 
     @Contract(mutates = "this")
     void copyFrom(ComponentContainer other);
 
     void tickComponents();
+
+    @CheckEnv(Env.CLIENT)
+    void tickClientComponents();
 
     /**
      * A factory for {@link ComponentContainer}s.
