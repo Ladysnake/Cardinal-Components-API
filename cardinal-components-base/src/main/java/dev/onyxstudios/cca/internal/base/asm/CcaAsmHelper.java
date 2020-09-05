@@ -322,13 +322,15 @@ public final class CcaAsmHelper {
                 generateTickImpl(containerImplName, tick, componentFieldName, impl, componentFieldDescriptor, "tick");
             }
             if (ClientTickingComponent.class.isAssignableFrom(impl)) {
-                generateTickImpl(containerImplName, tick, componentFieldName, impl, componentFieldDescriptor, "clientTick");
+                generateTickImpl(containerImplName, clientTick, componentFieldName, impl, componentFieldDescriptor, "clientTick");
             }
         }
         init.visitInsn(Opcodes.RETURN);
         init.visitEnd();
         tick.visitInsn(Opcodes.RETURN);
         tick.visitEnd();
+        clientTick.visitInsn(Opcodes.RETURN);
+        clientTick.visitEnd();
 
         if (!componentFactories.isEmpty()) {
             generateLookupMethods(componentFactories.keySet(), containerImplName, classNode, componentFieldDescriptors);
