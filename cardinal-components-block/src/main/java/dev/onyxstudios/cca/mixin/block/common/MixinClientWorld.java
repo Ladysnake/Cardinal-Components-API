@@ -20,11 +20,18 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component;
+package dev.onyxstudios.cca.mixin.block.common;
 
-/**
- * A component that gets ticked alongside the provider it is attached to.
- */
-public interface TickingComponent extends ComponentV3 {
-    void tick();
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.world.ClientWorld;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(ClientWorld.class)
+public class MixinClientWorld extends MixinWorld {
+    @Override   // turns out you can override injections, which lets us call a different method
+    protected BlockEntity tick(BlockEntity be) {
+        ((InternalComponentProvider) be).getComponentContainer().tickClientComponents();
+        return be;
+    }
 }

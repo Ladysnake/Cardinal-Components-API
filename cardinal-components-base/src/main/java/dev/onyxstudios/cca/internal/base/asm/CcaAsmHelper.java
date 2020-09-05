@@ -22,10 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import dev.onyxstudios.cca.api.v3.component.TickingComponent;
+import dev.onyxstudios.cca.api.v3.component.*;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -252,6 +249,8 @@ public final class CcaAsmHelper {
 
         MethodVisitor tick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickComponents", "()V", null, null);
         tick.visitCode();
+        MethodVisitor clientTick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickClientComponents", "()V", null, null);
+        clientTick.visitCode();
 
         for (ComponentKey<?> key : componentFactories.keySet()) {
             Identifier identifier = key.getId();
@@ -319,16 +318,11 @@ public final class CcaAsmHelper {
             getter.visitEnd();
 
             /* tick implementation */
-            if (TickingComponent.class.isAssignableFrom(impl)) {
-                tick.visitVarInsn(Opcodes.ALOAD, 0);
-                // stack: <this>
-                tick.visitFieldInsn(Opcodes.GETFIELD, containerImplName, componentFieldName, componentFieldDescriptor);
-                // stack: component
-                if (impl.isInterface()) {
-                    tick.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(impl), "tick", "()V", true);
-                } else {
-                    tick.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(impl), "tick", "()V", false);
-                }
+            if (ServerTickingComponent.class.isAssignableFrom(impl)) {
+                generateTickImpl(containerImplName, tick, componentFieldName, impl, componentFieldDescriptor, "tick");
+            }
+            if (ClientTickingComponent.class.isAssignableFrom(impl)) {
+                generateTickImpl(containerImplName, tick, componentFieldName, impl, componentFieldDescriptor, "clientTick");
             }
         }
         init.visitInsn(Opcodes.RETURN);
@@ -361,6 +355,18 @@ public final class CcaAsmHelper {
             }
         }
         return ret;
+    }
+
+    private static void generateTickImpl(String containerImplName, MethodVisitor tick, String componentFieldName, Class<? extends Component> impl, String componentFieldDescriptor, String target) {
+        tick.visitVarInsn(Opcodes.ALOAD, 0);
+        // stack: <this>
+        tick.visitFieldInsn(Opcodes.GETFIELD, containerImplName, componentFieldName, componentFieldDescriptor);
+        // stack: component
+        if (impl.isInterface()) {
+            tick.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(impl), target, "()V", true);
+        } else {
+            tick.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(impl), target, "()V", false);
+        }
     }
 
     // TODO V3 remove when dynamic components are gone
