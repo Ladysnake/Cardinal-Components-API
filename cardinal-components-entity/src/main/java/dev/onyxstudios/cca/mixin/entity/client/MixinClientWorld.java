@@ -20,11 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component;
+package dev.onyxstudios.cca.mixin.entity.client;
 
-/**
- * A component that gets ticked alongside the provider it is attached to.
- */
-public interface TickingComponent extends ComponentV3 {
-    void tick();
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(ClientWorld.class)
+public abstract class MixinClientWorld {
+
+    @Inject(method = "tickEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tick()V", shift = At.Shift.AFTER))
+    private void tick(Entity entity, CallbackInfo ci) {
+        ((InternalComponentProvider) entity).getComponentContainer().tickComponents();
+    }
+
+    @Inject(method = "tickPassenger", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tickRiding()V", shift = At.Shift.AFTER))
+    private void tickRiding(Entity vehicle, Entity passenger, CallbackInfo ci) {
+        ((InternalComponentProvider) passenger).getComponentContainer().tickComponents();
+    }
 }

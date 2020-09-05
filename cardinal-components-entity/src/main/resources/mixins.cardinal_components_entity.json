@@ -9,6 +9,9 @@
     "common.MixinServerPlayerEntity",
     "common.MixinServerWorld"
   ],
+  "client": [
+    "client.MixinClientWorld"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

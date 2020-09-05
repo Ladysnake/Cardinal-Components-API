@@ -20,11 +20,21 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component;
+package dev.onyxstudios.cca.mixin.world.client;
 
-/**
- * A component that gets ticked alongside the provider it is attached to.
- */
-public interface TickingComponent extends ComponentV3 {
-    void tick();
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import net.minecraft.client.world.ClientWorld;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.function.BooleanSupplier;
+
+@Mixin(ClientWorld.class)
+public abstract class MixinClientWorld {
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+        ((InternalComponentProvider) this).getComponentContainer().tickComponents();
+    }
 }
