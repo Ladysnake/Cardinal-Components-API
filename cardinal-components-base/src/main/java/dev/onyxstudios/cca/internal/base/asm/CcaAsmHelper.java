@@ -217,8 +217,8 @@ public final class CcaAsmHelper {
         MethodVisitor hasComponents = classNode.visitMethod(Opcodes.ACC_PUBLIC, "hasComponents", "()Z", null, null);
         hasComponents.visitCode();
         hasComponents.visitLdcInsn(!componentFactories.isEmpty());
-        getComponentClass.visitInsn(Opcodes.IRETURN);
-        getComponentClass.visitEnd();
+        hasComponents.visitInsn(Opcodes.IRETURN);
+        hasComponents.visitEnd();
 */
 
         MethodVisitor init = classNode.visitMethod(Opcodes.ACC_PUBLIC, "<init>", ctorDesc, null, null);
