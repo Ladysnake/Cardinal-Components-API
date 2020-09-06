@@ -62,35 +62,12 @@ public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<
 
     @Override
     public <C extends Component> void register(ComponentKey<C> type, ChunkComponentFactory<? extends C> factory) {
-        this.checkLoading(ChunkComponentFactoryRegistry.class, "register");
-        super.register(type, (chunk) -> Objects.requireNonNull(((ChunkComponentFactory<?>) factory).createForChunk(chunk), "Component factory "+ factory + " for " + type.getId() + " returned null on " + chunk.getClass().getSimpleName()));
+        this.register(type, type.getComponentClass(), factory);
     }
 
     @Override
-    public <C extends Component> Registration<C> beginRegistration(ComponentKey<C> key) {
-        return new RegistrationImpl<>(key);
-    }
-
-    private final class RegistrationImpl<C extends Component> implements Registration<C> {
-        private final ComponentKey<? super C> key;
-        private Class<C> componentClass;
-
-        public RegistrationImpl(ComponentKey<C> key) {
-            this.componentClass = key.getComponentClass();
-            this.key = key;
-        }
-
-        @Override
-        public <I extends C> RegistrationImpl<I> impl(Class<I> impl) {
-            @SuppressWarnings("unchecked") RegistrationImpl<I> ret = (RegistrationImpl<I>) this;
-            ret.componentClass = impl;
-            return ret;
-        }
-
-        @Override
-        public void end(ChunkComponentFactory<C> factory) {
-            StaticChunkComponentPlugin.this.checkLoading(Registration.class, "end");
-            StaticChunkComponentPlugin.this.register(this.key, factory, this.componentClass);
-        }
+    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ChunkComponentFactory<? extends C> factory) {
+        this.checkLoading(ChunkComponentFactoryRegistry.class, "register");
+        super.register(type, (chunk) -> Objects.requireNonNull(((ChunkComponentFactory<?>) factory).createForChunk(chunk), "Component factory "+ factory + " for " + type.getId() + " returned null on " + chunk.getClass().getSimpleName()));
     }
 }

@@ -303,10 +303,10 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
     }
 
     protected void register(ComponentKey<?> key, F factory) {
-        this.register(key, factory, key.getComponentClass());
+        this.register(key, key.getComponentClass(), factory);
     }
 
-    protected void register(ComponentKey<?> key, F factory, Class<? extends Component> impl) {
+    protected void register(ComponentKey<?> key, Class<? extends Component> impl, F factory) {
         this.componentFactories.put(key, factory);
         this.componentImpls.put(key, impl);
     }

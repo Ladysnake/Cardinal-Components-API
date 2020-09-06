@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.api.v3.chunk;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.component.Component;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * @since 2.4.0
@@ -35,33 +34,13 @@ public interface ChunkComponentFactoryRegistry {
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void register(ComponentKey<C> type, ChunkComponentFactory<? extends C> factory);
+    <C extends Component> void register(ComponentKey<C> key, ChunkComponentFactory<? extends C> factory);
 
     /**
-     * Begin a factory registration.
+     * Registers a {@link ChunkComponentFactory}.
      *
-     * @param key    the key of components to attach
-     * @throws NullPointerException if any of the arguments is {@code null}
+     * @param impl the class object representing the type of component produced by the factory
+     * @param factory the factory to use to create components of the given type
      */
-    @ApiStatus.Experimental
-    <C extends Component> Registration<C> beginRegistration(ComponentKey<C> key);
-
-    @ApiStatus.Experimental
-    interface Registration<C extends Component> {
-        /**
-         * Specify the implementation class that will be produced by the factory.
-         *
-         * <p>Properties of the component are detected using the available class information.
-         * If the implementation is not specified, {@link ComponentKey#getComponentClass()}
-         * will be used.
-         */
-        <I extends C> Registration<I> impl(Class<I> impl);
-
-        /**
-         * Complete the ongoing registration.
-         *
-         * @param factory a factory creating instances of {@code C} that will be attached to instances of {@code E}
-         */
-        void end(ChunkComponentFactory<C> factory);
-    }
+    <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, ChunkComponentFactory<? extends C> factory);
 }
