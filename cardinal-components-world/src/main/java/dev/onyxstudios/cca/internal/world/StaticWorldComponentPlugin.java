@@ -55,36 +55,13 @@ public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<C> type, WorldComponentFactory<? extends C> factory) {
-        this.checkLoading(WorldComponentFactoryRegistry.class, "register");
-        super.register(type, (world) -> Objects.requireNonNull(((WorldComponentFactory<?>) factory).createForWorld(world), "Component factory "+ factory + " for " + type.getId() + " returned null on " + world.getClass().getSimpleName()));
+    public <C extends Component> void register(ComponentKey<C> key, WorldComponentFactory<? extends C> factory) {
+        this.register(key, key.getComponentClass(), factory);
     }
 
     @Override
-    public <C extends Component> Registration<C> beginRegistration(ComponentKey<C> key) {
-        return new RegistrationImpl<>(key);
-    }
-
-    private final class RegistrationImpl<C extends Component> implements Registration<C> {
-        private final ComponentKey<? super C> key;
-        private Class<C> componentClass;
-
-        public RegistrationImpl(ComponentKey<C> key) {
-            this.componentClass = key.getComponentClass();
-            this.key = key;
-        }
-
-        @Override
-        public <I extends C> RegistrationImpl<I> impl(Class<I> impl) {
-            @SuppressWarnings("unchecked") RegistrationImpl<I> ret = (RegistrationImpl<I>) this;
-            ret.componentClass = impl;
-            return ret;
-        }
-
-        @Override
-        public void end(WorldComponentFactory<C> factory) {
-            StaticWorldComponentPlugin.this.checkLoading(Registration.class, "end");
-            StaticWorldComponentPlugin.this.register(this.key, factory, this.componentClass);
-        }
+    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, WorldComponentFactory<? extends C> factory) {
+        this.checkLoading(WorldComponentFactoryRegistry.class, "register");
+        super.register(type, impl, (world) -> Objects.requireNonNull(((WorldComponentFactory<?>) factory).createForWorld(world), "Component factory "+ factory + " for " + type.getId() + " returned null on " + world.getClass().getSimpleName()));
     }
 }
