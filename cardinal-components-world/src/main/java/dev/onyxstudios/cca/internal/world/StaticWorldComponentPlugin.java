@@ -55,8 +55,13 @@ public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<C> type, WorldComponentFactory<? extends C> factory) {
+    public <C extends Component> void register(ComponentKey<C> key, WorldComponentFactory<? extends C> factory) {
+        this.register(key, key.getComponentClass(), factory);
+    }
+
+    @Override
+    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, WorldComponentFactory<? extends C> factory) {
         this.checkLoading(WorldComponentFactoryRegistry.class, "register");
-        super.register(type, (world) -> Objects.requireNonNull(((WorldComponentFactory<?>) factory).createForWorld(world), "Component factory "+ factory + " for " + type.getId() + " returned null on " + world.getClass().getSimpleName()));
+        super.register(type, impl, (world) -> Objects.requireNonNull(((WorldComponentFactory<?>) factory).createForWorld(world), "Component factory "+ factory + " for " + type.getId() + " returned null on " + world.getClass().getSimpleName()));
     }
 }

@@ -22,6 +22,8 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
+import dev.onyxstudios.cca.api.v3.component.ClientTickingComponent;
+import dev.onyxstudios.componenttest.CardinalComponentsTest;
 import dev.onyxstudios.componenttest.TestComponents;
 import nerdhub.cardinal.components.api.util.sync.BaseSyncedComponent;
 import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
@@ -71,7 +73,7 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
     /**
      * Implements markDirty and syncWith through {@code WorldSyncedComponent}
      */
-    public static class WorldVita extends AmbientVita implements WorldSyncedComponent {
+    public static class WorldVita extends AmbientVita implements WorldSyncedComponent, ClientTickingComponent {
         private final World world;
 
         public WorldVita(World world) {
@@ -86,6 +88,13 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
         @Override
         public void syncWithAll(MinecraftServer server) {
             TestComponents.VITA.sync(this.world);
+        }
+
+        @Override
+        public void clientTick() {
+            if (this.world.getTime() % 2400 == 0) {
+                CardinalComponentsTest.LOGGER.info("The world still runs, and is now worth {}", this.vitality);
+            }
         }
     }
 

@@ -25,8 +25,7 @@ package dev.onyxstudios.cca.api.v3.scoreboard;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.scoreboard.Team;
 import org.jetbrains.annotations.ApiStatus;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.Contract;
 
 /**
  * A component factory for {@linkplain Team teams}.
@@ -46,6 +45,6 @@ public interface TeamComponentFactory<C extends Component> {
      *
      * @param team      the team being constructed
      */
-    @Nonnull
+    @Contract(pure = true)
     C createForTeam(Team team);
 }

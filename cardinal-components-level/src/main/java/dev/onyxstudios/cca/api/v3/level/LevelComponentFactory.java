@@ -25,8 +25,7 @@ package dev.onyxstudios.cca.api.v3.level;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.ApiStatus;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.Contract;
 
 /**
  * A component factory for {@linkplain WorldProperties world saves}.
@@ -45,6 +44,6 @@ public interface LevelComponentFactory<C extends Component> {
      *
      * @param properties the {@code WorldProperties} being constructed
      */
-    @Nonnull
+    @Contract(pure = true)
     C createForSave(WorldProperties properties);
 }

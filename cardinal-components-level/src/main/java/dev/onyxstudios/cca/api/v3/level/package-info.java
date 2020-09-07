@@ -20,32 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.chunk;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package dev.onyxstudios.cca.api.v3.level;
 
-import nerdhub.cardinal.components.api.component.Component;
-import net.minecraft.world.chunk.Chunk;
-import org.jetbrains.annotations.Contract;
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-/**
- * A component factory for {@linkplain Chunk chunks}.
- *
- * <p>When invoked, the factory must return a {@link Component} of the right type.
- *
- * @since 2.4.0
- */
-@FunctionalInterface
-public interface ChunkComponentFactory<C extends Component> {
-    /**
-     * Initialize components for the given chunk.
-     *
-     * <p>The component returned by this method will be available
-     * on the chunk as soon as all component factories have been invoked.
-     *
-     * @param chunk      the chunk being constructed
-     * @implNote Because this method is called for each chunk creation, implementations
-     * should avoid side effects and keep costly computations at a minimum. Lazy initialization
-     * should be considered for components that are costly to initialize.
-     */
-    @Contract(pure = true)
-    C createForChunk(Chunk chunk);
-}
+import javax.annotation.ParametersAreNonnullByDefault;

@@ -28,6 +28,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.function.Predicate;
+
 /**
  * @since 2.5.0
  */
@@ -61,4 +63,40 @@ public interface BlockComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      */
     <C extends Component, BE extends BlockEntity> void registerFor(Class<BE> target, ComponentKey<C> key, BlockEntityComponentFactory<C, BE> factory);
+
+    /**
+     * Begin a factory registration, initially targeting all instances of the {@code target}.
+     *
+     * @param target a class object representing the type of entities targeted by the factory
+     * @param key    the key of components to attach
+     * @throws NullPointerException if any of the arguments is {@code null}
+     */
+    @ApiStatus.Experimental
+    <C extends Component, B extends BlockEntity> Registration<C, B> beginRegistration(Class<B> target, ComponentKey<C> key);
+
+    @ApiStatus.Experimental
+    interface Registration<C extends Component, BE extends BlockEntity> {
+        /**
+         * Registers a {@link BlockEntityComponentFactory} for all instances of classes that pass the {@code test}.
+         *
+         * @param test a predicate testing whether the class can have the component attached to its instances
+         */
+        Registration<C, BE> filter(Predicate<Class<? extends BE>> test);
+
+        /**
+         * Specify the implementation class that will be produced by the factory.
+         *
+         * <p>Properties of the component are detected using the available class information.
+         * If the implementation is not specified, {@link ComponentKey#getComponentClass()}
+         * will be used.
+         */
+        <I extends C> Registration<I, BE> impl(Class<I> impl);
+
+        /**
+         * Complete the ongoing registration.
+         *
+         * @param factory a factory creating instances of {@code C} that will be attached to instances of {@code BE}
+         */
+        void end(BlockEntityComponentFactory<C, BE> factory);
+    }
 }

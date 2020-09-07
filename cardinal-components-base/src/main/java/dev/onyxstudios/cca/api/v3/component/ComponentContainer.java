@@ -22,13 +22,13 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
+import com.demonwav.mcdev.annotations.CheckEnv;
+import com.demonwav.mcdev.annotations.Env;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.util.NbtSerializable;
-import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -51,27 +51,19 @@ import java.util.function.Function;
 @ApiStatus.Experimental
 public interface ComponentContainer extends NbtSerializable {
 
-    @Unmodifiable
-    Set<ComponentKey<?>> keys();
+    @Contract(pure = true)
+    @Unmodifiable Set<ComponentKey<?>> keys();
 
+    @Contract(pure = true)
     boolean hasComponents();
 
-    default void copyFrom(ComponentContainer other) {
-        for (ComponentKey<?> key : this.keys()) {
-            Component theirs = key.getInternal(other);
-            Component ours = key.getInternal(this);
-            assert ours != null;
+    @Contract(mutates = "this")
+    void copyFrom(ComponentContainer other);
 
-            if (theirs != null && !ours.equals(theirs)) {
-                if (ours instanceof CopyableComponent) {
-                    @SuppressWarnings("unchecked") CopyableComponent<Component> copyable = (CopyableComponent<Component>) ours;
-                    copyable.copyFrom(theirs);
-                } else {
-                    ours.fromTag(theirs.toTag(new CompoundTag()));
-                }
-            }
-        }
-    }
+    void tickComponents();
+
+    @CheckEnv(Env.CLIENT)
+    void tickClientComponents();
 
     /**
      * A factory for {@link ComponentContainer}s.
@@ -137,6 +129,7 @@ public interface ComponentContainer extends NbtSerializable {
                 this.factories = new LinkedHashMap<>();
             }
 
+            @Contract(mutates = "this")
             public <C extends Component> Builder<T> component(ComponentKey<C> key, Function<T, ? extends C> factory) {
                 this.factories.put(key, factory);
                 return this;

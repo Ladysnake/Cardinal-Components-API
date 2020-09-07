@@ -24,6 +24,7 @@ package dev.onyxstudios.cca.mixin.world.common;
 
 import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.world.ComponentPersistentState;
 import dev.onyxstudios.cca.internal.world.ComponentsWorldNetworking;
 import net.minecraft.network.PacketByteBuf;
@@ -41,6 +42,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 @Mixin(ServerWorld.class)
 public abstract class MixinServerWorld extends MixinWorld {
@@ -56,6 +58,11 @@ public abstract class MixinServerWorld extends MixinWorld {
     private void constructor(CallbackInfo ci) {
         PersistentStateManager persistentStateManager = this.getPersistentStateManager();
         persistentStateManager.getOrCreate(() -> new ComponentPersistentState(PERSISTENT_STATE_KEY, this.components), PERSISTENT_STATE_KEY);
+    }
+
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+        ((InternalComponentProvider) this).getComponentContainer().tickComponents();
     }
 
     @Override

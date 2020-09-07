@@ -63,6 +63,7 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
 
     private final Class<? super F> componentFactoryType;
     private final Map<ComponentKey<?>, F> componentFactories = new LinkedHashMap<>();
+    private final Map<ComponentKey<?>, Class<? extends Component>> componentImpls = new LinkedHashMap<>();
     protected final Class<T> providerClass;
     protected final String implSuffix;
     private Class<? extends DynamicContainerFactory<T>> containerFactoryClass;
@@ -264,7 +265,12 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         processInitializers(this.getEntrypoints(), this::dispatchRegistration);
 
         try {
-            Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(this.componentFactoryType, this.componentFactories, this.implSuffix);
+            Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(
+                this.componentFactoryType,
+                this.componentFactories,
+                this.componentImpls,
+                this.implSuffix
+            );
             this.containerFactoryClass = this.spinContainerFactory(containerCls);
         } catch (IOException e) {
             throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + this.providerClass, e);
@@ -297,6 +303,11 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
     }
 
     protected void register(ComponentKey<?> key, F factory) {
+        this.register(key, key.getComponentClass(), factory);
+    }
+
+    protected void register(ComponentKey<?> key, Class<? extends Component> impl, F factory) {
         this.componentFactories.put(key, factory);
+        this.componentImpls.put(key, impl);
     }
 }
