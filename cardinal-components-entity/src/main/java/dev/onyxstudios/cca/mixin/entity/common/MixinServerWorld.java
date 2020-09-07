@@ -20,22 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.world;
+package dev.onyxstudios.cca.mixin.entity.common;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.world.ServerWorld;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * @since 2.4.0
- */
-public interface WorldComponentFactoryRegistry {
-    /**
-     * Registers a {@link WorldComponentFactory}.
-     *
-     * @param factory the factory to use to create components of the given type
-     */
-    <C extends Component> void register(ComponentKey<C> type, WorldComponentFactory<? extends C> factory);
+@Mixin(ServerWorld.class)
+public abstract class MixinServerWorld {
 
-    <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, WorldComponentFactory<? extends C> factory);
+    @Inject(method = "tickEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tick()V", shift = At.Shift.AFTER))
+    private void tick(Entity entity, CallbackInfo ci) {
+        ((InternalComponentProvider) entity).getComponentContainer().tickComponents();
+    }
 
+    @Inject(method = "tickPassenger", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tickRiding()V", shift = At.Shift.AFTER))
+    private void tickRiding(Entity vehicle, Entity passenger, CallbackInfo ci) {
+        ((InternalComponentProvider) passenger).getComponentContainer().tickComponents();
+    }
 }

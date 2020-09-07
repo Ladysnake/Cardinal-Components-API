@@ -20,22 +20,18 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.world;
+package dev.onyxstudios.cca.mixin.block.common;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.world.ClientWorld;
+import org.spongepowered.asm.mixin.Mixin;
 
-/**
- * @since 2.4.0
- */
-public interface WorldComponentFactoryRegistry {
-    /**
-     * Registers a {@link WorldComponentFactory}.
-     *
-     * @param factory the factory to use to create components of the given type
-     */
-    <C extends Component> void register(ComponentKey<C> type, WorldComponentFactory<? extends C> factory);
-
-    <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, WorldComponentFactory<? extends C> factory);
-
+@Mixin(ClientWorld.class)
+public class MixinClientWorld extends MixinWorld {
+    @Override   // turns out you can override injections, which lets us call a different method
+    protected BlockEntity tick(BlockEntity be) {
+        ((InternalComponentProvider) be).getComponentContainer().tickClientComponents();
+        return be;
+    }
 }
