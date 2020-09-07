@@ -22,11 +22,19 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
+import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
+
 /**
  * A component that gets ticked alongside the provider it is attached to.
  *
+ * <p>This interface must be visible at factory registration time - which means the class implementing it
+ * must either be the parameter to {@link ComponentRegistryV3#getOrCreate(Identifier, Class)} or declared explicitly
+ * using a dedicated method on the factory registry.
+ *
  * <p>Not every provider supports client ticking. Check individual module documentation for more information.
  */
+@ApiStatus.Experimental
 public interface ClientTickingComponent extends ComponentV3 {
     void clientTick();
 }
