@@ -7,8 +7,10 @@
     "common.MixinBlock",
     "common.MixinBlockEntity",
     "common.MixinChunkHolder",
+    "common.MixinClientWorld",
     "common.MixinServerPlayerEntity",
-    "common.MixinThreadedAnvilChunkStorage"
+    "common.MixinThreadedAnvilChunkStorage",
+    "common.MixinWorld"
   ],
   "injectors": {
     "defaultRequire": 1

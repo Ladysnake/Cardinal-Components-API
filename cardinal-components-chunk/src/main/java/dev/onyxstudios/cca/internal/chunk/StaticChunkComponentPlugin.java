@@ -62,6 +62,11 @@ public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<
 
     @Override
     public <C extends Component> void register(ComponentKey<C> type, ChunkComponentFactory<? extends C> factory) {
+        this.register(type, type.getComponentClass(), factory);
+    }
+
+    @Override
+    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ChunkComponentFactory<? extends C> factory) {
         this.checkLoading(ChunkComponentFactoryRegistry.class, "register");
         super.register(type, (chunk) -> Objects.requireNonNull(((ChunkComponentFactory<?>) factory).createForChunk(chunk), "Component factory "+ factory + " for " + type.getId() + " returned null on " + chunk.getClass().getSimpleName()));
     }

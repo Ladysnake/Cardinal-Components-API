@@ -22,11 +22,10 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.*;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
@@ -51,6 +50,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class CcaAsmHelper {
@@ -177,6 +177,25 @@ public final class CcaAsmHelper {
      * @return the generated container class
      */
     public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, String implNameSuffix) throws IOException {
+        return spinComponentContainer(componentFactoryType, componentFactories, componentFactories.keySet().stream().collect(Collectors.toMap(Function.identity(), ComponentKey::getComponentClass)), implNameSuffix);
+    }
+
+    /**
+     * Defines an implementation of {@link ComponentContainer} that supports direct component access.
+     *
+     * <p>Instances of the returned class can be returned by {@link ComponentProvider#getComponentContainer()}.
+     * <strong>This method must not be called before the static component container interface has been defined!</strong>
+     *
+     * <p>Generated component container classes will take an additional {@code int} as first argument to their
+     * constructors (until 3.0). That number corresponds to the expected dynamic size of the container (see {@link FastComponentContainer}).
+     *
+     * @param componentFactoryType the interface implemented by the component factories used to initialize this container
+     * @param componentFactories   a map of {@link ComponentKey}s to factories for components of that type
+     * @param componentImpls       a map of {@link ComponentKey}s to their actual implementation classes for the container
+     * @param implNameSuffix       a unique suffix for the generated class
+     * @return the generated container class
+     */
+    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, Map<ComponentKey<?>, Class<? extends Component>> componentImpls, String implNameSuffix) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
 
         checkValidJavaIdentifier(implNameSuffix);
@@ -184,6 +203,8 @@ public final class CcaAsmHelper {
         String componentFactoryName = Type.getInternalName(componentFactoryType);
         Method sam = findSam(componentFactoryType);
         String samDescriptor = Type.getMethodDescriptor(sam);
+        // TODO V3 remove
+        Int2ObjectMap<String> componentFieldDescriptors = new Int2ObjectOpenHashMap<>();
         Class<?>[] factoryArgs = sam.getParameterTypes();
         Type[] actualCtorArgs = new Type[factoryArgs.length + 1];
         actualCtorArgs[0] = Type.INT_TYPE;
@@ -203,7 +224,6 @@ public final class CcaAsmHelper {
             null
         );
 
-        String componentFieldDescriptor = Type.getDescriptor(Component.class);
         String factoryFieldDescriptor = Type.getDescriptor(componentFactoryType);
 
         classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "componentKeys", "Ljava/util/Set;", null, null);
@@ -227,9 +247,17 @@ public final class CcaAsmHelper {
         init.visitVarInsn(Opcodes.ILOAD, 1);
         init.visitMethodInsn(Opcodes.INVOKESPECIAL, STATIC_COMPONENT_CONTAINER, "<init>", FAST_COMPONENT_CONTAINER_CTOR_DESC, false);
 
+        MethodVisitor tick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickComponents", "()V", null, null);
+        tick.visitCode();
+        MethodVisitor clientTick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickClientComponents", "()V", null, null);
+        clientTick.visitCode();
+
         for (ComponentKey<?> key : componentFactories.keySet()) {
             Identifier identifier = key.getId();
-            String fieldName = getJavaIdentifierName(identifier);
+            String componentFieldName = getJavaIdentifierName(identifier);
+            Class<? extends Component> impl = componentImpls.get(key);
+            String componentFieldDescriptor = Type.getDescriptor(impl);
+            componentFieldDescriptors.put(key.getRawId(), componentFieldDescriptor);
             String factoryFieldName = getFactoryFieldName(identifier);
             /* field declaration */
             classNode.visitField(
@@ -241,7 +269,7 @@ public final class CcaAsmHelper {
             ).visitEnd();
             classNode.visitField(
                 Opcodes.ACC_PRIVATE | Opcodes.ACC_FINAL,
-                fieldName,
+                componentFieldName,
                 componentFieldDescriptor,
                 null,
                 null
@@ -257,13 +285,15 @@ public final class CcaAsmHelper {
             init.visitMethodInsn(Opcodes.INVOKEINTERFACE, componentFactoryName, sam.getName(), samDescriptor, true);
             // stack: component
             init.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Objects", "requireNonNull", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
+            // stack: object
+            init.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(impl));
             // stack: component
             init.visitVarInsn(Opcodes.ALOAD, 0);
             // stack: component <this>
             init.visitInsn(Opcodes.SWAP);
             // stack: <this> component
             // store in the field
-            init.visitFieldInsn(Opcodes.PUTFIELD, containerImplName, fieldName, componentFieldDescriptor);
+            init.visitFieldInsn(Opcodes.PUTFIELD, containerImplName, componentFieldName, componentFieldDescriptor);
             // <empty stack>
             init.visitVarInsn(Opcodes.ALOAD, 0);
             // stack: <this>
@@ -282,16 +312,28 @@ public final class CcaAsmHelper {
             );
             getter.visitVarInsn(Opcodes.ALOAD, 0);
             // stack: <this>
-            getter.visitFieldInsn(Opcodes.GETFIELD, containerImplName, fieldName, componentFieldDescriptor);
+            getter.visitFieldInsn(Opcodes.GETFIELD, containerImplName, componentFieldName, componentFieldDescriptor);
             // stack: component
             getter.visitInsn(Opcodes.ARETURN);
             getter.visitEnd();
+
+            /* tick implementation */
+            if (ServerTickingComponent.class.isAssignableFrom(impl)) {
+                generateTickImpl(containerImplName, tick, componentFieldName, impl, componentFieldDescriptor, "tick");
+            }
+            if (ClientTickingComponent.class.isAssignableFrom(impl)) {
+                generateTickImpl(containerImplName, clientTick, componentFieldName, impl, componentFieldDescriptor, "clientTick");
+            }
         }
         init.visitInsn(Opcodes.RETURN);
         init.visitEnd();
+        tick.visitInsn(Opcodes.RETURN);
+        tick.visitEnd();
+        clientTick.visitInsn(Opcodes.RETURN);
+        clientTick.visitEnd();
 
         if (!componentFactories.isEmpty()) {
-            generateLookupMethods(componentFactories.keySet(), containerImplName, classNode, componentFieldDescriptor);
+            generateLookupMethods(componentFactories.keySet(), containerImplName, classNode, componentFieldDescriptors);
         }
 
         Class<? extends ComponentContainer> ret = generateClass(classNode).asSubclass(ComponentContainer.class);
@@ -317,8 +359,20 @@ public final class CcaAsmHelper {
         return ret;
     }
 
+    private static void generateTickImpl(String containerImplName, MethodVisitor tick, String componentFieldName, Class<? extends Component> impl, String componentFieldDescriptor, String target) {
+        tick.visitVarInsn(Opcodes.ALOAD, 0);
+        // stack: <this>
+        tick.visitFieldInsn(Opcodes.GETFIELD, containerImplName, componentFieldName, componentFieldDescriptor);
+        // stack: component
+        if (impl.isInterface()) {
+            tick.visitMethodInsn(Opcodes.INVOKEINTERFACE, Type.getInternalName(impl), target, "()V", true);
+        } else {
+            tick.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(impl), target, "()V", false);
+        }
+    }
+
     // TODO V3 remove when dynamic components are gone
-    private static void generateLookupMethods(Set<ComponentKey<?>> components, String containerImplName, ClassNode classNode, String componentFieldDescriptor) {
+    private static void generateLookupMethods(Set<ComponentKey<?>> components, String containerImplName, ClassNode classNode, Int2ObjectMap<String> componentFieldDescriptors) {
         MethodVisitor canBeAssigned = classNode.visitMethod(Opcodes.ACC_PROTECTED, "canBeAssigned", CAN_BE_ASSIGNED_DESC, null, null);
         MethodVisitor get = classNode.visitMethod(Opcodes.ACC_PUBLIC, "get", COMPONENT_CONTAINER$GET_DESC, null, null);
         canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
@@ -360,7 +414,7 @@ public final class CcaAsmHelper {
         for (Int2ObjectMap.Entry<Identifier> entry : raw2Id.int2ObjectEntrySet()) {
             // stack[get]: <this>
             get.visitLabel(getLabels[entry.getIntKey()]);
-            get.visitFieldInsn(Opcodes.GETFIELD, containerImplName, getJavaIdentifierName(entry.getValue()), componentFieldDescriptor);
+            get.visitFieldInsn(Opcodes.GETFIELD, containerImplName, getJavaIdentifierName(entry.getValue()), componentFieldDescriptors.get(entry.getIntKey()));
             // stack[get]: component
             get.visitInsn(Opcodes.ARETURN);
         }

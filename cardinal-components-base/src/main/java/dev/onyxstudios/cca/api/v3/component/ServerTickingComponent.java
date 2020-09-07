@@ -20,22 +20,11 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.world;
-
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
+package dev.onyxstudios.cca.api.v3.component;
 
 /**
- * @since 2.4.0
+ * A component that gets ticked alongside the provider it is attached to.
  */
-public interface WorldComponentFactoryRegistry {
-    /**
-     * Registers a {@link WorldComponentFactory}.
-     *
-     * @param factory the factory to use to create components of the given type
-     */
-    <C extends Component> void register(ComponentKey<C> type, WorldComponentFactory<? extends C> factory);
-
-    <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, WorldComponentFactory<? extends C> factory);
-
+public interface ServerTickingComponent extends ComponentV3 {
+    void tick();
 }

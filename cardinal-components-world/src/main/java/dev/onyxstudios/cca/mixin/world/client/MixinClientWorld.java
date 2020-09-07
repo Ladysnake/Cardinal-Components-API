@@ -20,22 +20,21 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.world;
+package dev.onyxstudios.cca.mixin.world.client;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import net.minecraft.client.world.ClientWorld;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * @since 2.4.0
- */
-public interface WorldComponentFactoryRegistry {
-    /**
-     * Registers a {@link WorldComponentFactory}.
-     *
-     * @param factory the factory to use to create components of the given type
-     */
-    <C extends Component> void register(ComponentKey<C> type, WorldComponentFactory<? extends C> factory);
+import java.util.function.BooleanSupplier;
 
-    <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, WorldComponentFactory<? extends C> factory);
-
+@Mixin(ClientWorld.class)
+public abstract class MixinClientWorld {
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+        ((InternalComponentProvider) this).getComponentContainer().tickClientComponents();
+    }
 }

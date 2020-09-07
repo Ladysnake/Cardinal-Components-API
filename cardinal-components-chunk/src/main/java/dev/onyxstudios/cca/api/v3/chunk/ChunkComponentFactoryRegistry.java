@@ -34,5 +34,13 @@ public interface ChunkComponentFactoryRegistry {
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void register(ComponentKey<C> type, ChunkComponentFactory<? extends C> factory);
+    <C extends Component> void register(ComponentKey<C> key, ChunkComponentFactory<? extends C> factory);
+
+    /**
+     * Registers a {@link ChunkComponentFactory}.
+     *
+     * @param impl the class object representing the type of component produced by the factory
+     * @param factory the factory to use to create components of the given type
+     */
+    <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, ChunkComponentFactory<? extends C> factory);
 }
