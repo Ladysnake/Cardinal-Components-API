@@ -25,8 +25,7 @@ package dev.onyxstudios.cca.api.v3.scoreboard;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.scoreboard.Scoreboard;
 import org.jetbrains.annotations.ApiStatus;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.Contract;
 
 /**
  * A component factory for {@linkplain Scoreboard scoreboards}.
@@ -46,6 +45,6 @@ public interface ScoreboardComponentFactory<C extends Component> {
      *
      * @param scoreboard the scoreboard being constructed
      */
-    @Nonnull
+    @Contract(pure = true)
     C createForScoreboard(Scoreboard scoreboard);
 }

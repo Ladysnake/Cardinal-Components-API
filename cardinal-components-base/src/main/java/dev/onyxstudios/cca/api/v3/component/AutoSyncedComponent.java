@@ -22,6 +22,8 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
+import com.demonwav.mcdev.annotations.CheckEnv;
+import com.demonwav.mcdev.annotations.Env;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
@@ -30,6 +32,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Util;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 
 /**
  * A {@link Component} implementing this interface will have its data automatically
@@ -37,6 +40,7 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @see ComponentKey#sync(Object)
  */
+// TODO consider renaming packet methods to writeSyncPacket and applySyncPacket
 public interface AutoSyncedComponent extends ComponentV3 {
     /**
      * The default sync operation.
@@ -64,6 +68,7 @@ public interface AutoSyncedComponent extends ComponentV3 {
      * @return {@code true} if synchronization with the {@code player} should occur,
      * {@code false} otherwise
      */
+    @Contract(pure = true)
     default boolean shouldSyncWith(ServerPlayerEntity player, int syncOp) {
         // calling the deprecated overload for backward compatibility
         return this.shouldSyncWith(player);
@@ -102,6 +107,7 @@ public interface AutoSyncedComponent extends ComponentV3 {
      * @see ComponentKey#sync(Object, int)
      * @see #readFromPacket(PacketByteBuf)
      */
+    @Contract(mutates = "param1")
     default void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient, int syncOp) {
         // calling the deprecated overload for backward compatibility
         this.writeToPacket(buf, recipient);
@@ -116,6 +122,7 @@ public interface AutoSyncedComponent extends ComponentV3 {
      * such that it uses a different data format must override this method.
      * @see #writeToPacket(PacketByteBuf, ServerPlayerEntity)
      */
+    @CheckEnv(Env.CLIENT)
     default void readFromPacket(PacketByteBuf buf) {
         CompoundTag tag = buf.readCompoundTag();
         if (tag != null) {

@@ -1,4 +1,11 @@
 ------------------------------------------------------
+Version 2.6.0
+------------------------------------------------------
+- Added the Ticking Components experimental feature
+- Made cardinal-components-block possibly more compatible with future versions of Immersive Portals
+- Documented more methods with annotations
+
+------------------------------------------------------
 Version 2.5.4
 ------------------------------------------------------
 - ComponentContainer iteration order is now the same as the factory registration order

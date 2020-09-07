@@ -22,12 +22,15 @@
  */
 package nerdhub.cardinal.components.api.util.container;
 
+import dev.onyxstudios.cca.api.v3.component.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ServerTickingComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -62,9 +65,47 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
         return (Set<ComponentKey<?>>) (Set<?>) this.keySet();
     }
 
+    @Override   // overridden by ASM
+    public void tickComponents() {
+        for (ComponentKey<?> key : this.keys()) {
+            Component c = key.getFromContainer(this);
+            if (c instanceof ServerTickingComponent) {
+                ((ServerTickingComponent) c).tick();
+            }
+        }
+    }
+
+    @Override
+    public void tickClientComponents() {
+        for (ComponentKey<?> key : this.keys()) {
+            Component c = key.getFromContainer(this);
+            if (c instanceof ClientTickingComponent) {
+                ((ClientTickingComponent) c).clientTick();
+            }
+        }
+    }
+
     @Override
     public boolean hasComponents() {
         return !this.isEmpty();
+    }
+
+    @Override
+    public void copyFrom(dev.onyxstudios.cca.api.v3.component.ComponentContainer other) {
+        for (ComponentKey<?> key : this.keys()) {
+            Component theirs = key.getInternal(other);
+            Component ours = key.getInternal(this);
+            assert ours != null;
+
+            if (theirs != null && !ours.equals(theirs)) {
+                if (ours instanceof CopyableComponent) {
+                    @SuppressWarnings("unchecked") CopyableComponent<Component> copyable = (CopyableComponent<Component>) ours;
+                    copyable.copyFrom(theirs);
+                } else {
+                    ours.fromTag(theirs.toTag(new CompoundTag()));
+                }
+            }
+        }
     }
 
     @SuppressWarnings("deprecation")    // overriding the deprecated method to avoid the compiler's warning...

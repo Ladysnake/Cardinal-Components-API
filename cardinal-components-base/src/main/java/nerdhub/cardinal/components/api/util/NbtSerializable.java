@@ -26,6 +26,7 @@ import com.mojang.serialization.Dynamic;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 
 public interface NbtSerializable {
     /**
@@ -37,6 +38,7 @@ public interface NbtSerializable {
      * version. They should also store values into {@code tag} using only unique namespaced keys, as other
      * information may be stored in said tag.
      */
+    @Contract(mutates = "this")
     void fromTag(CompoundTag tag);
 
     /**
@@ -45,13 +47,16 @@ public interface NbtSerializable {
      * @param tag a {@code CompoundTag} on which to write this component's serializable data
      * @return {@code tag} for easy chaining
      */
+    @Contract(mutates = "param")
     CompoundTag toTag(CompoundTag tag);
 
+    @Contract(mutates = "this")
     @ApiStatus.Experimental
     default void fromDynamic(Dynamic<?> dynamic) {
         this.fromTag((CompoundTag) dynamic.convert(NbtOps.INSTANCE).getValue());
     }
 
+    @Contract(pure = true)
     @ApiStatus.Experimental
     default <T> Dynamic<T> toDynamic(Dynamic<T> dynamic) {
         return dynamic.convert(NbtOps.INSTANCE).map(tag -> this.toTag((CompoundTag)tag)).convert(dynamic.getOps());

@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.api.v3.component;
 
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
 import io.netty.buffer.Unpooled;
-import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
@@ -33,6 +32,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnegative;
@@ -44,9 +44,9 @@ import java.util.Optional;
  * A key for retrieving {@link Component} instances from component providers.
  *
  * <p> A {@link ComponentKey} must be registered for every component type through
- * {@link ComponentRegistry#registerIfAbsent(Identifier, Class)}.
+ * {@link ComponentRegistryV3#getOrCreate(Identifier, Class)}.
  *
- * @see ComponentRegistry
+ * @see ComponentRegistryV3
  */
 @ApiStatus.NonExtendable
 public abstract class ComponentKey<C extends Component> {
@@ -68,6 +68,7 @@ public abstract class ComponentKey<C extends Component> {
      * @see #maybeGet(Object)
      */
     // overridden by generated types
+    @Contract(pure = true)
     @ApiStatus.Experimental
     public abstract <V> @Nullable C getNullable(V provider);
 
@@ -79,6 +80,7 @@ public abstract class ComponentKey<C extends Component> {
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      * @see #maybeGet(Object)
      */
+    @Contract(pure = true)
     public abstract <V> C get(V provider);
 
     /**
@@ -88,8 +90,10 @@ public abstract class ComponentKey<C extends Component> {
      * {@code Optional} if {@code provider} does not have such a component.
      * @see #get(Object)
      */
+    @Contract(pure = true)
     public abstract <V> Optional<C> maybeGet(@Nullable V provider);
 
+    @Contract(pure = true)
     @ApiStatus.Experimental
     public <V> boolean isProvidedBy(V provider) {
         return this.getNullable(provider) != null;
@@ -153,7 +157,7 @@ public abstract class ComponentKey<C extends Component> {
     /**
      * Constructs a new immutable ComponentType
      *
-     * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
+     * @see ComponentRegistryV3#getOrCreate(Identifier, Class)
      */
     @ApiStatus.Internal
     protected ComponentKey(Identifier id, Class<C> componentClass, int rawId) {
@@ -171,6 +175,7 @@ public abstract class ComponentKey<C extends Component> {
      * @see #maybeGet(Object)
      */
     // overridden by generated types
+    @Contract(pure = true)
     @ApiStatus.Internal
     public abstract @Nullable C getInternal(ComponentContainer container);
 

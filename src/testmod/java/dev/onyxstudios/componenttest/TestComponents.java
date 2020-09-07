@@ -28,6 +28,7 @@ import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
@@ -70,11 +71,10 @@ public final class TestComponents implements
     public static final Identifier CUSTOM_PROVIDER_2 = new Identifier("componenttest:custom/2");
     public static final Identifier CUSTOM_PROVIDER_3 = new Identifier("componenttest:custom/3");
 
-    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>>() {
-    };
+    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>>() {};
 
-    public static final ComponentKey<Vita> VITA = ComponentRegistry.INSTANCE.registerStatic(CardinalComponentsTest.id("vita"), Vita.class);
-    public static final ComponentKey<Vita> ALT_VITA = ComponentRegistry.INSTANCE.registerStatic(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
+    public static final ComponentKey<Vita> VITA = ComponentRegistryV3.INSTANCE.getOrCreate(CardinalComponentsTest.id("vita"), Vita.class);
+    public static final ComponentKey<Vita> ALT_VITA = ComponentRegistryV3.INSTANCE.getOrCreate(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
     public static final ComponentType<Vita> OLD_VITA = ComponentRegistry.INSTANCE.registerIfAbsent(CardinalComponentsTest.id("old_vita"), Vita.class);
 
     private static BaseVita createForEntity(LivingEntity e) {
@@ -85,7 +85,7 @@ public final class TestComponents implements
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerFor(HostileEntity.class, ALT_VITA, e -> new BaseVita());
         registry.registerFor(LivingEntity.class, VITA, TestComponents::createForEntity);
-        registry.registerForPlayers(VITA, PlayerVita::new);
+        registry.beginRegistration(PlayerEntity.class, VITA).impl(PlayerVita.class).end(PlayerVita::new);
         registry.registerFor(VitalityZombieEntity.class, VITA, VitalityZombieEntity::createVitaComponent);
     }
 
@@ -118,7 +118,7 @@ public final class TestComponents implements
 
     @Override
     public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
-        registry.register(VITA, AmbientVita.WorldVita::new);
+        registry.register(VITA, AmbientVita.WorldVita.class, AmbientVita.WorldVita::new);
     }
 
     @Override

@@ -35,4 +35,7 @@ public interface WorldComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      */
     <C extends Component> void register(ComponentKey<C> type, WorldComponentFactory<? extends C> factory);
+
+    <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, WorldComponentFactory<? extends C> factory);
+
 }

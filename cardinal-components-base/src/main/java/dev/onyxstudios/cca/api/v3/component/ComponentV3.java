@@ -26,6 +26,7 @@ import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 
 /**
  * The base interface for components.
@@ -42,11 +43,11 @@ public interface ComponentV3 extends Component {
      * Reads this component's properties from a {@link CompoundTag}.
      *
      * @param tag a {@code CompoundTag} on which this component's serializable data has been written
-     * @throws UnsupportedOperationException if this {@code Component} does not support serialization to NBT
      * @implNote implementations should not assert that the data written on the tag corresponds to any
      * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
      * version.
      */
+    @Contract(mutates = "this")
     void readFromNbt(CompoundTag tag);
 
     /**
@@ -54,6 +55,7 @@ public interface ComponentV3 extends Component {
      *
      * @param tag a {@code CompoundTag} on which to write this component's serializable data
      */
+    @Contract(mutates = "param")
     void writeToNbt(CompoundTag tag);
 
     /**

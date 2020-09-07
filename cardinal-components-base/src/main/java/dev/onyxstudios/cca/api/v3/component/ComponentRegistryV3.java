@@ -24,6 +24,7 @@ package dev.onyxstudios.cca.api.v3.component;
 
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nullable;
 import java.util.stream.Stream;
@@ -83,13 +84,13 @@ public interface ComponentRegistryV3 {
      * @return the {@code ComponentKey} that got registered with {@code id}, or {@code null}
      * if no such {@code ComponentKey} is found.
      */
-    @Nullable
-    ComponentKey<?> get(Identifier id);
+    @Contract(pure = true)
+    @Nullable ComponentKey<?> get(Identifier id);
 
     /**
      * Return a sequential stream with this registry at its source.
      *
      * @return a sequential {@code Stream} over the component types of this registry.
      */
-     Stream<ComponentKey<?>> stream();
+    Stream<ComponentKey<?>> stream();
 }

@@ -13,3 +13,10 @@ trim_trailing_whitespace = true
 [*.md]
 insert_final_newline = false
 trim_trailing_whitespace = false
+
+[*.json]
+indent_size = 2
+
+[*.java]
+ij_java_insert_override_annotation = true
+ij_java_method_annotation_wrap = normal

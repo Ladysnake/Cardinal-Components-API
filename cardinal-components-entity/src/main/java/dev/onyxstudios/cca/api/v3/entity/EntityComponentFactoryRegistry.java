@@ -57,30 +57,45 @@ public interface EntityComponentFactoryRegistry {
     /**
      * Registers an {@link EntityComponentFactory} for all instances of classes that pass the {@code test}.
      *
-     * @param test  a predicate testing whether the class can have the component attached to its instances
-     * @param key the key of components to attach
+     * @param test    a predicate testing whether the class can have the component attached to its instances
+     * @param key     the key of components to attach
      * @param factory the factory to use to create components of the given key
      * @throws NullPointerException if any of the arguments is {@code null}
      */
+    @Deprecated
     <C extends Component> void registerFor(Predicate<Class<? extends Entity>> test, ComponentKey<C> key, EntityComponentFactory<C, Entity> factory);
+
+    /**
+     * Begin a factory registration, initially targeting all instances of the {@code target}.
+     *
+     * @param target a class object representing the type of entities targeted by the factory
+     * @param key    the key of components to attach
+     * @throws NullPointerException if any of the arguments is {@code null}
+     */
+    @ApiStatus.Experimental
+    <C extends Component, E extends Entity> Registration<C, E> beginRegistration(Class<E> target, ComponentKey<C> key);
 
     /**
      * Registers an {@link EntityComponentFactory} for all {@link PlayerEntity} instances.
      *
-     * @param key the key of components to attach
+     * @param key     the key of components to attach
      * @param factory the factory to use to create components of the given key
      * @throws NullPointerException if any of the arguments is {@code null}
-     * @since 2.5.1
+     * @since 2.6
      */
-    <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, EntityComponentFactory<P, PlayerEntity> factory);
+    @ApiStatus.Experimental
+    <C extends PlayerComponent<? super C>> void registerForPlayers(ComponentKey<? super C> key, EntityComponentFactory<C, PlayerEntity> factory);
 
     /**
      * Registers an {@link EntityComponentFactory} for all {@link PlayerEntity} instances, with a specific {@link RespawnCopyStrategy}.
      *
-     * @param key the key of components to attach
+     * @param key     the key of components to attach
      * @param factory the factory to use to create components of the given key
      * @throws NullPointerException if any of the arguments is {@code null}
      * @since 2.5.1
+     * @see RespawnCopyStrategy#ALWAYS_COPY
+     * @see RespawnCopyStrategy#INVENTORY
+     * @see RespawnCopyStrategy#LOSSLESS_ONLY
      */
     <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, EntityComponentFactory<P, PlayerEntity> factory, RespawnCopyStrategy<? super P> respawnStrategy);
 
@@ -94,10 +109,48 @@ public interface EntityComponentFactoryRegistry {
      * @param key      the representation of the registered type
      * @param strategy a copy strategy to use when copying components between player instances
      * @param <C>      the type of components affected
-     *
      * @see PlayerCopyCallback
+     * @deprecated use {@link Registration#respawnStrategy(RespawnCopyStrategy)}
      */
-    @ApiStatus.Experimental
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     <C extends Component> void setRespawnCopyStrategy(ComponentKey<C> key, RespawnCopyStrategy<? super C> strategy);
 
+    @ApiStatus.Experimental
+    interface Registration<C extends Component, E extends Entity> {
+        /**
+         * Registers an {@link EntityComponentFactory} for all instances of classes that pass the {@code test}.
+         *
+         * @param test a predicate testing whether the class can have the component attached to its instances
+         */
+        Registration<C, E> filter(Predicate<Class<? extends E>> test);
+
+        /**
+         * Specify the implementation class that will be produced by the factory.
+         *
+         * <p>Properties of the component are detected using the available class information.
+         * If the implementation is not specified, {@link ComponentKey#getComponentClass()}
+         * will be used.
+         */
+        <I extends C> Registration<I, E> impl(Class<I> impl);
+
+        /**
+         * Set the respawn copy strategy used for components of a given type.
+         *
+         * <p> When a player is cloned as part of the respawn process, its components are copied using
+         * a {@link RespawnCopyStrategy}. By default, the strategy used is {@link RespawnCopyStrategy#LOSSLESS_ONLY}.
+         * Calling this method allows one to customize the copy process.
+         *
+         * @param strategy a copy strategy to use when copying components between player instances
+         * @see PlayerCopyCallback
+         */
+        Registration<C, E> respawnStrategy(RespawnCopyStrategy<? super C> strategy);
+
+        /**
+         * Complete the ongoing registration.
+         *
+         * @param factory a factory creating instances of {@code C} that will be attached to instances of {@code E}
+         */
+        void end(EntityComponentFactory<C, E> factory);
+    }
 }

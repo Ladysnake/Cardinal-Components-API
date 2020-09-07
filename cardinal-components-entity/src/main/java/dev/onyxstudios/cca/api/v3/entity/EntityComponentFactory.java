@@ -24,8 +24,7 @@ package dev.onyxstudios.cca.api.v3.entity;
 
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.entity.Entity;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.Contract;
 
 
 /**
@@ -52,6 +51,6 @@ public interface EntityComponentFactory<C extends Component, E extends Entity> {
      * should avoid side effects and keep costly computations at a minimum. Lazy initialization
      * should be considered for components that are costly to initialize.
      */
-    @Nonnull
+    @Contract(pure = true)
     C createForEntity(E entity);
 }
