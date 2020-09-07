@@ -1,7 +1,8 @@
 ------------------------------------------------------
-Version 2.5.5
+Version 2.6.0
 ------------------------------------------------------
-- Fixed crash between Immersive Portals and the chunk and block modules
+- Added the Ticking Components experimental feature
+- Made cardinal-components-block possibly more compatible with future versions of Immersive Portals
 - Documented more methods with annotations
 
 ------------------------------------------------------
