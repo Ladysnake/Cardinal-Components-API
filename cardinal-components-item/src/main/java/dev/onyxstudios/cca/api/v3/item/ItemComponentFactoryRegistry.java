@@ -71,7 +71,10 @@ public interface ItemComponentFactoryRegistry {
      *
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
+     * @deprecated if you are sure of what you are doing, and you really want to attach a
+     * component to every item, use {@code registerFor(i -> true, type, factory)}
      */
+    @Deprecated
     <C extends Component> void registerForAll(ComponentKey<C> type, ItemComponentFactory<? extends C> factory);
 
     /**
@@ -85,6 +88,9 @@ public interface ItemComponentFactoryRegistry {
      *
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
+     * @deprecated if you are sure of what you are doing, and you really want to attach a
+     * component to every item, use {@code registerFor(i -> true, type, factory)}
      */
+    @Deprecated
     <C extends Component> void registerForAll(ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory);
 }
