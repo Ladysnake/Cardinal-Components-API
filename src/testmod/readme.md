@@ -19,15 +19,16 @@ vita available in the chunk.
 
 - `dev.onyxstudios.componenttest`: root package
     - `vita`: component classes
-        - `Vita`: the interface defining Vita behaviour
+        - `Vita`: the interface defining the vita component
         - `BaseVita`: base implementation
         - `AmbientVita`: abstract synchronized extension of `BaseVita` with custom behaviour
             - `LevelVita`: global implementation of `AmbientVita`
             - `WorldVita`: world-aware implementation of `AmbientVita`
-        - `ChunkVita`: chunk-aware, synchronized implementation of `BaseVita`
-        - `EntityVita`: entity-aware extension of `BaseVita` with custom behaviour
-        - `PlayerVita`: synchronized extension of `EntityVita`
-    - `CardinalComponentsTest`: registration + callbacks
+        - `SyncedVita`: synchronized implementation of `BaseVita`
+        - `EntityVita`: entity-specific extension of `BaseVita` with custom behaviour
+        - `PlayerVita`: player-specific, synchronized extension of `EntityVita` with custom respawn behaviour
+    - `CardinalComponentsTest`: mod initialization
+    - `TestComponents`: component registration
     - `VitalityCondenser`: a custom block re-implementing `BlockProvider`, interacting with chunk and ambient vita
     - `VitalityStickItem`: a custom item that attaches a `BaseVita` instance to its item stacks
     - `VitalityZombieEntity`: a custom entity that attaches an `EntityVita` instance to itself
@@ -35,15 +36,11 @@ vita available in the chunk.
 ## Notes
 
 Most Vita implementations exist to exhibit custom logic and synchronization behaviour.
-Ideally, logic should run in a separate system. Synchronization is also not actually needed in
-most cases, the mod's function being here contrived to test synchronization facilities.
-This means that a standard mod could very well have one or two component implementations for
-all providers.
+Synchronization is not actually needed in most cases, the mod's function being here contrived
+to test synchronization facilities. This means that a standard mod could very well have one
+or two component implementations for all providers.
 
-3 different ways of initializing components are shown. All use a `ComponentCallback`;
-the player vita uses a regular lambda, the stick item vita has the item itself implement the `ItemComponentCallback`
-interface, and the zombie vita uses a method reference to a `VitalityZombieEntity` instance method.
-As such, the various `initComponents` methods are just one way of structuring the code and can be just as
-easily replaced with lambdas.
+All component registration is done in `TestComponents`, using some variant of `ComponentFactoryRegistry`.
+Most use a regular lambda or constructor reference, although the zombie vita uses a method reference to a `VitalityZombieEntity` instance method instead.
 
 Adding custom items and entities is never required to use components. The ones in this test mod are merely examples of what a typical mod could do.
