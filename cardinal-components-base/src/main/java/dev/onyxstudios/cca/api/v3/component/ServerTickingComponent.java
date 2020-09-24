@@ -31,8 +31,11 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This interface must be visible at factory registration time - which means the class implementing it
  * must either be the parameter to {@link ComponentRegistryV3#getOrCreate(Identifier, Class)} or declared explicitly
  * using a dedicated method on the factory registry.
+ *
+ * @see ClientTickingComponent
+ * @see CommonTickingComponent
  */
 @ApiStatus.Experimental
 public interface ServerTickingComponent extends Component {
-    void tick();
+    void serverTick();
 }

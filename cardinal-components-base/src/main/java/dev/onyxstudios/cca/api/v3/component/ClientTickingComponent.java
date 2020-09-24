@@ -33,6 +33,9 @@ import org.jetbrains.annotations.ApiStatus;
  * using a dedicated method on the factory registry.
  *
  * <p>Not every provider supports client ticking. Check individual module documentation for more information.
+ *
+ * @see CommonTickingComponent
+ * @see ServerTickingComponent
  */
 @ApiStatus.Experimental
 public interface ClientTickingComponent extends Component {
