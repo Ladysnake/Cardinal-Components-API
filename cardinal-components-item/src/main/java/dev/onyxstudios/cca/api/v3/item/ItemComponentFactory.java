@@ -54,5 +54,6 @@ public interface ItemComponentFactory<C extends Component> extends ItemComponent
      * should avoid side effects and keep costly computations at a minimum. Lazy initialization
      * should be considered for components that are costly to initialize.
      */
+    @Contract(pure = true)
     C createForStack(ItemStack stack);
 }

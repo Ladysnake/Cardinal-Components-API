@@ -23,11 +23,10 @@
 package dev.onyxstudios.cca.mixin.item.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
-import dev.onyxstudios.cca.internal.item.ItemComponentContainerFactory;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
-import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -36,9 +35,8 @@ import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(Item.class)
 public abstract class MixinItem implements ItemCaller {
-    @Unique private final Event<ItemComponentCallbackV2> cardinal_componentsEventV2 = CardinalItemInternals.createItemComponentsEventV2();
-    @Unique private final Event<ItemComponentCallback> cardinal_componentsEvent = CardinalItemInternals.createItemComponentsEvent(this.cardinal_componentsEventV2);
-    @Unique private ItemComponentContainerFactory cardinal_containerFactory;
+    @Unique private final Event<ItemComponentCallback> cardinal_componentsEvent = CardinalItemInternals.createItemComponentsEvent();
+    @Unique private DynamicContainerFactory<ItemStack> cardinal_containerFactory;
 
     @Override
     public Event<ItemComponentCallback> cardinal_getItemComponentEvent() {
@@ -46,16 +44,12 @@ public abstract class MixinItem implements ItemCaller {
     }
 
     @Override
-    public Event<ItemComponentCallbackV2> cardinal_getItemComponentEventV2() {
-        return this.cardinal_componentsEventV2;
-    }
-
-    @Override
     public ComponentContainer cardinal_createComponents(ItemStack stack) {
-        // assert stack.getItem() == this;
+        //noinspection ConstantConditions
+        assert stack.getItem() == (ItemCaller) this;
         if (this.cardinal_containerFactory == null) {
             this.cardinal_containerFactory = CardinalItemInternals.createItemStackContainerFactory((Item) (Object) this);
         }
-        return this.cardinal_containerFactory.create((Item) (Object) this, stack);
+        return this.cardinal_containerFactory.create(stack);
     }
 }

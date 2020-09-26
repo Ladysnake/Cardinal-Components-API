@@ -25,6 +25,7 @@ package dev.onyxstudios.cca.internal.item;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
@@ -33,10 +34,11 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Set;
 
 public final class CardinalItemInternals {
@@ -77,25 +79,50 @@ public final class CardinalItemInternals {
     }
 
     public static void copyComponents(ItemStack original, ItemStack copy) {
-        ComponentContainer originalComponents = InternalStackComponentProvider.get(original).getActualComponentContainer();
-        ComponentContainer copiedComponents = InternalStackComponentProvider.get(copy).getActualComponentContainer();
-        copiedComponents.copyFrom(originalComponents);
+        InternalStackComponentProvider originalProvider = InternalStackComponentProvider.get(original);
+        InternalStackComponentProvider copiedProvider = InternalStackComponentProvider.get(copy);
+        ComponentContainer originalComponents = originalProvider.getActualComponentContainer();
+        ComponentContainer copiedComponents = copiedProvider.getActualComponentContainer();
+        CompoundTag serializedComponents;
+
+        if (originalComponents != null) {
+            // the original stack has live components
+            if (copiedComponents != null) {
+                // both stacks' components are initialized
+                copiedComponents.copyFrom(originalComponents);
+            } else if (originalComponents.hasComponents()) {
+                // only the original stack's components are initialized
+                CompoundTag tag = new CompoundTag();
+                originalComponents.toTag(tag);
+                copiedProvider.cca_setSerializedComponentData(tag);
+            }
+        } else if ((serializedComponents = originalProvider.cca_getSerializedComponentData()) != null) {
+            // the original stack has frozen components
+            if (copiedComponents != null) {
+                // only the copied stack's components are initialized (unlikely)
+                copiedComponents.fromTag(serializedComponents);
+            } else {
+                // no components are initialized
+                copiedProvider.cca_setSerializedComponentData(serializedComponents.copy());
+            }
+        }
     }
 
     public static boolean areComponentsIncompatible(ItemStack stack1, ItemStack stack2) {
-        if (stack1.isEmpty() || stack2.isEmpty()) {
-            return stack1.isEmpty() != stack2.isEmpty();
-        }
-
-        Set<ComponentKey<?>> keys1 = ((InternalStackComponentProvider) ComponentProvider.fromItemStack(stack1)).getComponentContainer().keys();
-        Set<ComponentKey<?>> keys2 = ((InternalStackComponentProvider) ComponentProvider.fromItemStack(stack2)).getComponentContainer().keys();
-
-        if (keys1.size() != keys2.size()) {
+        // this method should only be called to supplement an equals check, not to check if 2
+        // unrelated stacks have compatible components
+        if (stack1.getItem() != stack2.getItem()) {
             return true;
         }
 
+        if (stack1.isEmpty()) return false;
+
+        // Possibly initialize components
+        Set<ComponentKey<?>> keys1 = ((InternalComponentProvider) ComponentProvider.fromItemStack(stack1)).getComponentContainer().keys();
+
         for(ComponentKey<?> key : keys1) {
             @Nullable Component otherComponent = key.getNullable(stack2);
+            // TODO replace with Objects.equals(key.getNullable(stack1), key.getNullable(stack2))
             if(otherComponent == null || !key.get(stack1).isComponentEqual(otherComponent)) {
                 return true;
             }
