@@ -29,8 +29,8 @@ import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.ItemStack;
 
 public interface ItemCaller {
-	Event<ItemComponentCallback> cardinal_getItemComponentEvent();
-	Event<ItemComponentCallbackV2> cardinal_getItemComponentEventV2();
+    Event<ItemComponentCallback> cardinal_getItemComponentEvent();
+    Event<ItemComponentCallbackV2> cardinal_getItemComponentEventV2();
 
-	ComponentContainer cardinal_createComponents(ItemStack stack);
+    ComponentContainer cardinal_createComponents(ItemStack stack);
 }

@@ -48,6 +48,7 @@ import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.CollisionView;
@@ -131,8 +132,7 @@ public final class TestComponents implements
 
     @Override
     public void registerItemComponentFactories(ItemComponentFactoryRegistry registry) {
-        registry.registerForAll(ALT_VITA, (item, stack) -> new BaseVita(stack.getCount()));
-        registry.registerFor(new Identifier("diamond_chestplate"), ALT_VITA, stack -> new BaseVita(3));
+        registry.registerFor(i -> true, ALT_VITA, (stack) -> new BaseVita(stack.getItem() == Items.DIAMOND_CHESTPLATE ? 3 : stack.getCount()));
         registry.registerFor(CardinalComponentsTest.VITA_STICK_ID, VITA, stack -> new BaseVita());
     }
 
