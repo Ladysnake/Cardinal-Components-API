@@ -27,12 +27,11 @@ import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
+import nerdhub.cardinal.components.api.util.container.AbstractComponentContainer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.nbt.Tag;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -42,6 +41,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 @Mixin(value = ItemStack.class)
 public abstract class MixinItemStack implements InternalStackComponentProvider {
@@ -73,52 +73,45 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
 
     @Inject(method = "toTag", at = @At("RETURN"))
     private void serialize(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
-        this.components.toTag(cir.getReturnValue());
+        CompoundTag stackTag = cir.getReturnValue().getCompound("tag");
+        this.components.toTag(stackTag);
+        cir.getReturnValue().put("tag", stackTag);
     }
 
     @Shadow
     public abstract Item getItem();
 
-    /**
-     * Direct reference to the item held by this {@code ItemStack}.
-     *
-     * <p> When inserting an item into an inventory, Minecraft creates
-     * an empty itemstack of the right item and then increases the count.
-     * ItemStack#getItem() returns the wrong item in those cases,
-     * causing component initialization to fail.
-     *
-     * <p> This is normally deprecated, but we have to use it for the reason
-     * above.
-     */
-    @Shadow
-    @Final
-    private Item item;
-
     @Shadow
     private boolean empty;
 
-    @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("RETURN"))
-    private void initComponents(ItemConvertible item, int amount, CallbackInfo ci) {
-        this.initComponents();
-    }
+    @Shadow @Nullable public abstract CompoundTag getTag();
+
+    @Shadow public abstract CompoundTag getOrCreateTag();
+
+    @Shadow public abstract void removeSubTag(String key);
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
-        this.initComponents();
-        this.components.fromTag(tag);
-    }
-
-    @Unique
-    private void initComponents() {
-        // we use the actual item type held by this stack, bypassing empty checks made by ItemStack#getItem(),
-        // so as to avoid uninitialized components from empty stacks.
-        this.components = ((ItemCaller) (this.item == null ? Items.AIR : this.item)).cardinal_createComponents((ItemStack) (Object) this);
+        // Migrate old data
+        Tag componentData = tag.get(AbstractComponentContainer.NBT_KEY);
+        if (componentData != null) {
+            this.getOrCreateTag().put(AbstractComponentContainer.NBT_KEY, componentData.copy());
+        }
     }
 
     @Nonnull
     @Override
     public ComponentContainer getComponentContainer() {
-        return this.empty ? EMPTY_COMPONENTS : this.components;
+        if (this.empty) return EMPTY_COMPONENTS;
+        if (this.components == null) {
+            this.components = ((ItemCaller) this.getItem()).cardinal_createComponents((ItemStack) (Object) this);
+            CompoundTag tag = this.getTag();
+            if (tag != null) {
+                this.components.fromTag(tag);
+                this.removeSubTag(AbstractComponentContainer.NBT_KEY);
+            }
+        }
+        return this.components;
     }
 
     @Nonnull

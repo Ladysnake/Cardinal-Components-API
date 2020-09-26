@@ -136,7 +136,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
     @Override
     public C get(@Nullable Object key) {
         if (key != null && key.getClass() == ComponentType.class) {
-            return (C) get((ComponentType<?>) key);
+            return (C) this.get((ComponentType<?>) key);
         }
         return null;
     }

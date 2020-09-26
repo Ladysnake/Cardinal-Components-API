@@ -25,6 +25,7 @@ package dev.onyxstudios.cca.internal.item;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public interface InternalStackComponentProvider extends InternalComponentProvider {
     @SuppressWarnings("ConstantConditions")
@@ -32,5 +33,5 @@ public interface InternalStackComponentProvider extends InternalComponentProvide
         return (InternalStackComponentProvider) (Object) stack;
     }
 
-    ComponentContainer getActualComponentContainer();
+    @Nullable ComponentContainer getActualComponentContainer();
 }

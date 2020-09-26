@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.api.v3.item;
 
 import nerdhub.cardinal.components.api.component.Component;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Contract;
 
@@ -36,13 +35,7 @@ import org.jetbrains.annotations.Contract;
  * @since 2.4.0
  */
 @FunctionalInterface
-public interface ItemComponentFactory<C extends Component> extends ItemComponentFactoryV2<C> {
-    @Contract(pure = true)
-    @Override
-    default C createForStack(Item item, ItemStack stack) {
-        return this.createForStack(stack);
-    }
-
+public interface ItemComponentFactory<C extends Component> {
     /**
      * Initialize components for the given stack.
      *
@@ -54,5 +47,6 @@ public interface ItemComponentFactory<C extends Component> extends ItemComponent
      * should avoid side effects and keep costly computations at a minimum. Lazy initialization
      * should be considered for components that are costly to initialize.
      */
+    @Contract(pure = true)
     C createForStack(ItemStack stack);
 }
