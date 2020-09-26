@@ -25,61 +25,71 @@ package dev.onyxstudios.cca.internal.item;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
-import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;
+import nerdhub.cardinal.components.api.util.container.AbstractComponentContainer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.Set;
 
 public final class CardinalItemInternals {
-    public static final Event<ItemComponentCallbackV2> WILDCARD_ITEM_EVENT_V2 = createItemComponentsEventV2();
-    public static final Event<ItemComponentCallback> WILDCARD_ITEM_EVENT = createItemComponentsEvent(WILDCARD_ITEM_EVENT_V2);
+    public static final Event<ItemComponentCallback> WILDCARD_ITEM_EVENT = createItemComponentsEvent();
     public static final String CCA_SYNCED_COMPONENTS = "cca_synced_components";
 
-    public static Event<ItemComponentCallbackV2> createItemComponentsEventV2() {
-        return EventFactory.createArrayBacked(ItemComponentCallbackV2.class,
-            (listeners) -> (item, stack, components) -> {
-                for (ItemComponentCallbackV2 listener : listeners) {
-                    listener.initComponents(item, stack, components);
-                }
-            });
-    }
-
-    public static Event<ItemComponentCallback> createItemComponentsEvent(Event<ItemComponentCallbackV2> proxied) {
-        Event<ItemComponentCallback> ret = EventFactory.createArrayBacked(ItemComponentCallback.class,
+    public static Event<ItemComponentCallback> createItemComponentsEvent() {
+        return EventFactory.createArrayBacked(ItemComponentCallback.class,
             (listeners) -> (stack, components) -> {
                 for (ItemComponentCallback listener : listeners) {
                     listener.initComponents(stack, components);
                 }
             });
-        proxied.register((item, stack, components) -> ret.invoker().initComponents(stack, components));
-        return ret;
     }
 
     /**
      * Creates a container factory for an item id.
      *
      * <p>The container factory will populate the container by invoking the event for that item
-     * as well as the {@linkplain #WILDCARD_ITEM_EVENT_V2 wildcard event}.
+     * as well as the {@linkplain #WILDCARD_ITEM_EVENT wildcard event}.
      */
-    public static ItemComponentContainerFactory createItemStackContainerFactory(Item item) {
+    public static DynamicContainerFactory<ItemStack> createItemStackContainerFactory(Item item) {
         Identifier itemId = Registry.ITEM.getId(item);
-        Class<? extends ItemComponentContainerFactory> factoryClass = StaticItemComponentPlugin.INSTANCE.getFactoryClass(item, itemId);
-        return ComponentsInternals.createFactory(factoryClass, WILDCARD_ITEM_EVENT_V2, ((ItemCaller) item).cardinal_getItemComponentEventV2());
+        Class<? extends DynamicContainerFactory<ItemStack>> factoryClass = StaticItemComponentPlugin.INSTANCE.getFactoryClass(item, itemId);
+        return ComponentsInternals.createFactory(factoryClass, WILDCARD_ITEM_EVENT, ((ItemCaller) item).cardinal_getItemComponentEvent());
     }
 
     public static void copyComponents(ItemStack original, ItemStack copy) {
         ComponentContainer originalComponents = InternalStackComponentProvider.get(original).getActualComponentContainer();
         ComponentContainer copiedComponents = InternalStackComponentProvider.get(copy).getActualComponentContainer();
-        copiedComponents.copyFrom(originalComponents);
+        if (originalComponents != null) {
+            // the original stack has live components
+            if (copiedComponents != null) {
+                // both stacks' components are initialized
+                copiedComponents.copyFrom(originalComponents);
+            } else {
+                // only the original stack's components are initialized
+                originalComponents.toTag(copy.getOrCreateTag());
+            }
+        } else if (original.hasTag() && original.getSubTag(AbstractComponentContainer.NBT_KEY) != null) {
+            // the original stack has frozen components
+            CompoundTag tag = Objects.requireNonNull(original.getTag());
+            if (copiedComponents != null) {
+                // only the copied stack's components are initialized
+                copiedComponents.fromTag(tag);
+            } else {
+                // no components are initialized
+                tag.put(AbstractComponentContainer.NBT_KEY, tag.get(AbstractComponentContainer.NBT_KEY));
+            }
+        }
     }
 
     public static boolean areComponentsIncompatible(ItemStack stack1, ItemStack stack2) {

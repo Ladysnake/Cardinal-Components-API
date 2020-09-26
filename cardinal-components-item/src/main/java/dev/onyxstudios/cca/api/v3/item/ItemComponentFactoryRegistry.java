@@ -43,54 +43,12 @@ public interface ItemComponentFactoryRegistry {
     <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ItemComponentFactory<? extends C> factory);
 
     /**
-     * Registers an {@link ItemComponentFactoryV2} for stacks of a specific item.
-     *
-     * @param itemId  the id of an item to target
-     * @param factory the factory to use to create components of the given type
-     * @throws NullPointerException if any of the arguments is {@code null}
-     */
-    <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory);
-
-    /**
-     * Registers an {@link ItemComponentFactoryV2} for stacks of specific items, based on a predicate.
+     * Registers an {@link ItemComponentFactory} for stacks of specific items, based on a predicate.
      *
      * @param test  a predicate testing whether the Item can have the component attached to its stacks
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory);
+    <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ItemComponentFactory<? extends C> factory);
 
-    /**
-     * Registers an {@link ItemComponentFactory} for every item.
-     *
-     * <p> A callback registered using this method is called for every item stack ever
-     * created. For performance reasons, wildcard callbacks should be avoided
-     * where possible. Notably, when registering callbacks for various items,
-     * it is often better to register a separate specialized callback for each one
-     * than a single generic callback with additional checks.
-     *
-     * @param factory the factory to use to create components of the given type
-     * @throws NullPointerException if any of the arguments is {@code null}
-     * @deprecated if you are sure of what you are doing, and you really want to attach a
-     * component to every item, use {@code registerFor(i -> true, type, factory)}
-     */
-    @Deprecated
-    <C extends Component> void registerForAll(ComponentKey<C> type, ItemComponentFactory<? extends C> factory);
-
-    /**
-     * Registers an {@link ItemComponentFactoryV2} for every item.
-     *
-     * <p> A callback registered using this method is called for every item stack ever
-     * created. For performance reasons, wildcard callbacks should be avoided
-     * where possible. Notably, when registering callbacks for various items,
-     * it is often better to register a separate specialized callback for each one
-     * than a single generic callback with additional checks.
-     *
-     * @param factory the factory to use to create components of the given type
-     * @throws NullPointerException if any of the arguments is {@code null}
-     * @deprecated if you are sure of what you are doing, and you really want to attach a
-     * component to every item, use {@code registerFor(i -> true, type, factory)}
-     */
-    @Deprecated
-    <C extends Component> void registerForAll(ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory);
 }
