@@ -57,6 +57,7 @@ import java.util.Set;
  * @see AbstractMap
  * @see FastComponentContainer
  */
+// TODO merge with ComponentContainer and turn the latter into an abstract class with protected constructor
 public abstract class AbstractComponentContainer<C extends Component> extends AbstractMap<ComponentType<?>, C> implements ComponentContainer<C> {
 
     @SuppressWarnings("unchecked")
