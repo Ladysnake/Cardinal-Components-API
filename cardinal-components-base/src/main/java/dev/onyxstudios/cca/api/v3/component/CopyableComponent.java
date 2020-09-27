@@ -22,19 +22,33 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
-import net.minecraft.util.Identifier;
+import nerdhub.cardinal.components.api.ComponentType;
+import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * A component that gets ticked alongside the provider it is attached to.
+ * A component that can copy its data from another component of the same type.
  *
- * <p>This interface must be visible at factory registration time - which means the class implementing it
- * must either be the parameter to {@link ComponentRegistryV3#getOrCreate(Identifier, Class)} or declared explicitly
- * using a dedicated method on the factory registry.
- *
- * <p>Not every provider supports client ticking. Check individual module documentation for more information.
+ * @param <C> the type of components that this component may copy
+ * @since 2.3.0
  */
-@ApiStatus.Experimental
-public interface ClientTickingComponent extends Component {
-    void clientTick();
+public interface CopyableComponent<C extends nerdhub.cardinal.components.api.component.Component> extends Component, nerdhub.cardinal.components.api.component.extension.CopyableComponent<C> {
+    /**
+     * Copies the data from {@code other} into {@code this}.
+     *
+     * @implSpec The default implementation {@linkplain #toTag(CompoundTag) serializes}
+     * the component data to a {@link CompoundTag} and calls {@link #fromTag(CompoundTag)}.
+     * @implNote The default implementation should generally be overridden.
+     * The serialization done by the default implementation assumes NBT consistency
+     * between implementations, and is generally slower than a direct copy.
+     * Implementing classes can nearly always provide a better implementation.
+     */
+    void copyFrom(C other);
+
+    @Override
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
+    default ComponentType<?> getComponentType() {
+        throw new UnsupportedOperationException();
+    }
 }

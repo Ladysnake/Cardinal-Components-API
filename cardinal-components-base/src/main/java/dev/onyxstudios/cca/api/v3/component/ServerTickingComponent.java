@@ -33,6 +33,6 @@ import org.jetbrains.annotations.ApiStatus;
  * using a dedicated method on the factory registry.
  */
 @ApiStatus.Experimental
-public interface ServerTickingComponent extends ComponentV3 {
+public interface ServerTickingComponent extends Component {
     void tick();
 }

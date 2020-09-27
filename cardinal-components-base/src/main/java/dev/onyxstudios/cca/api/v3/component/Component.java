@@ -20,51 +20,48 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.component;
+package dev.onyxstudios.cca.api.v3.component;
 
-import nerdhub.cardinal.components.api.util.NbtSerializable;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 
 /**
- * base class for components.<br/>
- * provides basic serialization capability.<br/>
- * <p>Item Components <strong>MUST</strong> override and implement all methods of this interface!</p>
+ * The base interface for components.
  *
- * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
- * @deprecated implement {@link dev.onyxstudios.cca.api.v3.component.Component} instead
+ * <p>This interface exposes basic methods for serializing components.
+ * The {@link Object#equals(Object)} must additionally be overridden when attached to some providers
+ * like {@link ItemStack}s.
+ *
+ * @since 2.7.0
  */
-@Deprecated
-@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
-public interface Component extends NbtSerializable {
+public interface Component extends ComponentV3 {
 
     /**
      * Reads this component's properties from a {@link CompoundTag}.
      *
      * @param tag a {@code CompoundTag} on which this component's serializable data has been written
-     * @implNote implementations must not assert that the data written on the tag corresponds to any
+     * @implNote implementations should not assert that the data written on the tag corresponds to any
      * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
      * version.
      */
-    @Override
-    void fromTag(CompoundTag tag);
+    @Contract(mutates = "this")
+    void readFromNbt(CompoundTag tag);
 
     /**
      * Writes this component's properties to a {@link CompoundTag}.
      *
      * @param tag a {@code CompoundTag} on which to write this component's serializable data
-     * @return {@code tag}
-     * @implNote this method must <strong>NOT</strong> write any value associated with the {@code "componentId"} key
-     * in the given tag.
      */
-    @Override
-    CompoundTag toTag(CompoundTag tag);
+    @Contract(mutates = "param")
+    void writeToNbt(CompoundTag tag);
 
     /**
-     * Used to compare two instances of components for equality.
+     * Indicates whether some other object is "equal to" this component.
+     *
+     * <p> A well-defined equality is required by some modules, like {@code cardinal-components-item}.
+     *
+     * @see Object#equals(Object)
      */
-    // TODO deprecate in favor of Object#equals
-    default boolean isComponentEqual(Component other) {
-        return this.equals(other);
-    }
+    boolean equals(Object o);
 }

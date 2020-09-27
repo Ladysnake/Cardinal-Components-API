@@ -23,11 +23,17 @@
 package nerdhub.cardinal.components.api.util;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactory;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
+ * @deprecated use {@link dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry#registerForPlayers(ComponentKey, EntityComponentFactory, RespawnCopyStrategy)} instead
+ */
+@Deprecated
 public final class EntityComponents {
 
     /**
@@ -40,10 +46,11 @@ public final class EntityComponents {
      * @param type     the representation of the registered type
      * @param strategy a copy strategy to use when copying components between player instances
      * @param <C>      the type of components affected
-     *
      * @see nerdhub.cardinal.components.api.event.PlayerCopyCallback
      * @see #getRespawnCopyStrategy(ComponentType)
+     * @deprecated use {@link dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry#registerForPlayers(ComponentKey, EntityComponentFactory, RespawnCopyStrategy)} instead
      */
+    @Deprecated
     public static <C extends Component> void setRespawnCopyStrategy(ComponentType<C> type, RespawnCopyStrategy<? super C> strategy) {
         CardinalEntityInternals.registerRespawnCopyStrat(type, strategy);
     }

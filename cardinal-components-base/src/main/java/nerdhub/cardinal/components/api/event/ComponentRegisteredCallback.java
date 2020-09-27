@@ -27,12 +27,15 @@ import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * The callback interface for receiving component registration events.
  *
  * @see nerdhub.cardinal.components.api.ComponentRegistry#registerIfAbsent(Identifier, Class)
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface ComponentRegisteredCallback {
     Event<ComponentRegisteredCallback> EVENT = EventFactory.createArrayBacked(ComponentRegisteredCallback.class,
         listeners -> (Identifier id, Class<? extends Component> componentClass, ComponentType<?> type) -> {
