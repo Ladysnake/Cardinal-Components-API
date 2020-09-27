@@ -57,8 +57,9 @@ import java.util.Set;
  * @see AbstractMap
  * @see FastComponentContainer
  */
-// TODO merge with ComponentContainer and turn the latter into an abstract class with protected constructor
 public abstract class AbstractComponentContainer<C extends Component> extends AbstractMap<ComponentType<?>, C> implements ComponentContainer<C> {
+
+    public static final String NBT_KEY = "cardinal_components";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -154,8 +155,8 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
      */
     @Override
     public void fromTag(CompoundTag tag) {
-        if(tag.contains("cardinal_components", NbtType.LIST)) {
-            ListTag componentList = tag.getList("cardinal_components", NbtType.COMPOUND);
+        if(tag.contains(NBT_KEY, NbtType.LIST)) {
+            ListTag componentList = tag.getList(NBT_KEY, NbtType.COMPOUND);
             for (int i = 0; i < componentList.size(); i++) {
                 CompoundTag nbt = componentList.getCompound(i);
                 ComponentType<?> type = ComponentRegistry.INSTANCE.get(new Identifier(nbt.getString("componentId")));
@@ -167,7 +168,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
                 }
             }
         } else if (tag.contains("cardinal_components", NbtType.COMPOUND)) {
-            CompoundTag componentMap = tag.getCompound("cardinal_components");
+            CompoundTag componentMap = tag.getCompound(NBT_KEY);
             for (String keyId : componentMap.getKeys()) {
                 try {
                     ComponentKey<?> key = ComponentRegistry.INSTANCE.get(new Identifier(keyId));
@@ -198,17 +199,24 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
      */
     @Override
     public CompoundTag toTag(CompoundTag tag) {
-        if(!this.isEmpty()) {
-            CompoundTag componentMap = new CompoundTag();
+        if(this.hasComponents()) {
+            CompoundTag componentMap = null;
+            CompoundTag componentTag = new CompoundTag();
+
             for (ComponentKey<?> type : this.keySet()) {
                 Component component = type.getFromContainer(this);
-                CompoundTag componentTag = new CompoundTag();
                 component.toTag(componentTag);
+
                 if (!componentTag.isEmpty()) {
+                    if (componentMap == null) {
+                        componentMap = new CompoundTag();
+                        tag.put(NBT_KEY, componentMap);
+                    }
+
                     componentMap.put(type.getId().toString(), componentTag);
+                    componentTag = new CompoundTag();   // recycle tag objects if possible
                 }
             }
-            tag.put("cardinal_components", componentMap);
         }
         return tag;
     }
