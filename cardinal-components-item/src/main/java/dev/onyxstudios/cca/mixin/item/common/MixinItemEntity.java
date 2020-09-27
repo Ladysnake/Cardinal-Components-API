@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemEntity.class)
 public abstract class MixinItemEntity {
@@ -37,13 +37,13 @@ public abstract class MixinItemEntity {
     public abstract ItemStack getStack();
 
     @Inject(
-        method = "tryMerge(Lnet/minecraft/entity/ItemEntity;)V",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/ItemEntity;merge(Lnet/minecraft/entity/ItemEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/ItemEntity;Lnet/minecraft/item/ItemStack;)V"),
+        method = "canMerge(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z",
+        at = @At(value = "RETURN"),
         cancellable = true
     )
-    private void stopDifferentComponentsMerging(ItemEntity other, CallbackInfo ci) {
-        if (CardinalItemInternals.areComponentsIncompatible(this.getStack(), other.getStack())) {
-            ci.cancel();
+    private static void stopDifferentComponentsMerging(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> ci) {
+        if (ci.getReturnValueZ() && CardinalItemInternals.areComponentsIncompatible(stack1, stack2)) {
+            ci.setReturnValue(false);
         }
     }
 }
