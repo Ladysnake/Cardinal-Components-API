@@ -21,7 +21,7 @@
     "depends": {
         "minecraft": ">=1.16.2-",
         "fabric-api-base": "*",
-        "cardinal-components-base": "*"
+        "cardinal-components-base": "<3.0.0-"
     },
     "recommends": {
         "fabric-networking-v0": "*"
