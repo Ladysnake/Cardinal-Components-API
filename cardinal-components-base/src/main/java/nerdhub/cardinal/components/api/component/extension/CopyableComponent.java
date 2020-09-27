@@ -24,13 +24,17 @@ package nerdhub.cardinal.components.api.component.extension;
 
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A component that can copy its data from another component of the same type.
  *
  * @param <C> the type of components that this component may copy
  * @since 2.3.0
+ * @deprecated use {@link dev.onyxstudios.cca.api.v3.component.CopyableComponent}
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface CopyableComponent<C extends Component> extends TypeAwareComponent {
     /**
      * Copies the data from {@code other} into {@code this}.

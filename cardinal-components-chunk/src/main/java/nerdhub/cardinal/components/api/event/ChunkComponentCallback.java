@@ -40,7 +40,10 @@ import org.jetbrains.annotations.ApiStatus;
  * with the event, using {@link Event#register(Object)}.
  * When a {@code Chunk} object is constructed, the callback's
  * {@link #initComponents} method is invoked.
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
+ * @deprecated implement {@link dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer} instead
  */
+@Deprecated
 @FunctionalInterface
 public interface ChunkComponentCallback extends ComponentCallback<Chunk, CopyableComponent<?>> {
 

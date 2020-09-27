@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.api.v3.component;
 
 import com.demonwav.mcdev.annotations.CheckEnv;
 import com.demonwav.mcdev.annotations.Env;
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
@@ -41,7 +40,7 @@ import org.jetbrains.annotations.Contract;
  * @see ComponentKey#sync(Object)
  */
 // TODO consider renaming packet methods to writeSyncPacket and applySyncPacket
-public interface AutoSyncedComponent extends ComponentV3 {
+public interface AutoSyncedComponent extends Component {
     /**
      * The default sync operation.
      *

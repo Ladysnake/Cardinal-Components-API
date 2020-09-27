@@ -26,6 +26,7 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import net.fabricmc.fabric.api.event.Event;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Function;
 
@@ -39,6 +40,8 @@ import java.util.function.Function;
  * @see "EntityComponentCallback"
  * @see "ItemComponentCallback"
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 @FunctionalInterface
 public interface ComponentCallback<T, C extends Component> {
     void initComponents(T object, ComponentContainer<C> components);

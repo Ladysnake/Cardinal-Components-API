@@ -35,8 +35,11 @@ import org.jetbrains.annotations.ApiStatus;
  * {@link #syncWith(ServerPlayerEntity)} on provided {@code SyncedComponent} instances
  * when needed.
  *
- * @see nerdhub.cardinal.components.api.util.sync.BaseSyncedComponent
+ * @deprecated use {@link dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent}
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components>information on the V3 API</a>
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface SyncedComponent extends Component {
     /**
      * Marks this component as dirty.

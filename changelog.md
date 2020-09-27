@@ -1,4 +1,9 @@
 ------------------------------------------------------
+Version 2.7.0
+------------------------------------------------------
+**Deprecated most classes from the nerdhub.component.\* packages**
+
+------------------------------------------------------
 Version 2.6.0
 ------------------------------------------------------
 - Added the Ticking Components experimental feature

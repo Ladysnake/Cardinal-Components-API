@@ -35,18 +35,12 @@ import java.util.stream.Stream;
  * <p> A {@code ComponentRegistry} is used for registering components and obtaining
  * {@link ComponentKey} instances serving as keys for those components.
  *
+ * @see ComponentV3
  * @see ComponentKey
- * @see Component
- * @see ComponentRegistry
- * @since 2.5.0
+ * @since 2.7.0
  */
 @ApiStatus.NonExtendable
-public interface ComponentRegistryV3 {
-    /**
-     * The component registry
-     */
-    ComponentRegistryV3 INSTANCE = (ComponentRegistryV3) nerdhub.cardinal.components.api.ComponentRegistry.INSTANCE;
-
+public final class ComponentRegistry {
     /**
      * Get a component key for the given identifier and class, or create one if it does not exist.
      *
@@ -71,13 +65,15 @@ public interface ComponentRegistryV3 {
      * @param componentId    a unique identifier for the registered component type
      * @param componentClass the interface or class of which to obtain a {@link ComponentKey}
      * @return a shared instance of {@link ComponentKey}
-     * @throws IllegalArgumentException if {@code componentClass} does not extend {@link nerdhub.cardinal.components.api.component.Component}
+     * @throws IllegalArgumentException if {@code componentClass} does not extend {@link Component}
      * @throws IllegalStateException    if a different component class has been registered with the same {@code componentId},
      *                                  or if {@code componentId} has not been statically declared as a custom data value.
      * @apiNote It is recommended that {@code componentClass} be an interface, so that other
      * mods can interact with a well-defined API rather than directly accessing internals.
      */
-    <C extends ComponentV3> ComponentKey<C> getOrCreate(Identifier componentId, Class<C> componentClass);
+    public static <C extends Component> ComponentKey<C> getOrCreate(Identifier componentId, Class<C> componentClass) {
+        return ComponentRegistryV3.INSTANCE.getOrCreate(componentId, componentClass);
+    }
 
     /**
      * Directly retrieves a ComponentKey using its id.
@@ -86,12 +82,17 @@ public interface ComponentRegistryV3 {
      * if no such {@code ComponentKey} is found.
      */
     @Contract(pure = true)
-    @Nullable ComponentKey<?> get(Identifier id);
+    public static @Nullable ComponentKey<?> get(Identifier id) {
+        return ComponentRegistryV3.INSTANCE.get(id);
+    }
 
     /**
      * Return a sequential stream with this registry at its source.
      *
      * @return a sequential {@code Stream} over the component types of this registry.
      */
-    Stream<ComponentKey<?>> stream();
+    @Contract(pure = true)
+    public static Stream<ComponentKey<?>> stream() {
+        return ComponentRegistryV3.INSTANCE.stream();
+    }
 }
