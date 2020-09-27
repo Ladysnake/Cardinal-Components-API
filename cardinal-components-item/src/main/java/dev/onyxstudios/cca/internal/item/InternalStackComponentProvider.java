@@ -25,6 +25,7 @@ package dev.onyxstudios.cca.internal.item;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.Nullable;
 
 public interface InternalStackComponentProvider extends InternalComponentProvider {
@@ -34,4 +35,6 @@ public interface InternalStackComponentProvider extends InternalComponentProvide
     }
 
     @Nullable ComponentContainer getActualComponentContainer();
+    @Nullable CompoundTag cca_getSerializedComponentData();
+    void cca_setSerializedComponentData(@Nullable CompoundTag components);
 }
