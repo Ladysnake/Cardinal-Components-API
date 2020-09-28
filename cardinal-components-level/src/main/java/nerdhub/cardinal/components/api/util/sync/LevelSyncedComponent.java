@@ -54,6 +54,9 @@ public interface LevelSyncedComponent extends BaseSyncedComponent {
      */
     Identifier PACKET_ID = new Identifier("cardinal-components", "level_sync");
 
+    @Override
+    ComponentType<?> getComponentType();
+
     /**
      * @see #syncWithAll(MinecraftServer)
      */

@@ -22,7 +22,6 @@
  */
 /**
  * Main component definitions
- * @deprecated see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
  */
 @Deprecated
 @MethodsReturnNonnullByDefault

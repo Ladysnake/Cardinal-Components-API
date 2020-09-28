@@ -25,6 +25,7 @@ package dev.onyxstudios.componenttest.vita;
 import dev.onyxstudios.cca.api.v3.component.ClientTickingComponent;
 import dev.onyxstudios.componenttest.CardinalComponentsTest;
 import dev.onyxstudios.componenttest.TestComponents;
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.util.sync.BaseSyncedComponent;
 import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
 import nerdhub.cardinal.components.api.util.sync.WorldSyncedComponent;
@@ -102,6 +103,10 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
      * Implements markDirty and syncWith through {@code LevelSyncedComponent}
      */
     public static class LevelVita extends AmbientVita implements LevelSyncedComponent {
+        @Override
+        public ComponentType<?> getComponentType() {
+            return (ComponentType<?>) TestComponents.VITA;
+        }
         @Override
         public void syncWithAll(MinecraftServer server) {
             LevelSyncedComponent.super.syncWithAll(server);
