@@ -22,9 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
-import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.nbt.CompoundTag;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A component that can copy its data from another component of the same type.
@@ -44,11 +42,4 @@ public interface CopyableComponent<C extends nerdhub.cardinal.components.api.com
      * Implementing classes can nearly always provide a better implementation.
      */
     void copyFrom(C other);
-
-    @Override
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
-    default ComponentType<?> getComponentType() {
-        throw new UnsupportedOperationException();
-    }
 }

@@ -59,7 +59,11 @@ public interface TypeAwareComponent extends Component {
      *      }
      * }</pre>
      */
-    ComponentType<?> getComponentType();
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
+    default ComponentType<?> getComponentType() {
+        throw new UnsupportedOperationException();
+    }
 
     @SuppressWarnings("unchecked")
     @ApiStatus.Experimental
