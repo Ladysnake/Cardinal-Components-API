@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.api.util.sync;
 
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
@@ -37,7 +38,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Default implementations of {@link SyncedComponent} methods, specialized for level components
- * @deprecated use {@link dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent}
+ * @deprecated use {@link AutoSyncedComponent}
  * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components>information on the V3 API</a>
  */
 @Deprecated
