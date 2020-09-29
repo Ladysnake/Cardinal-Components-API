@@ -22,8 +22,8 @@
  */
 package nerdhub.cardinal.components.api.util.sync;
 
-import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.level.LevelComponents;
 import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.ComponentType;
