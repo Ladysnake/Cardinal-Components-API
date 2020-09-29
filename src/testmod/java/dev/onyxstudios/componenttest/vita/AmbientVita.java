@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.component.ClientTickingComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.componenttest.CardinalComponentsTest;
 import dev.onyxstudios.componenttest.TestComponents;
 import nerdhub.cardinal.components.api.ComponentType;
