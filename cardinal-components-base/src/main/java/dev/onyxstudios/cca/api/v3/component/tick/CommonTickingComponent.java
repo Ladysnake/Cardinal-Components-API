@@ -20,22 +20,35 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component;
+package dev.onyxstudios.cca.api.v3.component.tick;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * A component that gets ticked alongside the provider it is attached to.
+ * A component that gets ticked alongside the provider it is attached to, both serverside and clientside.
  *
  * <p>This interface must be visible at factory registration time - which means the class implementing it
  * must either be the parameter to {@link ComponentRegistryV3#getOrCreate(Identifier, Class)} or declared explicitly
  * using a dedicated method on the factory registry.
  *
+ * <p>If a provider only supports serverside ticking, this interface behaves the same as {@link ServerTickingComponent}.
+ *
  * @see ClientTickingComponent
- * @see CommonTickingComponent
+ * @see ServerTickingComponent
  */
 @ApiStatus.Experimental
-public interface ServerTickingComponent extends Component {
-    void serverTick();
+public interface CommonTickingComponent extends ServerTickingComponent, ClientTickingComponent {
+    @Override
+    default void clientTick() {
+        this.tick();
+    }
+
+    @Override
+    default void serverTick() {
+        this.tick();
+    }
+
+    void tick();
 }

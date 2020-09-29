@@ -20,8 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component;
+package dev.onyxstudios.cca.api.v3.component.tick;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -32,12 +34,10 @@ import org.jetbrains.annotations.ApiStatus;
  * must either be the parameter to {@link ComponentRegistryV3#getOrCreate(Identifier, Class)} or declared explicitly
  * using a dedicated method on the factory registry.
  *
- * <p>Not every provider supports client ticking. Check individual module documentation for more information.
- *
+ * @see ClientTickingComponent
  * @see CommonTickingComponent
- * @see ServerTickingComponent
  */
 @ApiStatus.Experimental
-public interface ClientTickingComponent extends Component {
-    void clientTick();
+public interface ServerTickingComponent extends Component {
+    void serverTick();
 }
