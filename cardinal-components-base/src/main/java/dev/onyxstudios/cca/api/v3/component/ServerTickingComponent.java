@@ -31,8 +31,16 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This interface must be visible at factory registration time - which means the class implementing it
  * must either be the parameter to {@link ComponentRegistryV3#getOrCreate(Identifier, Class)} or declared explicitly
  * using a dedicated method on the factory registry.
+ *
+ * @deprecated use {@link dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent}
  */
-@ApiStatus.Experimental
-public interface ServerTickingComponent extends Component {
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
+public interface ServerTickingComponent extends dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent {
+    @Override
+    default void serverTick() {
+        this.tick();
+    }
+
     void tick();
 }
