@@ -20,21 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.mixin.block.common;
+package dev.onyxstudios.cca.api.v3.component.tick;
 
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
+import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
-@Mixin(World.class)
-public abstract class MixinWorld {
-    // ModifyVariable to easily catch the local variable we want
-    @ModifyVariable(method = "tickBlockEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Tickable;tick()V", shift = At.Shift.AFTER))
-    protected BlockEntity tick(BlockEntity be) {
-        ((InternalComponentProvider) be).getComponentContainer().tickServerComponents();
-        return be;
-    }
+/**
+ * A component that gets ticked alongside the provider it is attached to.
+ *
+ * <p>This interface must be visible at factory registration time - which means the class implementing it
+ * must either be the parameter to {@link ComponentRegistryV3#getOrCreate(Identifier, Class)} or declared explicitly
+ * using a dedicated method on the factory registry.
+ *
+ * <p>Not every provider supports client ticking. Check individual module documentation for more information.
+ *
+ * @see CommonTickingComponent
+ * @see ServerTickingComponent
+ */
+@ApiStatus.Experimental
+public interface ClientTickingComponent extends Component {
+    void clientTick();
 }

@@ -22,9 +22,9 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.component.ServerTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
+import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import dev.onyxstudios.componenttest.CardinalComponentsTest;
 import dev.onyxstudios.componenttest.TestComponents;
@@ -55,7 +55,7 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
     }
 
     @Override
-    public void tick() {
+    public void serverTick() {
         if (this.owner.age % 1200 == 0) {
             CardinalComponentsTest.LOGGER.info("{} is still alive", this.owner);
         }
