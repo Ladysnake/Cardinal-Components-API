@@ -22,6 +22,8 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -124,21 +126,35 @@ public interface ComponentProvider {
         return Collections.emptyIterator();
     }
 
+    /**
+     * @deprecated use/override {@link #toComponentPacket(PacketByteBuf, ComponentKey, ComponentPacketWriter, ServerPlayerEntity)}
+     */
     @Nullable
-    @ApiStatus.Experimental
-    default <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient, int syncOp) {
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
+    default <C extends dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient, int syncOp) {
         // calling the deprecated overload for backward compatibility
         return this.toComponentPacket(buf, key, component, recipient);
     }
 
     /**
-     * @deprecated use/override {@link #toComponentPacket(PacketByteBuf, ComponentKey, AutoSyncedComponent, ServerPlayerEntity, int)}
+     * @deprecated use/override {@link #toComponentPacket(PacketByteBuf, ComponentKey, ComponentPacketWriter, ServerPlayerEntity)}
      */
     @SuppressWarnings("unused")
     @Nullable
     @Deprecated
     @ApiStatus.ScheduledForRemoval
-    default <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient) {
+    default <C extends dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient) {
         return null;
+    }
+
+    @Nullable
+    @ApiStatus.Experimental
+    default <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+        return null;
+    }
+
+    default boolean supportsCustomComponentPacketWriters() {
+        return false;
     }
 }

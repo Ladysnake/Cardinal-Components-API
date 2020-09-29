@@ -20,32 +20,16 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.vita;
+package dev.onyxstudios.cca.api.v3.component.sync;
 
-import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 
-public class TeamVita extends SyncedVita implements AutoSyncedComponent {
-    private final Team team;
-
-    public TeamVita(Team team) {
-        super(team);
-        this.team = team;
-    }
-
-    @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player, int syncOp) {
-        return player.getScoreboardTeam() == this.team;
-    }
-
-    @Override
-    public int getVitality() {
-        return super.getVitality() + this.team.getPlayerList().size();
-    }
-
-    @Override
-    public void transferTo(Vita dest, int amount) {
-        super.transferTo(dest, Math.min(this.vitality, amount));
-    }
+@ApiStatus.Experimental
+@FunctionalInterface
+public interface ComponentPacketWriter {
+    @Contract(mutates = "param1")
+    void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient);
 }

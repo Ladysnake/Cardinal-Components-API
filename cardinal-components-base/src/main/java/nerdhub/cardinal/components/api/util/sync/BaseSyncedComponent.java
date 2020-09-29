@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.api.util.sync;
 
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
@@ -34,7 +35,7 @@ import org.jetbrains.annotations.ApiStatus;
  * {@code SyncedComponent} extension with read and write methods that can respectively be used
  * as defaults in {@link #syncWith(ServerPlayerEntity)} and {@link #processPacket(PacketContext, PacketByteBuf)}
  * implementations.
- * @deprecated use {@link dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent}
+ * @deprecated use {@link AutoSyncedComponent}
  * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components>information on the V3 API</a>
  */
 @Deprecated
