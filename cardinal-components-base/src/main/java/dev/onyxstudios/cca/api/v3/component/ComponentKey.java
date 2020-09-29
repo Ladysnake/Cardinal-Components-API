@@ -22,10 +22,12 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
+import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
 import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
@@ -36,6 +38,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnegative;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -111,34 +114,63 @@ public abstract class ComponentKey<C extends Component> {
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
     public <V> void sync(V provider) {
-        this.sync(provider, AutoSyncedComponent.FULL_SYNC);
+        C c = this.get(provider);
+        if (c instanceof AutoSyncedComponent) {
+            AutoSyncedComponent synced = (AutoSyncedComponent) c;
+            this.sync(provider, synced, synced);
+        }
+    }
+
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
+    public <V> void sync(V provider, int syncOp) {
+        C c = this.get(provider);
+        if (c instanceof dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent) {
+            dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent synced = (dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent) c;
+            this.sync(provider, (buf, recipient) -> synced.writeToPacket(buf, recipient, syncOp), p -> synced.shouldSyncWith(p, syncOp));
+        } else {
+            throw new IllegalStateException("syncOp parameter supplied despite absence of legacy synced component");
+        }
     }
 
     /**
      * Attempts to synchronize the component attached to the given provider.
      *
-     * <p>The {@code syncOp} parameter is passed to {@link AutoSyncedComponent#writeToPacket(PacketByteBuf, ServerPlayerEntity, int)}.
-     * A value of {@link AutoSyncedComponent#FULL_SYNC} triggers the default behaviour of synchronizing all relevant data with watching players.
-     * Other values have varying behaviour depending on the component type.
-     *
      * <p>This method has no visible effect if the given provider does not support synchronization, or
      * the associated component does not implement an adequate synchronization interface.
      *
-     * @param <V>      the class of the component provider
-     * @param provider a component provider
-     * @param syncOp   the specific sync operation to be performed in {@link AutoSyncedComponent#writeToPacket(PacketByteBuf, ServerPlayerEntity, int)}
+     * @param <V>          the class of the component provider
+     * @param provider     a component provider
+     * @param packetWriter the specific sync operation to be performed in {@link AutoSyncedComponent#writeSyncPacket(PacketByteBuf, ServerPlayerEntity)}
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
     @ApiStatus.Experimental
-    public <V> void sync(V provider, int syncOp) {
-        ComponentProvider prov = (ComponentProvider) provider;
-        C c = this.get(prov);
-
+    public <V> void sync(V provider, ComponentPacketWriter packetWriter) {
+        C c = this.get(provider);
         if (c instanceof AutoSyncedComponent) {
-            prov.getRecipientsForComponentSync().forEachRemaining(player -> this.syncWith(player, prov, syncOp));
-        } else if (c instanceof SyncedComponent) {
-            ((SyncedComponent) c).sync();
+            this.sync(provider, packetWriter, (AutoSyncedComponent) c);
+        }
+    }
+
+    /**
+     * Attempts to synchronize the component attached to the given provider.
+     *
+     * <p>This method has no visible effect if the given provider does not support synchronization, or
+     * the associated component does not implement an adequate synchronization interface.
+     *
+     * @param <V>          the class of the component provider
+     * @param provider     a component provider
+     * @param packetWriter a writer for the sync packet
+     * @param predicate    a predicate for which players should receive the packet
+     * @throws NoSuchElementException if the provider does not provide this type of component
+     * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
+     */
+    @ApiStatus.Experimental
+    public <V> void sync(V provider, ComponentPacketWriter packetWriter, PlayerSyncPredicate predicate) {
+        ComponentProvider prov = (ComponentProvider) provider;
+        for (Iterator<ServerPlayerEntity> it = prov.getRecipientsForComponentSync(); it.hasNext();) {
+            this.syncWith(it.next(), prov, packetWriter, predicate);
         }
     }
 
@@ -192,23 +224,22 @@ public abstract class ComponentKey<C extends Component> {
 
     @ApiStatus.Internal
     public void syncWith(ServerPlayerEntity player, ComponentProvider provider) {
-        this.syncWith(player, provider, AutoSyncedComponent.FULL_SYNC);
+        C c = this.get(provider);
+        if (c instanceof AutoSyncedComponent) {
+            AutoSyncedComponent synced = (AutoSyncedComponent) c;
+            this.syncWith(player, provider, synced, synced);
+        }
     }
 
     @ApiStatus.Internal
-    public void syncWith(ServerPlayerEntity player, ComponentProvider provider, int syncOp) {
-        C c = this.get(provider);
-
-        if (c instanceof AutoSyncedComponent && ((AutoSyncedComponent) c).shouldSyncWith(player, syncOp)) {
+    public void syncWith(ServerPlayerEntity player, ComponentProvider provider, ComponentPacketWriter writer, PlayerSyncPredicate predicate) {
+        if (predicate.shouldSyncWith(player)) {
             PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-            // can't cast to (C & AutoSyncedComponent), but the guarantees are there
-            @SuppressWarnings({"unchecked", "rawtypes"}) Packet<?> packet = provider.toComponentPacket(buf, (ComponentKey) this, (AutoSyncedComponent) c, player, syncOp);
+            Packet<?> packet = provider.toComponentPacket(buf, this, writer, player);
 
             if (packet != null) {
                 ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, packet);
             }
-        } else if (c instanceof SyncedComponent) {
-            ((SyncedComponent) c).syncWith(player);
         }
     }
 }

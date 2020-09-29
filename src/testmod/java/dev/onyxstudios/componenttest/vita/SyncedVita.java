@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.componenttest.TestComponents;
 
 public class SyncedVita extends BaseVita implements AutoSyncedComponent {

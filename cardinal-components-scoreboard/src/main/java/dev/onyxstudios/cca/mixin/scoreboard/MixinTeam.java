@@ -22,10 +22,11 @@
  */
 package dev.onyxstudios.cca.mixin.scoreboard;
 
-import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
@@ -81,10 +82,10 @@ public abstract class MixinTeam implements InternalComponentProvider, TeamAccess
 
     @Nullable
     @Override
-    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, C component, ServerPlayerEntity recipient, int syncOp) {
+    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
         buf.writeString(this.getName());
         buf.writeIdentifier(key.getId());
-        component.writeToPacket(buf, recipient, syncOp);
+        writer.writeSyncPacket(buf, recipient);
         return new CustomPayloadS2CPacket(ComponentsScoreboardNetworking.TEAM_PACKET_ID, buf);
     }
 
