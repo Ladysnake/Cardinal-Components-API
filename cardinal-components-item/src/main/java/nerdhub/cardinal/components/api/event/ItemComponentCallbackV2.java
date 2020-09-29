@@ -51,7 +51,10 @@ import javax.annotation.Nullable;
  * More formally, if a callback is registered for an item {@code i},
  * its {@code initComponents} method will be invoked for any stack {@code s}
  * verifying {@code s.getItem() == i}.
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
+ * @deprecated implement {@link dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer} instead
  */
+@Deprecated
 @FunctionalInterface
 public interface ItemComponentCallbackV2 {
 

@@ -27,6 +27,10 @@ import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * @deprecated implement {@link dev.onyxstudios.cca.api.v3.component.Component} instead
+ */
+@Deprecated
 public interface ItemComponent<C extends Component> extends Component, CopyableComponent<C> {
 
     @Override

@@ -54,7 +54,10 @@ import javax.annotation.Nullable;
  * verifying {@code s.getItem() == i}.
  *
  * @see ItemComponentCallbackV2
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
+ * @deprecated implement {@link dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer} instead
  */
+@Deprecated
 @FunctionalInterface
 public interface ItemComponentCallback extends ComponentCallback<ItemStack, CopyableComponent<?>> {
 

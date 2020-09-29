@@ -24,6 +24,9 @@ package nerdhub.cardinal.components.api.util;
 
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import org.jetbrains.annotations.ApiStatus;
 
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface ChunkComponent<C extends Component> extends Component, CopyableComponent<C> {
 }
