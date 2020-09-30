@@ -26,6 +26,7 @@ import com.google.common.base.Preconditions;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -51,6 +52,8 @@ import java.util.function.BiConsumer;
  * execution for all read operations. They may be faster than their {@link FastComponentContainer}
  * counterparts.
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 public final class IndexedComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
     private int universeSize;
     private int minIndex;
