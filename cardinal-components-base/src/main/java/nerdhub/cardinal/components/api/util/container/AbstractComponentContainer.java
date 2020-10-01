@@ -57,6 +57,7 @@ import java.util.Set;
  * @see AbstractMap
  * @see FastComponentContainer
  */
+@Deprecated
 public abstract class AbstractComponentContainer<C extends Component> extends AbstractMap<ComponentType<?>, C> implements ComponentContainer<C> {
 
     public static final String NBT_KEY = "cardinal_components";
