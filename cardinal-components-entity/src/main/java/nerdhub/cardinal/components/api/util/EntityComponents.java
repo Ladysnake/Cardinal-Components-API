@@ -22,11 +22,11 @@
  */
 package nerdhub.cardinal.components.api.util;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactory;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import org.jetbrains.annotations.ApiStatus;
 
 /**

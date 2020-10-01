@@ -22,9 +22,9 @@
  */
 package nerdhub.cardinal.components.api;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 

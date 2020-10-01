@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.item;
 
-import nerdhub.cardinal.components.api.component.Component;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Contract;
 

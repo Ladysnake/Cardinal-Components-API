@@ -22,9 +22,9 @@
  */
 package nerdhub.cardinal.components.api.util;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import net.minecraft.nbt.CompoundTag;
@@ -99,7 +99,9 @@ public interface RespawnCopyStrategy<C extends Component> {
         if (to instanceof CopyableComponent) {
             CardinalEntityInternals.copyAsCopyable(from, (CopyableComponent<?>) to);
         } else {
-            to.fromTag(from.toTag(new CompoundTag()));
+            CompoundTag tag = new CompoundTag();
+            from.writeToNbt(tag);
+            to.readFromNbt(tag);
         }
     }
 }

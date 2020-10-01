@@ -22,13 +22,13 @@
  */
 package nerdhub.cardinal.components.api.util.container;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.fabricmc.fabric.api.util.NbtType;
@@ -105,7 +105,9 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
                     @SuppressWarnings("unchecked") CopyableComponent<Component> copyable = (CopyableComponent<Component>) ours;
                     copyable.copyFrom(theirs);
                 } else {
-                    ours.fromTag(theirs.toTag(new CompoundTag()));
+                    CompoundTag tag = new CompoundTag();
+                    theirs.writeToNbt(tag);
+                    ours.readFromNbt(tag);
                 }
             }
         }
@@ -164,7 +166,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
                 if (type != null) {
                     Component component = this.get(type);
                     if (component != null) {
-                        component.fromTag(nbt);
+                        component.readFromNbt(nbt);
                     }
                 }
             }
@@ -176,7 +178,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
                     if (key != null) {
                         Component component = key.getInternal(this);
                         if (component != null) {
-                            component.fromTag(componentMap.getCompound(keyId));
+                            component.readFromNbt(componentMap.getCompound(keyId));
                         }
                     } else {
                         ComponentsInternals.LOGGER.warn("Failed to deserialize component: unregistered key " + keyId);
@@ -194,7 +196,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
      * @implSpec This implementation first checks if the container is empty; if so it
      * returns immediately. Then, it iterates over this container's mappings, and creates
      * a compound tag for each component. The tag is then passed to the component's
-     * {@link Component#toTag(CompoundTag)} method. Every such serialized component is appended
+     * {@link Component#writeToNbt(CompoundTag)} method. Every such serialized component is appended
      * to a {@code CompoundTag}, using the component type's identifier as the key.
      * The serialized map is finally appended to the passed in tag using the "cardinal_components" key.
      */
@@ -206,7 +208,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
 
             for (ComponentKey<?> type : this.keySet()) {
                 Component component = type.getFromContainer(this);
-                component.toTag(componentTag);
+                component.writeToNbt(componentTag);
 
                 if (!componentTag.isEmpty()) {
                     if (componentMap == null) {

@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.api.component;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.entity.Entity;

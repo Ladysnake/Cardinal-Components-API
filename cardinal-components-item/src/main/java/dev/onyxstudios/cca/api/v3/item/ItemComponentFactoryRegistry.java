@@ -22,8 +22,8 @@
  */
 package dev.onyxstudios.cca.api.v3.item;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 

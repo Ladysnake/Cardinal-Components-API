@@ -71,7 +71,7 @@ public interface ComponentRegistryV3 {
      * @param componentId    a unique identifier for the registered component type
      * @param componentClass the interface or class of which to obtain a {@link ComponentKey}
      * @return a shared instance of {@link ComponentKey}
-     * @throws IllegalArgumentException if {@code componentClass} does not extend {@link nerdhub.cardinal.components.api.component.Component}
+     * @throws IllegalArgumentException if {@code componentClass} does not extend {@link Component}
      * @throws IllegalStateException    if a different component class has been registered with the same {@code componentId},
      *                                  or if {@code componentId} has not been statically declared as a custom data value.
      * @apiNote It is recommended that {@code componentClass} be an interface, so that other

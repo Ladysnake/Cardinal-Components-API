@@ -22,8 +22,8 @@
  */
 package dev.onyxstudios.cca.api.v3.level;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
 import org.jetbrains.annotations.ApiStatus;
 
 /**

@@ -23,9 +23,9 @@
 package nerdhub.cardinal.components.api.util.container;
 
 import com.google.common.base.Preconditions;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;

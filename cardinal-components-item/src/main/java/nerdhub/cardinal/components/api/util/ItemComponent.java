@@ -22,8 +22,8 @@
  */
 package nerdhub.cardinal.components.api.util;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -32,9 +32,6 @@ import org.jetbrains.annotations.ApiStatus;
  */
 @Deprecated
 public interface ItemComponent<C extends Component> extends Component, CopyableComponent<C> {
-
-    @Override
-    boolean isComponentEqual(Component other);
 
     /**
      * @deprecated do not call or override this method, it will be removed eventually.

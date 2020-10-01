@@ -22,8 +22,8 @@
  */
 package nerdhub.cardinal.components.api.util;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import net.minecraft.item.ItemStack;
 
@@ -53,13 +53,13 @@ public final class Components {
      * Compares a provider with another for equality based on the components they expose.
      * Returns {@code true} if the two providers expose the same component types through
      * {@link ComponentProvider#getComponentTypes}, and, for each of the types exposed as such,
-     * the corresponding component values are equal according to {@link Component#isComponentEqual}.
+     * the corresponding component values are equal according to {@link Object#equals(Object)}.
      */
     public static boolean areComponentsEqual(ComponentProvider accessor, ComponentProvider other) {
         Set<ComponentType<?>> types = accessor.getComponentTypes();
         if(types.size() == other.getComponentTypes().size()) {
             for(ComponentType<? extends Component> type : types) {
-                if(!type.isProvidedBy(other) || !type.get(accessor).isComponentEqual(type.get(other))) {
+                if(!type.isProvidedBy(other) || !type.get(accessor).equals(type.get(other))) {
                     return false;
                 }
             }

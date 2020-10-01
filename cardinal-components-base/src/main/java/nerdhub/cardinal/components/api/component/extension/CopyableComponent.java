@@ -22,7 +22,7 @@
  */
 package nerdhub.cardinal.components.api.component.extension;
 
-import nerdhub.cardinal.components.api.component.Component;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -39,14 +39,16 @@ public interface CopyableComponent<C extends Component> extends TypeAwareCompone
     /**
      * Copies the data from {@code other} into {@code this}.
      *
-     * @implSpec The default implementation {@linkplain #toTag(CompoundTag) serializes}
-     * the component data to a {@link CompoundTag} and calls {@link #fromTag(CompoundTag)}.
+     * @implSpec The default implementation {@linkplain #writeToNbt(CompoundTag) serializes}
+     * the component data to a {@link CompoundTag} and calls {@link #readFromNbt(CompoundTag)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation assumes NBT consistency
      * between implementations, and is generally slower than a direct copy.
      * Implementing classes can nearly always provide a better implementation.
      */
     default void copyFrom(C other) {    // TODO 3.0 make abstract as the interface is no longer mandatory
-        this.fromTag(other.toTag(new CompoundTag()));
+        CompoundTag tag = new CompoundTag();
+        other.writeToNbt(tag);
+        this.readFromNbt(tag);
     }
 }

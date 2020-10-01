@@ -27,7 +27,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import net.fabricmc.fabric.api.event.Event;
@@ -37,8 +36,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Set;
 
 public final class CardinalItemInternals {
@@ -106,12 +105,10 @@ public final class CardinalItemInternals {
         if (stack1.isEmpty()) return false;
 
         // Possibly initialize components
-        Set<ComponentKey<?>> keys1 = ((InternalComponentProvider) ComponentProvider.fromItemStack(stack1)).getComponentContainer().keys();
+        Set<ComponentKey<?>> keys = ((InternalComponentProvider) ComponentProvider.fromItemStack(stack1)).getComponentContainer().keys();
 
-        for(ComponentKey<?> key : keys1) {
-            @Nullable Component otherComponent = key.getNullable(stack2);
-            // TODO replace with Objects.equals(key.getNullable(stack1), key.getNullable(stack2))
-            if(otherComponent == null || !key.get(stack1).isComponentEqual(otherComponent)) {
+        for(ComponentKey<?> key : keys) {
+            if(Objects.equals(key.getNullable(stack1), key.getNullable(stack2))) {
                 return true;
             }
         }

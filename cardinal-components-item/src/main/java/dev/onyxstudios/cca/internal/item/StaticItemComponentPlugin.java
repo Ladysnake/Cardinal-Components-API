@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.item;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactory;
@@ -32,7 +33,6 @@ import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
