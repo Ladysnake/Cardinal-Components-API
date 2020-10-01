@@ -46,7 +46,7 @@ public interface BaseSyncedComponent extends SyncedComponent, TypeAwareComponent
      * Write this component's data to {@code buf}.
      *
      * @implSpec The default implementation writes the whole NBT representation
-     * of this component to the buffer using {@link #toTag(CompoundTag)}.
+     * of this component to the buffer using {@link #writeToNbt(CompoundTag)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation sends possibly hidden
      * information to clients, uses a wasteful data format, and does not support
@@ -56,14 +56,16 @@ public interface BaseSyncedComponent extends SyncedComponent, TypeAwareComponent
      * @see #readFromPacket(PacketByteBuf)
      */
     default void writeToPacket(PacketByteBuf buf) {
-        buf.writeCompoundTag(this.toTag(new CompoundTag()));
+        CompoundTag tag = new CompoundTag();
+        this.writeToNbt(tag);
+        buf.writeCompoundTag(tag);
     }
 
     /**
      * Reads this component's data from {@code buf}.
      *
      * @implSpec The default implementation converts the buffer's content
-     * to a {@code TagCompound} and calls {@link #fromTag(CompoundTag)}.
+     * to a {@code TagCompound} and calls {@link #readFromNbt(CompoundTag)}.
      * @implNote any implementing class overriding {@link #writeToPacket(PacketByteBuf)}
      * such that it uses a different data format must override this method.
      *
@@ -72,7 +74,7 @@ public interface BaseSyncedComponent extends SyncedComponent, TypeAwareComponent
     default void readFromPacket(PacketByteBuf buf) {
         CompoundTag tag = buf.readCompoundTag();
         if (tag != null) {
-            this.fromTag(tag);
+            this.readFromNbt(tag);
         }
     }
 }

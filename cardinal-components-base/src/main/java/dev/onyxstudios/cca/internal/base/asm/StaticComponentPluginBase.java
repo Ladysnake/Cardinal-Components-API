@@ -22,12 +22,13 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
@@ -79,7 +80,7 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
     @Deprecated
     @SuppressWarnings("unused")
     public static <I, C extends Component> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Class<? super C> componentClass, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
-        return CcaAsmHelper.spinComponentContainer(componentFactoryType, componentFactories.entrySet().stream().collect(Collectors.toMap(entry -> ComponentRegistry.INSTANCE.get(entry.getKey()), Map.Entry::getValue)), implNameSuffix);
+        return CcaAsmHelper.spinComponentContainer(componentFactoryType, componentFactories.entrySet().stream().collect(Collectors.toMap(entry -> ComponentRegistryV3.INSTANCE.get(entry.getKey()), Map.Entry::getValue)), implNameSuffix);
     }
 
     /**

@@ -22,8 +22,8 @@
  */
 package dev.onyxstudios.cca.api.v3.world;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
 
 /**
  * @since 2.4.0

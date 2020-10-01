@@ -22,9 +22,9 @@
  */
 package dev.onyxstudios.cca.internal.base;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import org.junit.jupiter.api.AfterEach;
@@ -63,10 +63,10 @@ class ComponentRegistryImplTest {
 
     static class TestComponentNotItf implements Component {
         @Override
-        public void fromTag(CompoundTag tag) { }
+        public void readFromNbt(CompoundTag tag) { }
 
         @Override
-        public CompoundTag toTag(CompoundTag tag) { throw new UnsupportedOperationException(); }
+        public void writeToNbt(CompoundTag tag) { throw new UnsupportedOperationException(); }
     }
 
     interface TestComponentItf extends Component {}

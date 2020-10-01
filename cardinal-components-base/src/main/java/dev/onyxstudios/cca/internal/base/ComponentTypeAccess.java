@@ -22,8 +22,8 @@
  */
 package dev.onyxstudios.cca.internal.base;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.util.Identifier;
 
 public interface ComponentTypeAccess {

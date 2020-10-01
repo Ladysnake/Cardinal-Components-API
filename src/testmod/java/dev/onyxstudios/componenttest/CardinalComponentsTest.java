@@ -23,6 +23,7 @@
 package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.util.ComponentContainerMetafactory;
@@ -30,7 +31,6 @@ import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.componenttest.vita.BaseVita;
 import dev.onyxstudios.componenttest.vita.Vita;
 import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.event.Event;

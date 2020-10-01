@@ -23,8 +23,8 @@
 package nerdhub.cardinal.components.api.util.provider;
 
 import com.google.common.collect.Sets;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 
 import javax.annotation.Nullable;

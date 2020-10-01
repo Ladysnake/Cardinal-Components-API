@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.block;
 
-import nerdhub.cardinal.components.api.component.Component;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.block.entity.BlockEntity;
 import org.jetbrains.annotations.ApiStatus;
 

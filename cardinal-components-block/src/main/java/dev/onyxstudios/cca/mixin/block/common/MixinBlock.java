@@ -24,11 +24,11 @@ package dev.onyxstudios.cca.mixin.block.common;
 
 import com.google.common.collect.ImmutableSet;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.block.InternalBlockComponentProvider;
 import dev.onyxstudios.cca.internal.block.StaticBlockComponentPlugin;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

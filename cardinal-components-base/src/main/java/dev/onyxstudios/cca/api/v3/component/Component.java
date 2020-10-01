@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Contract;
  *
  * @since 2.7.0
  */
-public interface Component extends ComponentV3 {
+public interface Component {
 
     /**
      * Reads this component's properties from a {@link CompoundTag}.

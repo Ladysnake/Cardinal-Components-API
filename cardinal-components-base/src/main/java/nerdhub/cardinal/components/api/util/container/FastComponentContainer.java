@@ -24,6 +24,7 @@ package nerdhub.cardinal.components.api.util.container;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
@@ -33,7 +34,6 @@ import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;

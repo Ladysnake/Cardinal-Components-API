@@ -27,7 +27,6 @@ import com.demonwav.mcdev.annotations.Env;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.util.NbtSerializable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
