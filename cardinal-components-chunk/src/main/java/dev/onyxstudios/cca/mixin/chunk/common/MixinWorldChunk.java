@@ -32,7 +32,6 @@ import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
-import nerdhub.cardinal.components.api.event.ChunkComponentCallback;
 import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -64,7 +63,7 @@ public abstract class MixinWorldChunk implements Chunk, InternalComponentProvide
 
     @Unique
     private static final Lazy<DynamicContainerFactory<Chunk>> componentsContainerFactory
-        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticChunkComponentPlugin.INSTANCE.getContainerFactoryClass(), ChunkComponentCallback.EVENT));
+        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticChunkComponentPlugin.INSTANCE.getContainerFactoryClass()));
     @Unique
     private ComponentContainer components;
 

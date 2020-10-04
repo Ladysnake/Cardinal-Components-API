@@ -24,13 +24,10 @@ package dev.onyxstudios.cca.internal.item;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
-import nerdhub.cardinal.components.api.event.ItemComponentCallback;
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
@@ -41,28 +38,15 @@ import java.util.Objects;
 import java.util.Set;
 
 public final class CardinalItemInternals {
-    public static final Event<ItemComponentCallback> WILDCARD_ITEM_EVENT = createItemComponentsEvent();
     public static final String CCA_SYNCED_COMPONENTS = "cca_synced_components";
-
-    public static Event<ItemComponentCallback> createItemComponentsEvent() {
-        return EventFactory.createArrayBacked(ItemComponentCallback.class,
-            (listeners) -> (stack, components) -> {
-                for (ItemComponentCallback listener : listeners) {
-                    listener.initComponents(stack, components);
-                }
-            });
-    }
 
     /**
      * Creates a container factory for an item id.
-     *
-     * <p>The container factory will populate the container by invoking the event for that item
-     * as well as the {@linkplain #WILDCARD_ITEM_EVENT wildcard event}.
      */
     public static DynamicContainerFactory<ItemStack> createItemStackContainerFactory(Item item) {
         Identifier itemId = Registry.ITEM.getId(item);
         Class<? extends DynamicContainerFactory<ItemStack>> factoryClass = StaticItemComponentPlugin.INSTANCE.getFactoryClass(item, itemId);
-        return ComponentsInternals.createFactory(factoryClass, WILDCARD_ITEM_EVENT, ((ItemCaller) item).cardinal_getItemComponentEvent());
+        return ComponentsInternals.createFactory(factoryClass);
     }
 
     public static void copyComponents(ItemStack original, ItemStack copy) {

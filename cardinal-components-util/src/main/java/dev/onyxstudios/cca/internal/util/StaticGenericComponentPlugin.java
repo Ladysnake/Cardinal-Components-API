@@ -37,7 +37,6 @@ import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.Identifier;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
@@ -78,10 +77,10 @@ public final class StaticGenericComponentPlugin extends LazyDispatcher implement
         return containerClass;
     }
 
-    <R> Class<? extends R> spinSingleArgContainerFactory(TypeToken<?> componentFactoryType, Identifier genericProviderId, Class<? super R> containerFactoryType, @Nullable Class<?> componentCallbackType, int eventCount, Class<?>[] actualFactoryArgs) throws IOException {
+    <R> Class<? extends R> spinSingleArgContainerFactory(TypeToken<?> componentFactoryType, Identifier genericProviderId, Class<? super R> containerFactoryType, Class<?>[] actualFactoryArgs) throws IOException {
         this.ensureInitialized();
         Class<? extends ComponentContainer> containerClass = this.spinComponentContainer(componentFactoryType, genericProviderId);
-        return StaticComponentPluginBase.spinContainerFactory(getSuffix(genericProviderId), containerFactoryType, containerClass, componentCallbackType, eventCount, actualFactoryArgs);
+        return StaticComponentPluginBase.spinContainerFactory(getSuffix(genericProviderId), containerFactoryType, containerClass, actualFactoryArgs);
     }
 
     @Override

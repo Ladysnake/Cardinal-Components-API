@@ -146,7 +146,7 @@ public interface ComponentContainer extends NbtSerializable {
                         Function.class, this.factories, implNameSuffix
                     );
                     Class<? extends Factory<T>> factoryClass = StaticComponentPluginBase.spinContainerFactory(
-                        implNameSuffix, Factory.class, containerClass, null, 0, this.argClass
+                        implNameSuffix, Factory.class, containerClass, this.argClass
                     );
                     return ComponentsInternals.createFactory(factoryClass);
                 } catch (IOException e) {

@@ -27,7 +27,6 @@ import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
-import nerdhub.cardinal.components.api.event.ChunkComponentCallback;
 import net.minecraft.util.Lazy;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
@@ -43,7 +42,7 @@ import javax.annotation.Nonnull;
 public abstract class MixinProtoChunk implements Chunk, InternalComponentProvider {
     @Unique
     private static final Lazy<DynamicContainerFactory<Chunk>> componentsContainerFactory
-        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticChunkComponentPlugin.INSTANCE.getContainerFactoryClass(), ChunkComponentCallback.EVENT));
+        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticChunkComponentPlugin.INSTANCE.getContainerFactoryClass()));
     @Unique
     private ComponentContainer components;
 

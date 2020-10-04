@@ -26,9 +26,6 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import nerdhub.cardinal.components.api.event.ComponentCallback;
-import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -128,25 +125,5 @@ public class ComponentType<T extends Component> extends ComponentKey<T> {
             return Optional.ofNullable(this.getInternal((ComponentProvider) provider));
         }
         return Optional.empty();
-    }
-
-    /**
-     * Attaches components of this type to a component provider using a {@link ComponentCallback} for that
-     * type of provider.
-     *
-     * <p> This method behaves as if:
-     * <pre>{@code
-     *      event.register((provider, components) -> components.put(type, factory.apply(provider)));
-     * }</pre>
-     *
-     * @param event   the event for which components of this type should be attached
-     * @param factory a factory creating instances for this {@code ComponentType}
-     * @param <P>     the type of providers targeted by the event
-     * @return {@code this}
-     * @throws IllegalArgumentException if {@code event} is not a valid component event
-     */
-    public final <P, C extends T, E extends ComponentCallback<P, ? super C>> ComponentType<T> attach(Event<E> event, Function<P, C> factory) {
-        event.register(ComponentsInternals.createCallback(event, this, factory));
-        return this;
     }
 }

@@ -34,7 +34,6 @@ import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
@@ -60,23 +59,21 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     private final Map<Class<? extends Entity>, Map<ComponentKey<?>, Class<? extends Component>>> componentImpls = new HashMap<>();
     private final Map<Class<? extends Entity>, Map<ComponentKey<?>, EntityComponentFactory<?, ?>>> componentFactories = new HashMap<>();
     private final Map<Class<? extends Entity>, Class<? extends ComponentContainer>> containerClasses = new HashMap<>();
-    private final Map<Key, Class<? extends DynamicContainerFactory<?>>> factoryClasses = new HashMap<>();
+    private final Map<Class<? extends Entity>, Class<? extends DynamicContainerFactory<?>>> factoryClasses = new HashMap<>();
 
     public boolean requiresStaticFactory(Class<? extends Entity> entityClass) {
         this.ensureInitialized();
         return entityClass == Entity.class || this.componentFactories.containsKey(entityClass);
     }
 
-    public Class<? extends DynamicContainerFactory<?>> spinDedicatedFactory(Key key) {
+    public Class<? extends DynamicContainerFactory<?>> spinDedicatedFactory(Class<? extends Entity> key) {
         this.ensureInitialized();
 
         // we need a cache as this method is called for a given class each time one of its subclasses is loaded.
-        return this.factoryClasses.computeIfAbsent(key, k -> {
+        return this.factoryClasses.computeIfAbsent(key, entityClass -> {
             for (PredicatedComponentFactory<?> dynamicFactory : this.dynamicFactories) {
-                dynamicFactory.tryRegister(k.entityClass);
+                dynamicFactory.tryRegister(entityClass);
             }
-
-            Class<? extends Entity> entityClass = k.entityClass;
 
             Map<ComponentKey<?>, EntityComponentFactory<?, ?>> compiled = new LinkedHashMap<>(this.componentFactories.getOrDefault(entityClass, Collections.emptyMap()));
             Map<ComponentKey<?>, Class<? extends Component>> compiledImpls = new LinkedHashMap<>(this.componentImpls.getOrDefault(entityClass, Collections.emptyMap()));
@@ -96,7 +93,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
                     containerCls = CcaAsmHelper.spinComponentContainer(EntityComponentFactory.class, compiled, compiledImpls, implSuffix);
                     this.containerClasses.put(entityClass, containerCls);
                 }
-                return StaticComponentPluginBase.spinContainerFactory(implSuffix + "_" + k.eventCount, DynamicContainerFactory.class, containerCls, EntityComponentCallback.class, k.eventCount, entityClass);
+                return StaticComponentPluginBase.spinContainerFactory(implSuffix, DynamicContainerFactory.class, containerCls, entityClass);
             } catch (IOException e) {
                 throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entityClass, e);
             }
@@ -152,30 +149,6 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         EntityComponentFactory<Component, E> checked = entity -> Objects.requireNonNull(((EntityComponentFactory<?, E>) factory).createForEntity(entity), "Component factory "+ factory + " for " + key.getId() + " returned null on " + target.getSimpleName());
         this.componentImpls.computeIfAbsent(target, t -> new LinkedHashMap<>()).put(key, impl);
         specializedMap.put(key, checked);
-    }
-
-    static class Key {
-        final int eventCount;
-        final Class<? extends Entity> entityClass;
-
-        public Key(int eventCount, Class<? extends Entity> entityClass) {
-            this.eventCount = eventCount;
-            this.entityClass = entityClass;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || this.getClass() != o.getClass()) return false;
-            Key key = (Key) o;
-            return this.eventCount == key.eventCount &&
-                this.entityClass.equals(key.entityClass);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.eventCount, this.entityClass);
-        }
     }
 
     private final class PredicatedComponentFactory<C extends Component> {

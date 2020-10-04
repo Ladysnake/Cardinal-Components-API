@@ -106,9 +106,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
                     implSuffix,
                     DynamicContainerFactory.class,
                     containerCls,
-                    null,
-                    0,
-                    entityClass
+                        entityClass
                 );
             } catch (IOException e) {
                 throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entityClass, e);
