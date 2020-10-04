@@ -49,6 +49,7 @@ import java.util.function.Function;
 @ApiStatus.NonExtendable
 @ApiStatus.Experimental
 public interface ComponentContainer extends NbtSerializable {
+    ComponentContainer EMPTY = StaticComponentPluginBase.createEmptyContainer();
 
     @Contract(pure = true)
     @Unmodifiable Set<ComponentKey<?>> keys();
@@ -141,6 +142,11 @@ public interface ComponentContainer extends NbtSerializable {
 
                 try {
                     this.built = true;
+
+                    if (this.factories.isEmpty()) {
+                        return t -> EMPTY;
+                    }
+
                     String implNameSuffix = "Custom$" + counter++;
                     Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(
                         Function.class, this.factories, implNameSuffix

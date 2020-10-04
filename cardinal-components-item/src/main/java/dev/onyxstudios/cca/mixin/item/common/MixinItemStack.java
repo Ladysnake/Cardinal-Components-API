@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.mixin.item.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
@@ -45,7 +44,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = ItemStack.class)
 public abstract class MixinItemStack implements InternalStackComponentProvider {
     @Unique
-    private static final ComponentContainer EMPTY_COMPONENTS = StaticComponentPluginBase.createEmptyContainer("EmptyItemImpl");
+    private static final ComponentContainer EMPTY_COMPONENTS = ComponentContainer.EMPTY;
 
     @Unique
     private @Nullable ComponentContainer components;
