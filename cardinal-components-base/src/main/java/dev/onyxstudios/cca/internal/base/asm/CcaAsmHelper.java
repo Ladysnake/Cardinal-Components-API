@@ -28,15 +28,9 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
-import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
+import dev.onyxstudios.cca.internal.base.AbstractComponentContainer;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
-import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.util.container.FastComponentContainer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
@@ -53,7 +47,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -69,29 +62,19 @@ public final class CcaAsmHelper {
     public static final String COMPONENT = Type.getInternalName(Component.class);
     public static final String COMPONENT_CONTAINER = Type.getInternalName(ComponentContainer.class);
     public static final String COMPONENT_TYPE = Type.getInternalName(ComponentType.class);
-    public static final String DYNAMIC_COMPONENT_CONTAINER_IMPL = Type.getInternalName(FastComponentContainer.class);
+    public static final String DYNAMIC_COMPONENT_CONTAINER_IMPL = Type.getInternalName(AbstractComponentContainer.class);
     public static final String IDENTIFIER = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960").replace('.', '/');
     public static final String EVENT = Type.getInternalName(Event.class);
-    // methods
-    public static final String BY_RAW_ID_DESC;
-    public static final String BY_RAW_ID;
-    public static final String COMPONENT_CONTAINER$GET_DESC;
     // generated references
     public static final String STATIC_COMPONENT_CONTAINER = "dev/onyxstudios/cca/_generated_/GeneratedComponentContainer";
-    public static final String STATIC_CONTAINER_GETTER_DESC = "()Lnerdhub/cardinal/components/api/component/Component;";
+    public static final String STATIC_CONTAINER_GETTER_DESC = "()L" + COMPONENT + ";";
     public static final String STATIC_COMPONENT_TYPE = "dev/onyxstudios/cca/_generated_/ComponentType";
     public static final String STATIC_CONTAINER_FACTORY = "dev/onyxstudios/cca/_generated_/GeneratedContainerFactory";
-    public static final String FAST_COMPONENT_CONTAINER_CTOR_DESC;
-    public static final String CAN_BE_ASSIGNED_DESC;
+    public static final String ABSTRACT_COMPONENT_CONTAINER_CTOR_DESC;
 
     static {
         try {
-            Method byRawId = ComponentRegistryImpl.class.getMethod("byRawId", int.class);
-            BY_RAW_ID_DESC = Type.getMethodDescriptor(byRawId);
-            BY_RAW_ID = byRawId.getName();
-            COMPONENT_CONTAINER$GET_DESC = Type.getMethodDescriptor(nerdhub.cardinal.components.api.component.ComponentContainer.class.getMethod("get", ComponentType.class));
-            FAST_COMPONENT_CONTAINER_CTOR_DESC = Type.getConstructorDescriptor(FastComponentContainer.class.getConstructor(int.class));
-            CAN_BE_ASSIGNED_DESC = Type.getMethodDescriptor(FastComponentContainer.class.getDeclaredMethod("canBeAssigned", ComponentType.class));
+            ABSTRACT_COMPONENT_CONTAINER_CTOR_DESC = Type.getConstructorDescriptor(AbstractComponentContainer.class.getConstructor());
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException("Failed to find one or more method descriptors", e);
         }
@@ -159,24 +142,14 @@ public final class CcaAsmHelper {
         return new IllegalArgumentException(callbackClass + " is not a functional interface!");
     }
 
-    public static void stackStaticComponentType(MethodVisitor method, Identifier componentId) {
-        method.visitLdcInsn(((ComponentRegistryImpl) ComponentRegistry.INSTANCE).assignRawId(componentId));
-        // stack: rawId
-        method.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getInternalName(ComponentRegistryImpl.class), BY_RAW_ID, BY_RAW_ID_DESC, false);
-        // stack: componentType
-    }
-
     /**
      * Defines an implementation of {@link ComponentContainer} that supports direct component access.
      *
      * <p>Instances of the returned class can be returned by {@link ComponentProvider#getComponentContainer()}.
      * <strong>This method must not be called before the static component container interface has been defined!</strong>
      *
-     * <p>Generated component container classes will take an additional {@code int} as first argument to their
-     * constructors (until 3.0). That number corresponds to the expected dynamic size of the container (see {@link FastComponentContainer}).
-     *
      * @param componentFactoryType the interface implemented by the component factories used to initialize this container
-     * @param componentFactories   a map of {@link ComponentType} ids to factories for components of that type
+     * @param componentFactories   a map of {@link ComponentKey} ids to factories for components of that type
      * @param implNameSuffix       a unique suffix for the generated class
      * @return the generated container class
      */
@@ -189,9 +162,6 @@ public final class CcaAsmHelper {
      *
      * <p>Instances of the returned class can be returned by {@link ComponentProvider#getComponentContainer()}.
      * <strong>This method must not be called before the static component container interface has been defined!</strong>
-     *
-     * <p>Generated component container classes will take an additional {@code int} as first argument to their
-     * constructors (until 3.0). That number corresponds to the expected dynamic size of the container (see {@link FastComponentContainer}).
      *
      * @param componentFactoryType the interface implemented by the component factories used to initialize this container
      * @param componentFactories   a map of {@link ComponentKey}s to factories for components of that type
@@ -207,14 +177,11 @@ public final class CcaAsmHelper {
         String componentFactoryName = Type.getInternalName(componentFactoryType);
         Method sam = findSam(componentFactoryType);
         String samDescriptor = Type.getMethodDescriptor(sam);
-        // TODO V3 remove
-        Int2ObjectMap<String> componentFieldDescriptors = new Int2ObjectOpenHashMap<>();
         Class<?>[] factoryArgs = sam.getParameterTypes();
-        Type[] actualCtorArgs = new Type[factoryArgs.length + 1];
-        actualCtorArgs[0] = Type.INT_TYPE;
+        Type[] actualCtorArgs = new Type[factoryArgs.length];
 
         for (int i = 0; i < factoryArgs.length; i++) {
-            actualCtorArgs[i + 1] = Type.getType(factoryArgs[i]);
+            actualCtorArgs[i] = Type.getType(factoryArgs[i]);
         }
 
         String ctorDesc = Type.getMethodDescriptor(Type.VOID_TYPE, actualCtorArgs);
@@ -231,25 +198,22 @@ public final class CcaAsmHelper {
         String factoryFieldDescriptor = Type.getDescriptor(componentFactoryType);
 
         classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "componentKeys", "Ljava/util/Set;", null, null);
-//      TODO V3 replace staticKeySet() with keys() when dynamic components are no more
-        MethodVisitor keys = classNode.visitMethod(Opcodes.ACC_PUBLIC, "staticKeySet", "()Ljava/util/Set;", null, null);
+
+        MethodVisitor keys = classNode.visitMethod(Opcodes.ACC_PUBLIC, "keys", "()Ljava/util/Set;", null, null);
         keys.visitFieldInsn(Opcodes.GETSTATIC, containerImplName, "componentKeys", "Ljava/util/Set;");
         keys.visitInsn(Opcodes.ARETURN);
         keys.visitEnd();
 
-/*      TODO V3 enable empty check optimization when dynamic components are no more
         MethodVisitor hasComponents = classNode.visitMethod(Opcodes.ACC_PUBLIC, "hasComponents", "()Z", null, null);
         hasComponents.visitCode();
         hasComponents.visitLdcInsn(!componentFactories.isEmpty());
         hasComponents.visitInsn(Opcodes.IRETURN);
         hasComponents.visitEnd();
-*/
 
         MethodVisitor init = classNode.visitMethod(Opcodes.ACC_PUBLIC, "<init>", ctorDesc, null, null);
         init.visitCode();
         init.visitVarInsn(Opcodes.ALOAD, 0);
-        init.visitVarInsn(Opcodes.ILOAD, 1);
-        init.visitMethodInsn(Opcodes.INVOKESPECIAL, STATIC_COMPONENT_CONTAINER, "<init>", FAST_COMPONENT_CONTAINER_CTOR_DESC, false);
+        init.visitMethodInsn(Opcodes.INVOKESPECIAL, STATIC_COMPONENT_CONTAINER, "<init>", ABSTRACT_COMPONENT_CONTAINER_CTOR_DESC, false);
 
         MethodVisitor serverTick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickServerComponents", "()V", null, null);
         serverTick.visitCode();
@@ -261,7 +225,6 @@ public final class CcaAsmHelper {
             String componentFieldName = getJavaIdentifierName(identifier);
             Class<? extends Component> impl = componentImpls.get(key);
             String componentFieldDescriptor = Type.getDescriptor(impl);
-            componentFieldDescriptors.put(key.getRawId(), componentFieldDescriptor);
             String factoryFieldName = getFactoryFieldName(identifier);
             /* field declaration */
             classNode.visitField(
@@ -282,7 +245,7 @@ public final class CcaAsmHelper {
             init.visitFieldInsn(Opcodes.GETSTATIC, containerImplName, factoryFieldName, factoryFieldDescriptor);
             // stack: factory
             for (int i = 0; i < factoryArgs.length; i++) {
-                init.visitVarInsn(Opcodes.ALOAD, i + 2);    // first 2 args are for the container itself
+                init.visitVarInsn(Opcodes.ALOAD, i + 1);    // first arg is for the container itself
             }
             // stack: factory factoryArgs...
             // initialize the component by calling the factory
@@ -298,12 +261,6 @@ public final class CcaAsmHelper {
             // stack: <this> component
             // store in the field
             init.visitFieldInsn(Opcodes.PUTFIELD, containerImplName, componentFieldName, componentFieldDescriptor);
-            // <empty stack>
-            init.visitVarInsn(Opcodes.ALOAD, 0);
-            // stack: <this>
-            stackStaticComponentType(init, identifier);
-            // stack: <this> componentType
-            init.visitMethodInsn(Opcodes.INVOKEVIRTUAL, DYNAMIC_COMPONENT_CONTAINER_IMPL, "addContainedType", "(L" + COMPONENT_TYPE + ";)V", false);
             // <empty stack>
 
             /* getter implementation */
@@ -335,10 +292,6 @@ public final class CcaAsmHelper {
         serverTick.visitEnd();
         clientTick.visitInsn(Opcodes.RETURN);
         clientTick.visitEnd();
-
-        if (!componentFactories.isEmpty()) {
-            generateLookupMethods(componentFactories.keySet(), containerImplName, classNode, componentFieldDescriptors);
-        }
 
         Class<? extends ComponentContainer> ret = generateClass(classNode).asSubclass(ComponentContainer.class);
 
@@ -373,68 +326,6 @@ public final class CcaAsmHelper {
         } else {
             tick.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Type.getInternalName(impl), target, "()V", false);
         }
-    }
-
-    // TODO V3 remove when dynamic components are gone
-    private static void generateLookupMethods(Set<ComponentKey<?>> components, String containerImplName, ClassNode classNode, Int2ObjectMap<String> componentFieldDescriptors) {
-        MethodVisitor canBeAssigned = classNode.visitMethod(Opcodes.ACC_PROTECTED, "canBeAssigned", CAN_BE_ASSIGNED_DESC, null, null);
-        MethodVisitor get = classNode.visitMethod(Opcodes.ACC_PUBLIC, "get", COMPONENT_CONTAINER$GET_DESC, null, null);
-        canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
-        // stack[canBeAssigned]: componentType
-        get.visitVarInsn(Opcodes.ALOAD, 0);
-        get.visitVarInsn(Opcodes.ALOAD, 1);
-        // stack[get]: <this> componentType
-        canBeAssigned.visitMethodInsn(Opcodes.INVOKEVIRTUAL, COMPONENT_TYPE, "getRawId", "()I", false);
-        // stack[canBeAssigned]: rawId
-        get.visitMethodInsn(Opcodes.INVOKEVIRTUAL, COMPONENT_TYPE, "getRawId", "()I", false);
-        // stack[get]: <this> rawId
-        Label yesAssign = new Label();
-        Label noAssign = new Label();
-        Label defaultGetCase = new Label();
-        Int2ObjectSortedMap<Identifier> raw2Id = components.stream().collect(Collectors.toMap(
-            ComponentKey::getRawId,
-            ComponentKey::getId, (r, r2) -> {
-                throw new IllegalStateException("Duplicate key " + r + ", " + r2);
-            }, Int2ObjectRBTreeMap::new
-        ));
-        int nbCases = raw2Id.lastIntKey() + 1;  // 0 is a valid raw id
-        Label[] getLabels = new Label[nbCases];
-        Label[] canBeAssignedLabels = new Label[nbCases];
-        for (int i = 0; i < nbCases; i++) {
-            boolean contained = raw2Id.containsKey(i);
-            getLabels[i] = contained ? new Label() : defaultGetCase;
-            canBeAssignedLabels[i] = contained ? noAssign : yesAssign;
-        }
-        canBeAssigned.visitTableSwitchInsn(0, nbCases - 1, yesAssign, canBeAssignedLabels);
-        // <empty stack[canBeAssigned]>
-        get.visitTableSwitchInsn(0, nbCases - 1, defaultGetCase, getLabels);
-        // stack[get]: <this>
-
-        canBeAssigned.visitLabel(noAssign);
-        canBeAssigned.visitInsn(Opcodes.ICONST_0);
-        // stack[canBeAssigned]: <false>
-        canBeAssigned.visitInsn(Opcodes.IRETURN);
-
-        for (Int2ObjectMap.Entry<Identifier> entry : raw2Id.int2ObjectEntrySet()) {
-            // stack[get]: <this>
-            get.visitLabel(getLabels[entry.getIntKey()]);
-            get.visitFieldInsn(Opcodes.GETFIELD, containerImplName, getJavaIdentifierName(entry.getValue()), componentFieldDescriptors.get(entry.getIntKey()));
-            // stack[get]: component
-            get.visitInsn(Opcodes.ARETURN);
-        }
-        canBeAssigned.visitLabel(yesAssign);
-        // <empty stack[canBeAssigned]>
-        canBeAssigned.visitVarInsn(Opcodes.ALOAD, 0);
-        canBeAssigned.visitVarInsn(Opcodes.ALOAD, 1);
-        canBeAssigned.visitMethodInsn(Opcodes.INVOKESPECIAL, DYNAMIC_COMPONENT_CONTAINER_IMPL, "canBeAssigned", CAN_BE_ASSIGNED_DESC, false);
-        canBeAssigned.visitInsn(Opcodes.IRETURN);
-        get.visitLabel(defaultGetCase);
-        // stack[get]: <this>
-        get.visitVarInsn(Opcodes.ALOAD, 1);
-        // stack[get]: <this> componentType
-        get.visitMethodInsn(Opcodes.INVOKESPECIAL, DYNAMIC_COMPONENT_CONTAINER_IMPL, "get", COMPONENT_CONTAINER$GET_DESC, false);
-        get.visitInsn(Opcodes.ARETURN);
-        get.visitEnd();
     }
 
     private static String getFactoryFieldName(Identifier identifier) {

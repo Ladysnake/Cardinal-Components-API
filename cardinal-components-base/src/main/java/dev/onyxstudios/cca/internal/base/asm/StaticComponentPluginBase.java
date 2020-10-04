@@ -78,9 +78,8 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
             throw new IllegalArgumentException("Actual argument list length mismatches with factory SAM: " + Arrays.toString(actualFactoryParams) + " and " + factorySam);
         }
 
-        // constructor has one more argument, for expected size
-        if (constructors[0].getParameterCount() != factorySam.getParameterCount() + 1) {
-            throw new IllegalArgumentException("Factory SAM parameter count should be one less than container constructor (found " + factorySam + " for " + constructors[0] + ")");
+        if (constructors[0].getParameterCount() != factorySam.getParameterCount()) {
+            throw new IllegalArgumentException("Factory SAM parameter count should be the same as container constructor (found " + factorySam + " for " + constructors[0] + ")");
         }
 
         Type[] factoryArgs;
@@ -101,8 +100,7 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
         ClassNode containerFactoryWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
         String factoryImplName = CcaAsmHelper.STATIC_CONTAINER_FACTORY + '_' + implNameSuffix;
         containerFactoryWriter.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, factoryImplName, null, "java/lang/Object", new String[]{Type.getInternalName(containerFactoryType)});
-        containerFactoryWriter.visitField(Opcodes.ACC_PRIVATE, "expectedSize", "I", null, 0);
-        MethodVisitor init = containerFactoryWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "(" + ")V", null, null);
+        MethodVisitor init = containerFactoryWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
         init.visitVarInsn(Opcodes.ALOAD, 0);
         init.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
         init.visitInsn(Opcodes.RETURN);
@@ -110,17 +108,14 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
         MethodVisitor createContainer = containerFactoryWriter.visitMethod(Opcodes.ACC_PUBLIC, factorySam.getName(), Type.getMethodDescriptor(factorySam), null, null);
         createContainer.visitTypeInsn(Opcodes.NEW, containerImplName);
         createContainer.visitInsn(Opcodes.DUP);
-        createContainer.visitVarInsn(Opcodes.ALOAD, 0);
-        // stack: <this>
-        createContainer.visitFieldInsn(Opcodes.GETFIELD, factoryImplName, "expectedSize", "I");
-        // stack: this.expectedSize
+        // stack: container, container
         for (int i = 0; i < actualFactoryParams.length; i++) {
             createContainer.visitVarInsn(factoryArgs[i].getOpcode(Opcodes.ILOAD), i + 1);
             if (factoryArgs[i].getSort() == Type.OBJECT || factoryArgs[i].getSort() == Type.ARRAY) {
                 createContainer.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(actualFactoryParams[i]));
             }
         }
-        // stack: this.expectedSize actualFactoryArgs...
+        // stack: container, container, actualFactoryArgs...
         createContainer.visitMethodInsn(Opcodes.INVOKESPECIAL, containerImplName, "<init>", containerCtorDesc, false);
         // stack: container
         createContainer.visitInsn(Opcodes.ARETURN);
@@ -133,7 +128,7 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
     public static ComponentContainer createEmptyContainer() {
         try {
             Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(Runnable.class, Collections.emptyMap(), "Empty");
-            return containerCls.getConstructor(int.class).newInstance(0);
+            return containerCls.getConstructor().newInstance();
         } catch (IOException | ReflectiveOperationException e) {
             throw new StaticComponentLoadingException("Failed to generate empty component container", e);
         }

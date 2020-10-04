@@ -86,7 +86,7 @@ public final class ComponentRegistryImpl implements ComponentRegistry, Component
             return existing;
         } else {
             ComponentType<T> registered;
-            Class<? extends ComponentType<?>> generated = CcaBootstrap.INSTANCE.getGeneratedComponentTypeClass(componentId);
+            Class<? extends ComponentKey<?>> generated = CcaBootstrap.INSTANCE.getGeneratedComponentTypeClass(componentId);
             if (generated != null) {
                 registered = this.instantiateStaticType(generated, componentId, componentClass, rawId);
             } else {
@@ -126,7 +126,7 @@ public final class ComponentRegistryImpl implements ComponentRegistry, Component
         return rawId;
     }
 
-    private <T extends Component> ComponentType<T> instantiateStaticType(Class<? extends ComponentType<?>> generated, Identifier componentId, Class<T> componentClass, int rawId) {
+    private <T extends Component> ComponentType<T> instantiateStaticType(Class<? extends ComponentKey<?>> generated, Identifier componentId, Class<T> componentClass, int rawId) {
         try {
             @SuppressWarnings("unchecked") ComponentType<T> ret = (ComponentType<T>) generated.getConstructor(Identifier.class, Class.class, int.class).newInstance(componentId, componentClass, rawId);
             return ret;

@@ -22,58 +22,21 @@
  */
 package nerdhub.cardinal.components.api.util.provider;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 
 /**
  * A component provider backed by a container.
  */
 public class SimpleComponentProvider implements ComponentProvider {
-    protected ComponentContainer<?> backing;
+    protected ComponentContainer backing;
 
-    public SimpleComponentProvider(ComponentContainer<?> backing) {
+    public SimpleComponentProvider(ComponentContainer backing) {
         this.backing = backing;
     }
 
-    /**
-     * if this method returns {@code true}, then {@link #getComponent(ComponentType)} <strong>must not</strong> return {@code null} for the same {@link ComponentType}
-     */
     @Override
-    public boolean hasComponent(ComponentType<?> type) {
-        return this.backing.containsKey(type);
-    }
-
-    /**
-     * A component requester should generally call one of the {@link ComponentType} methods
-     * instead of calling this directly.
-     *
-     * @return an instance of the requested component, or {@code null}
-     * @see ComponentType#get(Object)
-     * @see ComponentType#maybeGet(Object)
-     */
-    @Nullable
-    @Override
-    public <C extends Component> C getComponent(ComponentType<C> type) {
-        return this.backing.get(type);
-    }
-
-    /**
-     * @return an unmodifiable view of the component types
-     */
-    @Override
-    public Set<ComponentType<?>> getComponentTypes() {
-        return Collections.unmodifiableSet(this.backing.keySet());
-    }
-
-    @Nullable
-    @Override
-    public dev.onyxstudios.cca.api.v3.component.ComponentContainer getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return this.backing;
     }
 }
