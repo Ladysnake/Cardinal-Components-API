@@ -119,7 +119,6 @@ public interface ComponentProvider {
      * or {@code null} if this container does not support static components.
      */
     @ApiStatus.Experimental
-    @Nullable   // TODO mark NonNull when dynamic containers are gone
     ComponentContainer getComponentContainer();
 
     default Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {

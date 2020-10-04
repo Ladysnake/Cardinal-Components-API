@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
@@ -52,7 +53,7 @@ public final class CcaBootstrap extends LazyDispatcher {
 
     private final List<EntrypointContainer<StaticComponentInitializer>> staticComponentInitializers = FabricLoader.getInstance().getEntrypointContainers(STATIC_INIT_ENTRYPOINT, StaticComponentInitializer.class);
 
-    private Map<Identifier, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>();
+    private Map<Identifier, Class<? extends ComponentKey<?>>> generatedComponentTypes = new HashMap<>();
 
     public CcaBootstrap() {
         super("registering a ComponentType");
@@ -65,7 +66,7 @@ public final class CcaBootstrap extends LazyDispatcher {
     }
 
     @Nullable
-    public Class<? extends ComponentType<?>> getGeneratedComponentTypeClass(Identifier componentId) {
+    public Class<? extends ComponentKey<?>> getGeneratedComponentTypeClass(Identifier componentId) {
         this.ensureInitialized();
         assert this.generatedComponentTypes != null;
         return this.generatedComponentTypes.get(componentId);
@@ -120,9 +121,9 @@ public final class CcaBootstrap extends LazyDispatcher {
      * @param staticComponentTypes the set of all statically declared {@link ComponentType} ids
      * @return a map of {@link ComponentType} ids to specialized implementations
      */
-    private Map<Identifier, Class<? extends ComponentType<?>>> spinStaticComponentTypes(Set<Identifier> staticComponentTypes) throws IOException {
+    private Map<Identifier, Class<? extends ComponentKey<?>>> spinStaticComponentTypes(Set<Identifier> staticComponentTypes) throws IOException {
+        Map<Identifier, Class<? extends ComponentKey<?>>> generatedComponentTypes = new HashMap<>(staticComponentTypes.size());
 
-        Map<Identifier, Class<? extends ComponentType<?>>> generatedComponentTypes = new HashMap<>(staticComponentTypes.size());
         for (Identifier componentId : staticComponentTypes) {
             /* generate the component type class */
 
@@ -151,7 +152,7 @@ public final class CcaBootstrap extends LazyDispatcher {
             get.visitInsn(Opcodes.ARETURN);
             get.visitEnd();
 
-            @SuppressWarnings("unchecked") Class<? extends ComponentType<?>> ct = (Class<? extends ComponentType<?>>) CcaAsmHelper.generateClass(componentTypeWriter);
+            @SuppressWarnings("unchecked") Class<? extends ComponentKey<?>> ct = (Class<? extends ComponentKey<?>>) CcaAsmHelper.generateClass(componentTypeWriter);
             generatedComponentTypes.put(componentId, ct);
         }
         return generatedComponentTypes;
@@ -164,26 +165,16 @@ public final class CcaBootstrap extends LazyDispatcher {
         ClassNode staticContainerWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
         staticContainerWriter.visit(Opcodes.V1_8, Opcodes.ACC_ABSTRACT | Opcodes.ACC_PUBLIC, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, null, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, null);
 
-        MethodVisitor init = staticContainerWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", CcaAsmHelper.FAST_COMPONENT_CONTAINER_CTOR_DESC, null, null);
+        MethodVisitor init = staticContainerWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", CcaAsmHelper.ABSTRACT_COMPONENT_CONTAINER_CTOR_DESC, null, null);
         init.visitCode();
         init.visitVarInsn(Opcodes.ALOAD, 0);
-        init.visitVarInsn(Opcodes.ILOAD, 1);
-        init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "<init>", CcaAsmHelper.FAST_COMPONENT_CONTAINER_CTOR_DESC, false);
+        init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.DYNAMIC_COMPONENT_CONTAINER_IMPL, "<init>", CcaAsmHelper.ABSTRACT_COMPONENT_CONTAINER_CTOR_DESC, false);
         init.visitInsn(Opcodes.RETURN);
         init.visitEnd();
 
         for (Identifier componentId : staticComponentTypes) {
             MethodVisitor methodWriter = staticContainerWriter.visitMethod(Opcodes.ACC_PUBLIC, CcaAsmHelper.getStaticStorageGetterName(componentId), CcaAsmHelper.STATIC_CONTAINER_GETTER_DESC, null, null);
-            /* TODO return null by default when dynamic containers are gone
             methodWriter.visitInsn(Opcodes.ACONST_NULL);
-            methodWriter.visitInsn(Opcodes.ARETURN);
-             */
-            methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
-            // stack: <this>
-            CcaAsmHelper.stackStaticComponentType(methodWriter, componentId);
-            // stack: <this> componentType
-            methodWriter.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CcaAsmHelper.STATIC_COMPONENT_CONTAINER, "get", CcaAsmHelper.COMPONENT_CONTAINER$GET_DESC, false);
-            // stack: component
             methodWriter.visitInsn(Opcodes.ARETURN);
             methodWriter.visitEnd();
         }

@@ -183,7 +183,7 @@ public interface ComponentContainer extends NbtSerializable {
                         return t -> EMPTY;
                     }
 
-                    String implNameSuffix = "Custom$" + counter++;
+                    String implNameSuffix = Integer.toString(counter++);
                     Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(
                         ComponentFactory.class, this.factories, this.componentImpls, implNameSuffix
                     );

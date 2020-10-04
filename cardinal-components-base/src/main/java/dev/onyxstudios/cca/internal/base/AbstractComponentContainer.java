@@ -20,16 +20,12 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.container;
+package dev.onyxstudios.cca.internal.base;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
-import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.CompoundTag;
@@ -37,64 +33,17 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 
-import javax.annotation.Nullable;
-import java.util.AbstractMap;
-import java.util.Set;
+import java.util.Iterator;
 
 /**
- * This class provides a skeletal implementation of the {@code ComponentContainer} interface,
- * to minimize the effort required to implement this interface.
- *
- * <p> To implement an unmodifiable container, the programmer needs only to extend this class and
- * provide an implementation for the {@code entrySet} method, which returns a set-view of the container's
- * mappings. It is however recommended to provide a specific implementation of the {@link ComponentContainer#get(ComponentType)}
- * method, for performance reasons.
- *
- * <p> To implement a modifiable container, the programmer must additionally override the
- * {@link ComponentContainer#put(ComponentType, Component)} method (which otherwise throws an
- * {@code UnsupportedOperationException}).
- *
- * @see AbstractMap
- * @see FastComponentContainer
+ * Implementing class for {@link ComponentContainer}.
  */
-@Deprecated
-public abstract class AbstractComponentContainer<C extends Component> extends AbstractMap<ComponentType<?>, C> implements ComponentContainer<C> {
+public abstract class AbstractComponentContainer implements ComponentContainer {
 
     public static final String NBT_KEY = "cardinal_components";
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Set<ComponentKey<?>> keys() {
-        return (Set<ComponentKey<?>>) (Set<?>) this.keySet();
-    }
-
-    @Override   // overridden by ASM
-    public void tickServerComponents() {
-        for (ComponentKey<?> key : this.keys()) {
-            Component c = key.getFromContainer(this);
-            if (c instanceof ServerTickingComponent) {
-                ((ServerTickingComponent) c).serverTick();
-            }
-        }
-    }
-
-    @Override
-    public void tickClientComponents() {
-        for (ComponentKey<?> key : this.keys()) {
-            Component c = key.getFromContainer(this);
-            if (c instanceof ClientTickingComponent) {
-                ((ClientTickingComponent) c).clientTick();
-            }
-        }
-    }
-
-    @Override
-    public boolean hasComponents() {
-        return !this.isEmpty();
-    }
-
-    @Override
-    public void copyFrom(dev.onyxstudios.cca.api.v3.component.ComponentContainer other) {
+    public void copyFrom(ComponentContainer other) {
         for (ComponentKey<?> key : this.keys()) {
             Component theirs = key.getInternal(other);
             Component ours = key.getInternal(this);
@@ -113,39 +62,6 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
         }
     }
 
-    @SuppressWarnings("deprecation")    // overriding the deprecated method to avoid the compiler's warning...
-    @Deprecated
-    @Override
-    public C remove(Object key) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean containsKey(Object key) {
-        if (key != null && key.getClass() == ComponentType.class) {
-            return this.containsKey((ComponentType<?>) key);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    @Nullable
-    @Override
-    public C get(@Nullable Object key) {
-        if (key != null && key.getClass() == ComponentType.class) {
-            return (C) this.get((ComponentType<?>) key);
-        }
-        return null;
-    }
-
-    @Override
-    public abstract C put(ComponentType<?> key, C value);
     /**
      * {@inheritDoc}
      *
@@ -162,9 +78,9 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
             ListTag componentList = tag.getList(NBT_KEY, NbtType.COMPOUND);
             for (int i = 0; i < componentList.size(); i++) {
                 CompoundTag nbt = componentList.getCompound(i);
-                ComponentType<?> type = ComponentRegistry.INSTANCE.get(new Identifier(nbt.getString("componentId")));
+                ComponentKey<?> type = ComponentRegistry.get(new Identifier(nbt.getString("componentId")));
                 if (type != null) {
-                    Component component = this.get(type);
+                    Component component = type.getInternal(this);
                     if (component != null) {
                         component.readFromNbt(nbt);
                     }
@@ -174,7 +90,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
             CompoundTag componentMap = tag.getCompound(NBT_KEY);
             for (String keyId : componentMap.getKeys()) {
                 try {
-                    ComponentKey<?> key = ComponentRegistry.INSTANCE.get(new Identifier(keyId));
+                    ComponentKey<?> key = ComponentRegistry.get(new Identifier(keyId));
                     if (key != null) {
                         Component component = key.getInternal(this);
                         if (component != null) {
@@ -206,7 +122,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
             CompoundTag componentMap = null;
             CompoundTag componentTag = new CompoundTag();
 
-            for (ComponentKey<?> type : this.keySet()) {
+            for (ComponentKey<?> type : this.keys()) {
                 Component component = type.getFromContainer(this);
                 component.writeToNbt(componentTag);
 
@@ -222,5 +138,30 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
             }
         }
         return tag;
+    }
+
+    @Override
+    public String toString() {
+        Iterator<ComponentKey<?>> i = this.keys().iterator();
+
+        if (! i.hasNext()) {
+            return "{}";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append('{');
+        for (;;) {
+            ComponentKey<?> key = i.next();
+            Component value = key.getInternal(this);
+            sb.append(key);
+            sb.append('=');
+            sb.append(value);
+
+            if (! i.hasNext()) {
+                return sb.append('}').toString();
+            }
+
+            sb.append(',').append(' ');
+        }
     }
 }

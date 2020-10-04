@@ -60,13 +60,11 @@ public final class StaticScoreboardComponentPlugin extends StaticComponentPlugin
 
     @Override
     public <C extends Component> void registerScoreboardComponent(ComponentKey<C> type, ComponentFactory<Scoreboard, ? extends C> factory) {
-        this.checkLoading(ScoreboardComponentFactoryRegistry.class, "registerScoreboardComponent");
         super.register(type, factory);
     }
 
     @Override
     public <C extends Component> void registerTeamComponent(ComponentKey<C> type, ComponentFactory<Team, ? extends C> factory) {
-        this.checkLoading(ScoreboardComponentFactoryRegistry.class, "registerTeamComponent");
         StaticTeamComponentPlugin.INSTANCE.register(type, factory);
     }
 }

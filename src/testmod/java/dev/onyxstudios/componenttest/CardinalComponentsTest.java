@@ -33,8 +33,6 @@ import dev.onyxstudios.componenttest.vita.Vita;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -127,14 +125,6 @@ public class CardinalComponentsTest {
         ).apply(UUID.randomUUID(), null));
 
         LOGGER.info(ComponentContainerMetafactory.metafactory(
-            TestComponents.CUSTOM_PROVIDER_3,
-            TypeToken.of(TestContainerFactory.class),
-            TestComponents.CUSTOM_FACTORY_TYPE,
-            TestCallback.class,
-            TestCallback.EVENT
-        ).create(UUID.randomUUID(), null));
-
-        LOGGER.info(ComponentContainerMetafactory.metafactory(
             new Identifier("componenttest:no_factory"),
             TypeToken.of(TestContainerFactory.class),
             new TypeToken<BiFunction<UUID, PlayerEntity, ? extends Component>>() {}
@@ -143,15 +133,5 @@ public class CardinalComponentsTest {
 
     public interface TestContainerFactory {
         ComponentContainer create(UUID u, @Nullable PlayerEntity p);
-    }
-
-    public interface TestCallback {
-        Event<TestCallback> EVENT = EventFactory.createArrayBacked(TestCallback.class, callbacks -> (uuid, p, c) -> {
-            for (TestCallback callback : callbacks) {
-                callback.initComponents(uuid, p, c);
-            }
-        });
-
-        void initComponents(UUID uuid, @Nullable PlayerEntity p, nerdhub.cardinal.components.api.component.ComponentContainer<Component> components);
     }
 }

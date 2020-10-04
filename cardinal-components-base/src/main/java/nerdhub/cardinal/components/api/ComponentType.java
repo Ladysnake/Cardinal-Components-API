@@ -59,18 +59,12 @@ public class ComponentType<T extends Component> extends ComponentKey<T> {
     @Nullable
     @Override
     public T getInternal(ComponentContainer container) {
-        return ((nerdhub.cardinal.components.api.component.ComponentContainer<?>) container).get(this);
+        throw new UnsupportedOperationException();
     }
 
     @Nullable
     private T getInternal(ComponentProvider provider) {
-        ComponentContainer container = provider.getComponentContainer();
-
-        if (container != null) {
-            return this.getInternal(container);
-        } else {
-            return ((nerdhub.cardinal.components.api.component.ComponentProvider) provider).getComponent(this);
-        }
+        return this.getInternal(provider.getComponentContainer());
     }
 
     /* ------------- public methods -------------- */
