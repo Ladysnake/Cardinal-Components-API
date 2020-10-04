@@ -64,8 +64,8 @@ public final class ComponentContainerMetafactoryImpl {
         }
 
         try {
-            Class<? extends R> containerFactoryClass = StaticGenericComponentPlugin.INSTANCE.spinSingleArgContainerFactory(componentFactoryType, genericTypeId, containerFactoryType.getRawType(), callbackType, events.length, Arrays.stream(actualArgumentTypes).map(TypeToken::getRawType).toArray(Class<?>[]::new));
-            return ComponentsInternals.createFactory(containerFactoryClass, events);
+            Class<? extends R> containerFactoryClass = StaticGenericComponentPlugin.INSTANCE.spinSingleArgContainerFactory(componentFactoryType, genericTypeId, containerFactoryType.getRawType(), Arrays.stream(actualArgumentTypes).map(TypeToken::getRawType).toArray(Class<?>[]::new));
+            return ComponentsInternals.createFactory(containerFactoryClass);
         } catch (StaticComponentLoadingException | IOException e) {
             throw new ContainerGenerationException("Failed to generate metafactory for " + genericTypeId, e);
         }

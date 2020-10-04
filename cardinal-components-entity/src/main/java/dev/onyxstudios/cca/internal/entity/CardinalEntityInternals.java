@@ -22,8 +22,6 @@
  */
 package dev.onyxstudios.cca.internal.entity;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
@@ -31,13 +29,11 @@ import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.Entity;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class CardinalEntityInternals {
 
@@ -45,27 +41,9 @@ public final class CardinalEntityInternals {
 
     private CardinalEntityInternals() { throw new AssertionError(); }
 
-    private static final Map<Class<? extends Entity>, Event<?>> ENTITY_EVENTS = Collections.synchronizedMap(new HashMap<>());
     private static final Map<Class<? extends Entity>, DynamicContainerFactory<Entity>> entityContainerFactories = new HashMap<>();
     private static final Map<ComponentKey<?>, RespawnCopyStrategy<?>> RESPAWN_COPY_STRATEGIES = new HashMap<>();
     private static final Object factoryMutex = new Object();
-
-    @SuppressWarnings("unchecked")
-    public static <T extends Entity> Event<EntityComponentCallback<T>> event(Class<T> clazz) {
-        Preconditions.checkArgument(Entity.class.isAssignableFrom(clazz), "Entity component events must be registered on entity classes.");
-        // This cast keeps the gates of hell shut. This cast keeps the darkness within. This cast ensures the feeble
-        // light of the compiler never goes out, for what comes after is only death and destruction.
-        // You who sees this code, turn back before it is too late. For no one must witness the horror sealed within.
-        // DO NOT REMOVE THIS CAST (https://gist.github.com/Pyrofab/10892e2256ed181855b0809670cfdbbb)
-        //noinspection RedundantCast
-        return (Event<EntityComponentCallback<T>>) ENTITY_EVENTS.computeIfAbsent(clazz, c ->
-                EventFactory.createArrayBacked(EntityComponentCallback.class, callbacks -> (EntityComponentCallback<Entity>) (entity, components) -> {
-                    for (EntityComponentCallback<Entity> callback : callbacks) {
-                        callback.initComponents(entity, components);
-                    }
-                })
-        );
-    }
 
     /**
      * Gets a container factory for an entity class, or creates one if none exists.
@@ -84,21 +62,19 @@ public final class CardinalEntityInternals {
         synchronized (factoryMutex) {   // can be called from both client and server thread, see #
             // computeIfAbsent and not put, because the factory may have been generated while waiting
             return entityContainerFactories.computeIfAbsent(entityClass, cl -> {
-                List<Event<?>> events = new ArrayList<>();
                 Class<? extends Entity> c = cl;
                 Class<? extends Entity> parentWithStaticComponents = null;
 
                 while (Entity.class.isAssignableFrom(c)) {
-                    events.add(EntityComponentCallback.event(c));
                     if (parentWithStaticComponents == null && StaticEntityComponentPlugin.INSTANCE.requiresStaticFactory(c)) {   // try to find a specialized ASM factory
                         parentWithStaticComponents = c;
                     }
                     c = (Class<? extends Entity>) c.getSuperclass();
                 }
                 assert parentWithStaticComponents != null;
-                Class<? extends DynamicContainerFactory<Entity>> factoryClass = (Class<? extends DynamicContainerFactory<Entity>>) StaticEntityComponentPlugin.INSTANCE.spinDedicatedFactory(new StaticEntityComponentPlugin.Key(events.size(), parentWithStaticComponents));
+                Class<? extends DynamicContainerFactory<Entity>> factoryClass = (Class<? extends DynamicContainerFactory<Entity>>) StaticEntityComponentPlugin.INSTANCE.spinDedicatedFactory(parentWithStaticComponents);
 
-                return ComponentsInternals.createFactory(factoryClass, Lists.reverse(events).toArray(new Event[0]));
+                return ComponentsInternals.createFactory(factoryClass);
             }).create(entity);
         }
     }

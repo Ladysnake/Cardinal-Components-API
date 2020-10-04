@@ -30,7 +30,6 @@ import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
-import nerdhub.cardinal.components.api.event.LevelComponentCallback;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
@@ -59,7 +58,7 @@ import java.util.UUID;
 public abstract class MixinLevelProperties implements ServerWorldProperties, InternalComponentProvider {
     @Unique
     private static final Lazy<DynamicContainerFactory<WorldProperties>> componentContainerFactory
-        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getContainerFactoryClass(), LevelComponentCallback.EVENT));
+        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getContainerFactoryClass()));
     @Unique
     private ComponentContainer components;
 

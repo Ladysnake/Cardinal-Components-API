@@ -23,12 +23,8 @@
 package dev.onyxstudios.cca.internal.item;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import nerdhub.cardinal.components.api.event.ItemComponentCallback;
-import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.ItemStack;
 
 public interface ItemCaller {
-    Event<ItemComponentCallback> cardinal_getItemComponentEvent();
-
     ComponentContainer cardinal_createComponents(ItemStack stack);
 }

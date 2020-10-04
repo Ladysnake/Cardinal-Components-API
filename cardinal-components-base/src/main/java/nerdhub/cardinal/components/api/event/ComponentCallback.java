@@ -25,10 +25,7 @@ package nerdhub.cardinal.components.api.event;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentContainer;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
-import net.fabricmc.fabric.api.event.Event;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.util.function.Function;
 
 /**
  * The base callback interface for receiving component initialization events.
@@ -36,7 +33,6 @@ import java.util.function.Function;
  * <p> Specialized versions of this callback are available for every default {@link ComponentProvider}
  * implementation in their respective module.
  *
- * @see nerdhub.cardinal.components.api.ComponentType#attach(Event, Function)
  * @see "EntityComponentCallback"
  * @see "ItemComponentCallback"
  */

@@ -60,7 +60,7 @@ public final class StaticScoreboardComponentPlugin extends StaticComponentPlugin
 
     @Override
     protected Class<? extends DynamicContainerFactory<Scoreboard>> spinContainerFactory(Class<? extends ComponentContainer> containerCls) throws IOException {
-        return spinContainerFactory(this.implSuffix, DynamicContainerFactory.class, containerCls, null, 0, this.providerClass);
+        return spinContainerFactory(this.implSuffix, DynamicContainerFactory.class, containerCls, this.providerClass);
     }
 
     @Override
