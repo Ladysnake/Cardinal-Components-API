@@ -114,12 +114,12 @@ public final class TestComponents implements
 
     @Override
     public void registerLevelComponentFactories(LevelComponentFactoryRegistry registry) {
-        registry.register(VITA, properties -> new AmbientVita.LevelVita());
+        registry.register(VITA, properties -> new BaseVita());
     }
 
     @Override
     public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
-        registry.register(VITA, AmbientVita.WorldVita.class, AmbientVita.WorldVita::new);
+        registry.register(VITA, WorldVita.class, WorldVita::new);
     }
 
     @Override
