@@ -22,14 +22,14 @@
  */
 package dev.onyxstudios.cca.api.v3.block;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundTag;
 
 /**
  * A helper interface for components that entirely rely on contextual information like {@link BlockState}s.
  */
-public interface BlockComponent extends ComponentV3 {
+public interface BlockComponent extends Component {
     @Override
     default void readFromNbt(CompoundTag tag) {
         // NO-OP, block components must be serialized separately
