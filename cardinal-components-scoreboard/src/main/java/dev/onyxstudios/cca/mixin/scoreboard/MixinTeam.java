@@ -27,8 +27,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking;
 import dev.onyxstudios.cca.internal.scoreboard.StaticTeamComponentPlugin;
@@ -59,14 +57,14 @@ public abstract class MixinTeam implements InternalComponentProvider, TeamAccess
     @Final
     private Scoreboard scoreboard;
     @Unique
-    private static final Lazy<DynamicContainerFactory<Team>> componentsContainerFactory
-        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticTeamComponentPlugin.INSTANCE.getContainerFactoryClass()));
+    private static final Lazy<ComponentContainer.Factory<Team>> componentsContainerFactory
+        = new Lazy<>(StaticTeamComponentPlugin.INSTANCE::buildContainerFactory);
     @Unique
     private ComponentContainer components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
-        this.components = componentsContainerFactory.get().create((Team) (Object) this);
+        this.components = componentsContainerFactory.get().createContainer((Team) (Object) this);
     }
 
     @Nonnull

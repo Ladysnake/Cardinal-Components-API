@@ -23,8 +23,6 @@
 package dev.onyxstudios.cca.mixin.chunk.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
 import net.minecraft.util.Lazy;
@@ -41,14 +39,14 @@ import javax.annotation.Nonnull;
 @Mixin(ProtoChunk.class)
 public abstract class MixinProtoChunk implements Chunk, InternalComponentProvider {
     @Unique
-    private static final Lazy<DynamicContainerFactory<Chunk>> componentsContainerFactory
-        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticChunkComponentPlugin.INSTANCE.getContainerFactoryClass()));
+    private static final Lazy<ComponentContainer.Factory<Chunk>> componentsContainerFactory
+        = new Lazy<>(StaticChunkComponentPlugin.INSTANCE::buildContainerFactory);
     @Unique
     private ComponentContainer components;
 
     @Inject(method = "<init>(Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/world/chunk/UpgradeData;[Lnet/minecraft/world/chunk/ChunkSection;Lnet/minecraft/world/ChunkTickScheduler;Lnet/minecraft/world/ChunkTickScheduler;)V", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
-        this.components = componentsContainerFactory.get().create(this);
+        this.components = componentsContainerFactory.get().createContainer(this);
     }
 
     @Nonnull

@@ -23,8 +23,8 @@
 package dev.onyxstudios.cca.internal.world;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.world.WorldComponentFactory;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
@@ -33,15 +33,12 @@ import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.world.World;
 
 import java.util.Collection;
-import java.util.Objects;
 
-public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<World, WorldComponentInitializer, WorldComponentFactory<?>> implements WorldComponentFactoryRegistry {
-    public static final String WORLD_IMPL_SUFFIX = "WorldImpl";
-
+public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<World, WorldComponentInitializer> implements WorldComponentFactoryRegistry {
     public static final StaticWorldComponentPlugin INSTANCE = new StaticWorldComponentPlugin();
 
     private StaticWorldComponentPlugin() {
-        super("loading a world", World.class, WorldComponentFactory.class, WORLD_IMPL_SUFFIX);
+        super("loading a world", World.class);
     }
 
     @Override
@@ -55,13 +52,14 @@ public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<C> key, WorldComponentFactory<? extends C> factory) {
-        this.register(key, key.getComponentClass(), factory);
+    public <C extends Component> void register(ComponentKey<C> key, ComponentFactory<World, ? extends C> factory) {
+        this.checkLoading(WorldComponentFactoryRegistry.class, "register");
+        super.register(key, factory);
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, WorldComponentFactory<? extends C> factory) {
+    public <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, ComponentFactory<World, ? extends C> factory) {
         this.checkLoading(WorldComponentFactoryRegistry.class, "register");
-        super.register(type, impl, (world) -> Objects.requireNonNull(((WorldComponentFactory<?>) factory).createForWorld(world), "Component factory "+ factory + " for " + type.getId() + " returned null on " + world.getClass().getSimpleName()));
+        super.register(key, impl, factory);
     }
 }
