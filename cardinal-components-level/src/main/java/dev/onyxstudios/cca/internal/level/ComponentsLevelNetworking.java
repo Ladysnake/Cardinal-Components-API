@@ -26,26 +26,37 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.WorldSyncCallback;
-import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
+import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
 
 public final class ComponentsLevelNetworking {
+    /**
+     * {@link CustomPayloadS2CPacket} channel for default level component synchronization.
+     *
+     * <p> Packets emitted on this channel must begin with the
+     * {@link ComponentType#getId() component's type} (as an Identifier).
+     *
+     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * called on the game thread.
+     */
+    public static final Identifier PACKET_ID = new Identifier("cardinal-components", "level_sync");
+
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             if (FabricLoader.getInstance().isModLoaded("cardinal-components-world")) {
                 WorldSyncCallback.EVENT.register((player, world) -> {
                     ComponentProvider provider = ComponentProvider.fromLevel(world.getLevelProperties());
 
-                    for (ComponentKey<?> key : ((InternalComponentProvider) provider).getComponentContainer().keys()) {
+                    for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
                         key.syncWith(player, provider);
                     }
                 });
@@ -56,7 +67,7 @@ public final class ComponentsLevelNetworking {
     // Safe to put in the same class as no client-only class is directly referenced
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            ClientSidePacketRegistry.INSTANCE.register(LevelSyncedComponent.PACKET_ID, (context, buffer) -> {
+            ClientSidePacketRegistry.INSTANCE.register(PACKET_ID, (context, buffer) -> {
                 try {
                     Identifier componentTypeId = buffer.readIdentifier();
                     ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
