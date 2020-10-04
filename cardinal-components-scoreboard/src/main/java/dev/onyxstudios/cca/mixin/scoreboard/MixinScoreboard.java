@@ -26,8 +26,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking;
 import dev.onyxstudios.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
@@ -51,14 +49,14 @@ import java.util.Iterator;
 @Mixin(Scoreboard.class)
 public abstract class MixinScoreboard implements InternalComponentProvider {
     @Unique
-    private static final Lazy<DynamicContainerFactory<Scoreboard>> componentsContainerFactory
-        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticScoreboardComponentPlugin.INSTANCE.getContainerFactoryClass()));
+    private static final Lazy<ComponentContainer.Factory<Scoreboard>> componentsContainerFactory
+        = new Lazy<>(StaticScoreboardComponentPlugin.INSTANCE::buildContainerFactory);
     @Unique
     private ComponentContainer components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
-        this.components = componentsContainerFactory.get().create((Scoreboard) (Object) this);
+        this.components = componentsContainerFactory.get().createContainer((Scoreboard) (Object) this);
     }
 
     @Nonnull
@@ -86,5 +84,4 @@ public abstract class MixinScoreboard implements InternalComponentProvider {
         writer.writeSyncPacket(buf, recipient);
         return new CustomPayloadS2CPacket(ComponentsScoreboardNetworking.SCOREBOARD_PACKET_ID, buf);
     }
-
 }

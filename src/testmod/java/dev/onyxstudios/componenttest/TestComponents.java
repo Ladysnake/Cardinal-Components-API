@@ -138,6 +138,6 @@ public final class TestComponents implements
 
     @Override
     public void registerScoreboardComponentFactories(ScoreboardComponentFactoryRegistry registry) {
-        registry.register(VITA, TeamVita::new);
+        registry.registerTeamComponent(VITA, TeamVita::new);
     }
 }

@@ -23,26 +23,23 @@
 package dev.onyxstudios.cca.internal.level;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.level.LevelComponentFactory;
 import dev.onyxstudios.cca.api.v3.level.LevelComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.level.LevelComponentInitializer;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.world.WorldProperties;
 
 import java.util.Collection;
-import java.util.Objects;
 
-public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<WorldProperties, LevelComponentInitializer, LevelComponentFactory<?>> implements LevelComponentFactoryRegistry {
-    public static final String LEVEL_IMPL_SUFFIX = "LevelImpl";
-
+public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<WorldProperties, LevelComponentInitializer> implements LevelComponentFactoryRegistry {
     public static final StaticLevelComponentPlugin INSTANCE = new StaticLevelComponentPlugin();
 
     private StaticLevelComponentPlugin() {
-        super("loading a world save", WorldProperties.class, LevelComponentFactory.class, LEVEL_IMPL_SUFFIX);
+        super("loading a world save", WorldProperties.class);
     }
 
     @Override
@@ -56,13 +53,13 @@ public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<
     }
 
     @Override
-    public Class<? extends DynamicContainerFactory<WorldProperties>> getContainerFactoryClass() {
-        return super.getContainerFactoryClass();
+    public ComponentContainer.Factory<WorldProperties> buildContainerFactory() {
+        return super.buildContainerFactory();
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<C> type, LevelComponentFactory<C> factory) {
+    public <C extends Component> void register(ComponentKey<C> type, ComponentFactory<WorldProperties, ? extends C> factory) {
         this.checkLoading(LevelComponentFactoryRegistry.class, "register");
-        super.register(type, (props) -> Objects.requireNonNull(((LevelComponentFactory<?>) factory).createForSave(props), "Component factory "+ factory + " for " + type.getId() + " returned null on " + props));
+        super.register(type, factory);
     }
 }

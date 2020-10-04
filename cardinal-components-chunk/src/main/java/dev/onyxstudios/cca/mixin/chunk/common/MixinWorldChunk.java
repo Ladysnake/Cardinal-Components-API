@@ -27,8 +27,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
@@ -62,14 +60,14 @@ public abstract class MixinWorldChunk implements Chunk, InternalComponentProvide
     public abstract ChunkPos getPos();
 
     @Unique
-    private static final Lazy<DynamicContainerFactory<Chunk>> componentsContainerFactory
-        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticChunkComponentPlugin.INSTANCE.getContainerFactoryClass()));
+    private static final Lazy<ComponentContainer.Factory<Chunk>> componentsContainerFactory
+        = new Lazy<>(StaticChunkComponentPlugin.INSTANCE::buildContainerFactory);
     @Unique
     private ComponentContainer components;
 
     @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/world/biome/source/BiomeArray;Lnet/minecraft/world/chunk/UpgradeData;Lnet/minecraft/world/TickScheduler;Lnet/minecraft/world/TickScheduler;J[Lnet/minecraft/world/chunk/ChunkSection;Ljava/util/function/Consumer;)V", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
-        this.components = componentsContainerFactory.get().create(this);
+        this.components = componentsContainerFactory.get().createContainer(this);
     }
 
     @Nonnull

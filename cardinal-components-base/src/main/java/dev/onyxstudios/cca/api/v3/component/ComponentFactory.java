@@ -20,30 +20,28 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.level;
+package dev.onyxstudios.cca.api.v3.component;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
-import net.minecraft.world.WorldProperties;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
 /**
- * A component factory for {@linkplain WorldProperties world saves}.
+ * A single-arg component factory.
  *
  * <p>When invoked, the factory must return a {@link Component} of the right type.
  *
- * @since 2.4.0
+ * @since 3.0.0
  */
-@ApiStatus.Experimental
-public interface LevelComponentFactory<C extends Component> {
+@FunctionalInterface
+public interface ComponentFactory<T, C extends Component> {
     /**
-     * Initialize components for the given world properties.
+     * Instantiates a {@link Component} for the given provider.
      *
      * <p>The component returned by this method will be available
-     * on the properties object as soon as all component factories have been invoked.
+     * on the provider as soon as all component factories have been invoked.
      *
-     * @param properties the {@code WorldProperties} being constructed
+     * @param t the factory argument
+     * @return a new {@link Component}
      */
-    @Contract(pure = true)
-    C createForSave(WorldProperties properties);
+    @Contract(value = "_ -> new", pure = true)
+    C createComponent(T t);
 }

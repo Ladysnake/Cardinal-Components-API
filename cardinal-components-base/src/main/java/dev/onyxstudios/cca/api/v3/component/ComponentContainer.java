@@ -38,7 +38,6 @@ import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * An opaque container for components.
@@ -80,6 +79,29 @@ public interface ComponentContainer extends NbtSerializable {
          *
          * <p>Example code:
          * <pre>{@code
+         * private static final ComponentContainer.Factory<@Nullable Void> CONTAINER_FACTORY =
+         *      ComponentContainer.Factory.builder()
+         *          .component(MY_COMPONENT_KEY, v -> new MyComponent())
+         *          .build();
+         *
+         * public static ComponentContainer createContainer() {
+         *      return CONTAINER_FACTORY.create(null);
+         * }
+         * }</pre>
+         *
+         * @return a new container factory builder
+         */
+        @ApiStatus.Experimental
+        @Contract(value = "-> new", pure = true)
+        static Builder<@Nullable Void> builder() {
+            return new Builder<>(Void.class);
+        }
+
+        /**
+         * Create a builder to configure a {@link ComponentContainer} factory.
+         *
+         * <p>Example code:
+         * <pre>{@code
          * private static final ComponentContainer.Factory<ItemStack> CONTAINER_FACTORY =
          *      ComponentContainer.Factory.builder(ItemStack.class)
          *          .component(MY_COMPONENT_KEY, MyComponent::new)
@@ -103,7 +125,7 @@ public interface ComponentContainer extends NbtSerializable {
         /**
          * Instantiates a new {@link ComponentContainer} and populates it with components.
          *
-         * <p>The parameter {@code t} will be passed to every factory registered through {@link Builder#component(ComponentKey, Function)}.
+         * <p>The parameter {@code t} will be passed to every factory registered through {@link Builder#component(ComponentKey, ComponentFactory)}.
          *
          * @param t the factory argument
          * @return a new {@link ComponentContainer}
@@ -122,16 +144,30 @@ public interface ComponentContainer extends NbtSerializable {
 
             private boolean built;
             private final Class<T> argClass;
-            private final Map<ComponentKey<?>, Function<T, ? extends Component>> factories;
+            private final Map<ComponentKey<?>, ComponentFactory<T, ?>> factories;
+            private final Map<ComponentKey<?>, Class<? extends Component>> componentImpls;
 
             Builder(Class<T> argClass) {
                 this.argClass = argClass;
                 this.factories = new LinkedHashMap<>();
+                this.componentImpls = new LinkedHashMap<>();
             }
 
             @Contract(mutates = "this")
-            public <C extends Component> Builder<T> component(ComponentKey<C> key, Function<T, ? extends C> factory) {
-                this.factories.put(key, factory);
+            public <C extends Component> Builder<T> component(ComponentKey<C> key, ComponentFactory<T, ? extends C> factory) {
+                this.component(key, key.getComponentClass(), factory);
+                return this;
+            }
+
+            @Contract(mutates = "this")
+            public <C extends Component> Builder<T> component(ComponentKey<? super C> key, Class<C> implClass, ComponentFactory<T, ? extends C> factory) {
+                this.factories.put(key, t -> {
+                    C component = factory.createComponent(t);
+                    //noinspection ConstantConditions
+                    if (component == null) throw new NullPointerException("Component factory " + factory + " for " + key + " returned null on " + t.getClass().getSimpleName());
+                    return component;
+                });
+                this.componentImpls.put(key, implClass);
                 return this;
             }
 
@@ -149,7 +185,7 @@ public interface ComponentContainer extends NbtSerializable {
 
                     String implNameSuffix = "Custom$" + counter++;
                     Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(
-                        Function.class, this.factories, implNameSuffix
+                        ComponentFactory.class, this.factories, this.componentImpls, implNameSuffix
                     );
                     Class<? extends Factory<T>> factoryClass = StaticComponentPluginBase.spinContainerFactory(
                         implNameSuffix, Factory.class, containerClass, this.argClass

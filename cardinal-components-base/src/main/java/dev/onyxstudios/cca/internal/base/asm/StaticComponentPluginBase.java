@@ -24,16 +24,12 @@ package dev.onyxstudios.cca.internal.base.asm;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
-import nerdhub.cardinal.components.api.ComponentRegistry;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -42,43 +38,17 @@ import org.objectweb.asm.tree.ClassNode;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher {
+public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
+    private final ComponentContainer.Factory.Builder<T> containerFactoryBuilder;
 
-    private static final String EVENT_DESC = Type.getDescriptor(Event.class);
-    private static final String EVENT$INVOKER_DESC;
-
-
-    static {
-        try {
-            EVENT$INVOKER_DESC = Type.getMethodDescriptor(Event.class.getMethod("invoker"));
-        } catch (NoSuchMethodException e) {
-            throw new IllegalStateException("Failed to find one or more method descriptors", e);
-        }
-    }
-
-    private final Class<? super F> componentFactoryType;
-    private final Map<ComponentKey<?>, F> componentFactories = new LinkedHashMap<>();
-    private final Map<ComponentKey<?>, Class<? extends Component>> componentImpls = new LinkedHashMap<>();
-    protected final Class<T> providerClass;
-    protected final String implSuffix;
-    private Class<? extends DynamicContainerFactory<T>> containerFactoryClass;
-
-    protected StaticComponentPluginBase(String likelyInitTrigger, Class<T> providerClass, Class<? super F> componentFactoryType, String implSuffix) {
+    protected StaticComponentPluginBase(String likelyInitTrigger, Class<T> providerClass) {
         super(likelyInitTrigger);
-        this.componentFactoryType = componentFactoryType;
-        this.providerClass = providerClass;
-        this.implSuffix = implSuffix;
-    }
-
-    @ApiStatus.ScheduledForRemoval
-    @Deprecated
-    @SuppressWarnings("unused")
-    public static <I, C extends Component> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Class<? super C> componentClass, Map<Identifier, I> componentFactories, String implNameSuffix) throws IOException {
-        return CcaAsmHelper.spinComponentContainer(componentFactoryType, componentFactories.entrySet().stream().collect(Collectors.toMap(entry -> ComponentRegistryV3.INSTANCE.get(entry.getKey()), Map.Entry::getValue)), implNameSuffix);
+        this.containerFactoryBuilder = ComponentContainer.Factory.builder(providerClass);
     }
 
     /**
@@ -169,38 +139,15 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         }
     }
 
-    @SuppressWarnings("unused")
-    @ApiStatus.ScheduledForRemoval
-    @Deprecated
-    public static <C extends Component> ComponentContainer createEmptyContainer(Class<? super C> componentClass, String implSuffix) {
-        return createEmptyContainer(implSuffix);
-    }
-
-    public Class<? extends DynamicContainerFactory<T>> getContainerFactoryClass() {
+    public ComponentContainer.Factory<T> buildContainerFactory() {
         this.ensureInitialized();
 
-        return this.containerFactoryClass;
+        return this.containerFactoryBuilder.build();
     }
 
     @Override
     protected void init() {
         processInitializers(this.getEntrypoints(), this::dispatchRegistration);
-
-        try {
-            Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(
-                this.componentFactoryType,
-                this.componentFactories,
-                this.componentImpls,
-                this.implSuffix
-            );
-            this.containerFactoryClass = this.spinContainerFactory(containerCls);
-        } catch (IOException e) {
-            throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + this.providerClass, e);
-        }
-    }
-
-    protected Class<? extends DynamicContainerFactory<T>> spinContainerFactory(Class<? extends ComponentContainer> containerCls) throws IOException {
-        return spinContainerFactory(this.implSuffix, DynamicContainerFactory.class, containerCls, this.providerClass);
     }
 
     public static <I> void processInitializers(Collection<EntrypointContainer<I>> entrypoints, Consumer<I> action) {
@@ -218,18 +165,11 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
 
     protected abstract void dispatchRegistration(I entrypoint);
 
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    protected void register(Identifier componentId, F factory) {
-        this.register(Objects.requireNonNull(ComponentRegistry.INSTANCE.get(componentId)), factory);
+    protected <C extends Component> void register(ComponentKey<C> key, ComponentFactory<T, ? extends C> factory) {
+        this.containerFactoryBuilder.component(key, factory);
     }
 
-    protected void register(ComponentKey<?> key, F factory) {
-        this.register(key, key.getComponentClass(), factory);
-    }
-
-    protected void register(ComponentKey<?> key, Class<? extends Component> impl, F factory) {
-        this.componentFactories.put(key, factory);
-        this.componentImpls.put(key, impl);
+    protected <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, ComponentFactory<T, ? extends C> factory) {
+        this.containerFactoryBuilder.component(key, impl, factory);
     }
 }

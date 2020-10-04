@@ -22,27 +22,24 @@
  */
 package dev.onyxstudios.cca.internal.chunk;
 
-import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactory;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.world.chunk.Chunk;
 
 import java.util.Collection;
-import java.util.Objects;
 
-public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<Chunk, ChunkComponentInitializer, ChunkComponentFactory<?>> implements ChunkComponentFactoryRegistry {
-    public static final String CHUNK_IMPL_SUFFIX = "ChunkImpl";
-
+public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<Chunk, ChunkComponentInitializer> implements ChunkComponentFactoryRegistry {
     public static final StaticChunkComponentPlugin INSTANCE = new StaticChunkComponentPlugin();
 
     private StaticChunkComponentPlugin() {
-        super("loading a chunk", Chunk.class, ChunkComponentFactory.class, CHUNK_IMPL_SUFFIX);
+        super("loading a chunk", Chunk.class);
     }
 
     @Override
@@ -56,18 +53,18 @@ public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<
     }
 
     @Override
-    public Class<? extends DynamicContainerFactory<Chunk>> getContainerFactoryClass() {
-        return super.getContainerFactoryClass();
+    public ComponentContainer.Factory<Chunk> buildContainerFactory() {
+        return super.buildContainerFactory();
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<C> type, ChunkComponentFactory<? extends C> factory) {
+    public <C extends Component> void register(ComponentKey<C> type, ComponentFactory<Chunk, ? extends C> factory) {
         this.register(type, type.getComponentClass(), factory);
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ChunkComponentFactory<? extends C> factory) {
+    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<Chunk, ? extends C> factory) {
         this.checkLoading(ChunkComponentFactoryRegistry.class, "register");
-        super.register(type, (chunk) -> Objects.requireNonNull(((ChunkComponentFactory<?>) factory).createForChunk(chunk), "Component factory "+ factory + " for " + type.getId() + " returned null on " + chunk.getClass().getSimpleName()));
+        super.register(type, factory);
     }
 }

@@ -26,8 +26,6 @@ import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
 import net.minecraft.nbt.CompoundTag;
@@ -57,14 +55,14 @@ import java.util.UUID;
 @Mixin(LevelProperties.class)
 public abstract class MixinLevelProperties implements ServerWorldProperties, InternalComponentProvider {
     @Unique
-    private static final Lazy<DynamicContainerFactory<WorldProperties>> componentContainerFactory
-        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getContainerFactoryClass()));
+    private static final Lazy<ComponentContainer.Factory<WorldProperties>> componentContainerFactory
+        = new Lazy<>(StaticLevelComponentPlugin.INSTANCE::buildContainerFactory);
     @Unique
     private ComponentContainer components;
 
     @Inject(method = "<init>(Lcom/mojang/datafixers/DataFixer;ILnet/minecraft/nbt/CompoundTag;ZIIIFJJIIIZIZZZLnet/minecraft/world/border/WorldBorder$Properties;IILjava/util/UUID;Ljava/util/LinkedHashSet;Lnet/minecraft/world/timer/Timer;Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/LevelInfo;Lnet/minecraft/world/gen/GeneratorOptions;Lcom/mojang/serialization/Lifecycle;)V", at = @At("RETURN"))
     private void initComponents(DataFixer dataFixer, int dataVersion, CompoundTag playerData, boolean modded, int spawnX, int spawnY, int spawnZ, float spawnAngle, long time, long timeOfDay, int version, int clearWeatherTime, int rainTime, boolean raining, int thunderTime, boolean thundering, boolean initialized, boolean difficultyLocked, WorldBorder.Properties worldBorder, int wanderingTraderSpawnDelay, int wanderingTraderSpawnChance, UUID wanderingTraderId, LinkedHashSet<String> serverBrands, Timer<MinecraftServer> scheduledEvents, CompoundTag customBossEvents, CompoundTag dragonFight, LevelInfo levelInfo, GeneratorOptions generatorOptions, Lifecycle lifecycle, CallbackInfo ci) {
-        this.components = componentContainerFactory.get().create(this);
+        this.components = componentContainerFactory.get().createContainer(this);
     }
 
     @Inject(method = "method_29029", at = @At("RETURN"))

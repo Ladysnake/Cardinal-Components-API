@@ -24,25 +24,25 @@ package dev.onyxstudios.cca.internal.scoreboard;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
-import dev.onyxstudios.cca.api.v3.scoreboard.TeamComponentFactory;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.scoreboard.Team;
 
-import java.io.IOException;
 import java.util.Collection;
-import java.util.Objects;
 
-public final class StaticTeamComponentPlugin extends StaticComponentPluginBase<Team, ScoreboardComponentInitializer, TeamComponentFactory<?>> {
-    public static final String TEAM_IMPL_SUFFIX = "TeamImpl";
-
+public final class StaticTeamComponentPlugin extends StaticComponentPluginBase<Team, ScoreboardComponentInitializer> {
     public static final StaticTeamComponentPlugin INSTANCE = new StaticTeamComponentPlugin();
 
     private StaticTeamComponentPlugin() {
-        super("made a team", Team.class, TeamComponentFactory.class, TEAM_IMPL_SUFFIX);
+        super("made a team", Team.class);
+    }
+
+    @Override
+    public <C extends Component> void register(ComponentKey<C> key, ComponentFactory<Team, ? extends C> factory) {
+        super.register(key, factory);
     }
 
     @Override
@@ -56,16 +56,7 @@ public final class StaticTeamComponentPlugin extends StaticComponentPluginBase<T
     }
 
     @Override
-    protected Class<? extends DynamicContainerFactory<Team>> spinContainerFactory(Class<? extends ComponentContainer> containerCls) throws IOException {
-        return spinContainerFactory(this.implSuffix, DynamicContainerFactory.class, containerCls, this.providerClass);
-    }
-
-    @Override
-    public Class<? extends DynamicContainerFactory<Team>> getContainerFactoryClass() {
-        return super.getContainerFactoryClass();
-    }
-
-    public <C extends Component> void register(ComponentKey<C> type, TeamComponentFactory<? extends C> factory) {
-        super.register(type, (team) -> Objects.requireNonNull(((TeamComponentFactory<?>) factory).createForTeam(team), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
+    public ComponentContainer.Factory<Team> buildContainerFactory() {
+        return super.buildContainerFactory();
     }
 }
