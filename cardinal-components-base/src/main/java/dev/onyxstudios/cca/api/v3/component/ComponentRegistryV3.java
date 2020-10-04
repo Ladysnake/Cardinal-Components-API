@@ -77,7 +77,7 @@ public interface ComponentRegistryV3 {
      * @apiNote It is recommended that {@code componentClass} be an interface, so that other
      * mods can interact with a well-defined API rather than directly accessing internals.
      */
-    <C extends ComponentV3> ComponentKey<C> getOrCreate(Identifier componentId, Class<C> componentClass);
+    <C extends Component> ComponentKey<C> getOrCreate(Identifier componentId, Class<C> componentClass);
 
     /**
      * Directly retrieves a ComponentKey using its id.
