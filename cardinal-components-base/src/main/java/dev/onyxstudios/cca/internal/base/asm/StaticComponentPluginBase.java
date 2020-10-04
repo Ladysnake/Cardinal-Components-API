@@ -160,9 +160,9 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
         return ret;
     }
 
-    public static ComponentContainer createEmptyContainer(String implSuffix) {
+    public static ComponentContainer createEmptyContainer() {
         try {
-            Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(Runnable.class, Collections.emptyMap(), implSuffix);
+            Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(Runnable.class, Collections.emptyMap(), "Empty");
             return containerCls.getConstructor(int.class).newInstance(0);
         } catch (IOException | ReflectiveOperationException e) {
             throw new StaticComponentLoadingException("Failed to generate empty component container", e);
