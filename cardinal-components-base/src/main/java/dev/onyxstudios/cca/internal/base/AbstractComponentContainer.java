@@ -22,11 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.base;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import dev.onyxstudios.cca.api.v3.component.*;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

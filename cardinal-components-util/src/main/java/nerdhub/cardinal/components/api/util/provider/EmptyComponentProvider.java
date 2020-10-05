@@ -22,14 +22,8 @@
  */
 package nerdhub.cardinal.components.api.util.provider;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 
 /**
  * A provider that never exposes any component
@@ -40,33 +34,6 @@ public final class EmptyComponentProvider implements ComponentProvider {
 
     public static ComponentProvider instance() {
         return EMPTY_PROVIDER;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return {@code false}
-     */
-    @Override
-    public boolean hasComponent(ComponentType<?> type) {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return {@code null}
-     */
-    @Nullable
-    @Override
-    public <C extends Component> C getComponent(ComponentType<C> type) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return an empty set representing this provider's supported component types
-     */
-    public Set<ComponentType<?>> getComponentTypes() {
-        return Collections.emptySet();
     }
 
     @Override

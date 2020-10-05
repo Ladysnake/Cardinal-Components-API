@@ -30,7 +30,7 @@ import net.minecraft.nbt.CompoundTag;
  * @param <C> the type of components that this component may copy
  * @since 2.3.0
  */
-public interface CopyableComponent<C extends Component> extends Component, nerdhub.cardinal.components.api.component.extension.CopyableComponent<C> {
+public interface CopyableComponent<C extends Component> extends Component {
     /**
      * Copies the data from {@code other} into {@code this}.
      *

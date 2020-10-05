@@ -23,8 +23,9 @@
 package nerdhub.cardinal.components.api.util;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.item.ItemStack;
 
 import java.util.Set;
@@ -52,13 +53,13 @@ public final class Components {
     /**
      * Compares a provider with another for equality based on the components they expose.
      * Returns {@code true} if the two providers expose the same component types through
-     * {@link ComponentProvider#getComponentTypes}, and, for each of the types exposed as such,
+     * {@link ComponentContainer#keys()}, and, for each of the types exposed as such,
      * the corresponding component values are equal according to {@link Object#equals(Object)}.
      */
     public static boolean areComponentsEqual(ComponentProvider accessor, ComponentProvider other) {
-        Set<ComponentType<?>> types = accessor.getComponentTypes();
-        if(types.size() == other.getComponentTypes().size()) {
-            for(ComponentType<? extends Component> type : types) {
+        Set<ComponentKey<?>> types = accessor.getComponentContainer().keys();
+        if(types.size() == other.getComponentContainer().keys().size()) {
+            for(ComponentKey<? extends Component> type : types) {
                 if(!type.isProvidedBy(other) || !type.get(accessor).equals(type.get(other))) {
                     return false;
                 }
@@ -71,11 +72,11 @@ public final class Components {
     /**
      * Iterates over every component provided by {@code provider} and applies {@code op} to each
      * mapping.
-     * @deprecated use {@link ComponentProvider#forEachComponent(BiConsumer)}
      */
-    @Deprecated
-    public static void forEach(ComponentProvider provider, BiConsumer<ComponentType<?>, Component> op) {
-        provider.forEachComponent(op);
+    public static void forEach(ComponentProvider provider, BiConsumer<ComponentKey<?>, Component> op) {
+        for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
+            op.accept(key, key.get(provider));
+        }
     }
 
 }

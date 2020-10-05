@@ -23,9 +23,9 @@
 package nerdhub.cardinal.components.api.util;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
 import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.GameRules;
