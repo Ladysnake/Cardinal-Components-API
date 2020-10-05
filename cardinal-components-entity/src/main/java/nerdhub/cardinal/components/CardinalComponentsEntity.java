@@ -24,10 +24,10 @@ package nerdhub.cardinal.components;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
@@ -96,7 +96,7 @@ public final class CardinalComponentsEntity {
                 try {
                     int entityId = buffer.readInt();
                     Identifier componentTypeId = buffer.readIdentifier();
-                    ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+                    ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
                     if (componentType == null) {
                         return;
                     }

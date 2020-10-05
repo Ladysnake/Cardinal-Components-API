@@ -28,107 +28,49 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.event.ComponentRegisteredCallback;
 import net.minecraft.util.Identifier;
 
-import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.stream.Stream;
 
-public final class ComponentRegistryImpl implements ComponentRegistry, ComponentRegistryV3 {
+public final class ComponentRegistryImpl implements ComponentRegistryV3 {
 
-    // used by generated classes
-    public static ComponentType<?> byRawId(@Nonnegative int rawId) {
-        ComponentRegistryImpl registry = (ComponentRegistryImpl) ComponentRegistry.INSTANCE;
-        ComponentType<?> ret = registry.get(rawId);
-        if (ret == null) {
-            for (Object2IntMap.Entry<Identifier> entry : registry.id2Raw.object2IntEntrySet()) {
-                if (entry.getIntValue() == rawId) {
-                    throw new IllegalStateException("The component type for '" + entry.getKey() + "'  was not registered");
-                }
-            }
-            throw new IllegalArgumentException("Invalid raw id " + rawId);
-        }
-        return ret;
-    }
+    public static final ComponentRegistryImpl INSTANCE = new ComponentRegistryImpl();
 
-    private final ComponentTypeAccess access;
-    private final Object2IntMap<Identifier> id2Raw;
-    private ComponentType<?>[] raw2Types;
-    private int nextRawId = 0;
-    private int size;
-
-    public ComponentRegistryImpl(ComponentTypeAccess access) {
-        this.access = access;
-        this.id2Raw = new Object2IntOpenHashMap<>(16);
-        this.raw2Types = new ComponentType[16];
-        this.id2Raw.defaultReturnValue(-1);
-    }
+    private final Map<Identifier, ComponentKey<?>> keys = new HashMap<>();
 
     @Override
-    public synchronized <T extends Component> ComponentType<T> registerIfAbsent(Identifier componentId, Class<T> componentClass) {
+    public synchronized <T extends Component> ComponentKey<T> getOrCreate(Identifier componentId, Class<T> componentClass) {
         Preconditions.checkArgument(Component.class.isAssignableFrom(componentClass), "Component interface must extend " + Component.class.getCanonicalName());
         // make sure 2+ components cannot get registered at the same time
-        int rawId = this.assignRawId(componentId);
         @SuppressWarnings("unchecked")
-        ComponentType<T> existing = (ComponentType<T>) this.get(rawId);
+        ComponentKey<T> existing = (ComponentKey<T>) this.get(componentId);
+
         if (existing != null) {
             if (existing.getComponentClass() != componentClass) {
                 throw new IllegalStateException("Registered component " + componentId + " twice with 2 different classes: " + existing.getComponentClass() + ", " + componentClass);
             }
             return existing;
         } else {
-            ComponentType<T> registered;
             Class<? extends ComponentKey<?>> generated = CcaBootstrap.INSTANCE.getGeneratedComponentTypeClass(componentId);
-            if (generated != null) {
-                registered = this.instantiateStaticType(generated, componentId, componentClass, rawId);
-            } else {
-                registered = this.access.create(componentId, componentClass, rawId);
+
+            if (generated == null) {
+                throw new IllegalStateException(componentId + " was not registered through mod metadata or plugin");
             }
-            if (this.raw2Types.length <= rawId) {
-                this.raw2Types = Arrays.copyOf(this.raw2Types, rawId + 16);
-            }
-            this.raw2Types[rawId] = registered;
-            this.size++;
-            ComponentRegisteredCallback.EVENT.invoker().onComponentRegistered(componentId, componentClass, registered);
+
+            ComponentKey<T> registered = this.instantiateStaticType(generated, componentId, componentClass);
+            this.keys.put(componentId, registered);
             return registered;
         }
     }
 
-    @Override
-    public <T extends Component> ComponentType<T> registerStatic(Identifier componentId, Class<T> componentClass) {
-        if (CcaBootstrap.INSTANCE.getGeneratedComponentTypeClass(componentId) == null) {
-            throw new IllegalStateException(componentId + " was not registered through mod metadata or plugin");
-        }
-        return this.registerIfAbsent(componentId, componentClass);
-    }
-
-    public int size() {
-        return this.size;
-    }
-
-    // TODO V3 remove pre-assignment mechanisms
-    public synchronized int assignRawId(Identifier componentId) {
-        int existing = this.id2Raw.getInt(componentId);
-        if (existing >= 0) {
-            return existing;
-        }
-        int rawId = this.nextRawId;
-        this.id2Raw.put(componentId, rawId);
-        this.nextRawId++;
-        return rawId;
-    }
-
-    private <T extends Component> ComponentType<T> instantiateStaticType(Class<? extends ComponentKey<?>> generated, Identifier componentId, Class<T> componentClass, int rawId) {
+    private <T extends Component> ComponentKey<T> instantiateStaticType(Class<? extends ComponentKey<?>> generated, Identifier componentId, Class<T> componentClass) {
         try {
-            @SuppressWarnings("unchecked") ComponentType<T> ret = (ComponentType<T>) generated.getConstructor(Identifier.class, Class.class, int.class).newInstance(componentId, componentClass, rawId);
+            @SuppressWarnings("unchecked") ComponentKey<T> ret = (ComponentKey<T>) generated.getConstructor(Identifier.class, Class.class).newInstance(componentId, componentClass);
             return ret;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new IllegalStateException("Failed to create statically declared component type", e);
@@ -136,36 +78,18 @@ public final class ComponentRegistryImpl implements ComponentRegistry, Component
     }
 
     @Nullable
-    private ComponentType<?> get(int rawId) {
-        ComponentType<?>[] raw2Types = this.raw2Types;
-        if (rawId >= 0 && rawId < raw2Types.length) {
-            return raw2Types[rawId];
-        }
-        return null;
+    @Override
+    public ComponentKey<?> get(Identifier id) {
+        return this.keys.get(id);
     }
 
     @Override
-    public <C extends Component> ComponentKey<C> getOrCreate(Identifier componentId, Class<C> componentClass) {
-        return this.registerStatic(componentId, componentClass);
-    }
-
-    @Nullable
-    @Override
-    public ComponentType<?> get(Identifier id) {
-        return this.get(this.id2Raw.getInt(id));
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})    // unchecked magic to override 2 conflicting type signatures
-    @Override
-    public Stream stream() {
-        return Arrays.stream(this.raw2Types).filter(Objects::nonNull);
+    public Stream<ComponentKey<?>> stream() {
+        return new HashSet<>(this.keys.values()).stream();
     }
 
     @VisibleForTesting
     void clear() {
-        this.id2Raw.clear();
-        this.raw2Types = new ComponentType[16];
-        this.nextRawId = 0;
-        this.size = 0;
+        this.keys.clear();
     }
 }

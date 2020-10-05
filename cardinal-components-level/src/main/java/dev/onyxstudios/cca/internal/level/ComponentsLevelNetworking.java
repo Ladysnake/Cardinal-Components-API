@@ -25,9 +25,8 @@ package dev.onyxstudios.cca.internal.level;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.WorldSyncCallback;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
@@ -43,7 +42,7 @@ public final class ComponentsLevelNetworking {
      * {@link CustomPayloadS2CPacket} channel for default level component synchronization.
      *
      * <p> Packets emitted on this channel must begin with the
-     * {@link ComponentType#getId() component's type} (as an Identifier).
+     * {@link ComponentKey#getId() component's type} (as an Identifier).
      *
      * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
      * called on the game thread.
@@ -70,15 +69,17 @@ public final class ComponentsLevelNetworking {
             ClientSidePacketRegistry.INSTANCE.register(PACKET_ID, (context, buffer) -> {
                 try {
                     Identifier componentTypeId = buffer.readIdentifier();
-                    ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
-                    if (componentType == null) {
+                    ComponentKey<?> componentKey = ComponentRegistry.get(componentTypeId);
+
+                    if (componentKey == null) {
                         return;
                     }
+
                     PacketByteBuf copy = new PacketByteBuf(buffer.copy());
                     context.getTaskQueue().execute(() -> {
                         try {
                             assert MinecraftClient.getInstance().world != null;
-                            Component c = componentType.get(MinecraftClient.getInstance().world.getLevelProperties());
+                            Component c = componentKey.get(MinecraftClient.getInstance().world.getLevelProperties());
 
                             if (c instanceof SyncedComponent) {
                                 ((SyncedComponent) c).processPacket(context, copy);

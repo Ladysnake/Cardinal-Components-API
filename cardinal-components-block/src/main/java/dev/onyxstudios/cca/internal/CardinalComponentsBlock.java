@@ -25,11 +25,10 @@ package dev.onyxstudios.cca.internal;
 import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncAroundCallback;
 import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncCallback;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.PacketContext;
@@ -49,7 +48,7 @@ public class CardinalComponentsBlock {
      *
      * <p> Packets emitted on this channel must begin with, in order, the {@link BlockEntity#getType() BE type} (as an identifier),
      * the {@link BlockEntity#getPos() position} (using {@link PacketByteBuf#writeBlockPos(BlockPos)}),
-     * and the {@link ComponentType#getId() component's type} (as an Identifier).
+     * and the {@link ComponentKey#getId() component's type} (as an Identifier).
      *
      * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
      * called on the game thread.
@@ -82,7 +81,7 @@ public class CardinalComponentsBlock {
                     BlockPos position = buffer.readBlockPos();
                     Identifier componentTypeId = buffer.readIdentifier();
                     BlockEntityType<?> blockEntityType = Registry.BLOCK_ENTITY_TYPE.get(blockEntityTypeId);
-                    ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+                    ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
 
                     if (componentType == null || blockEntityType == null) {
                         return;

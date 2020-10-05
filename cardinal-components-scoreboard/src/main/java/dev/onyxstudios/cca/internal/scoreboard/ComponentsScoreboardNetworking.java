@@ -25,13 +25,11 @@ package dev.onyxstudios.cca.internal.scoreboard;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardSyncCallback;
 import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.PacketContext;
@@ -69,20 +67,20 @@ public final class ComponentsScoreboardNetworking {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             ScoreboardSyncCallback.EVENT.register((player, tracked) -> {
-                for (ComponentKey<?> key : ((InternalComponentProvider) tracked).getComponentContainer().keys()) {
+                for (ComponentKey<?> key : ((ComponentProvider) tracked).getComponentContainer().keys()) {
                     key.syncWith(player, ComponentProvider.fromScoreboard(tracked));
                 }
 
                 for (Team team : tracked.getTeams()) {
                     ComponentProvider provider = ComponentProvider.fromTeam(team);
 
-                    for (ComponentKey<?> key : ((InternalComponentProvider) provider).getComponentContainer().keys()) {
+                    for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
                         key.syncWith(player, provider);
                     }
                 }
             });
             TeamAddCallback.EVENT.register((tracked) -> {
-                for (ComponentKey<?> key : ((InternalComponentProvider) ComponentProvider.fromTeam(tracked)).getComponentContainer().keys()) {
+                for (ComponentKey<?> key : ComponentProvider.fromTeam(tracked).getComponentContainer().keys()) {
                     key.sync(tracked);
                 }
             });
@@ -102,12 +100,12 @@ public final class ComponentsScoreboardNetworking {
         }
     }
 
-    private static void registerScoreboardSync(Identifier packetId, BiFunction<PacketContext, PacketByteBuf, Function<ComponentType<?>, Optional<? extends Component>>> reader) {
+    private static void registerScoreboardSync(Identifier packetId, BiFunction<PacketContext, PacketByteBuf, Function<ComponentKey<?>, Optional<? extends Component>>> reader) {
         ClientSidePacketRegistry.INSTANCE.register(packetId, (context, buffer) -> {
             try {
-                Function<ComponentType<?>, Optional<? extends Component>> getter = reader.apply(context, buffer);
+                Function<ComponentKey<?>, Optional<? extends Component>> getter = reader.apply(context, buffer);
                 Identifier componentTypeId = buffer.readIdentifier();
-                ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+                ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
 
                 if (componentType != null) {
                     PacketByteBuf copy = new PacketByteBuf(buffer.copy());

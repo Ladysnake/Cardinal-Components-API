@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
-import nerdhub.cardinal.components.api.ComponentRegistry;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -32,7 +31,7 @@ import java.util.Collections;
 /**
  * Entrypoint getting invoked to declare static component types.
  *
- * <p><b>Implementations of this class must not call {@link ComponentRegistry#registerIfAbsent(Identifier, Class)}</b>,
+ * <p><b>Implementations of this class must not call {@link ComponentRegistry#getOrCreate(Identifier, Class)}</b>,
  * directly or indirectly, until {@link #finalizeStaticBootstrap()} is called. They must also avoid causing the
  * instantiation of a component provider (eg. ItemStack). It is recommended to implement this interface
  * on its own class to avoid running static initializers too early, e.g. because they were referenced in field or method

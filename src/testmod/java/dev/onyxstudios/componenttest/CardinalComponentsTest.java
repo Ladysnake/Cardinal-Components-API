@@ -23,15 +23,11 @@
 package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
-import dev.onyxstudios.cca.api.v3.component.Component;
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
-import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
+import dev.onyxstudios.cca.api.v3.component.*;
 import dev.onyxstudios.cca.api.v3.util.ComponentContainerMetafactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.componenttest.vita.BaseVita;
 import dev.onyxstudios.componenttest.vita.Vita;
-import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -75,7 +71,7 @@ public class CardinalComponentsTest {
         LOGGER.info("Hello, Components!");
 
         for (int i = 0; i < 16; i++) {
-            ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(String.valueOf(Math.random())), Vita.class);
+            ComponentRegistry.getOrCreate(new Identifier(String.valueOf(Math.random())), Vita.class);
         }
 
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
@@ -89,8 +85,9 @@ public class CardinalComponentsTest {
             factoryBuilder.build();
             assert false : "Component container factory builders are single use";
         } catch (IllegalStateException ignored) { }
+
         try {
-            ComponentRegistryV3.INSTANCE.getOrCreate(TestComponents.OLD_VITA.getId(), TestComponents.OLD_VITA.getComponentClass());
+            ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("hi"), Vita.class);
             assert false : "Static components must be registered through mod metadata or plugin";
         } catch (IllegalStateException ignored) { }
 
