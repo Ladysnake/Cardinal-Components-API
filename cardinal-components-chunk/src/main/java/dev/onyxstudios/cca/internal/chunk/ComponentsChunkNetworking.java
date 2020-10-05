@@ -23,11 +23,10 @@
 package dev.onyxstudios.cca.internal.chunk;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.ChunkSyncCallback;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
@@ -58,7 +57,7 @@ public final class ComponentsChunkNetworking {
                     int chunkX = buffer.readInt();
                     int chunkZ = buffer.readInt();
                     Identifier componentTypeId = buffer.readIdentifier();
-                    ComponentType<?> componentType = ComponentRegistry.INSTANCE.get(componentTypeId);
+                    ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
                     if (componentType == null) {
                         return;
                     }

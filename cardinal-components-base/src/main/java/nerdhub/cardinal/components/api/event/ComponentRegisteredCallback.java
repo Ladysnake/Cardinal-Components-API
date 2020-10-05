@@ -31,8 +31,6 @@ import org.jetbrains.annotations.ApiStatus;
 
 /**
  * The callback interface for receiving component registration events.
- *
- * @see nerdhub.cardinal.components.api.ComponentRegistry#registerIfAbsent(Identifier, Class)
  */
 @Deprecated
 @ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")

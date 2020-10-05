@@ -23,8 +23,9 @@
 package dev.onyxstudios.cca.api.v3.util;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
+import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -33,22 +34,22 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 @ApiStatus.Experimental
-public final class LazyComponentType<C extends Component> {
+public final class LazyComponentKey<C extends Component> {
 
-    public static LazyComponentType<?> create(Identifier id) {
-        return new LazyComponentType<>(id, null);
+    public static LazyComponentKey<?> create(Identifier id) {
+        return new LazyComponentKey<>(id, null);
     }
 
-    public static <C extends Component> LazyComponentType<C> create(Identifier id, Class<C> componentClass) {
+    public static <C extends Component> LazyComponentKey<C> create(Identifier id, Class<C> componentClass) {
         Objects.requireNonNull(componentClass);
-        return new LazyComponentType<>(id, componentClass);
+        return new LazyComponentKey<>(id, componentClass);
     }
 
     private final Identifier componentId;
     private final Class<C> componentClass;
-    private ComponentType<C> wrapped;
+    private ComponentKey<C> wrapped;
 
-    private LazyComponentType(Identifier componentId, @Nullable Class<C> componentClass) {
+    private LazyComponentKey(Identifier componentId, @Nullable Class<C> componentClass) {
         this.componentId = componentId;
         this.componentClass = componentClass;
     }
@@ -58,15 +59,15 @@ public final class LazyComponentType<C extends Component> {
     }
 
     // used by generated classes
-    public ComponentType<C> unwrap() {
+    public ComponentKey<C> unwrap() {
         return this.tryUnwrap(true);
     }
 
     public void register() {
         if (this.componentClass == null) {
-            throw new NullPointerException("Cannot register a ComponentType with an unknown component class");
+            throw new NullPointerException("Cannot register a ComponentKey with an unknown component class");
         }
-        ComponentRegistry.INSTANCE.registerIfAbsent(this.componentId, this.componentClass);
+        ComponentRegistry.getOrCreate(this.componentId, this.componentClass);
     }
 
     public Identifier getId() {
@@ -74,12 +75,12 @@ public final class LazyComponentType<C extends Component> {
     }
 
     /**
-     * Convenience method to retrieve a component without explicitly unwrapping a {@link ComponentType}.
+     * Convenience method to retrieve a component without explicitly unwrapping a {@link ComponentKey}.
      *
      * @param provider a component provider
      * @return the nonnull value of the held component of this type
-     * @see ComponentType#get(Object)
-     * @see ComponentType#maybeGet(Object)
+     * @see ComponentKey#get(Object)
+     * @see ComponentKey#maybeGet(Object)
      */
     public C getComponent(Object provider) {
         return this.unwrap().get(provider);
@@ -87,24 +88,24 @@ public final class LazyComponentType<C extends Component> {
 
     @Nullable
     @Contract("true -> !null")
-    private ComponentType<C> tryUnwrap(boolean enforceInitialized) {
-        ComponentType<C> value = this.wrapped;
+    private ComponentKey<C> tryUnwrap(boolean enforceInitialized) {
+        ComponentKey<C> value = this.wrapped;
         if (value != null) {
             return value;
         }
-        ComponentType<?> registered = ComponentRegistry.INSTANCE.get(this.getId());
+        ComponentKey<?> registered = ComponentRegistryImpl.INSTANCE.get(this.getId());
         if (registered == null && enforceInitialized) {
             if (this.componentClass == null) {
                 throw new IllegalStateException("The component type for '" + this.getId()  + "'  was not registered");
             } else {
-                ComponentType<C> newValue = ComponentRegistry.INSTANCE.registerIfAbsent(this.getId(), this.componentClass);
+                ComponentKey<C> newValue = ComponentRegistry.getOrCreate(this.getId(), this.componentClass);
                 this.wrapped = newValue;
                 return newValue;
             }
         } else if (registered != null) {
             if (this.componentClass == null || this.componentClass == registered.getComponentClass()) {
                 // either this holder has no type (cast from wildcard to wildcard), or the type has already been checked
-                @SuppressWarnings("unchecked") ComponentType<C> newValue = (ComponentType<C>) registered;
+                @SuppressWarnings("unchecked") ComponentKey<C> newValue = (ComponentKey<C>) registered;
                 this.wrapped = newValue;
                 return newValue;
             } else {

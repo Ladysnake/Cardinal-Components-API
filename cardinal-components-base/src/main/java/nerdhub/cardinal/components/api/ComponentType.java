@@ -35,9 +35,6 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * The representation of a component type registered through {@link ComponentRegistry#registerIfAbsent}
- *
- * @see ComponentRegistry
  * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
  * @deprecated use {@link ComponentKey} instead
  */
@@ -50,10 +47,9 @@ public class ComponentType<T extends Component> extends ComponentKey<T> {
     /**
      * Constructs a new immutable ComponentType
      *
-     * @see ComponentRegistry#registerIfAbsent(Identifier, Class)
      */
     protected ComponentType(Identifier id, Class<T> componentClass, int rawId) {
-        super(id, componentClass, rawId);
+        super(id, componentClass);
     }
 
     @Nullable

@@ -23,8 +23,7 @@
 package dev.onyxstudios.cca.internal.base;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import org.junit.jupiter.api.AfterEach;
@@ -36,27 +35,27 @@ class ComponentRegistryImplTest {
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     void checksRegisteredClasses() {
-        ComponentRegistry registry = ComponentRegistry.INSTANCE;
+        ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
         Identifier id = new Identifier("testmod:test");
-        Assertions.assertThrows(IllegalArgumentException.class, () -> registry.registerIfAbsent(id, (Class) TestNotComponentItf.class), "Component class must extend Component");
-        Assertions.assertDoesNotThrow(() -> registry.registerIfAbsent(id, TestComponentNotItf.class));
-        Assertions.assertDoesNotThrow(() -> registry.registerIfAbsent(id, TestComponentItf.class));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> registry.getOrCreate(id, (Class) TestNotComponentItf.class), "Component class must extend Component");
+        Assertions.assertDoesNotThrow(() -> registry.getOrCreate(id, TestComponentNotItf.class));
+        Assertions.assertDoesNotThrow(() -> registry.getOrCreate(id, TestComponentItf.class));
     }
 
     @Test
     void doesNotDuplicateComponentTypes() {
-        ComponentRegistry registry = ComponentRegistry.INSTANCE;
+        ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
         Identifier id = new Identifier("testmod:test");
-        ComponentType<?> type = registry.registerIfAbsent(id, TestComponentItf.class);
-        Assertions.assertThrows(IllegalStateException.class, () -> registry.registerIfAbsent(id, TestComponentItf2.class));
-        Assertions.assertThrows(IllegalStateException.class, () -> registry.registerIfAbsent(id, TestComponentItf3.class));
-        Assertions.assertEquals(type, registry.registerIfAbsent(id, TestComponentItf.class));
+        ComponentKey<?> type = registry.getOrCreate(id, TestComponentItf.class);
+        Assertions.assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf2.class));
+        Assertions.assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf3.class));
+        Assertions.assertEquals(type, registry.getOrCreate(id, TestComponentItf.class));
         Assertions.assertEquals(1, registry.stream().count());
     }
 
     @AfterEach
     void tearDown() {
-        ((ComponentRegistryImpl) ComponentRegistry.INSTANCE).clear();
+        ComponentRegistryImpl.INSTANCE.clear();
     }
 
     interface TestNotComponentItf {}

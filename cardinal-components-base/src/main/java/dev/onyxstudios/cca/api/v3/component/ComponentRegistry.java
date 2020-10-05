@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
+import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -83,7 +84,7 @@ public final class ComponentRegistry {
      */
     @Contract(pure = true)
     public static @Nullable ComponentKey<?> get(Identifier id) {
-        return ComponentRegistryV3.INSTANCE.get(id);
+        return ComponentRegistryImpl.INSTANCE.get(id);
     }
 
     /**
