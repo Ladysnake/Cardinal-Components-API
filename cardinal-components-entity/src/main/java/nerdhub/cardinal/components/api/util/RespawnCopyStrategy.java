@@ -24,8 +24,8 @@ package nerdhub.cardinal.components.api.util;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.GameRules;
@@ -33,11 +33,10 @@ import net.minecraft.world.GameRules;
 /**
  * Represents a strategy to copy a component from a player to another.
  *
- * <p> Copy strategies can be registered using {@link EntityComponents#setRespawnCopyStrategy(ComponentType, RespawnCopyStrategy)}.
+ * <p>Copy strategies can be registered using methods on {@link EntityComponentFactoryRegistry}.
  *
  * @param <C> the type of components handled by this strategy
  * @see PlayerCopyCallback
- * @see EntityComponents
  */
 @FunctionalInterface
 public interface RespawnCopyStrategy<C extends Component> {
@@ -83,7 +82,8 @@ public interface RespawnCopyStrategy<C extends Component> {
      * This strategy can be used when {@code RespawnCopyStrategy} does not offer enough context,
      * in which case {@link PlayerCopyCallback} may be used directly.
      */
-    RespawnCopyStrategy<Component> NEVER_COPY = (from, to, lossless, keepInventory) -> {};
+    RespawnCopyStrategy<Component> NEVER_COPY = (from, to, lossless, keepInventory) -> {
+    };
 
     /**
      * Copies data from one component to the other.
@@ -92,8 +92,8 @@ public interface RespawnCopyStrategy<C extends Component> {
      * method will be called, otherwise data will be copied using NBT serialization.
      *
      * @param from the component to copy data from
-     * @param to the component to copy data to
-     * @param <C> the common component type
+     * @param to   the component to copy data to
+     * @param <C>  the common component type
      */
     static <C extends Component> void copy(C from, C to) {
         if (to instanceof CopyableComponent) {
