@@ -26,11 +26,10 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.WorldSyncCallback;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
-import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
@@ -44,7 +43,7 @@ public final class ComponentsLevelNetworking {
      * <p> Packets emitted on this channel must begin with the
      * {@link ComponentKey#getId() component's type} (as an Identifier).
      *
-     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
      * called on the game thread.
      */
     public static final Identifier PACKET_ID = new Identifier("cardinal-components", "level_sync");
@@ -56,6 +55,7 @@ public final class ComponentsLevelNetworking {
                     ComponentProvider provider = ComponentProvider.fromLevel(world.getLevelProperties());
 
                     for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
+                        // TODO implement relevant methods on LevelProperties
                         key.syncWith(player, provider);
                     }
                 });
@@ -81,8 +81,8 @@ public final class ComponentsLevelNetworking {
                             assert MinecraftClient.getInstance().world != null;
                             Component c = componentKey.get(MinecraftClient.getInstance().world.getLevelProperties());
 
-                            if (c instanceof SyncedComponent) {
-                                ((SyncedComponent) c).processPacket(context, copy);
+                            if (c instanceof AutoSyncedComponent) {
+                                ((AutoSyncedComponent) c).applySyncPacket(copy);
                             }
                         } finally {
                             copy.release();
