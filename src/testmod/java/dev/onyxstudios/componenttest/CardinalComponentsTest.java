@@ -24,11 +24,11 @@ package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.component.*;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.util.ComponentContainerMetafactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.componenttest.vita.BaseVita;
 import dev.onyxstudios.componenttest.vita.Vita;
-import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -110,9 +110,9 @@ public class CardinalComponentsTest {
             LOGGER.info(ComponentContainerMetafactory.metafactory(
                 TestComponents.CUSTOM_PROVIDER_2,
                 new TypeToken<BiFunction<UUID, PlayerEntity, ? extends ComponentContainer>>() {},
-                new TypeToken<BiFunction<UUID, PlayerEntity, ? extends SyncedComponent>>() {}
+                new TypeToken<BiFunction<UUID, PlayerEntity, ? extends AutoSyncedComponent>>() {}
             ).apply(UUID.randomUUID(), null));
-            assert false : "Registered factory does not return " + SyncedComponent.class;
+            assert false : "Registered factory does not return " + AutoSyncedComponent.class;
         } catch (StaticComponentLoadingException ignored) { }
 
         LOGGER.info(ComponentContainerMetafactory.metafactory(

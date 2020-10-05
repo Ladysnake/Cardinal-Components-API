@@ -30,7 +30,6 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardSyncCallback;
 import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.loader.api.FabricLoader;
@@ -49,7 +48,7 @@ public final class ComponentsScoreboardNetworking {
      *
      * <p> Packets emitted on this channel must begin with the {@link Identifier} for the component's type.
      *
-     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
      * called on the game thread.
      */
     public static final Identifier SCOREBOARD_PACKET_ID = new Identifier("cardinal-components", "scoreboard_sync");
@@ -59,7 +58,7 @@ public final class ComponentsScoreboardNetworking {
      * <p> Packets emitted on this channel must begin with, in order, the team's name as a {@link String},
      * and the {@link Identifier} for the component's type.
      *
-     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
      * called on the game thread.
      */
     public static final Identifier TEAM_PACKET_ID = new Identifier("cardinal-components", "team_sync");

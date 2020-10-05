@@ -29,12 +29,10 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
-import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
 import nerdhub.cardinal.components.api.event.TrackingStartCallback;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
-import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
@@ -52,7 +50,7 @@ public final class CardinalComponentsEntity {
      * <p> Packets emitted on this channel must begin with, in order, the {@link Entity#getEntityId() entity id} (as an int),
      * and the {@link ComponentKey#getId() component's type} (as an Identifier).
      *
-     * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
      * called on the game thread.
      */
     public static final Identifier PACKET_ID = new Identifier("cardinal-components", "entity_sync");
@@ -103,13 +101,8 @@ public final class CardinalComponentsEntity {
                     context.getTaskQueue().execute(() -> {
                         try {
                             componentType.maybeGet(context.getPlayer().world.getEntityById(entityId))
-                                .ifPresent(c -> {
-                                    if (c instanceof AutoSyncedComponent) {
-                                        ((AutoSyncedComponent) c).applySyncPacket(copy);
-                                    } else if (c instanceof SyncedComponent) {
-                                        ((SyncedComponent) c).processPacket(context, copy);
-                                    }
-                                });
+                                .filter(c -> c instanceof AutoSyncedComponent)
+                                .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(copy));
                         } finally {
                             copy.release();
                         }

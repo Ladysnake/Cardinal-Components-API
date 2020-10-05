@@ -28,7 +28,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.WorldSyncCallback;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
@@ -68,8 +67,6 @@ public final class ComponentsWorldNetworking {
                         Component c = componentType.get(MinecraftClient.getInstance().world);
                         if (c instanceof AutoSyncedComponent) {
                             ((AutoSyncedComponent) c).applySyncPacket(buffer);
-                        } else if (c instanceof SyncedComponent) {
-                            ((SyncedComponent) c).processPacket(context, buffer);
                         }
                     } finally {
                         buffer.release();
