@@ -28,12 +28,11 @@ import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import nerdhub.cardinal.components.api.ComponentType;
+import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
 import nerdhub.cardinal.components.api.event.TrackingStartCallback;
-import nerdhub.cardinal.components.api.util.EntityComponents;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.loader.api.FabricLoader;
@@ -51,7 +50,7 @@ public final class CardinalComponentsEntity {
      * {@link CustomPayloadS2CPacket} channel for default entity component synchronization.
      *
      * <p> Packets emitted on this channel must begin with, in order, the {@link Entity#getEntityId() entity id} (as an int),
-     * and the {@link ComponentType#getId() component's type} (as an Identifier).
+     * and the {@link ComponentKey#getId() component's type} (as an Identifier).
      *
      * <p> Components synchronized through this channel will have {@linkplain SyncedComponent#processPacket(PacketContext, PacketByteBuf)}
      * called on the game thread.
@@ -77,8 +76,8 @@ public final class CardinalComponentsEntity {
 
     private static <C extends Component> void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless, boolean keepInventory, ComponentKey<C> key) {
         C from = key.get(original);
-        C to = key.getNullable(clone);
-        if (to != null) EntityComponents.getRespawnCopyStrategy(key).copyForRespawn(from, to, lossless, keepInventory);
+        C to = key.get(clone);
+        CardinalEntityInternals.getRespawnCopyStrategy(key).copyForRespawn(from, to, lossless, keepInventory);
     }
 
     private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {

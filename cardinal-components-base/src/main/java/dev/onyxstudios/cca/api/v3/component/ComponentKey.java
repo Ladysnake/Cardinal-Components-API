@@ -60,39 +60,47 @@ public abstract class ComponentKey<C extends Component> {
         return this.componentClass;
     }
 
-    /**
-     * @param provider a component provider
-     * @return the attached component associated with this key, or
-     * {@code null} if the provider does not support this type of component
-     * @throws ClassCastException if the {@code provider} is
-     * @see #get(Object)
-     * @see #maybeGet(Object)
-     */
-    // overridden by generated types
-    @Contract(pure = true)
-    @ApiStatus.Experimental
-    public abstract <V> @Nullable C getNullable(V provider);
+    @Nullable
+    public <V> C getNullable(V provider) {
+        return this.getInternal((ComponentProvider) provider);
+    }
 
     /**
      * @param provider a component provider
      * @param <V>      the class of the component provider
-     * @return the nonnull value of the component associated with this key
+     * @return the nonnull value of the held component of this type
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      * @see #maybeGet(Object)
      */
-    @Contract(pure = true)
-    public abstract <V> C get(V provider);
+    public final <V> C get(V provider) {
+        C component = this.getInternal((ComponentProvider) provider);
+        assert component == null || this.getComponentClass().isInstance(component);
+        if (component == null) {
+            try {
+                throw new NoSuchElementException(provider + " provides no component of type " + this.getId());
+            } catch (NullPointerException e) {  // some toString implementations crash in init because the name is not set
+                NoSuchElementException e1 = new NoSuchElementException(this.getId() + " not available");
+                e1.addSuppressed(e);
+                throw e1;
+            }
+        }
+        return component;
+    }
 
     /**
      * @param provider a component provider
      * @param <V>      the class of the component provider
-     * @return an {@code Optional} describing a component associated with this key, or an empty
+     * @return an {@code Optional} describing a component of this type, or an empty
      * {@code Optional} if {@code provider} does not have such a component.
      * @see #get(Object)
      */
-    @Contract(pure = true)
-    public abstract <V> Optional<C> maybeGet(@Nullable V provider);
+    public final <V> Optional<C> maybeGet(@Nullable V provider) {
+        if (provider instanceof ComponentProvider) {
+            return Optional.ofNullable(this.getInternal((ComponentProvider) provider));
+        }
+        return Optional.empty();
+    }
 
     @Contract(pure = true)
     @ApiStatus.Experimental
@@ -206,6 +214,10 @@ public abstract class ComponentKey<C extends Component> {
     @Contract(pure = true)
     @ApiStatus.Internal
     public abstract @Nullable C getInternal(ComponentContainer container);
+
+    private @Nullable C getInternal(ComponentProvider provider) {
+        return this.getInternal(provider.getComponentContainer());
+    }
 
     @ApiStatus.Internal
     public C getFromContainer(ComponentContainer container) {

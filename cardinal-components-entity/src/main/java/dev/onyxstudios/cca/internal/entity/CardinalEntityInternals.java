@@ -84,7 +84,7 @@ public final class CardinalEntityInternals {
     }
 
     @SuppressWarnings("unchecked")
-    public static <C extends Component> RespawnCopyStrategy<C> getRespawnCopyStrat(ComponentKey<C> type) {
+    public static <C extends Component> RespawnCopyStrategy<C> getRespawnCopyStrategy(ComponentKey<C> type) {
         return (RespawnCopyStrategy<C>) RESPAWN_COPY_STRATEGIES.getOrDefault(type, DEFAULT_COPY_STRATEGY);
     }
 

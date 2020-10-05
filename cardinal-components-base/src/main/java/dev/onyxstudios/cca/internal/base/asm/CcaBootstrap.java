@@ -26,7 +26,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
-import nerdhub.cardinal.components.api.ComponentType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
@@ -60,7 +59,6 @@ public final class CcaBootstrap extends LazyDispatcher {
     }
 
     public boolean isGenerated(Class<?> keyClass) {
-        if (keyClass == ComponentType.class) return true; // special case for as long as dynamic ComponentTypes exist
         if (this.requiresInitialization()) return false;
         return this.generatedComponentTypes.containsValue(keyClass);
     }
@@ -100,7 +98,7 @@ public final class CcaBootstrap extends LazyDispatcher {
             }
 
             this.spinStaticContainerItf(staticComponentTypes);
-            this.generatedComponentTypes = this.spinStaticComponentTypes(staticComponentTypes);
+            this.generatedComponentTypes = this.spinStaticComponentKeys(staticComponentTypes);
         } catch (IOException | UncheckedIOException e) {
             throw new StaticComponentLoadingException("Failed to load statically defined components", e);
         }
@@ -114,17 +112,17 @@ public final class CcaBootstrap extends LazyDispatcher {
     }
 
     /**
-     * Defines a {@link ComponentType} subclass for every statically declared component, as well as
+     * Defines a {@link ComponentKey} subclass for every statically declared component, as well as
      * a global {@link ComponentProvider} specialized interface
-     * that declares a direct getter for every {@link ComponentType} that has been scanned by plugins.
+     * that declares a direct getter for every {@link ComponentKey} that has been scanned by plugins.
      *
-     * @param staticComponentTypes the set of all statically declared {@link ComponentType} ids
-     * @return a map of {@link ComponentType} ids to specialized implementations
+     * @param staticComponentKeys the set of all statically declared {@link ComponentKey} ids
+     * @return a map of {@link ComponentKey} ids to specialized implementations
      */
-    private Map<Identifier, Class<? extends ComponentKey<?>>> spinStaticComponentTypes(Set<Identifier> staticComponentTypes) throws IOException {
-        Map<Identifier, Class<? extends ComponentKey<?>>> generatedComponentTypes = new HashMap<>(staticComponentTypes.size());
+    private Map<Identifier, Class<? extends ComponentKey<?>>> spinStaticComponentKeys(Set<Identifier> staticComponentKeys) throws IOException {
+        Map<Identifier, Class<? extends ComponentKey<?>>> generatedComponentTypes = new HashMap<>(staticComponentKeys.size());
 
-        for (Identifier componentId : staticComponentTypes) {
+        for (Identifier componentId : staticComponentKeys) {
             /* generate the component type class */
 
             ClassNode componentTypeWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
