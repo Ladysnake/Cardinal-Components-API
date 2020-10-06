@@ -78,4 +78,5 @@ public abstract class MixinServerWorld extends MixinWorld {
         writer.writeSyncPacket(buf, recipient);
         return new CustomPayloadS2CPacket(ComponentsWorldNetworking.PACKET_ID, buf);
     }
+
 }
