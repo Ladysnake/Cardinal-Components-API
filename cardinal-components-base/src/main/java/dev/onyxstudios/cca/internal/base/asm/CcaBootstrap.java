@@ -45,7 +45,7 @@ import java.util.*;
 
 public final class CcaBootstrap extends LazyDispatcher {
 
-    public static final String COMPONENT_TYPE_INIT_DESC = Type.getMethodDescriptor(Type.VOID_TYPE, Type.getObjectType(CcaAsmHelper.IDENTIFIER), Type.getType(Class.class), Type.INT_TYPE);
+    public static final String COMPONENT_TYPE_INIT_DESC = Type.getMethodDescriptor(Type.VOID_TYPE, Type.getObjectType(CcaAsmHelper.IDENTIFIER), Type.getType(Class.class));
     public static final String COMPONENT_TYPE_GET0_DESC = "(L" + CcaAsmHelper.COMPONENT_CONTAINER + ";)L" + CcaAsmHelper.COMPONENT + ";";
     public static final String STATIC_INIT_ENTRYPOINT = "cardinal-components:static-init";
     public static final CcaBootstrap INSTANCE = new CcaBootstrap();
@@ -134,7 +134,6 @@ public final class CcaBootstrap extends LazyDispatcher {
             init.visitVarInsn(Opcodes.ALOAD, 0);
             init.visitVarInsn(Opcodes.ALOAD, 1);
             init.visitVarInsn(Opcodes.ALOAD, 2);
-            init.visitVarInsn(Opcodes.ILOAD, 3);
             init.visitMethodInsn(Opcodes.INVOKESPECIAL, CcaAsmHelper.COMPONENT_TYPE, "<init>", COMPONENT_TYPE_INIT_DESC, false);
             init.visitInsn(Opcodes.RETURN);
             init.visitEnd();
