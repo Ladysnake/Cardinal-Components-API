@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Contract;
  * A {@link Component} implementing this interface will have its data automatically
  * synchronized with players watching its provider.
  *
- * @see ComponentKey#sync(Object)
+ * @deprecated implement {@link dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent} instead
  */
 @Deprecated
 @ApiStatus.ScheduledForRemoval
