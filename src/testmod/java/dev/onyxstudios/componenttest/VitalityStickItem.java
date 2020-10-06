@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.componenttest;
 
+import dev.onyxstudios.componenttest.vita.AmbientVita;
 import dev.onyxstudios.componenttest.vita.Vita;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -33,6 +34,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.AbstractTeam;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Hand;
@@ -56,13 +58,13 @@ public class VitalityStickItem extends Item {
         if (!world.isClient) {
             if (player.isSneaking()) {
                 Vita src = vita.getVitality() > 0 ? vita : Vita.get(player);
-                Vita dest = Vita.get(
+                AmbientVita worldVita = (AmbientVita) Vita.get(
                         world.random.nextInt(10) == 0
                                 ? world.getLevelProperties()
                                 : world
                 );
-                src.transferTo(dest, 1);
-                TestComponents.VITA.sync(world);
+                src.transferTo(worldVita, 1);
+                worldVita.syncWithAll(((ServerWorld)world).getServer());
             } else if (vita.getVitality() > 0) {
                 vita.transferTo(Vita.get(player), vita.getVitality());
             }
