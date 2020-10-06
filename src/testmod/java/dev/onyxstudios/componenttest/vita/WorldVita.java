@@ -24,10 +24,13 @@ package dev.onyxstudios.componenttest.vita;
 
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
+import dev.onyxstudios.cca.api.v3.level.LevelComponents;
 import dev.onyxstudios.componenttest.CardinalComponentsTest;
+import dev.onyxstudios.componenttest.TestComponents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -36,14 +39,27 @@ import net.minecraft.world.World;
 
 import java.util.Objects;
 
-/**
- * Implements markDirty and syncWith through {@code WorldSyncedComponent}
- */
-public class WorldVita extends BaseVita implements AutoSyncedComponent, ClientTickingComponent {
-    private final World world;
+public abstract class AmbientVita extends BaseVita implements AutoSyncedComponent {
 
-    public WorldVita(World world) {
-        this.world = world;
+    public abstract void syncWithAll(MinecraftServer server);
+
+    @Override
+    public void applySyncPacket(PacketByteBuf buf) {
+        int vita = buf.readInt();
+        this.setVitality(vita);
+        World world = Objects.requireNonNull(MinecraftClient.getInstance().player).world;
+        // Very bad shortcut to get a dimension's name
+        Text worldName = new LiteralText(
+            Objects.requireNonNull(world.getRegistryKey() == World.OVERWORLD ? "Overworld" : "Alien World")
+        );
+        Text worldVita = new TranslatableText(
+                "componenttest:title.world_vitality",
+                Vita.get(world).getVitality(),
+                Vita.get(world.getLevelProperties()).getVitality()
+        );
+        InGameHud inGameHud = MinecraftClient.getInstance().inGameHud;
+        inGameHud.setTitles(null, worldVita, -1, -1, -1);
+        inGameHud.setTitles(worldName, null, -1, -1, -1);
     }
 
     /**
@@ -52,37 +68,32 @@ public class WorldVita extends BaseVita implements AutoSyncedComponent, ClientTi
     @Override
     public void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity player) {
         buf.writeInt(this.getVitality());
-        buf.writeInt(Vita.get(this.world.getLevelProperties()).getVitality());
     }
 
-    @Override
-    public void applySyncPacket(PacketByteBuf buf) {
-        int vita = buf.readInt();
-        int vita2 = buf.readInt();
+    public static class WorldVita extends AmbientVita implements ClientTickingComponent {
+        private final World world;
 
-        Vita globalVita = Vita.get(this.world.getLevelProperties());
-        this.setVitality(vita);
-        globalVita.setVitality(vita2);
+        public WorldVita(World world) {
+            this.world = world;
+        }
 
-        World world = Objects.requireNonNull(MinecraftClient.getInstance().player).world;
-        // Very bad shortcut to get a dimension's name
-        Text worldName = new LiteralText(
-            Objects.requireNonNull(world.getRegistryKey() == World.OVERWORLD ? "Overworld" : "Alien World")
-        );
-        Text worldVita = new TranslatableText(
-            "componenttest:title.world_vitality",
-            this.getVitality(),
-            globalVita.getVitality()
-        );
-        InGameHud inGameHud = MinecraftClient.getInstance().inGameHud;
-        inGameHud.setTitles(null, worldVita, -1, -1, -1);
-        inGameHud.setTitles(worldName, null, -1, -1, -1);
+        @Override
+        public void syncWithAll(MinecraftServer server) {
+            TestComponents.VITA.sync(this.world);
+        }
+
+        @Override
+        public void clientTick() {
+            if (this.world.getTime() % 2400 == 0) {
+                CardinalComponentsTest.LOGGER.info("The world still runs, and is now worth {}", this.vitality);
+            }
+        }
     }
 
-    @Override
-    public void clientTick() {
-        if (this.world.getTime() % 2400 == 0) {
-            CardinalComponentsTest.LOGGER.info("The world still runs, and is now worth {}", this.vitality);
+    public static class LevelVita extends AmbientVita {
+        @Override
+        public void syncWithAll(MinecraftServer server) {
+            LevelComponents.sync(TestComponents.VITA, server);
         }
     }
 }

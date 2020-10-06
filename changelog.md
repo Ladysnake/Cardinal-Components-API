@@ -1,7 +1,12 @@
 ------------------------------------------------------
 Version 2.7.0
 ------------------------------------------------------
-**Deprecated most classes from the nerdhub.component.\* packages**
+**Deprecated most classes from the nerdhub.component.\* packages.**
+Those classes will be **removed** during the MC 1.17 update.
+
+Additions
+- Implemented the new synchronization API in `cardinal-components-level`
+    - Added `LevelComponents#sync`, replacing `ComponentKey#sync` for components attached to `WorldProperties`
 
 ------------------------------------------------------
 Version 2.6.0

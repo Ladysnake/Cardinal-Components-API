@@ -107,4 +107,5 @@ public abstract class MixinBlockEntity implements InternalComponentProvider {
         writer.writeSyncPacket(buf, recipient);
         return new CustomPayloadS2CPacket(CardinalComponentsBlock.PACKET_ID, buf);
     }
+
 }
