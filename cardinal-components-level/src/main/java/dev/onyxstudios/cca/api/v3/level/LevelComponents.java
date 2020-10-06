@@ -24,6 +24,10 @@ package dev.onyxstudios.cca.api.v3.level;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
+import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
+import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.WorldProperties;
@@ -37,11 +41,10 @@ public final class LevelComponents {
     /**
      * Attempts to synchronize the component attached to the main {@link WorldProperties} of the given {@link MinecraftServer}.
      *
-     * <p>This method has no visible effect if the given provider does not support synchronization, or
-     * the associated component does not implement an adequate synchronization interface.
+     * <p>This method has no visible effect if the component associated with the key
+     * does not implement an adequate synchronization interface.
      *
      * @throws NoSuchElementException if the provider does not provide this type of component
-     * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
     public static void sync(ComponentKey<?> key, MinecraftServer server) {
         ComponentProvider provider = ComponentProvider.fromLevel(server.getSaveProperties().getMainWorldProperties());
@@ -50,10 +53,39 @@ public final class LevelComponents {
         }
     }
 
-    public static void sync(ComponentKey<?> key, MinecraftServer server, int syncOp) {
+    /**
+     * Attempts to synchronize the component attached to the main {@link WorldProperties} of the given {@link MinecraftServer}.
+     *
+     * <p>This method has no visible effect if the component associated with the key
+     * does not implement an adequate synchronization interface.
+     *
+     * @param packetWriter a writer for the sync packet
+     * @throws NoSuchElementException if the provider does not provide this type of component
+     */
+    public static void sync(ComponentKey<?> key, MinecraftServer server, ComponentPacketWriter packetWriter) {
+        ComponentProvider provider = ComponentProvider.fromLevel(server.getSaveProperties().getMainWorldProperties());
+        Component c = key.get(provider);
+        if (c instanceof AutoSyncedComponent) {
+            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+                key.syncWith(player, provider, packetWriter, ((AutoSyncedComponent) c));
+            }
+        }
+    }
+
+    /**
+     * Attempts to synchronize the component attached to the main {@link WorldProperties} of the given {@link MinecraftServer}.
+     *
+     * <p>This method has no visible effect if the component associated with the key
+     * does not implement an adequate synchronization interface.
+     *
+     * @param packetWriter a writer for the sync packet
+     * @param predicate    a predicate for which players should receive the packet
+     * @throws NoSuchElementException if the provider does not provide this type of component
+     */
+    public static void sync(ComponentKey<?> key, MinecraftServer server, ComponentPacketWriter packetWriter, PlayerSyncPredicate predicate) {
         ComponentProvider provider = ComponentProvider.fromLevel(server.getSaveProperties().getMainWorldProperties());
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            key.syncWith(player, provider, syncOp);
+            key.syncWith(player, provider, packetWriter, predicate);
         }
     }
 }

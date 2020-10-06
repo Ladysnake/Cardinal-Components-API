@@ -141,7 +141,7 @@ public abstract class ComponentKey<C extends Component> {
      *
      * @param <V>          the class of the component provider
      * @param provider     a component provider
-     * @param packetWriter the specific sync operation to be performed in {@link AutoSyncedComponent#writeSyncPacket(PacketByteBuf, ServerPlayerEntity)}
+     * @param packetWriter a writer for the sync packet
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
