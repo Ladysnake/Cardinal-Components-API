@@ -27,7 +27,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
@@ -89,10 +88,10 @@ public final class CardinalItemInternals {
         if (stack1.isEmpty()) return false;
 
         // Possibly initialize components
-        Set<ComponentKey<?>> keys = ((InternalComponentProvider) ComponentProvider.fromItemStack(stack1)).getComponentContainer().keys();
+        Set<ComponentKey<?>> keys = ComponentProvider.fromItemStack(stack1).getComponentContainer().keys();
 
         for(ComponentKey<?> key : keys) {
-            if(Objects.equals(key.getNullable(stack1), key.getNullable(stack2))) {
+            if(!Objects.equals(key.getNullable(stack1), key.getNullable(stack2))) {
                 return true;
             }
         }
