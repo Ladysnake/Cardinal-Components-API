@@ -134,7 +134,7 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
         }
     }
 
-    public ComponentContainer.Factory<T> buildContainerFactory() {
+    protected ComponentContainer.Factory<T> buildContainerFactory() {
         this.ensureInitialized();
 
         return this.containerFactoryBuilder.build();

@@ -34,7 +34,6 @@ import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Lazy;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -49,14 +48,11 @@ import java.util.Iterator;
 @Mixin(Scoreboard.class)
 public abstract class MixinScoreboard implements InternalComponentProvider {
     @Unique
-    private static final Lazy<ComponentContainer.Factory<Scoreboard>> componentsContainerFactory
-        = new Lazy<>(StaticScoreboardComponentPlugin.INSTANCE::buildContainerFactory);
-    @Unique
     private ComponentContainer components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
-        this.components = componentsContainerFactory.get().createContainer((Scoreboard) (Object) this);
+        this.components = StaticScoreboardComponentPlugin.componentsContainerFactory.get().createContainer((Scoreboard) (Object) this);
     }
 
     @Nonnull

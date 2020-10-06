@@ -30,11 +30,14 @@ import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.util.Lazy;
 
 import java.util.Collection;
 
 public final class StaticTeamComponentPlugin extends StaticComponentPluginBase<Team, ScoreboardComponentInitializer> {
     public static final StaticTeamComponentPlugin INSTANCE = new StaticTeamComponentPlugin();
+    public static final Lazy<ComponentContainer.Factory<Team>> componentsContainerFactory
+        = new Lazy<>(INSTANCE::buildContainerFactory);
 
     private StaticTeamComponentPlugin() {
         super("made a team", Team.class);
@@ -53,10 +56,5 @@ public final class StaticTeamComponentPlugin extends StaticComponentPluginBase<T
     @Override
     protected void dispatchRegistration(ScoreboardComponentInitializer entrypoint) {
         StaticScoreboardComponentPlugin.INSTANCE.dispatchRegistration(entrypoint);
-    }
-
-    @Override
-    public ComponentContainer.Factory<Team> buildContainerFactory() {
-        return super.buildContainerFactory();
     }
 }

@@ -35,7 +35,6 @@ import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Lazy;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -57,14 +56,11 @@ public abstract class MixinTeam implements InternalComponentProvider, TeamAccess
     @Final
     private Scoreboard scoreboard;
     @Unique
-    private static final Lazy<ComponentContainer.Factory<Team>> componentsContainerFactory
-        = new Lazy<>(StaticTeamComponentPlugin.INSTANCE::buildContainerFactory);
-    @Unique
     private ComponentContainer components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
-        this.components = componentsContainerFactory.get().createContainer((Team) (Object) this);
+        this.components = StaticTeamComponentPlugin.componentsContainerFactory.get().createContainer((Team) (Object) this);
     }
 
     @Nonnull

@@ -26,10 +26,8 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.Lazy;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.MutableWorldProperties;
-import net.minecraft.world.WorldProperties;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,14 +39,11 @@ import javax.annotation.Nonnull;
 @Mixin(ClientWorld.Properties.class)
 public abstract class MixinClientWorldProperties implements MutableWorldProperties, InternalComponentProvider {
     @Unique
-    private static final Lazy<ComponentContainer.Factory<WorldProperties>> componentContainerFactory
-        = new Lazy<>(StaticLevelComponentPlugin.INSTANCE::buildContainerFactory);
-    @Unique
     private ComponentContainer components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(Difficulty difficulty, boolean hardcore, boolean flatWorld, CallbackInfo ci) {
-        this.components = componentContainerFactory.get().createContainer(this);
+        this.components = StaticLevelComponentPlugin.createContainer(this);
     }
 
     @Nonnull

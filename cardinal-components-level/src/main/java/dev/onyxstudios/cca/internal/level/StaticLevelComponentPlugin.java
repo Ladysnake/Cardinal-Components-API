@@ -31,12 +31,19 @@ import dev.onyxstudios.cca.api.v3.level.LevelComponentInitializer;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.minecraft.util.Lazy;
 import net.minecraft.world.WorldProperties;
 
 import java.util.Collection;
 
 public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<WorldProperties, LevelComponentInitializer> implements LevelComponentFactoryRegistry {
     public static final StaticLevelComponentPlugin INSTANCE = new StaticLevelComponentPlugin();
+    public static final Lazy<ComponentContainer.Factory<WorldProperties>> componentContainerFactory
+        = new Lazy<>(INSTANCE::buildContainerFactory);
+
+    public static ComponentContainer createContainer(WorldProperties properties) {
+        return componentContainerFactory.get().createContainer(properties);
+    }
 
     private StaticLevelComponentPlugin() {
         super("loading a world save", WorldProperties.class);
@@ -50,11 +57,6 @@ public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<
     @Override
     protected void dispatchRegistration(LevelComponentInitializer entrypoint) {
         entrypoint.registerLevelComponentFactories(this);
-    }
-
-    @Override
-    public ComponentContainer.Factory<WorldProperties> buildContainerFactory() {
-        return super.buildContainerFactory();
     }
 
     @Override
