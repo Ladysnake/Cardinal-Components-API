@@ -31,12 +31,19 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.minecraft.util.Lazy;
 import net.minecraft.world.chunk.Chunk;
 
 import java.util.Collection;
 
 public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<Chunk, ChunkComponentInitializer> implements ChunkComponentFactoryRegistry {
     public static final StaticChunkComponentPlugin INSTANCE = new StaticChunkComponentPlugin();
+    private static final Lazy<ComponentContainer.Factory<Chunk>> componentsContainerFactory
+        = new Lazy<>(INSTANCE::buildContainerFactory);
+
+    public static ComponentContainer createContainer(Chunk chunk) {
+        return componentsContainerFactory.get().createContainer(chunk);
+    }
 
     private StaticChunkComponentPlugin() {
         super("loading a chunk", Chunk.class);
@@ -50,11 +57,6 @@ public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<
     @Override
     protected void dispatchRegistration(ChunkComponentInitializer entrypoint) {
         entrypoint.registerChunkComponentFactories(this);
-    }
-
-    @Override
-    public ComponentContainer.Factory<Chunk> buildContainerFactory() {
-        return super.buildContainerFactory();
     }
 
     @Override

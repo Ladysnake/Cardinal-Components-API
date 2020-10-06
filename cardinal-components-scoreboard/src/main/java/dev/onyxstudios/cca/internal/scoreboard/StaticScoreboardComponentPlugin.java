@@ -33,11 +33,14 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.util.Lazy;
 
 import java.util.Collection;
 
 public final class StaticScoreboardComponentPlugin extends StaticComponentPluginBase<Scoreboard, ScoreboardComponentInitializer> implements ScoreboardComponentFactoryRegistry {
     public static final StaticScoreboardComponentPlugin INSTANCE = new StaticScoreboardComponentPlugin();
+    public static final Lazy<ComponentContainer.Factory<Scoreboard>> componentsContainerFactory
+        = new Lazy<>(INSTANCE::buildContainerFactory);
 
     private StaticScoreboardComponentPlugin() {
         super("made a scoreboard", Scoreboard.class);
@@ -51,11 +54,6 @@ public final class StaticScoreboardComponentPlugin extends StaticComponentPlugin
     @Override
     protected void dispatchRegistration(ScoreboardComponentInitializer entrypoint) {
         entrypoint.registerScoreboardComponentFactories(this);
-    }
-
-    @Override
-    public ComponentContainer.Factory<Scoreboard> buildContainerFactory() {
-        return super.buildContainerFactory();
     }
 
     @Override

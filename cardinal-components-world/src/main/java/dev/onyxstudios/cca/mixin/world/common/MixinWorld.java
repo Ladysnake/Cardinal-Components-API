@@ -25,7 +25,6 @@ package dev.onyxstudios.cca.mixin.world.common;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.world.StaticWorldComponentPlugin;
-import net.minecraft.util.Lazy;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -37,16 +36,13 @@ import javax.annotation.Nonnull;
 
 @Mixin(World.class)
 public abstract class MixinWorld implements InternalComponentProvider {
-    @Unique
-    private static final Lazy<ComponentContainer.Factory<World>> componentContainerFactory
-        = new Lazy<>(StaticWorldComponentPlugin.INSTANCE::buildContainerFactory);
 
     @Unique
     protected ComponentContainer components;
 
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
-        this.components = componentContainerFactory.get().createContainer((World) (Object) this);
+        this.components = StaticWorldComponentPlugin.componentContainerFactory.get().createContainer((World) (Object) this);
     }
 
     @Nonnull

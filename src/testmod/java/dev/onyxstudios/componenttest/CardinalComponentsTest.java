@@ -23,7 +23,10 @@
 package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
-import dev.onyxstudios.cca.api.v3.component.*;
+import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
+import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.util.ComponentContainerMetafactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
@@ -69,10 +72,6 @@ public class CardinalComponentsTest {
 
     public static void init() {
         LOGGER.info("Hello, Components!");
-
-        for (int i = 0; i < 16; i++) {
-            ComponentRegistry.getOrCreate(new Identifier(String.valueOf(Math.random())), Vita.class);
-        }
 
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
 

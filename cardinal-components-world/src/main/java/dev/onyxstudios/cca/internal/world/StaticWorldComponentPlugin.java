@@ -23,6 +23,7 @@
 package dev.onyxstudios.cca.internal.world;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
@@ -30,12 +31,15 @@ import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.minecraft.util.Lazy;
 import net.minecraft.world.World;
 
 import java.util.Collection;
 
 public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<World, WorldComponentInitializer> implements WorldComponentFactoryRegistry {
     public static final StaticWorldComponentPlugin INSTANCE = new StaticWorldComponentPlugin();
+    public static final Lazy<ComponentContainer.Factory<World>> componentContainerFactory
+        = new Lazy<>(INSTANCE::buildContainerFactory);
 
     private StaticWorldComponentPlugin() {
         super("loading a world", World.class);
