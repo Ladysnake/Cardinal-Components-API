@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.mixin.chunk.common;
 
-import nerdhub.cardinal.components.api.event.ChunkSyncCallback;
+import dev.onyxstudios.cca.api.v3.chunk.ChunkSyncCallback;
 import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkHolder;

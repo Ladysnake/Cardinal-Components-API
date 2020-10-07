@@ -20,26 +20,25 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.event;
+package dev.onyxstudios.cca.api.v3.entity;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 
 /**
- * Callback interface to receive world synchronization events.
+ * The callback interface for receiving player synchronization events.
  */
 @FunctionalInterface
-public interface WorldSyncCallback {
-    Event<WorldSyncCallback> EVENT = EventFactory.createArrayBacked(WorldSyncCallback.class, (p, e) -> {}, listeners -> (player, world) -> {
-        for (WorldSyncCallback callback : listeners) {
-            callback.onPlayerStartTracking(player, world);
+public interface PlayerSyncCallback {
+    Event<PlayerSyncCallback> EVENT = EventFactory.createArrayBacked(PlayerSyncCallback.class, (p) -> {}, listeners -> (player) -> {
+        for (PlayerSyncCallback callback : listeners) {
+            callback.onPlayerSync(player);
         }
     });
 
     /**
-     * Called when a player starts tracking a world (eg. by joining it).
+     * Called when a player eg. joins the server or changes dimension, can be used to synchronize the player's own data
      */
-    void onPlayerStartTracking(ServerPlayerEntity player, ServerWorld world);
+    void onPlayerSync(ServerPlayerEntity player);
 }
