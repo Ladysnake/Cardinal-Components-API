@@ -29,19 +29,15 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.internal.level.ComponentsLevelNetworking;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
-import nerdhub.cardinal.components.api.event.LevelComponentCallback;
-import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Lazy;
 import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.gen.GeneratorOptions;
@@ -99,7 +95,7 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Int
     public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
-        return new CustomPayloadS2CPacket(LevelSyncedComponent.PACKET_ID, buf);
+        return new CustomPayloadS2CPacket(ComponentsLevelNetworking.PACKET_ID, buf);
     }
 
 }
