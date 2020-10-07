@@ -20,18 +20,17 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components;
+package dev.onyxstudios.cca.internal.entity;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.entity.PlayerCopyCallback;
+import dev.onyxstudios.cca.api.v3.entity.PlayerSyncCallback;
+import dev.onyxstudios.cca.api.v3.entity.TrackingStartCallback;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
-import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
-import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
-import nerdhub.cardinal.components.api.event.TrackingStartCallback;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;

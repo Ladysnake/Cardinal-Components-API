@@ -22,12 +22,12 @@
  */
 package dev.onyxstudios.cca.internal.chunk;
 
+import dev.onyxstudios.cca.api.v3.chunk.ChunkSyncCallback;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import nerdhub.cardinal.components.api.event.ChunkSyncCallback;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;

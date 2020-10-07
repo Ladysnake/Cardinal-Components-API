@@ -20,26 +20,20 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.event;
+package dev.onyxstudios.cca.api.v3.entity;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.chunk.WorldChunk;
 
-/**
- * The callback interface for receiving chunk synchronization events.
- */
 @FunctionalInterface
-public interface ChunkSyncCallback {
-    Event<ChunkSyncCallback> EVENT = EventFactory.createArrayBacked(ChunkSyncCallback.class, (p, chunk) -> {}, listeners -> (player, chunk) -> {
-        for (ChunkSyncCallback callback : listeners) {
-            callback.onChunkSync(player, chunk);
+public interface TrackingStartCallback {
+    Event<TrackingStartCallback> EVENT = EventFactory.createArrayBacked(TrackingStartCallback.class, (p, e) -> {}, listeners -> (player, entity) -> {
+        for (TrackingStartCallback callback : listeners) {
+            callback.onPlayerStartTracking(player, entity);
         }
     });
 
-    /**
-     * Called when a chunk's data is sent to a player
-     */
-    void onChunkSync(ServerPlayerEntity player, WorldChunk chunk);
+    void onPlayerStartTracking(ServerPlayerEntity player, Entity entity);
 }

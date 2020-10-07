@@ -20,13 +20,11 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util;
+package dev.onyxstudios.cca.api.v3.entity;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
-import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.GameRules;
 

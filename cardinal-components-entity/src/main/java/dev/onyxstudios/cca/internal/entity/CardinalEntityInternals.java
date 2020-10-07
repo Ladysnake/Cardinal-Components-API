@@ -27,9 +27,9 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
+import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
-import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.minecraft.entity.Entity;
 
 import java.util.HashMap;
