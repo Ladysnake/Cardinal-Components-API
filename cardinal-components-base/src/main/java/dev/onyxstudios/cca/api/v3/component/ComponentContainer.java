@@ -48,7 +48,6 @@ import java.util.function.Function;
  * can be added, replaced, or deleted. Component instances themselves can be mutated by third parties.
  */
 @ApiStatus.NonExtendable
-@ApiStatus.Experimental
 public interface ComponentContainer extends NbtSerializable {
 
     @Contract(pure = true)
