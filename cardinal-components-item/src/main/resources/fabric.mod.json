@@ -5,7 +5,6 @@
     "name": "Cardinal Components API (items)",
     "description": "dynamically exposing components",
     "version": "${version}",
-    "side": "universal",
     "custom": {
         "modmenu:api": true,
         "modmenu:parent": "cardinal-components"

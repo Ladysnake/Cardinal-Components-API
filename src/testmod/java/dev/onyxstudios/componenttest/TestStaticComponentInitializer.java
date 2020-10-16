@@ -30,6 +30,8 @@ import dev.onyxstudios.componenttest.vita.Vita;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.util.Identifier;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ import java.util.Collections;
 import java.util.List;
 
 public final class TestStaticComponentInitializer implements StaticComponentInitializer {
+    public static final Logger LOGGER = LogManager.getLogger("Component Test Bootstrap");
 
     // note: the actual ComponentKey must not be registered in this class' <clinit>, to avoid circular initialization
     public static final Identifier ALT_VITA_ID = new Identifier("componenttest", "alt-vita");
@@ -53,13 +56,13 @@ public final class TestStaticComponentInitializer implements StaticComponentInit
 
     @Override
     public void finalizeStaticBootstrap() {
-        CardinalComponentsTest.LOGGER.info("CCA Bootstrap complete!");
+        LOGGER.info("CCA Bootstrap complete!");
         ComponentType<Vita> altVita = ComponentRegistry.INSTANCE.registerIfAbsent(ALT_VITA_ID, Vita.class);
         CardinalComponentsTest.TestCallback.EVENT.register((uuid, p, components) -> components.put(altVita, new BaseVita()));
         ComponentContainer.Factory.Builder<@Nullable Void> builder = ComponentContainer.Factory.builder(Void.class);
         for (int i = 127; i >= 0; i--) {
             builder.component(ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("-.-", "-random/test." + i), Vita.class), v -> new BaseVita());
         }
-        CardinalComponentsTest.LOGGER.info(builder.build().createContainer(null));
+        LOGGER.info(builder.build().createContainer(null));
     }
 }
