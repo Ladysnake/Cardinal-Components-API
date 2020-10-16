@@ -5,7 +5,6 @@
     "name": "Cardinal Components API (world saves)",
     "description": "dynamically exposing components",
     "version": "${version}",
-    "side": "universal",
     "entrypoints": {
         "main": [
             "dev.onyxstudios.cca.internal.level.ComponentsLevelNetworking::init"

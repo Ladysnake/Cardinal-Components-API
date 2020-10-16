@@ -122,6 +122,7 @@ dependencies {
     modImplementation fabricApi.module("fabric-renderer-registries-v1", rootProject.fabric_api_version)
     modImplementation fabricApi.module("fabric-lifecycle-events-v1", rootProject.fabric_api_version)
     modImplementation fabricApi.module("fabric-item-api-v1", rootProject.fabric_api_version)
+    modImplementation fabricApi.module("fabric-item-groups-v0", rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-networking-v0", rootProject.rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-resource-loader-v0", rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-mining-levels-v0", rootProject.fabric_api_version)

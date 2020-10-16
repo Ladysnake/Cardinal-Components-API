@@ -5,7 +5,6 @@
     "name": "Cardinal Components API Test Mod",
     "description": "Test mod for Cardinal Components API",
     "version": "${version}",
-    "side": "universal",
     "entrypoints": {
         "main": [
             "dev.onyxstudios.componenttest.CardinalComponentsTest::init"

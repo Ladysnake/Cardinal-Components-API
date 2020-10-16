@@ -46,7 +46,6 @@ import java.util.Set;
  * can be added, replaced, or deleted. Component instances themselves can be mutated by third parties.
  */
 @ApiStatus.NonExtendable
-@ApiStatus.Experimental
 public interface ComponentContainer extends NbtSerializable {
     ComponentContainer EMPTY = StaticComponentPluginBase.createEmptyContainer();
 
