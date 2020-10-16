@@ -5,8 +5,21 @@ Version 2.7.0
 Those classes will be **removed** during the MC 1.17 update.
 
 Additions
-- Implemented the new synchronization API in `cardinal-components-level`
+- Implemented the new synchronization and (serverside) ticking APIs in `cardinal-components-level`
     - Added `LevelComponents#sync`, replacing `ComponentKey#sync` for components attached to `WorldProperties`
+- Added a `CommonTickingComponent` interface, implementing both Client and Server variants
+
+Changes
+- Item components now use lazily initialization
+- The `ComponentContainer` and `ComponentProvider` interfaces are no longer experimental
+- Refactored the sync API again, making it more flexible
+    - Deprecated the old AutoSyncedComponent interface
+- Moved ticking interfaces to a separate package
+    - Deprecated the old ticking component interfaces
+
+Fixes
+- Fixed invalid metadata in the fabric.mod.json
+- Fixed some hypothetical bugs with dropped items not merging
 
 ------------------------------------------------------
 Version 2.6.0
