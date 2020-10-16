@@ -25,6 +25,7 @@ package dev.onyxstudios.cca.api.v3.item;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -35,14 +36,17 @@ import javax.annotation.Nonnull;
  * <p>When invoked, the factory must return a {@link Component} of the right type.
  *
  * @since 2.4.0
+ * @deprecated use {@link ItemComponentFactory}, as {@link ItemStack#getItem()} is guaranteed to be correct
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval
 @FunctionalInterface
 public interface ItemComponentFactoryV2<C extends Component> {
     /**
      * Initialize components for the given stack.
      *
      * <p>The component returned by this method will be available
-     * on the chunk as soon as all component factories have been invoked.
+     * on the stack as soon as all component factories have been invoked.
      *
      * @param item  the actual item held by the stack, may differ from the result of {@link ItemStack#getItem()}
      * @param stack the {@code ItemStack} being constructed
