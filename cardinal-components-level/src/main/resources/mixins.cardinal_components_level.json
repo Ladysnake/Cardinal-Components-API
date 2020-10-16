@@ -1,16 +1,17 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "compatibilityLevel": "JAVA_8",
-    "package": "dev.onyxstudios.cca.mixin.level",
-    "client": [
-        "client.MixinClientWorldProperties"
-    ],
-    "mixins": [
-      "common.MixinLevelProperties",
-      "common.MixinUnmodifiableLevelProperties"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "package": "dev.onyxstudios.cca.mixin.level",
+  "client": [
+    "client.MixinClientWorldProperties"
+  ],
+  "mixins": [
+    "common.MixinLevelProperties",
+    "common.MixinMinecraftServer",
+    "common.MixinUnmodifiableLevelProperties"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }
