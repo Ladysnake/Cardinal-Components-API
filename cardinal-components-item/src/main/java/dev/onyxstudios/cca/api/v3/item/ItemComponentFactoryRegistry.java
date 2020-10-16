@@ -25,7 +25,9 @@ package dev.onyxstudios.cca.api.v3.item;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Predicate;
 
@@ -48,7 +50,10 @@ public interface ItemComponentFactoryRegistry {
      * @param itemId  the id of an item to target
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
+     * @deprecated use {@link #registerFor(Identifier, ComponentKey, ItemComponentFactory)}, as {@link ItemStack#getItem()} is guaranteed to be correct
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory);
 
     /**
@@ -58,6 +63,18 @@ public interface ItemComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      */
+    <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ItemComponentFactory<? extends C> factory);
+
+    /**
+     * Registers an {@link ItemComponentFactoryV2} for stacks of specific items, based on a predicate.
+     *
+     * @param test  a predicate testing whether the Item can have the component attached to its stacks
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
+     * @deprecated use {@link #registerFor(Identifier, ComponentKey, ItemComponentFactory)}, as {@link ItemStack#getItem()} is guaranteed to be correct
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory);
 
     /**
@@ -92,5 +109,6 @@ public interface ItemComponentFactoryRegistry {
      * component to every item, use {@code registerFor(i -> true, type, factory)}
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval
     <C extends Component> void registerForAll(ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory);
 }
