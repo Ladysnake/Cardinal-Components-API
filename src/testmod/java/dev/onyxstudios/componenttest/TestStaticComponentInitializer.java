@@ -29,6 +29,8 @@ import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
 import dev.onyxstudios.componenttest.vita.BaseVita;
 import dev.onyxstudios.componenttest.vita.Vita;
 import net.minecraft.util.Identifier;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,6 +38,7 @@ import java.util.Collections;
 import java.util.List;
 
 public final class TestStaticComponentInitializer implements StaticComponentInitializer {
+    public static final Logger LOGGER = LogManager.getLogger("Component Test Bootstrap");
 
     // note: the actual ComponentKey must not be registered in this class' <clinit>, to avoid circular initialization
     public static final Identifier ALT_VITA_ID = new Identifier("componenttest", "alt-vita");
@@ -51,12 +54,12 @@ public final class TestStaticComponentInitializer implements StaticComponentInit
 
     @Override
     public void finalizeStaticBootstrap() {
-        CardinalComponentsTest.LOGGER.info("CCA Bootstrap complete!");
-        CardinalComponentsTest.LOGGER.info(ComponentRegistry.getOrCreate(ALT_VITA_ID, Vita.class));
+        LOGGER.info("CCA Bootstrap complete!");
+        LOGGER.info(ComponentRegistry.getOrCreate(ALT_VITA_ID, Vita.class));
         ComponentContainer.Factory.Builder<Void> builder = ComponentContainer.Factory.builder(Void.class);
         for (int i = 127; i >= 0; i--) {
             builder.component(ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("-.-", "-random/test." + i), Vita.class), v -> new BaseVita());
         }
-        CardinalComponentsTest.LOGGER.info(builder.build().createContainer(null));
+        LOGGER.info(builder.build().createContainer(null));
     }
 }

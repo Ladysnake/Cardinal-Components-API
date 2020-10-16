@@ -46,7 +46,6 @@ import java.util.Iterator;
 /**
  * used to access an object's components.
  */
-@ApiStatus.Experimental
 public interface ComponentProvider {
 
     /**
