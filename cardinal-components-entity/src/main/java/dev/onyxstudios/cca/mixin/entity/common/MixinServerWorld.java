@@ -35,11 +35,11 @@ public abstract class MixinServerWorld {
 
     @Inject(method = "tickEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tick()V", shift = At.Shift.AFTER))
     private void tick(Entity entity, CallbackInfo ci) {
-        ((InternalComponentProvider) entity).getComponentContainer().tickServerComponents();
+        ((InternalComponentProvider) entity).getComponentContainer().tickComponents();
     }
 
     @Inject(method = "tickPassenger", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tickRiding()V", shift = At.Shift.AFTER))
     private void tickRiding(Entity vehicle, Entity passenger, CallbackInfo ci) {
-        ((InternalComponentProvider) passenger).getComponentContainer().tickServerComponents();
+        ((InternalComponentProvider) passenger).getComponentContainer().tickComponents();
     }
 }
