@@ -63,7 +63,7 @@ public abstract class MixinServerWorld extends MixinWorld {
 
     @Inject(method = "tick", at = @At("RETURN"))
     private void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-        ((InternalComponentProvider) this).getComponentContainer().tickComponents();
+        ((InternalComponentProvider) this).getComponentContainer().tickServerComponents();
     }
 
     @Override

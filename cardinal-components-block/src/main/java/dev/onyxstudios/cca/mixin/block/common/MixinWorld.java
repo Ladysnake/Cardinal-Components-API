@@ -34,7 +34,7 @@ public abstract class MixinWorld {
     // ModifyVariable to easily catch the local variable we want
     @ModifyVariable(method = "tickBlockEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Tickable;tick()V", shift = At.Shift.AFTER))
     protected BlockEntity tick(BlockEntity be) {
-        ((InternalComponentProvider) be).getComponentContainer().tickComponents();
+        ((InternalComponentProvider) be).getComponentContainer().tickServerComponents();
         return be;
     }
 }
