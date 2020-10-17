@@ -59,9 +59,11 @@ public interface ComponentContainer extends NbtSerializable {
     @Contract(mutates = "this")
     void copyFrom(ComponentContainer other);
 
-    void tickServerComponents();
+    @ApiStatus.Experimental
+    void tickComponents();
 
     @CheckEnv(Env.CLIENT)
+    @ApiStatus.Experimental
     void tickClientComponents();
 
     /**
