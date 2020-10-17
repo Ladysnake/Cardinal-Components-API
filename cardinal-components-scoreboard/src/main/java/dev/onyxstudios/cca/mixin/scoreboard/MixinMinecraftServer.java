@@ -20,21 +20,32 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.mixin.block.common;
+package dev.onyxstudios.cca.mixin.scoreboard;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.world.World;
+import net.minecraft.scoreboard.ServerScoreboard;
+import net.minecraft.scoreboard.Team;
+import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(World.class)
-public abstract class MixinWorld {
-    // ModifyVariable to easily catch the local variable we want
-    @ModifyVariable(method = "tickBlockEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Tickable;tick()V", shift = At.Shift.AFTER))
-    protected BlockEntity tick(BlockEntity be) {
-        ((InternalComponentProvider) be).getComponentContainer().tickComponents();
-        return be;
+import java.util.function.BooleanSupplier;
+
+@Mixin(MinecraftServer.class)
+public abstract class MixinMinecraftServer {
+    @Shadow public abstract ServerScoreboard getScoreboard();
+
+    @Inject(at = @At("TAIL"), method = "tick")
+    private void onEndTick(BooleanSupplier shouldKeepTicking, CallbackInfo info) {
+        ServerScoreboard scoreboard = this.getScoreboard();
+        ((InternalComponentProvider) ComponentProvider.fromScoreboard(scoreboard)).getComponentContainer().tickComponents();
+
+        for (Team team : scoreboard.getTeams()) {
+            ((InternalComponentProvider) ComponentProvider.fromTeam(team)).getComponentContainer().tickComponents();
+        }
     }
 }

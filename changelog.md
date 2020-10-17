@@ -5,8 +5,9 @@ Version 2.7.0
 Those classes will be **removed** during the MC 1.17 update.
 
 Additions
-- Implemented the new synchronization and (serverside) ticking APIs in `cardinal-components-level`
+- Implemented the new synchronization in `cardinal-components-level`
     - Added `LevelComponents#sync`, replacing `ComponentKey#sync` for components attached to `WorldProperties`
+- Implemented the new (serverside) ticking API in `cardinal-components-level` and `cardinal-components-scoreboard`
 - Added a `CommonTickingComponent` interface, implementing both Client and Server variants
 
 Changes
