@@ -69,7 +69,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
     }
 
     @Override   // overridden by ASM
-    public void tickComponents() {
+    public void tickServerComponents() {
         for (ComponentKey<?> key : this.keys()) {
             Component c = key.getFromContainer(this);
             if (c instanceof ServerTickingComponent) {

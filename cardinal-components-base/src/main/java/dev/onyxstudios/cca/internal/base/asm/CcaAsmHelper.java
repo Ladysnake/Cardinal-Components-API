@@ -251,7 +251,7 @@ public final class CcaAsmHelper {
         init.visitVarInsn(Opcodes.ILOAD, 1);
         init.visitMethodInsn(Opcodes.INVOKESPECIAL, STATIC_COMPONENT_CONTAINER, "<init>", FAST_COMPONENT_CONTAINER_CTOR_DESC, false);
 
-        MethodVisitor serverTick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickComponents", "()V", null, null);
+        MethodVisitor serverTick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickServerComponents", "()V", null, null);
         serverTick.visitCode();
         MethodVisitor clientTick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickClientComponents", "()V", null, null);
         clientTick.visitCode();
