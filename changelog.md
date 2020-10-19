@@ -3,6 +3,7 @@ Version 2.7.1
 ------------------------------------------------------
 - Remove the `ScheduledForRemoval` annotation from the legacy `Component` interface
     - Should fix unstable API warnings in IDEA
+- Fixed the new `AutoSyncedComponent` interface for level components
 
 ------------------------------------------------------
 Version 2.7.0
