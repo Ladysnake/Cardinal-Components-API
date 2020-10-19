@@ -1,4 +1,10 @@
 ------------------------------------------------------
+Version 2.7.1
+------------------------------------------------------
+- Remove the `ScheduledForRemoval` annotation from the legacy `Component` interface
+    - Should fix unstable API warnings in IDEA
+
+------------------------------------------------------
 Version 2.7.0
 ------------------------------------------------------
 **Deprecated most classes from the nerdhub.component.\* packages.**
