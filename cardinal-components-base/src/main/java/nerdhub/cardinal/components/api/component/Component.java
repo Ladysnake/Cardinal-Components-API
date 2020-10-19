@@ -24,7 +24,6 @@ package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.util.NbtSerializable;
 import net.minecraft.nbt.CompoundTag;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * base class for components.<br/>
@@ -35,7 +34,8 @@ import org.jetbrains.annotations.ApiStatus;
  * @deprecated implement {@link dev.onyxstudios.cca.api.v3.component.Component} instead
  */
 @Deprecated
-@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
+// Not marked ScheduledForRemoval to avoid transitive deprecation warnings
+// @ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface Component extends NbtSerializable {
 
     /**
