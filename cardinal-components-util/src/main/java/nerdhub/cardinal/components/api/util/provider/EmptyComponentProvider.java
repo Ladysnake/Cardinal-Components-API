@@ -70,7 +70,6 @@ public final class EmptyComponentProvider implements ComponentProvider {
         return Collections.emptySet();
     }
 
-    @Nullable
     @Override
     public ComponentContainer getComponentContainer() {
         return EMPTY_CONTAINER;

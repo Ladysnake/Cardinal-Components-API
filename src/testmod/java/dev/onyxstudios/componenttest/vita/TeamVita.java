@@ -22,10 +22,11 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
+import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class TeamVita extends SyncedVita {
+public class TeamVita extends SyncedVita implements AutoSyncedComponent {
     private final Team team;
 
     public TeamVita(Team team) {

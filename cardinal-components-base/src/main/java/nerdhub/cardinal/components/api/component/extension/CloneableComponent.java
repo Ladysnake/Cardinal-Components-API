@@ -31,7 +31,7 @@ import org.jetbrains.annotations.ApiStatus;
  * @deprecated use {@link CopyableComponent}
  */
 @Deprecated
-@ApiStatus.ScheduledForRemoval
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface CloneableComponent extends Component, CopyableComponent<CloneableComponent> {
     /**
      * Creates a brand new instance of this object's class.

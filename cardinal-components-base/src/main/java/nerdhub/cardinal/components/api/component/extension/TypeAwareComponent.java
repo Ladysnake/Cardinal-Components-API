@@ -34,7 +34,8 @@ import java.util.Set;
 /**
  * A component that is aware of its {@code ComponentType}.
  */
-// TODO V3 erase from existence
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface TypeAwareComponent extends Component {
     /**
      * Return the component type this component instance is associated with.
@@ -58,7 +59,11 @@ public interface TypeAwareComponent extends Component {
      *      }
      * }</pre>
      */
-    ComponentType<?> getComponentType();
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
+    default ComponentType<?> getComponentType() {
+        throw new UnsupportedOperationException();
+    }
 
     @SuppressWarnings("unchecked")
     @ApiStatus.Experimental

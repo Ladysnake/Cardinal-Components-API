@@ -22,7 +22,11 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
-import dev.onyxstudios.cca.api.v3.component.*;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -247,8 +251,8 @@ public final class CcaAsmHelper {
         init.visitVarInsn(Opcodes.ILOAD, 1);
         init.visitMethodInsn(Opcodes.INVOKESPECIAL, STATIC_COMPONENT_CONTAINER, "<init>", FAST_COMPONENT_CONTAINER_CTOR_DESC, false);
 
-        MethodVisitor tick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickComponents", "()V", null, null);
-        tick.visitCode();
+        MethodVisitor serverTick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickComponents", "()V", null, null);
+        serverTick.visitCode();
         MethodVisitor clientTick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickClientComponents", "()V", null, null);
         clientTick.visitCode();
 
@@ -319,7 +323,7 @@ public final class CcaAsmHelper {
 
             /* tick implementation */
             if (ServerTickingComponent.class.isAssignableFrom(impl)) {
-                generateTickImpl(containerImplName, tick, componentFieldName, impl, componentFieldDescriptor, "tick");
+                generateTickImpl(containerImplName, serverTick, componentFieldName, impl, componentFieldDescriptor, "serverTick");
             }
             if (ClientTickingComponent.class.isAssignableFrom(impl)) {
                 generateTickImpl(containerImplName, clientTick, componentFieldName, impl, componentFieldDescriptor, "clientTick");
@@ -327,8 +331,8 @@ public final class CcaAsmHelper {
         }
         init.visitInsn(Opcodes.RETURN);
         init.visitEnd();
-        tick.visitInsn(Opcodes.RETURN);
-        tick.visitEnd();
+        serverTick.visitInsn(Opcodes.RETURN);
+        serverTick.visitEnd();
         clientTick.visitInsn(Opcodes.RETURN);
         clientTick.visitEnd();
 

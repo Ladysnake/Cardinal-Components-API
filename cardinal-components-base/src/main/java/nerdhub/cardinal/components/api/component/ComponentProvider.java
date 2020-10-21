@@ -30,6 +30,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.level.LevelProperties;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -37,7 +38,11 @@ import java.util.function.BiConsumer;
 
 /**
  * used to access an object's components.
+ * @deprecated use {@link dev.onyxstudios.cca.api.v3.component.ComponentProvider}
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface ComponentProvider extends dev.onyxstudios.cca.api.v3.component.ComponentProvider {
 
     /**

@@ -40,7 +40,10 @@ import org.jetbrains.annotations.ApiStatus;
  * with the event, using {@link Event#register(Object)}.
  * When a {@code LevelProperties} object is constructed, the callback's
  * {@link #initComponents} method is invoked.
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
+ * @deprecated implement {@link dev.onyxstudios.cca.api.v3.level.LevelComponentInitializer} instead
  */
+@Deprecated
 @FunctionalInterface    // TODO rename the interface when yarn updates
 public interface LevelComponentCallback extends ComponentCallback<WorldProperties, Component> {
 

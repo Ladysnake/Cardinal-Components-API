@@ -23,6 +23,7 @@
 /**
  * Main component definitions
  */
+@Deprecated
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 package nerdhub.cardinal.components.api.component;

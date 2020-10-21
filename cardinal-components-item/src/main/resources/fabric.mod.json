@@ -5,14 +5,13 @@
     "name": "Cardinal Components API (items)",
     "description": "dynamically exposing components",
     "version": "${version}",
-    "side": "universal",
     "custom": {
         "modmenu:api": true,
         "modmenu:parent": "cardinal-components"
     },
     "depends": {
         "fabric-api-base": "*",
-        "cardinal-components-base": "*"
+        "cardinal-components-base": "<3.0.0-"
     },
     "conflicts": {
         "optifabric": "*"

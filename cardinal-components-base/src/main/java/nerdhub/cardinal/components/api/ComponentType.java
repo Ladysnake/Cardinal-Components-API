@@ -41,7 +41,10 @@ import java.util.function.Function;
  * The representation of a component type registered through {@link ComponentRegistry#registerIfAbsent}
  *
  * @see ComponentRegistry
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
+ * @deprecated use {@link ComponentKey} instead
  */
+@Deprecated
 @ApiStatus.NonExtendable
 public class ComponentType<T extends Component> extends ComponentKey<T> {
 

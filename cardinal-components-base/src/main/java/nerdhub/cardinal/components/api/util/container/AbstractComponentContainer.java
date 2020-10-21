@@ -22,9 +22,9 @@
  */
 package nerdhub.cardinal.components.api.util.container;
 
-import dev.onyxstudios.cca.api.v3.component.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ServerTickingComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
@@ -57,7 +57,10 @@ import java.util.Set;
  * @see AbstractMap
  * @see FastComponentContainer
  */
+@Deprecated
 public abstract class AbstractComponentContainer<C extends Component> extends AbstractMap<ComponentType<?>, C> implements ComponentContainer<C> {
+
+    public static final String NBT_KEY = "cardinal_components";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -70,7 +73,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
         for (ComponentKey<?> key : this.keys()) {
             Component c = key.getFromContainer(this);
             if (c instanceof ServerTickingComponent) {
-                ((ServerTickingComponent) c).tick();
+                ((ServerTickingComponent) c).serverTick();
             }
         }
     }
@@ -134,7 +137,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
     @Override
     public C get(@Nullable Object key) {
         if (key != null && key.getClass() == ComponentType.class) {
-            return (C) get((ComponentType<?>) key);
+            return (C) this.get((ComponentType<?>) key);
         }
         return null;
     }
@@ -153,8 +156,8 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
      */
     @Override
     public void fromTag(CompoundTag tag) {
-        if(tag.contains("cardinal_components", NbtType.LIST)) {
-            ListTag componentList = tag.getList("cardinal_components", NbtType.COMPOUND);
+        if(tag.contains(NBT_KEY, NbtType.LIST)) {
+            ListTag componentList = tag.getList(NBT_KEY, NbtType.COMPOUND);
             for (int i = 0; i < componentList.size(); i++) {
                 CompoundTag nbt = componentList.getCompound(i);
                 ComponentType<?> type = ComponentRegistry.INSTANCE.get(new Identifier(nbt.getString("componentId")));
@@ -166,7 +169,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
                 }
             }
         } else if (tag.contains("cardinal_components", NbtType.COMPOUND)) {
-            CompoundTag componentMap = tag.getCompound("cardinal_components");
+            CompoundTag componentMap = tag.getCompound(NBT_KEY);
             for (String keyId : componentMap.getKeys()) {
                 try {
                     ComponentKey<?> key = ComponentRegistry.INSTANCE.get(new Identifier(keyId));
@@ -197,17 +200,24 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
      */
     @Override
     public CompoundTag toTag(CompoundTag tag) {
-        if(!this.isEmpty()) {
-            CompoundTag componentMap = new CompoundTag();
+        if(this.hasComponents()) {
+            CompoundTag componentMap = null;
+            CompoundTag componentTag = new CompoundTag();
+
             for (ComponentKey<?> type : this.keySet()) {
                 Component component = type.getFromContainer(this);
-                CompoundTag componentTag = new CompoundTag();
                 component.toTag(componentTag);
+
                 if (!componentTag.isEmpty()) {
+                    if (componentMap == null) {
+                        componentMap = new CompoundTag();
+                        tag.put(NBT_KEY, componentMap);
+                    }
+
                     componentMap.put(type.getId().toString(), componentTag);
+                    componentTag = new CompoundTag();   // recycle tag objects if possible
                 }
             }
-            tag.put("cardinal_components", componentMap);
         }
         return tag;
     }

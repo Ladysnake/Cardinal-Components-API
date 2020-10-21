@@ -22,18 +22,24 @@
  */
 package nerdhub.cardinal.components.api.util.sync;
 
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * {@code SyncedComponent} extension with read and write methods that can respectively be used
  * as defaults in {@link #syncWith(ServerPlayerEntity)} and {@link #processPacket(PacketContext, PacketByteBuf)}
  * implementations.
+ * @deprecated use {@link AutoSyncedComponent}
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components>information on the V3 API</a>
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface BaseSyncedComponent extends SyncedComponent, TypeAwareComponent {
 
     /**

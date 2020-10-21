@@ -23,13 +23,10 @@
 package dev.onyxstudios.componenttest.vita;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentV3;
-import dev.onyxstudios.componenttest.TestComponents;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import nerdhub.cardinal.components.api.component.extension.TypeAwareComponent;
+import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
 import net.minecraft.nbt.CompoundTag;
 
-public class BaseVita implements Vita, ComponentV3, TypeAwareComponent, CopyableComponent<BaseVita> {
+public class BaseVita implements Vita, ComponentV3, CopyableComponent<BaseVita> {
     protected int vitality;
 
     public BaseVita() {
@@ -58,12 +55,6 @@ public class BaseVita implements Vita, ComponentV3, TypeAwareComponent, Copyable
     @Override
     public void writeToNbt(CompoundTag tag) {
         tag.putInt("vitality", this.vitality);
-    }
-
-    @Deprecated
-    @Override
-    public ComponentType<Vita> getComponentType() {
-        return (ComponentType<Vita>) TestComponents.VITA;
     }
 
     @Override

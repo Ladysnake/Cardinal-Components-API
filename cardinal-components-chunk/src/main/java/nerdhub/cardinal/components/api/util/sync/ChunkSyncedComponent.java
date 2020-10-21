@@ -23,6 +23,7 @@
 package nerdhub.cardinal.components.api.util.sync;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking;
 import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.ComponentType;
@@ -38,10 +39,15 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Default implementations of {@link SyncedComponent} methods, specialized for chunk components
+ * @deprecated use {@link AutoSyncedComponent}
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components>information on the V3 API</a>
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface ChunkSyncedComponent<C extends Component> extends ChunkComponent<C>, BaseSyncedComponent {
     /**
      * {@link CustomPayloadS2CPacket} channel for default chunk component synchronization.

@@ -5,7 +5,6 @@
     "name": "Cardinal Components API (entities)",
     "description": "dynamically exposing components",
     "version": "${version}",
-    "side": "universal",
     "entrypoints": {
         "main": [
           "nerdhub.cardinal.components.CardinalComponentsEntity::init"
@@ -20,7 +19,7 @@
     },
     "depends": {
         "fabric-api-base": "*",
-        "cardinal-components-base": "*"
+        "cardinal-components-base": "<3.0.0-"
     },
     "recommends": {
         "fabric-networking-v0": "*"

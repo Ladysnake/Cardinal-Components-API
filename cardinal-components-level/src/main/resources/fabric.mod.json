@@ -5,7 +5,6 @@
     "name": "Cardinal Components API (world saves)",
     "description": "dynamically exposing components",
     "version": "${version}",
-    "side": "universal",
     "entrypoints": {
         "main": [
             "dev.onyxstudios.cca.internal.level.ComponentsLevelNetworking::init"
@@ -21,7 +20,7 @@
     "depends": {
         "minecraft": ">=1.16.2-",
         "fabric-api-base": "*",
-        "cardinal-components-base": "*"
+        "cardinal-components-base": "<3.0.0-"
     },
     "recommends": {
         "fabric-networking-v0": "*",

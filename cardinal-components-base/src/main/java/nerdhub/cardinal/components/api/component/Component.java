@@ -29,7 +29,13 @@ import net.minecraft.nbt.CompoundTag;
  * base class for components.<br/>
  * provides basic serialization capability.<br/>
  * <p>Item Components <strong>MUST</strong> override and implement all methods of this interface!</p>
+ *
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
+ * @deprecated implement {@link dev.onyxstudios.cca.api.v3.component.Component} instead
  */
+@Deprecated
+// Not marked ScheduledForRemoval to avoid transitive deprecation warnings
+// @ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface Component extends NbtSerializable {
 
     /**

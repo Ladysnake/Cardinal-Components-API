@@ -22,16 +22,16 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.component.ClientTickingComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
+import dev.onyxstudios.cca.api.v3.level.LevelComponents;
 import dev.onyxstudios.componenttest.CardinalComponentsTest;
 import dev.onyxstudios.componenttest.TestComponents;
-import nerdhub.cardinal.components.api.util.sync.BaseSyncedComponent;
-import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
-import nerdhub.cardinal.components.api.util.sync.WorldSyncedComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -39,12 +39,12 @@ import net.minecraft.world.World;
 
 import java.util.Objects;
 
-public abstract class AmbientVita extends BaseVita implements BaseSyncedComponent {
+public abstract class AmbientVita extends BaseVita implements AutoSyncedComponent {
 
     public abstract void syncWithAll(MinecraftServer server);
 
     @Override
-    public void readFromPacket(PacketByteBuf buf) {
+    public void applySyncPacket(PacketByteBuf buf) {
         int vita = buf.readInt();
         this.setVitality(vita);
         World world = Objects.requireNonNull(MinecraftClient.getInstance().player).world;
@@ -66,23 +66,15 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
      * proper implementation of {@code writeToPacket}, writes a single int instead of a whole tag
      */
     @Override
-    public void writeToPacket(PacketByteBuf buf) {
+    public void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity player) {
         buf.writeInt(this.getVitality());
     }
 
-    /**
-     * Implements markDirty and syncWith through {@code WorldSyncedComponent}
-     */
-    public static class WorldVita extends AmbientVita implements WorldSyncedComponent, ClientTickingComponent {
+    public static class WorldVita extends AmbientVita implements ClientTickingComponent {
         private final World world;
 
         public WorldVita(World world) {
             this.world = world;
-        }
-
-        @Override
-        public World getWorld() {
-            return this.world;
         }
 
         @Override
@@ -98,13 +90,10 @@ public abstract class AmbientVita extends BaseVita implements BaseSyncedComponen
         }
     }
 
-    /**
-     * Implements markDirty and syncWith through {@code LevelSyncedComponent}
-     */
-    public static class LevelVita extends AmbientVita implements LevelSyncedComponent {
+    public static class LevelVita extends AmbientVita {
         @Override
         public void syncWithAll(MinecraftServer server) {
-            LevelSyncedComponent.super.syncWithAll(server);
+            LevelComponents.sync(TestComponents.VITA, server);
         }
     }
 }

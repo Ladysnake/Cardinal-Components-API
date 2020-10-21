@@ -37,9 +37,10 @@ import java.util.stream.Stream;
  * <p> A {@code ComponentRegistry} is used for registering components and obtaining
  * {@link ComponentType} instances serving as keys for those components.
  *
- * @see Component
- * @see ComponentType
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
+ * @deprecated use {@link dev.onyxstudios.cca.api.v3.component.ComponentRegistry} instead
  */
+@Deprecated
 @ApiStatus.NonExtendable
 public interface ComponentRegistry {
     /**

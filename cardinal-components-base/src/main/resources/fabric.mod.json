@@ -5,12 +5,12 @@
     "name": "Cardinal Components API (base)",
     "description": "dynamically exposing components",
     "version": "${version}",
-    "side": "universal",
     "custom": {
         "modmenu:api": true,
         "modmenu:parent": "cardinal-components"
     },
     "depends": {
+        "minecraft": "<1.17-",
         "fabric-api-base": ">=0.1.2"
     },
     "authors": [

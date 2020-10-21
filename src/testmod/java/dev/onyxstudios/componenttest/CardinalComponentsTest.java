@@ -33,11 +33,13 @@ import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
+import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -45,6 +47,7 @@ import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
@@ -56,12 +59,16 @@ import java.util.function.BiFunction;
 
 public class CardinalComponentsTest {
 
+    public static final ItemGroup ITEM_GROUP = FabricItemGroupBuilder.build(
+        id("ccagroup"),
+        () -> new ItemStack(Blocks.COBBLESTONE));   // confirm that lazy item components work
+
     public static final Logger LOGGER = LogManager.getLogger("Component Test");
 
     public static final Identifier VITA_STICK_ID = id("vita_stick");
     // inline self component callback registration
     public static final VitalityStickItem VITALITY_STICK = Registry.register(Registry.ITEM, VITA_STICK_ID,
-            new VitalityStickItem(new Item.Settings().group(ItemGroup.COMBAT)));
+            new VitalityStickItem(new Item.Settings().group(ITEM_GROUP)));
 
     public static final VitalityCondenser VITALITY_CONDENSER = Registry.register(Registry.BLOCK, "componenttest:vita_condenser",
             new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().lightLevel(5).ticksRandomly()));
