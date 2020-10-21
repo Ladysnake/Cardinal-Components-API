@@ -22,6 +22,7 @@
  */
 package nerdhub.cardinal.components.api.component.extension;
 
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.network.PacketByteBuf;
@@ -35,8 +36,11 @@ import org.jetbrains.annotations.ApiStatus;
  * {@link #syncWith(ServerPlayerEntity)} on provided {@code SyncedComponent} instances
  * when needed.
  *
- * @see nerdhub.cardinal.components.api.util.sync.BaseSyncedComponent
+ * @deprecated use {@link AutoSyncedComponent}
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components>information on the V3 API</a>
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface SyncedComponent extends Component {
     /**
      * Marks this component as dirty.

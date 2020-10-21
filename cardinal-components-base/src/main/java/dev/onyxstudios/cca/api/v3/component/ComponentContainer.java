@@ -48,7 +48,6 @@ import java.util.function.Function;
  * can be added, replaced, or deleted. Component instances themselves can be mutated by third parties.
  */
 @ApiStatus.NonExtendable
-@ApiStatus.Experimental
 public interface ComponentContainer extends NbtSerializable {
 
     @Contract(pure = true)
@@ -60,9 +59,11 @@ public interface ComponentContainer extends NbtSerializable {
     @Contract(mutates = "this")
     void copyFrom(ComponentContainer other);
 
+    @ApiStatus.Experimental
     void tickComponents();
 
     @CheckEnv(Env.CLIENT)
+    @ApiStatus.Experimental
     void tickClientComponents();
 
     /**

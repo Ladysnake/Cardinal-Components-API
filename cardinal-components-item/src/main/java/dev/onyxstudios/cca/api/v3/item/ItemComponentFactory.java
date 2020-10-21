@@ -25,6 +25,7 @@ package dev.onyxstudios.cca.api.v3.item;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
 
@@ -37,6 +38,8 @@ import org.jetbrains.annotations.Contract;
  */
 @FunctionalInterface
 public interface ItemComponentFactory<C extends Component> extends ItemComponentFactoryV2<C> {
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     @Contract(pure = true)
     @Override
     default C createForStack(Item item, ItemStack stack) {
@@ -47,12 +50,13 @@ public interface ItemComponentFactory<C extends Component> extends ItemComponent
      * Initialize components for the given stack.
      *
      * <p>The component returned by this method will be available
-     * on the chunk as soon as all component factories have been invoked.
+     * on the stack as soon as all component factories have been invoked.
      *
      * @param stack the {@code ItemStack} being constructed
      * @implNote Because this method is called for each stack creation, implementations
      * should avoid side effects and keep costly computations at a minimum. Lazy initialization
      * should be considered for components that are costly to initialize.
      */
+    @Contract(pure = true)
     C createForStack(ItemStack stack);
 }

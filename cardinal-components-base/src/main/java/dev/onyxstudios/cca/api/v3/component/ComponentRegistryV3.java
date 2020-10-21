@@ -35,8 +35,9 @@ import java.util.stream.Stream;
  * <p> A {@code ComponentRegistry} is used for registering components and obtaining
  * {@link ComponentKey} instances serving as keys for those components.
  *
- * @see ComponentV3
  * @see ComponentKey
+ * @see Component
+ * @see ComponentRegistry
  * @since 2.5.0
  */
 @ApiStatus.NonExtendable

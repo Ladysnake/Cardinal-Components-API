@@ -24,8 +24,8 @@ package dev.onyxstudios.cca.internal;
 
 import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncAroundCallback;
 import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncCallback;
-import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.ComponentRegistry;
@@ -94,7 +94,7 @@ public class CardinalComponentsBlock {
                         try {
                             componentType.maybeGet(blockEntityType.get(context.getPlayer().world, position))
                                 .filter(c -> c instanceof AutoSyncedComponent)
-                                .ifPresent(c -> ((AutoSyncedComponent) c).readFromPacket(buffer));
+                                .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(buffer));
                         } finally {
                             buffer.release();
                         }

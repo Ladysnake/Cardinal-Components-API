@@ -39,9 +39,23 @@ public interface ScoreboardComponentFactoryRegistry {
     <C extends Component> void register(ComponentKey<C> type, TeamComponentFactory<? extends C> factory);
 
     /**
+     * Registers a {@link TeamComponentFactory}.
+     *
+     * @param factory the factory to use to create components of the given type
+     */
+    <C extends Component> void registerForTeams(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactory<? extends C> factory);
+
+    /**
      * Registers a {@link ScoreboardComponentFactory}.
      *
      * @param factory the factory to use to create components of the given type
      */
     <C extends Component> void register(ComponentKey<C> type, ScoreboardComponentFactory<? extends C> factory);
+
+    /**
+     * Registers a {@link ScoreboardComponentFactory}.
+     *
+     * @param factory the factory to use to create components of the given type
+     */
+    <C extends Component> void registerForScoreboards(ComponentKey<? super C> type, Class<C> impl, ScoreboardComponentFactory<? extends C> factory);
 }

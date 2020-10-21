@@ -1,4 +1,35 @@
 ------------------------------------------------------
+Version 2.7.1
+------------------------------------------------------
+- Remove the `ScheduledForRemoval` annotation from the legacy `Component` interface
+    - Should fix unstable API warnings in IDEA
+- Fixed the new `AutoSyncedComponent` interface for level components
+
+------------------------------------------------------
+Version 2.7.0
+------------------------------------------------------
+**Deprecated most classes from the nerdhub.component.\* packages.**
+Those classes will be **removed** during the MC 1.17 update.
+
+Additions
+- Implemented the new synchronization in `cardinal-components-level`
+    - Added `LevelComponents#sync`, replacing `ComponentKey#sync` for components attached to `WorldProperties`
+- Implemented the new (serverside) ticking API in `cardinal-components-level` and `cardinal-components-scoreboard`
+- Added a `CommonTickingComponent` interface, implementing both Client and Server variants
+
+Changes
+- Item components now use lazily initialization
+- The `ComponentContainer` and `ComponentProvider` interfaces are no longer experimental
+- Refactored the sync API again, making it more flexible
+    - Deprecated the old AutoSyncedComponent interface
+- Moved ticking interfaces to a separate package
+    - Deprecated the old ticking component interfaces
+
+Fixes
+- Fixed invalid metadata in the fabric.mod.json
+- Fixed some hypothetical bugs with dropped items not merging
+
+------------------------------------------------------
 Version 2.6.0
 ------------------------------------------------------
 - Added the Ticking Components experimental feature

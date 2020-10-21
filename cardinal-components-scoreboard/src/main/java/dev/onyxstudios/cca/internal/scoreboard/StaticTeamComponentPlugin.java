@@ -68,4 +68,8 @@ public final class StaticTeamComponentPlugin extends StaticComponentPluginBase<T
     public <C extends Component> void register(ComponentKey<C> type, TeamComponentFactory<? extends C> factory) {
         super.register(type, (team) -> Objects.requireNonNull(((TeamComponentFactory<?>) factory).createForTeam(team), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
     }
+
+    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactory<? extends C> factory) {
+        super.register(type, impl, (team) -> Objects.requireNonNull(((TeamComponentFactory<?>) factory).createForTeam(team), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
+    }
 }

@@ -22,8 +22,8 @@
  */
 package dev.onyxstudios.cca.internal.world;
 
-import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.ComponentRegistry;
@@ -69,7 +69,7 @@ public final class ComponentsWorldNetworking {
                         assert MinecraftClient.getInstance().world != null;
                         Component c = componentType.get(MinecraftClient.getInstance().world);
                         if (c instanceof AutoSyncedComponent) {
-                            ((AutoSyncedComponent) c).readFromPacket(buffer);
+                            ((AutoSyncedComponent) c).applySyncPacket(buffer);
                         } else if (c instanceof SyncedComponent) {
                             ((SyncedComponent) c).processPacket(context, buffer);
                         }

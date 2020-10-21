@@ -52,7 +52,8 @@ public abstract class MixinItem implements ItemCaller {
 
     @Override
     public ComponentContainer cardinal_createComponents(ItemStack stack) {
-        // assert stack.getItem() == this;
+        //noinspection ConstantConditions
+        assert stack.getItem() == (ItemCaller) this;
         if (this.cardinal_containerFactory == null) {
             this.cardinal_containerFactory = CardinalItemInternals.createItemStackContainerFactory((Item) (Object) this);
         }

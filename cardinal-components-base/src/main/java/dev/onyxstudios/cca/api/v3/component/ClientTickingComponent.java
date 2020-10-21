@@ -33,8 +33,12 @@ import org.jetbrains.annotations.ApiStatus;
  * using a dedicated method on the factory registry.
  *
  * <p>Not every provider supports client ticking. Check individual module documentation for more information.
+ *
+ * @deprecated implement {@link dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent}
  */
-@ApiStatus.Experimental
-public interface ClientTickingComponent extends ComponentV3 {
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
+public interface ClientTickingComponent extends dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent {
+    @Override
     void clientTick();
 }

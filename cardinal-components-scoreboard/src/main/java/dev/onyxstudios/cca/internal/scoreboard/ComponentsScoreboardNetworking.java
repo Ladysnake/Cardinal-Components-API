@@ -22,9 +22,9 @@
  */
 package dev.onyxstudios.cca.internal.scoreboard;
 
-import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardSyncCallback;
 import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
@@ -115,7 +115,7 @@ public final class ComponentsScoreboardNetworking {
                         try {
                             getter.apply(componentType)
                                 .filter(c -> c instanceof AutoSyncedComponent)
-                                .ifPresent(c -> ((AutoSyncedComponent) c).readFromPacket(copy));
+                                .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(copy));
                         } finally {
                             copy.release();
                         }

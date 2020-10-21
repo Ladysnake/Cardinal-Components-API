@@ -47,7 +47,10 @@ import org.jetbrains.annotations.ApiStatus;
  * be invoked for any entity {@code e} verifying {@code e instanceof E}.
  *
  * @param <E> the type of entity targeted by this callback
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
+ * @deprecated implement {@link dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer} instead
  */
+@Deprecated
 @FunctionalInterface
 public interface EntityComponentCallback<E extends Entity> extends ComponentCallback<E, Component> {
 

@@ -22,8 +22,8 @@
  */
 package dev.onyxstudios.cca.internal.chunk;
 
-import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.ComponentRegistry;
@@ -69,7 +69,7 @@ public final class ComponentsChunkNetworking {
                             componentType.maybeGet(context.getPlayer().world.getChunk(chunkX, chunkZ))
                                 .ifPresent(c -> {
                                     if (c instanceof AutoSyncedComponent) {
-                                        ((AutoSyncedComponent) c).readFromPacket(copy);
+                                        ((AutoSyncedComponent) c).applySyncPacket(copy);
                                     } else if (c instanceof SyncedComponent) {
                                         ((SyncedComponent) c).processPacket(context, copy);
                                     }

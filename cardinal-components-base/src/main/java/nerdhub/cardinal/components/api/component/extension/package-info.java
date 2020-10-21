@@ -23,6 +23,7 @@
 /**
  * Special component traits
  */
+@Deprecated
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 package nerdhub.cardinal.components.api.component.extension;

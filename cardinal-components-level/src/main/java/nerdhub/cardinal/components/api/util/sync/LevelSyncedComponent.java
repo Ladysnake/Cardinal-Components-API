@@ -22,6 +22,9 @@
  */
 package nerdhub.cardinal.components.api.util.sync;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.level.LevelComponents;
 import io.netty.buffer.Unpooled;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
@@ -33,10 +36,15 @@ import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Default implementations of {@link SyncedComponent} methods, specialized for level components
+ * @deprecated use {@link AutoSyncedComponent} and {@link LevelComponents#sync(ComponentKey, MinecraftServer)}
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components>information on the V3 API</a>
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface LevelSyncedComponent extends BaseSyncedComponent {
     /**
      * {@link CustomPayloadS2CPacket} channel for default level component synchronization.
@@ -48,6 +56,9 @@ public interface LevelSyncedComponent extends BaseSyncedComponent {
      * called on the game thread.
      */
     Identifier PACKET_ID = new Identifier("cardinal-components", "level_sync");
+
+    @Override
+    ComponentType<?> getComponentType();
 
     /**
      * @see #syncWithAll(MinecraftServer)

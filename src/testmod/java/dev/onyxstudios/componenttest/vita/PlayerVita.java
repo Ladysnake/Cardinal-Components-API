@@ -22,8 +22,9 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.component.ServerTickingComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
+import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import dev.onyxstudios.componenttest.CardinalComponentsTest;
 import dev.onyxstudios.componenttest.TestComponents;
@@ -47,29 +48,32 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
     @Override
     public void setVitality(int value) {
         if (value != this.vitality) {
-            boolean increase = value > this.vitality;
+            int increase = value - this.vitality;
             super.setVitality(value);
-            TestComponents.VITA.sync(this.owner, increase ? INCREASE_VITA : DECREASE_VITA);
+            TestComponents.VITA.sync(this.owner, (buf, recipient) -> this.writeSyncPacket(buf, recipient, increase), PlayerSyncPredicate.all());
         }
     }
 
     @Override
-    public void tick() {
+    public void serverTick() {
         if (this.owner.age % 1200 == 0) {
             CardinalComponentsTest.LOGGER.info("{} is still alive", this.owner);
         }
     }
 
     @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player, int syncOp) {
-        // We only sync the full data with the holder, not with everyone around
-        return player == this.owner || syncOp != FULL_SYNC;
+    public boolean shouldSyncWith(ServerPlayerEntity player) {
+        return player == this.owner;
     }
 
     @Override
-    public void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient, int syncOp) {
+    public void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
+        this.writeSyncPacket(buf, recipient, 0);
+    }
+
+    private void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient, int increase) {
         boolean fullSync = recipient == this.owner;
-        int flags = (fullSync ? 1 : 0) | (syncOp & INCREASE_VITA) | (syncOp & DECREASE_VITA);
+        int flags = (fullSync ? 1 : 0) | (increase > 0 ? INCREASE_VITA : increase < 0 ? DECREASE_VITA : 0);
         buf.writeByte(flags);
         if (fullSync) {
             buf.writeVarInt(this.vitality);
@@ -77,7 +81,7 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
     }
 
     @Override
-    public void readFromPacket(PacketByteBuf buf) {
+    public void applySyncPacket(PacketByteBuf buf) {
         int flags = buf.readByte();
         if ((flags & 1) != 0) {
             this.vitality = buf.readVarInt();

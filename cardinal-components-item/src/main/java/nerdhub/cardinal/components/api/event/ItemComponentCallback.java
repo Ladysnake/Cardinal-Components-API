@@ -32,7 +32,6 @@ import nerdhub.cardinal.components.api.util.ItemComponent;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
@@ -54,7 +53,10 @@ import javax.annotation.Nullable;
  * verifying {@code s.getItem() == i}.
  *
  * @see ItemComponentCallbackV2
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
+ * @deprecated implement {@link dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer} instead
  */
+@Deprecated
 @FunctionalInterface
 public interface ItemComponentCallback extends ComponentCallback<ItemStack, CopyableComponent<?>> {
 
@@ -98,10 +100,6 @@ public interface ItemComponentCallback extends ComponentCallback<ItemStack, Copy
      * Initialize components for the given item stack.
      * Components that are added to the given container will be available
      * on the stack as soon as all callbacks have been invoked.
-     *
-     * <p><b>Some stacks may be initialized with a count of 0, causing {@link ItemStack#getItem()} to
-     * return {@link Items#AIR}.</b> If the item is needed for initializing components,
-     * use {@link ItemComponentCallbackV2} instead.
      *
      * <p> Example code: <pre><code>
      *  ItemComponentCallback.event(Items.DIAMOND_PICKAXE)

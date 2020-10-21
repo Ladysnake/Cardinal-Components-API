@@ -75,7 +75,18 @@ public final class StaticScoreboardComponentPlugin extends StaticComponentPlugin
     }
 
     @Override
+    public <C extends Component> void registerForScoreboards(ComponentKey<? super C> type, Class<C> impl, ScoreboardComponentFactory<? extends C> factory) {
+        this.checkLoading(ScoreboardComponentFactoryRegistry.class, "registerForScoreboards");
+        super.register(type, impl, (team) -> Objects.requireNonNull(((ScoreboardComponentFactory<?>) factory).createForScoreboard(team), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
+    }
+
+    @Override
     public <C extends Component> void register(ComponentKey<C> type, TeamComponentFactory<? extends C> factory) {
         StaticTeamComponentPlugin.INSTANCE.register(type, factory);
+    }
+
+    @Override
+    public <C extends Component> void registerForTeams(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactory<? extends C> factory) {
+        StaticTeamComponentPlugin.INSTANCE.register(type, impl, factory);
     }
 }

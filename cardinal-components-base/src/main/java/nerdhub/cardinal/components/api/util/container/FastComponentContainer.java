@@ -34,6 +34,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -50,7 +51,8 @@ import java.util.*;
  * a structural modification.) This is typically accomplished by synchronizing on some object
  * that naturally encapsulates the container.
  */
-// TODO merge with superclass
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public class FastComponentContainer<C extends Component> extends AbstractComponentContainer<C> {
     private final BitSet containedTypes;
     private final Int2ObjectLinkedOpenHashMap<C> vals;

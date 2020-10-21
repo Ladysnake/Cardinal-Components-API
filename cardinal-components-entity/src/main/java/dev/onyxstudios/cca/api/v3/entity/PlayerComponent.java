@@ -22,14 +22,15 @@
  */
 package dev.onyxstudios.cca.api.v3.entity;
 
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
+import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.GameRules;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
 @ApiStatus.Experimental
-public interface PlayerComponent<C extends Component> extends CopyableComponent<C> {
+public interface PlayerComponent<C extends nerdhub.cardinal.components.api.component.Component> extends Component, CopyableComponent<C> {
     /**
      * Check whether component data should be copied as part of a respawn situation.
      *
@@ -50,9 +51,16 @@ public interface PlayerComponent<C extends Component> extends CopyableComponent<
      * @param lossless      {@code true} if the player is copied exactly, such as when coming back from the End
      * @param keepInventory {@code true} if the player's inventory and XP are kept, such as when
      *                      {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
-     * @implNote the default implementation delegates to {@link #copyFrom(Component)}
+     * @implNote the default implementation delegates to {@link #copyFrom}
      */
     default void copyForRespawn(C original, boolean lossless, boolean keepInventory) {
         this.copyFrom(original);
+    }
+
+    @Override
+    default void copyFrom(C other) {
+        CompoundTag tag = new CompoundTag();
+        other.toTag(tag);
+        this.readFromNbt(tag);
     }
 }

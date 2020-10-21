@@ -24,6 +24,7 @@ package nerdhub.cardinal.components.api.component;
 
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.util.NbtSerializable;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import javax.annotation.Nonnull;
@@ -46,7 +47,11 @@ import java.util.Set;
  * is unsupported. This guarantees consistent behaviour for consumers.
  *
  * @param <C> The upper bound for components stored in this container
+ * @deprecated use {@link dev.onyxstudios.cca.api.v3.component.ComponentContainer}
+ * @see <a href=https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/README.md>information on the V3 API</a>
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface ComponentContainer<C extends Component> extends Map<ComponentType<?>, C>, NbtSerializable, dev.onyxstudios.cca.api.v3.component.ComponentContainer {
 
     /**

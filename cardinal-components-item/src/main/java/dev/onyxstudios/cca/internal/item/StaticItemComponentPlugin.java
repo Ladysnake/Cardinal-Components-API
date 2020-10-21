@@ -124,6 +124,11 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     }
 
     @Override
+    public <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ItemComponentFactory<? extends C> factory) {
+        this.registerFor(test, type, (ItemComponentFactoryV2<? extends C>) factory);
+    }
+
+    @Override
     public <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory) {
         Objects.requireNonNull(itemId);
         this.register(itemId, type, factory);
