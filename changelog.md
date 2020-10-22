@@ -1,4 +1,9 @@
 ------------------------------------------------------
+Version 2.7.2
+------------------------------------------------------
+- Fixed components attached to a block entity not stacking with the superclass' components
+
+------------------------------------------------------
 Version 2.7.1
 ------------------------------------------------------
 - Remove the `ScheduledForRemoval` annotation from the legacy `Component` interface
