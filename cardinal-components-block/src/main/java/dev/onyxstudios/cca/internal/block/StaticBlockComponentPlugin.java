@@ -88,8 +88,8 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
 
             while (type != BlockEntity.class) {
                 type = type.getSuperclass().asSubclass(BlockEntity.class);
-                this.beComponentFactories.getOrDefault(entityClass, Collections.emptyMap()).forEach(compiled::putIfAbsent);
-                this.beComponentImpls.getOrDefault(entityClass, Collections.emptyMap()).forEach(compiledImpls::putIfAbsent);
+                this.beComponentFactories.getOrDefault(type, Collections.emptyMap()).forEach(compiled::putIfAbsent);
+                this.beComponentImpls.getOrDefault(type, Collections.emptyMap()).forEach(compiledImpls::putIfAbsent);
             }
 
             String implSuffix = getSuffix(entityClass);
