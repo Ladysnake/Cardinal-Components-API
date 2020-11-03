@@ -1,4 +1,16 @@
 ------------------------------------------------------
+Version 2.7.3
+------------------------------------------------------
+- Updated to 1.16.4
+
+Changes
+- `cardinal-components-item` will now verify that components attached to `ItemStack`s redefine `equals`
+    - This behaviour can be disabled by adding `-Dcca.debug.noverifyequals=true` to your VM options
+
+Fixes
+- Fixed cardinal-components-block crashing on dedicated servers
+
+------------------------------------------------------
 Version 2.7.2
 ------------------------------------------------------
 - Fixed components attached to a block entity not stacking with the superclass' components
