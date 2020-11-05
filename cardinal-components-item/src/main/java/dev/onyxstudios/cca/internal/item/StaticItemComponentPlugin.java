@@ -24,6 +24,7 @@ package dev.onyxstudios.cca.internal.item;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentV3;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactory;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
@@ -49,8 +50,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
     public static final String WILDCARD_IMPL_SUFFIX = "ItemStackImpl_All";
     private static final boolean DEV = Boolean.getBoolean("fabric.development");
-    // TODO enable by default when Component#isComponentEqual is gone
-    private static final boolean ENABLE_CHECKS = Boolean.getBoolean("cca.debug.verifyequals");
+    private static final boolean VERIFY_EQUALS = DEV && !Boolean.getBoolean("cca.debug.noverifyequals");
 
     private StaticItemComponentPlugin() {
         super("creating an ItemStack");
@@ -135,7 +135,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         );
         ItemComponentFactory<Component> finalFactory;
 
-        if (DEV && ENABLE_CHECKS) {
+        if (VERIFY_EQUALS && ComponentV3.class.isAssignableFrom(type.getComponentClass())) {
             finalFactory = new ItemComponentFactory<Component>() {
                 private boolean checked;
 
@@ -147,7 +147,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
                     if (!this.checked) {
                         try {
                             if (component.getClass().getMethod("equals", Object.class).getDeclaringClass() == Object.class) {
-                                throw new IllegalStateException("Component implementation " + component.getClass().getTypeName() + " attached to " + stack + " does not override Object#equals!");
+                                throw new IllegalStateException("Component implementation " + component.getClass().getTypeName() + " attached to " + stack + " should override Object#equals.\nMore information: https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Item");
                             }
                         } catch (NoSuchMethodException e) {
                             throw new AssertionError("Object#equals not found ?!");

@@ -1,4 +1,28 @@
 ------------------------------------------------------
+Version 2.7.3
+------------------------------------------------------
+- Updated to 1.16.4
+
+Changes
+- `cardinal-components-item` will now verify that components attached to `ItemStack`s redefine `equals`
+    - This behaviour can be disabled by adding `-Dcca.debug.noverifyequals=true` to your VM options
+
+Fixes
+- Fixed cardinal-components-block crashing on dedicated servers
+
+------------------------------------------------------
+Version 2.7.2
+------------------------------------------------------
+- Fixed components attached to a block entity not stacking with the superclass' components
+
+------------------------------------------------------
+Version 2.7.1
+------------------------------------------------------
+- Remove the `ScheduledForRemoval` annotation from the legacy `Component` interface
+    - Should fix unstable API warnings in IDEA
+- Fixed the new `AutoSyncedComponent` interface for level components
+
+------------------------------------------------------
 Version 2.7.0
 ------------------------------------------------------
 **Deprecated most classes from the nerdhub.component.\* packages.**
