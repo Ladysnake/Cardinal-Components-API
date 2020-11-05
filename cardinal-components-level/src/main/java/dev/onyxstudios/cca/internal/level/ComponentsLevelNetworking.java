@@ -22,9 +22,9 @@
  */
 package dev.onyxstudios.cca.internal.level;
 
-import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.ComponentRegistry;
@@ -71,7 +71,7 @@ public final class ComponentsLevelNetworking {
                             Component c = componentType.get(MinecraftClient.getInstance().world.getLevelProperties());
 
                             if (c instanceof AutoSyncedComponent) {
-                                ((AutoSyncedComponent) c).readFromPacket(copy);
+                                ((AutoSyncedComponent) c).applySyncPacket(copy);
                             } else if (c instanceof SyncedComponent) {
                                 ((SyncedComponent) c).processPacket(context, copy);
                             }
