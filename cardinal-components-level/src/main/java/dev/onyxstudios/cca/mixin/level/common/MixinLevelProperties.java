@@ -69,7 +69,7 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Int
         this.components = StaticLevelComponentPlugin.createContainer(this);
     }
 
-    @Inject(method = "method_29029", at = @At("RETURN"))
+    @Inject(method = "readProperties", at = @At("RETURN"))
     private static void readComponents(Dynamic<Tag> dynamic, DataFixer dataFixer, int dataVersion, CompoundTag compoundTag, LevelInfo levelInfo, SaveVersionInfo arg, GeneratorOptions generatorOptions, Lifecycle lifecycle, CallbackInfoReturnable<LevelProperties> cir) {
         ((InternalComponentProvider) cir.getReturnValue()).getComponentContainer().fromDynamic(dynamic);
     }

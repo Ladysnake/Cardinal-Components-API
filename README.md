@@ -83,7 +83,8 @@ If you want your component to be **automatically synchronized with watching clie
 If you want your component to **tick alongside its provider**, you can add the [`ServerTickingComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/ServerTickingComponent.java) or [`ClientTickingComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/ClientTickingComponent.java)
 (or both) to your *component interface* (here, `IntComponent`). If you'd rather add the ticking interface to a single
 component subclass, you can use one of the specific methods provided in the individual modules.
-*This feature is still experimental, and only implemented for entities, block entities, chunks, and worlds.*
+*This feature is still experimental. Serverside ticking is implemented for all providers except item stacks.
+ Clientside ticking is only implemented for entities, block entities, and worlds.*
 
 The next step is to choose an identifier for your component, and to declare it in your `fabric.mod.json`'s custom properties:
 ```json
