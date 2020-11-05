@@ -40,4 +40,10 @@ public interface LevelComponentFactoryRegistry {
      */
     <C extends Component> void register(ComponentKey<C> type, ComponentFactory<WorldProperties, ? extends C> factory);
 
+    /**
+     * Registers a {@link LevelComponentFactory}.
+     *
+     * @param factory the factory to use to create components of the given type
+     */
+    <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, LevelComponentFactory<C> factory);
 }

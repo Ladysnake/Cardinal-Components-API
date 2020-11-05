@@ -64,4 +64,10 @@ public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<
         this.checkLoading(LevelComponentFactoryRegistry.class, "register");
         super.register(type, factory);
     }
+
+    @Override
+    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, LevelComponentFactory<C> factory) {
+        this.checkLoading(LevelComponentFactoryRegistry.class, "register");
+        super.register(type, impl, (world) -> Objects.requireNonNull(((LevelComponentFactory<?>) factory).createForSave(world), "Component factory "+ factory + " for " + type.getId() + " returned null on " + world.getClass().getSimpleName()));
+    }
 }
