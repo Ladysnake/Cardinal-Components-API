@@ -20,10 +20,24 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.api.util.container;
+package dev.onyxstudios.cca.api.v3.util.provider;
 
-import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+/**
+ * A component provider backed by a container.
+ */
+public class SimpleComponentProvider implements ComponentProvider {
+    protected ComponentContainer backing;
+
+    public SimpleComponentProvider(ComponentContainer backing) {
+        this.backing = backing;
+    }
+
+    @Override
+    public ComponentContainer getComponentContainer() {
+        return this.backing;
+    }
+}
+

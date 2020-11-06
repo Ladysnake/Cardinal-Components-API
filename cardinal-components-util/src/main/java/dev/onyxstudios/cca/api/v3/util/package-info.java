@@ -20,13 +20,9 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/**
- * Side-aware variants of component classes.
- * Classes in this package can be used notably in {@code BlockComponentProvider} implementations.
- */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.api.util.sided;
+package dev.onyxstudios.cca.api.v3.util;
 
 import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 

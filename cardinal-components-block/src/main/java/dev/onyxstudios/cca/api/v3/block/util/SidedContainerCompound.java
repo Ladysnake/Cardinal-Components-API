@@ -20,34 +20,28 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.sided;
+package dev.onyxstudios.cca.api.v3.block.util;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import nerdhub.cardinal.components.api.util.provider.EmptyComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import nerdhub.cardinal.components.api.util.NbtSerializable;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.Direction;
 
 import javax.annotation.Nullable;
 
 /**
- * A sided component provider that is always empty.
+ * A side-aware compound component container.
+ * Each direction of a cubic space is associated with a separate component container.
+ * <p> In this context, the {@code null} side acts as a default value.
+ * Attaching a component to the {@code null} side generally
+ * implies that it should be accessible from any side. A query for a component on
+ * a {@code null} side should only be made when the caller does not have specific
+ * side information, and will return only elements attached to the {@code null} side.
  */
-public final class EmptySidedProviderCompound implements SidedProviderCompound {
+public interface SidedContainerCompound extends NbtSerializable {
+    ComponentContainer get(@Nullable Direction side);
 
-    public static SidedProviderCompound instance() {
-        return EMPTY_SIDED_PROVIDER;
-    }
+    void fromTag(CompoundTag serialized);
 
-    /**
-     * {@inheritDoc}
-     * @return a {@link ComponentProvider} that is always empty
-     * @see EmptyComponentProvider
-     */
-    @Override
-    public ComponentProvider getComponents(@Nullable Direction side) {
-        return EmptyComponentProvider.instance();
-    }
-
-    private static final SidedProviderCompound EMPTY_SIDED_PROVIDER = new EmptySidedProviderCompound();
-    private EmptySidedProviderCompound() { }
+    CompoundTag toTag(CompoundTag tag);
 }
-

@@ -20,28 +20,14 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.sided;
-
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import nerdhub.cardinal.components.api.util.NbtSerializable;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.math.Direction;
-
-import javax.annotation.Nullable;
-
 /**
- * A side-aware compound component container.
- * Each direction of a cubic space is associated with a separate component container.
- * <p> In this context, the {@code null} side acts as a default value.
- * Attaching a component to the {@code null} side generally
- * implies that it should be accessible from any side. A query for a component on
- * a {@code null} side should only be made when the caller does not have specific
- * side information, and will return only elements attached to the {@code null} side.
+ * Side-aware variants of component classes.
+ * Classes in this package can be used notably in {@code BlockComponentProvider} implementations.
  */
-public interface SidedContainerCompound extends NbtSerializable {
-    ComponentContainer get(@Nullable Direction side);
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package dev.onyxstudios.cca.api.v3.block.util;
 
-    void fromTag(CompoundTag serialized);
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-    CompoundTag toTag(CompoundTag tag);
-}
+import javax.annotation.ParametersAreNonnullByDefault;

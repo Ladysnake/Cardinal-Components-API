@@ -20,18 +20,13 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.sided;
-
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import net.minecraft.util.math.Direction;
-
-import javax.annotation.Nullable;
-
 /**
- * A side-aware component provider.
+ * This package includes several implementations of component providers, for use by custom API implementations
  */
-public interface SidedProviderCompound {
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package dev.onyxstudios.cca.api.v3.util.provider;
 
-    ComponentProvider getComponents(@Nullable Direction side);
+import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
 
-}
+import javax.annotation.ParametersAreNonnullByDefault;
