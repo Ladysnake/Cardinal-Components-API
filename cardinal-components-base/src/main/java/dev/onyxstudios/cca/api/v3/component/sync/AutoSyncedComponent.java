@@ -89,7 +89,7 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      * Reads this component's data from {@code buf}.
      *
      * @implSpec The default implementation converts the buffer's content
-     * to a {@link CompoundTag} and calls {@link #fromTag(CompoundTag)}.
+     * to a {@link CompoundTag} and calls {@link #readFromNbt(CompoundTag)}.
      * @implNote any implementing class overriding {@link #writeSyncPacket(PacketByteBuf, ServerPlayerEntity)}
      * such that it uses a different data format must override this method.
      * @see #writeSyncPacket(PacketByteBuf, ServerPlayerEntity)

@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
+import dev.onyxstudios.cca.internal.base.ComponentRegistryImpl;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -45,7 +46,7 @@ public interface ComponentRegistryV3 {
     /**
      * The component registry
      */
-    ComponentRegistryV3 INSTANCE = (ComponentRegistryV3) nerdhub.cardinal.components.api.ComponentRegistry.INSTANCE;
+    ComponentRegistryV3 INSTANCE = ComponentRegistryImpl.INSTANCE;
 
     /**
      * Get a component key for the given identifier and class, or create one if it does not exist.
@@ -71,13 +72,13 @@ public interface ComponentRegistryV3 {
      * @param componentId    a unique identifier for the registered component type
      * @param componentClass the interface or class of which to obtain a {@link ComponentKey}
      * @return a shared instance of {@link ComponentKey}
-     * @throws IllegalArgumentException if {@code componentClass} does not extend {@link nerdhub.cardinal.components.api.component.Component}
+     * @throws IllegalArgumentException if {@code componentClass} does not extend {@link Component}
      * @throws IllegalStateException    if a different component class has been registered with the same {@code componentId},
      *                                  or if {@code componentId} has not been statically declared as a custom data value.
      * @apiNote It is recommended that {@code componentClass} be an interface, so that other
      * mods can interact with a well-defined API rather than directly accessing internals.
      */
-    <C extends ComponentV3> ComponentKey<C> getOrCreate(Identifier componentId, Class<C> componentClass);
+    <C extends Component> ComponentKey<C> getOrCreate(Identifier componentId, Class<C> componentClass);
 
     /**
      * Directly retrieves a ComponentKey using its id.
@@ -91,7 +92,10 @@ public interface ComponentRegistryV3 {
     /**
      * Return a sequential stream with this registry at its source.
      *
-     * @return a sequential {@code Stream} over the component types of this registry.
+     * <p>The result streams over every {@link ComponentKey} that has been registered using {@link #getOrCreate(Identifier, Class)}
+     * up until the method call. Keys registered after the method returns will not be part of the stream.
+     *
+     * @return a sequential {@code Stream} over the component keys in this registry.
      */
     Stream<ComponentKey<?>> stream();
 }

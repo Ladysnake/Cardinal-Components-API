@@ -22,8 +22,8 @@
  */
 package dev.onyxstudios.cca.mixin.entity.common;
 
-import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
-import nerdhub.cardinal.components.api.event.TrackingStartCallback;
+import dev.onyxstudios.cca.api.v3.entity.PlayerCopyCallback;
+import dev.onyxstudios.cca.api.v3.entity.TrackingStartCallback;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;

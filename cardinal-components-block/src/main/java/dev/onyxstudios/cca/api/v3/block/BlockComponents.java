@@ -22,9 +22,9 @@
  */
 package dev.onyxstudios.cca.api.v3.block;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.block.InternalBlockComponentProvider;
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;

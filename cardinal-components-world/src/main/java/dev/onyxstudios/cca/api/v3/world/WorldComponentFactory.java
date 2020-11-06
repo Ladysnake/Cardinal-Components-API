@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.world;
 
-import nerdhub.cardinal.components.api.component.Component;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Contract;
 

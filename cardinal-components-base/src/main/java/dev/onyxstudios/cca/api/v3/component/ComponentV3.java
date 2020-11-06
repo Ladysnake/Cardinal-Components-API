@@ -22,11 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
 
 /**
  * The base interface for components.
@@ -39,53 +35,4 @@ import org.jetbrains.annotations.Contract;
  */
 public interface ComponentV3 extends Component {
 
-    /**
-     * Reads this component's properties from a {@link CompoundTag}.
-     *
-     * @param tag a {@code CompoundTag} on which this component's serializable data has been written
-     * @implNote implementations should not assert that the data written on the tag corresponds to any
-     * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
-     * version.
-     */
-    @Contract(mutates = "this")
-    void readFromNbt(CompoundTag tag);
-
-    /**
-     * Writes this component's properties to a {@link CompoundTag}.
-     *
-     * @param tag a {@code CompoundTag} on which to write this component's serializable data
-     */
-    @Contract(mutates = "param")
-    void writeToNbt(CompoundTag tag);
-
-    /**
-     * Indicates whether some other object is "equal to" this component.
-     *
-     * <p> A well-defined equality is required by some modules, like {@code cardinal-components-item}.
-     *
-     * @see Object#equals(Object)
-     */
-    boolean equals(Object o);
-
-    @ApiStatus.ScheduledForRemoval
-    @Deprecated
-    @Override
-    default void fromTag(CompoundTag tag) {
-        this.readFromNbt(tag);
-    }
-
-    @ApiStatus.ScheduledForRemoval
-    @Deprecated
-    @Override
-    default CompoundTag toTag(CompoundTag tag) {
-        this.writeToNbt(tag);
-        return tag;
-    }
-
-    @ApiStatus.ScheduledForRemoval
-    @Deprecated
-    @Override
-    default boolean isComponentEqual(Component other) {
-        return Component.super.isComponentEqual(other);
-    }
 }

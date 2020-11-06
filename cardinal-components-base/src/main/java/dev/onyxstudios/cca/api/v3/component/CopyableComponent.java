@@ -30,12 +30,12 @@ import net.minecraft.nbt.CompoundTag;
  * @param <C> the type of components that this component may copy
  * @since 2.3.0
  */
-public interface CopyableComponent<C extends nerdhub.cardinal.components.api.component.Component> extends Component, nerdhub.cardinal.components.api.component.extension.CopyableComponent<C> {
+public interface CopyableComponent<C extends Component> extends Component {
     /**
      * Copies the data from {@code other} into {@code this}.
      *
-     * @implSpec The default implementation {@linkplain #toTag(CompoundTag) serializes}
-     * the component data to a {@link CompoundTag} and calls {@link #fromTag(CompoundTag)}.
+     * @implSpec The default implementation {@linkplain #writeToNbt(CompoundTag) serializes}
+     * the component data to a {@link CompoundTag} and calls {@link #readFromNbt(CompoundTag)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation assumes NBT consistency
      * between implementations, and is generally slower than a direct copy.

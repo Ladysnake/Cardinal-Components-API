@@ -22,30 +22,28 @@
  */
 package dev.onyxstudios.cca.internal.scoreboard;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentFactory;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
-import dev.onyxstudios.cca.api.v3.scoreboard.TeamComponentFactory;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.Team;
+import net.minecraft.util.Lazy;
 
-import java.io.IOException;
 import java.util.Collection;
-import java.util.Objects;
 
-public final class StaticScoreboardComponentPlugin extends StaticComponentPluginBase<Scoreboard, ScoreboardComponentInitializer, ScoreboardComponentFactory<?>> implements ScoreboardComponentFactoryRegistry {
-    public static final String SCOREBOARD_IMPL_SUFFIX = "ScoreboardImpl";
-
+public final class StaticScoreboardComponentPlugin extends StaticComponentPluginBase<Scoreboard, ScoreboardComponentInitializer> implements ScoreboardComponentFactoryRegistry {
     public static final StaticScoreboardComponentPlugin INSTANCE = new StaticScoreboardComponentPlugin();
+    public static final Lazy<ComponentContainer.Factory<Scoreboard>> componentsContainerFactory
+        = new Lazy<>(INSTANCE::buildContainerFactory);
 
     private StaticScoreboardComponentPlugin() {
-        super("made a scoreboard", Scoreboard.class, ScoreboardComponentFactory.class, SCOREBOARD_IMPL_SUFFIX);
+        super("made a scoreboard", Scoreboard.class);
     }
 
     @Override
@@ -59,34 +57,12 @@ public final class StaticScoreboardComponentPlugin extends StaticComponentPlugin
     }
 
     @Override
-    protected Class<? extends DynamicContainerFactory<Scoreboard>> spinContainerFactory(Class<? extends ComponentContainer> containerCls) throws IOException {
-        return spinContainerFactory(this.implSuffix, DynamicContainerFactory.class, containerCls, null, 0, this.providerClass);
+    public <C extends Component> void registerScoreboardComponent(ComponentKey<C> type, ComponentFactory<Scoreboard, ? extends C> factory) {
+        super.register(type, factory);
     }
 
     @Override
-    public Class<? extends DynamicContainerFactory<Scoreboard>> getContainerFactoryClass() {
-        return super.getContainerFactoryClass();
-    }
-
-    @Override
-    public <C extends Component> void register(ComponentKey<C> type, ScoreboardComponentFactory<? extends C> factory) {
-        this.checkLoading(ScoreboardComponentFactoryRegistry.class, "register");
-        super.register(type, (team) -> Objects.requireNonNull(((ScoreboardComponentFactory<?>) factory).createForScoreboard(team), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
-    }
-
-    @Override
-    public <C extends Component> void registerForScoreboards(ComponentKey<? super C> type, Class<C> impl, ScoreboardComponentFactory<? extends C> factory) {
-        this.checkLoading(ScoreboardComponentFactoryRegistry.class, "registerForScoreboards");
-        super.register(type, impl, (team) -> Objects.requireNonNull(((ScoreboardComponentFactory<?>) factory).createForScoreboard(team), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
-    }
-
-    @Override
-    public <C extends Component> void register(ComponentKey<C> type, TeamComponentFactory<? extends C> factory) {
+    public <C extends Component> void registerTeamComponent(ComponentKey<C> type, ComponentFactory<Team, ? extends C> factory) {
         StaticTeamComponentPlugin.INSTANCE.register(type, factory);
-    }
-
-    @Override
-    public <C extends Component> void registerForTeams(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactory<? extends C> factory) {
-        StaticTeamComponentPlugin.INSTANCE.register(type, impl, factory);
     }
 }

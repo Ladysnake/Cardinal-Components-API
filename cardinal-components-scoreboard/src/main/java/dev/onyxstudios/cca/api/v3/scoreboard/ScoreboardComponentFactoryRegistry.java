@@ -22,8 +22,11 @@
  */
 package dev.onyxstudios.cca.api.v3.scoreboard;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.Team;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -32,30 +35,16 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.Experimental
 public interface ScoreboardComponentFactoryRegistry {
     /**
-     * Registers a {@link TeamComponentFactory}.
+     * Registers a {@link ComponentFactory} for {@link Team}s.
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void register(ComponentKey<C> type, TeamComponentFactory<? extends C> factory);
+    <C extends Component> void registerTeamComponent(ComponentKey<C> type, ComponentFactory<Team, ? extends C> factory);
 
     /**
-     * Registers a {@link TeamComponentFactory}.
+     * Registers a {@link ComponentFactory} for {@link Scoreboard}s.
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void registerForTeams(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactory<? extends C> factory);
-
-    /**
-     * Registers a {@link ScoreboardComponentFactory}.
-     *
-     * @param factory the factory to use to create components of the given type
-     */
-    <C extends Component> void register(ComponentKey<C> type, ScoreboardComponentFactory<? extends C> factory);
-
-    /**
-     * Registers a {@link ScoreboardComponentFactory}.
-     *
-     * @param factory the factory to use to create components of the given type
-     */
-    <C extends Component> void registerForScoreboards(ComponentKey<? super C> type, Class<C> impl, ScoreboardComponentFactory<? extends C> factory);
+    <C extends Component> void registerScoreboardComponent(ComponentKey<C> type, ComponentFactory<Scoreboard, ? extends C> factory);
 }

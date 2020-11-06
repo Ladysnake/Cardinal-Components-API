@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.mixin.world.common;
 
-import nerdhub.cardinal.components.api.event.WorldSyncCallback;
+import dev.onyxstudios.cca.api.v3.world.WorldSyncCallback;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;

@@ -23,17 +23,15 @@
 package dev.onyxstudios.cca.mixin.item.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
+import dev.onyxstudios.cca.internal.base.AbstractComponentContainer;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
-import nerdhub.cardinal.components.api.util.container.AbstractComponentContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -45,7 +43,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = ItemStack.class)
 public abstract class MixinItemStack implements InternalStackComponentProvider {
     @Unique
-    private static final ComponentContainer EMPTY_COMPONENTS = StaticComponentPluginBase.createEmptyContainer("EmptyItemImpl");
+    private static final ComponentContainer EMPTY_COMPONENTS = ComponentContainer.EMPTY;
 
     @Unique
     private @Nullable ComponentContainer components;
@@ -94,7 +92,7 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
 
     @Shadow public abstract void removeSubTag(String key);
 
-    @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/item/ItemStack;count:I", shift = At.Shift.AFTER))
+    @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
         // Keep data without deserializing
         Tag componentData = tag.get(AbstractComponentContainer.NBT_KEY);

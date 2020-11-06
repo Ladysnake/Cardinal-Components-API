@@ -22,17 +22,14 @@
  */
 package dev.onyxstudios.cca.mixin.block.common;
 
-import com.google.common.collect.ImmutableSet;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.block.InternalBlockComponentProvider;
 import dev.onyxstudios.cca.internal.block.StaticBlockComponentPlugin;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
@@ -41,12 +38,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 @Mixin(Block.class)
-public abstract class MixinBlock extends AbstractBlock implements InternalBlockComponentProvider, nerdhub.cardinal.components.api.component.BlockComponentProvider {
+public abstract class MixinBlock extends AbstractBlock implements InternalBlockComponentProvider {
     @Unique
     private Map<ComponentKey<?>, BlockComponentProvider<?>> containerFactories = null;
 
@@ -64,27 +59,5 @@ public abstract class MixinBlock extends AbstractBlock implements InternalBlockC
         @SuppressWarnings("unchecked") BlockComponentProvider<? extends C> factory = (BlockComponentProvider<? extends C>) this.containerFactories.get(key);
 
         return factory == null ? null : factory.get(state, world, pos, side);
-    }
-
-    @Override
-    public <T extends Component> boolean hasComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
-        if (!this.hasBlockEntity()) return false;
-        BlockEntity be = blockView.getBlockEntity(pos);
-        return be instanceof nerdhub.cardinal.components.api.component.BlockComponentProvider && ((nerdhub.cardinal.components.api.component.BlockComponentProvider) be).hasComponent(blockView, pos, type, side);
-    }
-
-    @Nullable
-    @Override
-    public <T extends Component> T getComponent(BlockView blockView, BlockPos pos, ComponentType<T> type, @Nullable Direction side) {
-        if (!this.hasBlockEntity()) return null;
-        BlockEntity be = blockView.getBlockEntity(pos);
-        return be instanceof nerdhub.cardinal.components.api.component.BlockComponentProvider ? ((nerdhub.cardinal.components.api.component.BlockComponentProvider) be).getComponent(blockView, pos, type, side) : null;
-    }
-
-    @Override
-    public Set<ComponentType<?>> getComponentTypes(BlockView blockView, BlockPos pos, @Nullable Direction side) {
-        if (!this.hasBlockEntity()) return Collections.emptySet();
-        BlockEntity be = blockView.getBlockEntity(pos);
-        return be instanceof nerdhub.cardinal.components.api.component.BlockComponentProvider ? ((nerdhub.cardinal.components.api.component.BlockComponentProvider) be).getComponentTypes(blockView, pos, side) : ImmutableSet.of();
     }
 }

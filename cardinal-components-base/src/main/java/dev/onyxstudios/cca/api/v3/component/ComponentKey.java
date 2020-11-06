@@ -27,7 +27,6 @@ import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
 import io.netty.buffer.Unpooled;
-import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
@@ -37,7 +36,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnegative;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -62,39 +60,47 @@ public abstract class ComponentKey<C extends Component> {
         return this.componentClass;
     }
 
-    /**
-     * @param provider a component provider
-     * @return the attached component associated with this key, or
-     * {@code null} if the provider does not support this type of component
-     * @throws ClassCastException if the {@code provider} is
-     * @see #get(Object)
-     * @see #maybeGet(Object)
-     */
-    // overridden by generated types
-    @Contract(pure = true)
-    @ApiStatus.Experimental
-    public abstract <V> @Nullable C getNullable(V provider);
+    @Nullable
+    public <V> C getNullable(V provider) {
+        return this.getInternal((ComponentProvider) provider);
+    }
 
     /**
      * @param provider a component provider
      * @param <V>      the class of the component provider
-     * @return the nonnull value of the component associated with this key
+     * @return the nonnull value of the held component of this type
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      * @see #maybeGet(Object)
      */
-    @Contract(pure = true)
-    public abstract <V> C get(V provider);
+    public final <V> C get(V provider) {
+        C component = this.getInternal((ComponentProvider) provider);
+        assert component == null || this.getComponentClass().isInstance(component);
+        if (component == null) {
+            try {
+                throw new NoSuchElementException(provider + " provides no component of type " + this.getId());
+            } catch (NullPointerException e) {  // some toString implementations crash in init because the name is not set
+                NoSuchElementException e1 = new NoSuchElementException(this.getId() + " not available");
+                e1.addSuppressed(e);
+                throw e1;
+            }
+        }
+        return component;
+    }
 
     /**
      * @param provider a component provider
      * @param <V>      the class of the component provider
-     * @return an {@code Optional} describing a component associated with this key, or an empty
+     * @return an {@code Optional} describing a component of this type, or an empty
      * {@code Optional} if {@code provider} does not have such a component.
      * @see #get(Object)
      */
-    @Contract(pure = true)
-    public abstract <V> Optional<C> maybeGet(@Nullable V provider);
+    public final <V> Optional<C> maybeGet(@Nullable V provider) {
+        if (provider instanceof ComponentProvider) {
+            return Optional.ofNullable(this.getInternal((ComponentProvider) provider));
+        }
+        return Optional.empty();
+    }
 
     @Contract(pure = true)
     @ApiStatus.Experimental
@@ -184,7 +190,6 @@ public abstract class ComponentKey<C extends Component> {
 
     private final Identifier id;
     private final Class<C> componentClass;
-    private final int rawId;
 
     /**
      * Constructs a new immutable ComponentType
@@ -192,8 +197,7 @@ public abstract class ComponentKey<C extends Component> {
      * @see ComponentRegistryV3#getOrCreate(Identifier, Class)
      */
     @ApiStatus.Internal
-    protected ComponentKey(Identifier id, Class<C> componentClass, int rawId) {
-        this.rawId = rawId;
+    protected ComponentKey(Identifier id, Class<C> componentClass) {
         if (!CcaBootstrap.INSTANCE.isGenerated(this.getClass())) throw new IllegalStateException();
         this.componentClass = componentClass;
         this.id = id;
@@ -211,10 +215,8 @@ public abstract class ComponentKey<C extends Component> {
     @ApiStatus.Internal
     public abstract @Nullable C getInternal(ComponentContainer container);
 
-    @Nonnegative
-    @ApiStatus.Internal
-    public final int getRawId() {
-        return this.rawId;
+    private @Nullable C getInternal(ComponentProvider provider) {
+        return this.getInternal(provider.getComponentContainer());
     }
 
     @ApiStatus.Internal

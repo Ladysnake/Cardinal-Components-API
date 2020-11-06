@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.mixin.entity.common;
 
-import nerdhub.cardinal.components.api.event.PlayerSyncCallback;
+import dev.onyxstudios.cca.api.v3.entity.PlayerSyncCallback;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
