@@ -20,13 +20,34 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package dev.onyxstudios.cca.api.v3.block.util;
+
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.util.provider.EmptyComponentProvider;
+import net.minecraft.util.math.Direction;
+
+import javax.annotation.Nullable;
+
 /**
- * This package includes several implementations of component providers, for use by custom API implementations
+ * A sided component provider that is always empty.
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
-package nerdhub.cardinal.components.api.util.provider;
+public final class EmptySidedProviderCompound implements SidedProviderCompound {
 
-import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
+    public static SidedProviderCompound instance() {
+        return EMPTY_SIDED_PROVIDER;
+    }
 
-import javax.annotation.ParametersAreNonnullByDefault;
+    /**
+     * {@inheritDoc}
+     * @return a {@link ComponentProvider} that is always empty
+     * @see EmptyComponentProvider
+     */
+    @Override
+    public ComponentProvider getComponents(@Nullable Direction side) {
+        return EmptyComponentProvider.instance();
+    }
+
+    private static final SidedProviderCompound EMPTY_SIDED_PROVIDER = new EmptySidedProviderCompound();
+    private EmptySidedProviderCompound() { }
+}
+

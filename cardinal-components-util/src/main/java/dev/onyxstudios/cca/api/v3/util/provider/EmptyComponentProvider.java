@@ -20,24 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.provider;
+package dev.onyxstudios.cca.api.v3.util.provider;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 
 /**
- * A component provider backed by a container.
+ * A provider that never exposes any component
  */
-public class SimpleComponentProvider implements ComponentProvider {
-    protected ComponentContainer backing;
+public final class EmptyComponentProvider implements ComponentProvider {
+    private static final ComponentProvider EMPTY_PROVIDER = new EmptyComponentProvider();
+    private static final ComponentContainer EMPTY_CONTAINER = ComponentContainer.EMPTY;
 
-    public SimpleComponentProvider(ComponentContainer backing) {
-        this.backing = backing;
+    public static ComponentProvider instance() {
+        return EMPTY_PROVIDER;
     }
 
     @Override
     public ComponentContainer getComponentContainer() {
-        return this.backing;
+        return EMPTY_CONTAINER;
     }
-}
 
+    private EmptyComponentProvider() {}
+}

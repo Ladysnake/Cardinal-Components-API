@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.sided;
+package dev.onyxstudios.cca.api.v3.block.util;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import net.minecraft.nbt.CompoundTag;

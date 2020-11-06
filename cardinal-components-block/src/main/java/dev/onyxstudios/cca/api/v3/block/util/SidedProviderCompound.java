@@ -20,26 +20,18 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util.provider;
+package dev.onyxstudios.cca.api.v3.block.util;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import net.minecraft.util.math.Direction;
+
+import javax.annotation.Nullable;
 
 /**
- * A provider that never exposes any component
+ * A side-aware component provider.
  */
-public final class EmptyComponentProvider implements ComponentProvider {
-    private static final ComponentProvider EMPTY_PROVIDER = new EmptyComponentProvider();
-    private static final ComponentContainer EMPTY_CONTAINER = ComponentContainer.EMPTY;
+public interface SidedProviderCompound {
 
-    public static ComponentProvider instance() {
-        return EMPTY_PROVIDER;
-    }
+    ComponentProvider getComponents(@Nullable Direction side);
 
-    @Override
-    public ComponentContainer getComponentContainer() {
-        return EMPTY_CONTAINER;
-    }
-
-    private EmptyComponentProvider() {}
 }
