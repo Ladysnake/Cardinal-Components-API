@@ -23,19 +23,16 @@
 package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
+import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.util.ComponentContainerMetafactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.componenttest.vita.BaseVita;
 import dev.onyxstudios.componenttest.vita.Vita;
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -83,10 +80,6 @@ public class CardinalComponentsTest {
     public static void init() {
         LOGGER.info("Hello, Components!");
 
-        for (int i = 0; i < 16; i++) {
-            ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(String.valueOf(Math.random())), Vita.class);
-        }
-
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
 
         ComponentContainer.Factory.Builder<Integer> factoryBuilder = ComponentContainer.Factory.builder(Integer.class)
@@ -98,8 +91,9 @@ public class CardinalComponentsTest {
             factoryBuilder.build();
             assert false : "Component container factory builders are single use";
         } catch (IllegalStateException ignored) { }
+
         try {
-            ComponentRegistryV3.INSTANCE.getOrCreate(TestComponents.OLD_VITA.getId(), TestComponents.OLD_VITA.getComponentClass());
+            ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("hi"), Vita.class);
             assert false : "Static components must be registered through mod metadata or plugin";
         } catch (IllegalStateException ignored) { }
 
@@ -122,9 +116,9 @@ public class CardinalComponentsTest {
             LOGGER.info(ComponentContainerMetafactory.metafactory(
                 TestComponents.CUSTOM_PROVIDER_2,
                 new TypeToken<BiFunction<UUID, PlayerEntity, ? extends ComponentContainer>>() {},
-                new TypeToken<BiFunction<UUID, PlayerEntity, ? extends SyncedComponent>>() {}
+                new TypeToken<BiFunction<UUID, PlayerEntity, ? extends AutoSyncedComponent>>() {}
             ).apply(UUID.randomUUID(), null));
-            assert false : "Registered factory does not return " + SyncedComponent.class;
+            assert false : "Registered factory does not return " + AutoSyncedComponent.class;
         } catch (StaticComponentLoadingException ignored) { }
 
         LOGGER.info(ComponentContainerMetafactory.metafactory(
@@ -132,14 +126,6 @@ public class CardinalComponentsTest {
             new TypeToken<BiFunction<UUID, PlayerEntity, ComponentContainer>>() {},
             new TypeToken<BiFunction<UUID, PlayerEntity, ? extends CopyableComponent<?>>>() {}
         ).apply(UUID.randomUUID(), null));
-
-        LOGGER.info(ComponentContainerMetafactory.metafactory(
-            TestComponents.CUSTOM_PROVIDER_3,
-            TypeToken.of(TestContainerFactory.class),
-            TestComponents.CUSTOM_FACTORY_TYPE,
-            TestCallback.class,
-            TestCallback.EVENT
-        ).create(UUID.randomUUID(), null));
 
         LOGGER.info(ComponentContainerMetafactory.metafactory(
             new Identifier("componenttest:no_factory"),
@@ -150,15 +136,5 @@ public class CardinalComponentsTest {
 
     public interface TestContainerFactory {
         ComponentContainer create(UUID u, @Nullable PlayerEntity p);
-    }
-
-    public interface TestCallback {
-        Event<TestCallback> EVENT = EventFactory.createArrayBacked(TestCallback.class, callbacks -> (uuid, p, c) -> {
-            for (TestCallback callback : callbacks) {
-                callback.initComponents(uuid, p, c);
-            }
-        });
-
-        void initComponents(UUID uuid, @Nullable PlayerEntity p, nerdhub.cardinal.components.api.component.ComponentContainer<Component> components);
     }
 }

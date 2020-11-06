@@ -22,8 +22,10 @@
  */
 package dev.onyxstudios.cca.api.v3.world;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.world.World;
 
 /**
  * @since 2.4.0
@@ -34,8 +36,8 @@ public interface WorldComponentFactoryRegistry {
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void register(ComponentKey<C> type, WorldComponentFactory<? extends C> factory);
+    <C extends Component> void register(ComponentKey<C> type, ComponentFactory<World, ? extends C> factory);
 
-    <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, WorldComponentFactory<? extends C> factory);
+    <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, ComponentFactory<World, ? extends C> factory);
 
 }

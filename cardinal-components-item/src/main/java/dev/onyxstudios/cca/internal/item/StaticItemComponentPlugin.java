@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.item;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentV3;
@@ -33,8 +34,6 @@ import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.event.ItemComponentCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -78,7 +77,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
                 this.getWildcard().forEach(compiled::putIfAbsent);
                 String implSuffix = getSuffix(itemId);
                 Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(ItemComponentFactory.class, compiled, implSuffix);
-                return StaticComponentPluginBase.spinContainerFactory(implSuffix, DynamicContainerFactory.class, containerCls, ItemComponentCallback.class, 2, ItemStack.class);
+                return StaticComponentPluginBase.spinContainerFactory(implSuffix, DynamicContainerFactory.class, containerCls, ItemStack.class);
             } catch (IOException e) {
                 throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + itemId, e);
             }
@@ -97,7 +96,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
 
         try {
             Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(ItemComponentFactory.class, this.getWildcard(), WILDCARD_IMPL_SUFFIX);
-            this.wildcardFactoryClass = StaticComponentPluginBase.spinContainerFactory(WILDCARD_IMPL_SUFFIX, DynamicContainerFactory.class, containerCls, ItemComponentCallback.class, 2, ItemStack.class);
+            this.wildcardFactoryClass = StaticComponentPluginBase.spinContainerFactory(WILDCARD_IMPL_SUFFIX, DynamicContainerFactory.class, containerCls, ItemStack.class);
         } catch (IOException e) {
             throw new StaticComponentLoadingException("Failed to generate the fallback component container for item stacks", e);
         }

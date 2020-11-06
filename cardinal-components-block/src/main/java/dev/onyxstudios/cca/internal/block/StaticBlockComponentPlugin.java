@@ -26,6 +26,7 @@ import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentProvider;
 import dev.onyxstudios.cca.api.v3.block.BlockEntityComponentFactory;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
@@ -34,7 +35,6 @@ import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.Identifier;
@@ -106,9 +106,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
                     implSuffix,
                     DynamicContainerFactory.class,
                     containerCls,
-                    null,
-                    0,
-                    entityClass
+                        entityClass
                 );
             } catch (IOException e) {
                 throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entityClass, e);

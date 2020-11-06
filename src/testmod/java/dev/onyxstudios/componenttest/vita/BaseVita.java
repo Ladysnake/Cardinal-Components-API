@@ -22,11 +22,11 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
 import net.minecraft.nbt.CompoundTag;
 
-public class BaseVita implements Vita, ComponentV3, CopyableComponent<BaseVita> {
+public class BaseVita implements Vita, Component, CopyableComponent<BaseVita> {
     protected int vitality;
 
     public BaseVita() {

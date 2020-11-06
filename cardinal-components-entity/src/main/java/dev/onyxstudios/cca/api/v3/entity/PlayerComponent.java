@@ -30,7 +30,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
 @ApiStatus.Experimental
-public interface PlayerComponent<C extends nerdhub.cardinal.components.api.component.Component> extends Component, CopyableComponent<C> {
+public interface PlayerComponent<C extends Component> extends Component, CopyableComponent<C> {
     /**
      * Check whether component data should be copied as part of a respawn situation.
      *
@@ -60,7 +60,7 @@ public interface PlayerComponent<C extends nerdhub.cardinal.components.api.compo
     @Override
     default void copyFrom(C other) {
         CompoundTag tag = new CompoundTag();
-        other.toTag(tag);
+        other.writeToNbt(tag);
         this.readFromNbt(tag);
     }
 }

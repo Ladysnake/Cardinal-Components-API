@@ -29,21 +29,16 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.internal.level.ComponentsLevelNetworking;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
-import nerdhub.cardinal.components.api.event.LevelComponentCallback;
-import nerdhub.cardinal.components.api.util.sync.LevelSyncedComponent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Lazy;
 import net.minecraft.util.registry.DynamicRegistryManager;
-import net.minecraft.world.WorldProperties;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
@@ -67,14 +62,11 @@ import java.util.UUID;
 @Mixin(LevelProperties.class)
 public abstract class MixinLevelProperties implements ServerWorldProperties, InternalComponentProvider {
     @Unique
-    private static final Lazy<DynamicContainerFactory<WorldProperties>> componentContainerFactory
-        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticLevelComponentPlugin.INSTANCE.getContainerFactoryClass(), LevelComponentCallback.EVENT));
-    @Unique
     private ComponentContainer components;
 
     @Inject(method = "<init>(Lcom/mojang/datafixers/DataFixer;ILnet/minecraft/nbt/CompoundTag;ZIIIFJJIIIZIZZZLnet/minecraft/world/border/WorldBorder$Properties;IILjava/util/UUID;Ljava/util/LinkedHashSet;Lnet/minecraft/world/timer/Timer;Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/LevelInfo;Lnet/minecraft/world/gen/GeneratorOptions;Lcom/mojang/serialization/Lifecycle;)V", at = @At("RETURN"))
     private void initComponents(DataFixer dataFixer, int dataVersion, CompoundTag playerData, boolean modded, int spawnX, int spawnY, int spawnZ, float spawnAngle, long time, long timeOfDay, int version, int clearWeatherTime, int rainTime, boolean raining, int thunderTime, boolean thundering, boolean initialized, boolean difficultyLocked, WorldBorder.Properties worldBorder, int wanderingTraderSpawnDelay, int wanderingTraderSpawnChance, UUID wanderingTraderId, LinkedHashSet<String> serverBrands, Timer<MinecraftServer> scheduledEvents, CompoundTag customBossEvents, CompoundTag dragonFight, LevelInfo levelInfo, GeneratorOptions generatorOptions, Lifecycle lifecycle, CallbackInfo ci) {
-        this.components = componentContainerFactory.get().create(this);
+        this.components = StaticLevelComponentPlugin.createContainer(this);
     }
 
     @Inject(method = "readProperties", at = @At("RETURN"))
@@ -103,7 +95,7 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Int
     public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
-        return new CustomPayloadS2CPacket(LevelSyncedComponent.PACKET_ID, buf);
+        return new CustomPayloadS2CPacket(ComponentsLevelNetworking.PACKET_ID, buf);
     }
 
 }

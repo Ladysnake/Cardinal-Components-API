@@ -22,8 +22,10 @@
  */
 package dev.onyxstudios.cca.api.v3.level;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -32,16 +34,16 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.Experimental
 public interface LevelComponentFactoryRegistry {
     /**
-     * Registers a {@link LevelComponentFactory}.
+     * Registers a {@link ComponentFactory} for {@link WorldProperties}.
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void register(ComponentKey<C> type, LevelComponentFactory<C> factory);
+    <C extends Component> void register(ComponentKey<C> type, ComponentFactory<WorldProperties, ? extends C> factory);
 
     /**
-     * Registers a {@link LevelComponentFactory}.
+     * Registers a {@link ComponentFactory} for {@link WorldProperties}.
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, LevelComponentFactory<C> factory);
+    <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<WorldProperties, ? extends C> factory);
 }

@@ -23,42 +23,12 @@
 package dev.onyxstudios.cca.internal.base;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
-import java.util.function.BiConsumer;
 
 // TODO V3 remove when old ComponentProvider goes
-public interface InternalComponentProvider extends ComponentProvider, nerdhub.cardinal.components.api.component.ComponentProvider {
-    @Override
-    default boolean hasComponent(ComponentType<?> type) {
-        return type.isProvidedBy(this);
-    }
-
-    @Nullable
-    @Override
-    default <C extends Component> C getComponent(ComponentType<C> type) {
-        return ((nerdhub.cardinal.components.api.component.ComponentContainer<?>) this.getComponentContainer()).get(type);
-    }
-
-    @Override
-    default Set<ComponentType<?>> getComponentTypes() {
-        return Collections.unmodifiableSet(((nerdhub.cardinal.components.api.component.ComponentContainer<?>) this.getComponentContainer()).keySet());
-    }
-
-    @Override
-    default void forEachComponent(BiConsumer<ComponentType<?>, Component> op) {
-        for (ComponentKey<?> key : this.getComponentContainer().keys()) {
-            op.accept((ComponentType<?>) key, key.get(this));
-        }
-    }
-
+public interface InternalComponentProvider extends ComponentProvider {
     @Override
     @Nonnull
     ComponentContainer getComponentContainer();

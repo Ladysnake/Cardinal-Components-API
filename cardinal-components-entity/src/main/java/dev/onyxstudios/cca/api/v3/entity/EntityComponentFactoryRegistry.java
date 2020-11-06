@@ -22,10 +22,8 @@
  */
 package dev.onyxstudios.cca.api.v3.entity;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import nerdhub.cardinal.components.api.component.Component;
-import nerdhub.cardinal.components.api.event.PlayerCopyCallback;
-import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.ApiStatus;

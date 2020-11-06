@@ -26,8 +26,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
-import nerdhub.cardinal.components.api.event.ItemComponentCallback;
-import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,13 +33,7 @@ import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(Item.class)
 public abstract class MixinItem implements ItemCaller {
-    @Unique private final Event<ItemComponentCallback> cardinal_componentsEvent = CardinalItemInternals.createItemComponentsEvent();
     @Unique private DynamicContainerFactory<ItemStack> cardinal_containerFactory;
-
-    @Override
-    public Event<ItemComponentCallback> cardinal_getItemComponentEvent() {
-        return this.cardinal_componentsEvent;
-    }
 
     @Override
     public ComponentContainer cardinal_createComponents(ItemStack stack) {

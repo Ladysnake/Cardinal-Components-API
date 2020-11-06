@@ -23,12 +23,8 @@
 package dev.onyxstudios.cca.mixin.world.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.world.StaticWorldComponentPlugin;
-import nerdhub.cardinal.components.api.event.WorldComponentCallback;
-import net.minecraft.util.Lazy;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -40,16 +36,13 @@ import javax.annotation.Nonnull;
 
 @Mixin(World.class)
 public abstract class MixinWorld implements InternalComponentProvider {
-    @Unique
-    private static final Lazy<? extends DynamicContainerFactory<World>> componentContainerFactory
-        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticWorldComponentPlugin.INSTANCE.getContainerFactoryClass(), WorldComponentCallback.EVENT));
 
     @Unique
     protected ComponentContainer components;
 
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
-        this.components = componentContainerFactory.get().create((World) (Object) this);
+        this.components = StaticWorldComponentPlugin.componentContainerFactory.get().createContainer((World) (Object) this);
     }
 
     @Nonnull

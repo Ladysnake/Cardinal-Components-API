@@ -7,10 +7,10 @@
     "version": "${version}",
     "entrypoints": {
         "main": [
-          "nerdhub.cardinal.components.CardinalComponentsEntity::init"
+          "dev.onyxstudios.cca.internal.entity.CardinalComponentsEntity::init"
         ],
         "client": [
-            "nerdhub.cardinal.components.CardinalComponentsEntity::initClient"
+          "dev.onyxstudios.cca.internal.entity.CardinalComponentsEntity::initClient"
         ]
     },
     "custom": {
