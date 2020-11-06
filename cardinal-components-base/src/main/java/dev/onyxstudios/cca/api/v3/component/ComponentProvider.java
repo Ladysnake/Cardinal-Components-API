@@ -114,8 +114,7 @@ public interface ComponentProvider {
     }
 
     /**
-     * @return a runtime-generated component container storing statically declared components,
-     * or {@code null} if this container does not support static components.
+     * @return a runtime-generated component container storing statically declared components.
      */
     @ApiStatus.Experimental
     ComponentContainer getComponentContainer();
