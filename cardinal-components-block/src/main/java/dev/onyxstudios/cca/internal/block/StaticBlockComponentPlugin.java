@@ -29,15 +29,21 @@ import dev.onyxstudios.cca.api.v3.block.BlockEntityComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -46,6 +52,7 @@ import java.util.function.Predicate;
 
 public final class StaticBlockComponentPlugin extends LazyDispatcher implements BlockComponentFactoryRegistry {
     public static final StaticBlockComponentPlugin INSTANCE = new StaticBlockComponentPlugin();
+
     private static String getSuffix(Class<? extends BlockEntity> key) {
         String simpleName = key.getSimpleName();
         return String.format("BlockEntityImpl_%s_%s", simpleName, Integer.toHexString(key.getName().hashCode()));
@@ -61,11 +68,31 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     private final Map<Class<? extends BlockEntity>, Map<ComponentKey<?>, Class<? extends Component>>> beComponentImpls = new HashMap<>();
     private final Map<Class<? extends BlockEntity>, Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>>> beComponentFactories = new Reference2ObjectOpenHashMap<>();
     private final Map<Class<? extends BlockEntity>, Class<? extends DynamicContainerFactory<BlockEntity>>> factoryClasses = new Reference2ObjectOpenHashMap<>();
+    private final Set<Class<? extends BlockEntity>> clientTicking = new ReferenceOpenHashSet<>();
+    private final Set<Class<? extends BlockEntity>> serverTicking = new ReferenceOpenHashSet<>();
 
     public Map<ComponentKey<?>, BlockComponentProvider<?>> getComponentFactories(Identifier blockId) {
         this.ensureInitialized();
         assert this.wildcard != null;
         return this.blockComponentFactories.getOrDefault(blockId, this.wildcard);
+    }
+
+    @Nullable
+    public <T extends BlockEntity> BlockEntityTicker<T> getComponentTicker(World world, T be, @Nullable BlockEntityTicker<T> base) {
+        if (world.isClient && this.clientTicking.contains(be.getClass())) {
+            if (base == null) return (w, pos, state, blockEntity) -> ComponentProvider.fromBlockEntity(blockEntity).getComponentContainer().tickClientComponents();
+            return (w, pos, state, blockEntity) -> {
+                ComponentProvider.fromBlockEntity(blockEntity).getComponentContainer().tickClientComponents();
+                base.tick(w, pos, state, blockEntity);
+            };
+        } else if (!world.isClient && this.serverTicking.contains(be.getClass())) {
+            if (base == null) return (w, pos, state, blockEntity) -> ComponentProvider.fromBlockEntity(blockEntity).getComponentContainer().tickServerComponents();
+            return (w, pos, state, blockEntity) -> {
+                ComponentProvider.fromBlockEntity(blockEntity).getComponentContainer().tickServerComponents();
+                base.tick(w, pos, state, blockEntity);
+            };
+        }
+        return base;
     }
 
     public boolean requiresStaticFactory(Class<? extends BlockEntity> entityClass) {
@@ -89,7 +116,12 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
             while (type != BlockEntity.class) {
                 type = type.getSuperclass().asSubclass(BlockEntity.class);
                 this.beComponentFactories.getOrDefault(type, Collections.emptyMap()).forEach(compiled::putIfAbsent);
-                this.beComponentImpls.getOrDefault(type, Collections.emptyMap()).forEach(compiledImpls::putIfAbsent);
+                for (Map.Entry<ComponentKey<?>, Class<? extends Component>> entry : this.beComponentImpls.getOrDefault(type, Collections.emptyMap()).entrySet()) {
+                    Class<? extends Component> impl = entry.getValue();
+                    if (ClientTickingComponent.class.isAssignableFrom(impl)) this.clientTicking.add(entityClass);
+                    if (ServerTickingComponent.class.isAssignableFrom(impl)) this.serverTicking.add(entityClass);
+                    compiledImpls.putIfAbsent(entry.getKey(), impl);
+                }
             }
 
             String implSuffix = getSuffix(entityClass);
@@ -106,7 +138,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
                     implSuffix,
                     DynamicContainerFactory.class,
                     containerCls,
-                        entityClass
+                    entityClass
                 );
             } catch (IOException e) {
                 throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entityClass, e);
