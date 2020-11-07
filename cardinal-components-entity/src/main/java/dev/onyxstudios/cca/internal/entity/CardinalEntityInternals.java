@@ -29,7 +29,6 @@ import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import net.minecraft.entity.Entity;
 
 import java.util.HashMap;
@@ -41,7 +40,7 @@ public final class CardinalEntityInternals {
 
     private CardinalEntityInternals() { throw new AssertionError(); }
 
-    private static final Map<Class<? extends Entity>, DynamicContainerFactory<Entity>> entityContainerFactories = new HashMap<>();
+    private static final Map<Class<? extends Entity>, ComponentContainer.Factory<Entity>> entityContainerFactories = new HashMap<>();
     private static final Map<ComponentKey<?>, RespawnCopyStrategy<?>> RESPAWN_COPY_STRATEGIES = new HashMap<>();
     private static final Object factoryMutex = new Object();
 
@@ -53,10 +52,10 @@ public final class CardinalEntityInternals {
     @SuppressWarnings("unchecked")
     public static ComponentContainer createEntityComponentContainer(Entity entity) {
         Class<? extends Entity> entityClass = entity.getClass();
-        DynamicContainerFactory<Entity> existing = entityContainerFactories.get(entityClass);
+        ComponentContainer.Factory<Entity> existing = entityContainerFactories.get(entityClass);
 
         if (existing != null) {
-            return existing.create(entity);
+            return existing.createContainer(entity);
         }
 
         synchronized (factoryMutex) {   // can be called from both client and server thread, see #
@@ -72,10 +71,10 @@ public final class CardinalEntityInternals {
                     c = (Class<? extends Entity>) c.getSuperclass();
                 }
                 assert parentWithStaticComponents != null;
-                Class<? extends DynamicContainerFactory<Entity>> factoryClass = (Class<? extends DynamicContainerFactory<Entity>>) StaticEntityComponentPlugin.INSTANCE.spinDedicatedFactory(parentWithStaticComponents);
+                Class<? extends ComponentContainer.Factory<Entity>> factoryClass = (Class<? extends ComponentContainer.Factory<Entity>>) StaticEntityComponentPlugin.INSTANCE.spinDedicatedFactory(parentWithStaticComponents);
 
                 return ComponentsInternals.createFactory(factoryClass);
-            }).create(entity);
+            }).createContainer(entity);
         }
     }
 

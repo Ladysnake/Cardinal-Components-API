@@ -25,8 +25,6 @@ package dev.onyxstudios.cca.internal.item;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
@@ -42,10 +40,9 @@ public final class CardinalItemInternals {
     /**
      * Creates a container factory for an item id.
      */
-    public static DynamicContainerFactory<ItemStack> createItemStackContainerFactory(Item item) {
+    public static ComponentContainer.Factory<ItemStack> createItemStackContainerFactory(Item item) {
         Identifier itemId = Registry.ITEM.getId(item);
-        Class<? extends DynamicContainerFactory<ItemStack>> factoryClass = StaticItemComponentPlugin.INSTANCE.getFactoryClass(item, itemId);
-        return ComponentsInternals.createFactory(factoryClass);
+        return StaticItemComponentPlugin.INSTANCE.getFactoryClass(item, itemId);
     }
 
     public static void copyComponents(ItemStack original, ItemStack copy) {

@@ -26,6 +26,7 @@ import com.demonwav.mcdev.annotations.CheckEnv;
 import com.demonwav.mcdev.annotations.Env;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
+import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.util.NbtSerializable;
 import org.jetbrains.annotations.ApiStatus;
@@ -38,6 +39,7 @@ import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * An opaque container for components.
@@ -150,6 +152,13 @@ public interface ComponentContainer extends NbtSerializable {
                 this.argClass = argClass;
                 this.factories = new LinkedHashMap<>();
                 this.componentImpls = new LinkedHashMap<>();
+            }
+
+            @ApiStatus.Experimental
+            public void checkDuplicate(ComponentKey<?> key, Function<ComponentFactory<T, ?>, String> msgFactory) {
+                if (this.factories.containsKey(key)) {
+                    throw new StaticComponentLoadingException(msgFactory.apply(this.factories.get(key)));
+                }
             }
 
             @Contract(mutates = "this")
