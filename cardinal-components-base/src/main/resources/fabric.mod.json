@@ -10,7 +10,7 @@
         "modmenu:parent": "cardinal-components"
     },
     "depends": {
-        "minecraft": "<1.17-",
+        "minecraft": ">=1.17-",
         "fabric-api-base": ">=0.1.2"
     },
     "authors": [
@@ -19,7 +19,8 @@
             "contact": {
                 "homepage": "https://twitter.com/UpcraftLP"
             }
-        }
+        },
+      "Pyrofab"
     ],
     "contact": {
         "homepage": "https://minecraft.curseforge.com/projects/318449",

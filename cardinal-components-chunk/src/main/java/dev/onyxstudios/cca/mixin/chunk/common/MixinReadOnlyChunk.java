@@ -25,10 +25,7 @@ package dev.onyxstudios.cca.mixin.chunk.common;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.ReadOnlyChunk;
-import net.minecraft.world.chunk.UpgradeData;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,12 +34,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import javax.annotation.Nonnull;
 
 @Mixin(ReadOnlyChunk.class)
-public abstract class MixinReadOnlyChunk extends ProtoChunk implements InternalComponentProvider {
+public abstract class MixinReadOnlyChunk implements InternalComponentProvider {
     @Shadow @Final private WorldChunk wrapped;
-
-    public MixinReadOnlyChunk(ChunkPos pos, UpgradeData data) {
-        super(pos, data);
-    }
 
     @Nonnull
     @Override
