@@ -24,13 +24,13 @@ package dev.onyxstudios.cca.internal.entity;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerCopyCallback;
 import dev.onyxstudios.cca.api.v3.entity.PlayerSyncCallback;
 import dev.onyxstudios.cca.api.v3.entity.TrackingStartCallback;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
@@ -64,7 +64,7 @@ public final class CardinalComponentsEntity {
 
     private static void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless) {
         boolean keepInventory = original.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || clone.isSpectator();
-        Set<ComponentKey<?>> keys = ((InternalComponentProvider) original).getComponentContainer().keys();
+        Set<ComponentKey<?>> keys = ((ComponentProvider) original).getComponentContainer().keys();
 
         for (ComponentKey<?> key : keys) {
             copyData(original, clone, lossless, keepInventory, key);
@@ -78,7 +78,7 @@ public final class CardinalComponentsEntity {
     }
 
     private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {
-        InternalComponentProvider provider = (InternalComponentProvider) tracked;
+        ComponentProvider provider = (ComponentProvider) tracked;
 
         for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
             key.syncWith(player, provider);

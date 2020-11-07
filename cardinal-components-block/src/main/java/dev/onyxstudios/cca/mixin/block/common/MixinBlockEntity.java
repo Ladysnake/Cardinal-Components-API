@@ -24,10 +24,10 @@ package dev.onyxstudios.cca.mixin.block.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.CardinalComponentsBlock;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.block.CardinalBlockInternals;
 import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.block.BlockState;
@@ -53,7 +53,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 @Mixin(BlockEntity.class)
-public abstract class MixinBlockEntity implements InternalComponentProvider {
+public abstract class MixinBlockEntity implements ComponentProvider {
     @Shadow
     @Nullable
     public abstract World getWorld();

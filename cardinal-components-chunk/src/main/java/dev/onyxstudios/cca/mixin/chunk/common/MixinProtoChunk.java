@@ -23,7 +23,7 @@
 package dev.onyxstudios.cca.mixin.chunk.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
@@ -36,10 +36,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import javax.annotation.Nonnull;
 
 @Mixin(ProtoChunk.class)
-public abstract class MixinProtoChunk implements Chunk, InternalComponentProvider { @Unique
+public abstract class MixinProtoChunk implements Chunk, ComponentProvider {
+    @Unique
     private ComponentContainer components;
 
-    @Inject(method = "<init>(Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/world/chunk/UpgradeData;[Lnet/minecraft/world/chunk/ChunkSection;Lnet/minecraft/world/ChunkTickScheduler;Lnet/minecraft/world/ChunkTickScheduler;)V", at = @At("RETURN"))
+    @Inject(method = "<init>(Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/world/chunk/UpgradeData;[Lnet/minecraft/world/chunk/ChunkSection;Lnet/minecraft/world/ChunkTickScheduler;Lnet/minecraft/world/ChunkTickScheduler;Lnet/minecraft/world/HeightLimitView;)V", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
         this.components = StaticChunkComponentPlugin.createContainer(this);
     }

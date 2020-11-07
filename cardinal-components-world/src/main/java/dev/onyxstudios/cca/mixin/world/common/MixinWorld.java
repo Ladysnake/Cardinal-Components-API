@@ -23,7 +23,7 @@
 package dev.onyxstudios.cca.mixin.world.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.world.StaticWorldComponentPlugin;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import javax.annotation.Nonnull;
 
 @Mixin(World.class)
-public abstract class MixinWorld implements InternalComponentProvider {
+public abstract class MixinWorld implements ComponentProvider {
 
     @Unique
     protected ComponentContainer components;

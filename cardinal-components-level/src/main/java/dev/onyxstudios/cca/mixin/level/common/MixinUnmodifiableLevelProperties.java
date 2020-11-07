@@ -23,7 +23,7 @@
 package dev.onyxstudios.cca.mixin.level.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.world.level.ServerWorldProperties;
 import net.minecraft.world.level.UnmodifiableLevelProperties;
 import org.spongepowered.asm.mixin.Final;
@@ -33,13 +33,13 @@ import org.spongepowered.asm.mixin.Shadow;
 import javax.annotation.Nonnull;
 
 @Mixin(UnmodifiableLevelProperties.class)
-public abstract class MixinUnmodifiableLevelProperties implements InternalComponentProvider {
+public abstract class MixinUnmodifiableLevelProperties implements ComponentProvider {
 
     @Shadow @Final private ServerWorldProperties properties;
 
     @Nonnull
     @Override
     public ComponentContainer getComponentContainer() {
-        return ((InternalComponentProvider) this.properties).getComponentContainer();
+        return ((ComponentProvider) this.properties).getComponentContainer();
     }
 }

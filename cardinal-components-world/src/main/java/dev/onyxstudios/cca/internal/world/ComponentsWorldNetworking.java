@@ -24,11 +24,11 @@ package dev.onyxstudios.cca.internal.world;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.world.WorldSyncCallback;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -40,7 +40,7 @@ public final class ComponentsWorldNetworking {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
             WorldSyncCallback.EVENT.register((player, world) -> {
-                InternalComponentProvider provider = (InternalComponentProvider) world;
+                ComponentProvider provider = (ComponentProvider) world;
                 for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
                     key.syncWith(player, provider);
                 }

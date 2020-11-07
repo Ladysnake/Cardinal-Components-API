@@ -27,9 +27,9 @@ import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.level.ComponentsLevelNetworking;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
 import net.minecraft.nbt.CompoundTag;
@@ -60,7 +60,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Mixin(LevelProperties.class)
-public abstract class MixinLevelProperties implements ServerWorldProperties, InternalComponentProvider {
+public abstract class MixinLevelProperties implements ServerWorldProperties, ComponentProvider {
     @Unique
     private ComponentContainer components;
 
@@ -71,7 +71,7 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Int
 
     @Inject(method = "readProperties", at = @At("RETURN"))
     private static void readComponents(Dynamic<Tag> dynamic, DataFixer dataFixer, int dataVersion, CompoundTag compoundTag, LevelInfo levelInfo, SaveVersionInfo arg, GeneratorOptions generatorOptions, Lifecycle lifecycle, CallbackInfoReturnable<LevelProperties> cir) {
-        ((InternalComponentProvider) cir.getReturnValue()).getComponentContainer().fromDynamic(dynamic);
+        ((ComponentProvider) cir.getReturnValue()).getComponentContainer().fromDynamic(dynamic);
     }
 
     @Inject(method = "updateProperties", at = @At("RETURN"))

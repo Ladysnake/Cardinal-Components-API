@@ -27,7 +27,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking;
 import dev.onyxstudios.cca.internal.scoreboard.StaticTeamComponentPlugin;
 import net.minecraft.network.PacketByteBuf;
@@ -48,7 +47,7 @@ import javax.annotation.Nullable;
 import java.util.Iterator;
 
 @Mixin(Team.class)
-public abstract class MixinTeam implements InternalComponentProvider, TeamAccessor {
+public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
     @Shadow
     public abstract String getName();
 

@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.mixin.scoreboard;
 
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.scoreboard.Scoreboard;
@@ -46,13 +46,13 @@ public abstract class MixinScoreboardState {
 
     @Inject(method = "toTag", at = @At("RETURN"))
     private void saveComponents(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
-        ((InternalComponentProvider) this.scoreboard).getComponentContainer().toTag(tag);
+        ((ComponentProvider) this.scoreboard).getComponentContainer().toTag(tag);
     }
 
     @Inject(method = "fromTag", at = @At("RETURN"))
     private void loadComponents(CompoundTag tag, CallbackInfo ci) {
         if (this.scoreboard != null) {  // weird deferred loading thing
-            ((InternalComponentProvider) this.scoreboard).getComponentContainer().fromTag(tag);
+            ((ComponentProvider) this.scoreboard).getComponentContainer().fromTag(tag);
         }
     }
 
@@ -66,7 +66,7 @@ public abstract class MixinScoreboardState {
         locals = LocalCapture.CAPTURE_FAILEXCEPTION
     )
     private void loadTeamComponents(ListTag listTag, CallbackInfo ci, int i, CompoundTag teamData, String name, Team team) {
-        ((InternalComponentProvider) team).getComponentContainer().fromTag(teamData);
+        ((ComponentProvider) team).getComponentContainer().fromTag(teamData);
     }
 
     @Inject(
@@ -85,6 +85,6 @@ public abstract class MixinScoreboardState {
         Team team,
         CompoundTag teamData
     ) {
-        ((InternalComponentProvider) team).getComponentContainer().toTag(teamData);
+        ((ComponentProvider) team).getComponentContainer().toTag(teamData);
     }
 }

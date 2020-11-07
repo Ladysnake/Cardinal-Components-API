@@ -24,9 +24,9 @@ package dev.onyxstudios.cca.mixin.scoreboard;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking;
 import dev.onyxstudios.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
 import net.minecraft.network.PacketByteBuf;
@@ -46,7 +46,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 @Mixin(Scoreboard.class)
-public abstract class MixinScoreboard implements InternalComponentProvider {
+public abstract class MixinScoreboard implements ComponentProvider {
     @Unique
     private ComponentContainer components;
 
