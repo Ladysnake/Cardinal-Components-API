@@ -94,15 +94,15 @@ public final class TestComponents implements
 
     @Override
     public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
-        registry.registerFor(CardinalComponentsTest.id("vita_condenser"), VITA,
+        registry.registerForBlock(CardinalComponentsTest.id("vita_condenser"), VITA,
             (state, world, pos, side) -> {
                 if (world instanceof CollisionView)
                     return VITA.get(Objects.requireNonNull(((CollisionView) world).getExistingChunk(pos.getX() >> 4, pos.getZ() >> 4)));
                 if (world instanceof Chunk) return VITA.get(world);
                 return null;
             });
-        registry.registerFor(EndPortalBlockEntity.class, VITA, SyncedVita::new);
-        registry.registerFor(
+        registry.registerForBlockEntity(EndPortalBlockEntity.class, VITA, SyncedVita::new);
+        registry.registerForBlock(
             new Identifier("end_gateway"),
             VITA,
             (state, world, pos, side) -> side != Direction.UP ? VITA.maybeGet(world.getBlockEntity(pos)).orElse(null) : null

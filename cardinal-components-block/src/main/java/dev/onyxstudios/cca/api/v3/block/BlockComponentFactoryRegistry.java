@@ -23,6 +23,7 @@
 package dev.onyxstudios.cca.api.v3.block;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.Identifier;
@@ -45,10 +46,10 @@ public interface BlockComponentFactoryRegistry {
      * @see BlockComponent
      * @see BlockComponents
      */
-    <C extends Component> void registerFor(Identifier blockId, ComponentKey<? super C> key, BlockComponentProvider<C> factory);
+    <C extends Component> void registerForBlock(Identifier blockId, ComponentKey<? super C> key, BlockComponentProvider<C> factory);
 
     /**
-     * Registers a {@link BlockEntityComponentFactory} for all instances of a given {@link BlockEntity} class.
+     * Registers a {@link ComponentFactory} for all instances of a given {@link BlockEntity} class.
      *
      * <p>Callers of this method should always use the most specific block entity
      * type for their use. For example, a factory which goal is to attach a component
@@ -58,11 +59,10 @@ public interface BlockComponentFactoryRegistry {
      * For these same reasons, when registering factories for various block entity types,
      * it is often better to register a separate specialized callback for each type
      * than a single generic callback with additional checks.
-     *
-     * @param target  a class object representing the type of entities targeted by the factory
+     *  @param target  a class object representing the type of entities targeted by the factory
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component, BE extends BlockEntity> void registerFor(Class<BE> target, ComponentKey<C> key, BlockEntityComponentFactory<C, BE> factory);
+    <C extends Component, BE extends BlockEntity> void registerForBlockEntity(Class<BE> target, ComponentKey<C> key, ComponentFactory<BE, C> factory);
 
     /**
      * Begin a factory registration, initially targeting all instances of the {@code target}.
@@ -97,6 +97,6 @@ public interface BlockComponentFactoryRegistry {
          *
          * @param factory a factory creating instances of {@code C} that will be attached to instances of {@code BE}
          */
-        void end(BlockEntityComponentFactory<C, BE> factory);
+        void end(ComponentFactory<BE, C> factory);
     }
 }

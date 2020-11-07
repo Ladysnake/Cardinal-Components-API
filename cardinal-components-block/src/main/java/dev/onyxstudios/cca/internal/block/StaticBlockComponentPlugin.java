@@ -25,11 +25,7 @@ package dev.onyxstudios.cca.internal.block;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentProvider;
-import dev.onyxstudios.cca.api.v3.block.BlockEntityComponentFactory;
-import dev.onyxstudios.cca.api.v3.component.Component;
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.*;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
@@ -65,7 +61,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     private final Map<Identifier, Map<ComponentKey<?>, BlockComponentProvider<?>>> blockComponentFactories = new HashMap<>();
     private final List<PredicatedComponentFactory<?>> dynamicFactories = new ArrayList<>();
     private final Map<Class<? extends BlockEntity>, Map<ComponentKey<?>, Class<? extends Component>>> beComponentImpls = new HashMap<>();
-    private final Map<Class<? extends BlockEntity>, Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>>> beComponentFactories = new Reference2ObjectOpenHashMap<>();
+    private final Map<Class<? extends BlockEntity>, Map<ComponentKey<?>, ComponentFactory<?, ?>>> beComponentFactories = new Reference2ObjectOpenHashMap<>();
     private final Map<Class<? extends BlockEntity>, Class<? extends ComponentContainer.Factory<BlockEntity>>> factoryClasses = new Reference2ObjectOpenHashMap<>();
     private final Set<Class<? extends BlockEntity>> clientTicking = new ReferenceOpenHashSet<>();
     private final Set<Class<? extends BlockEntity>> serverTicking = new ReferenceOpenHashSet<>();
@@ -108,7 +104,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
                 dynamicFactory.tryRegister(entityClass);
             }
 
-            Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>> compiled = new LinkedHashMap<>(this.beComponentFactories.getOrDefault(entityClass, Collections.emptyMap()));
+            Map<ComponentKey<?>, ComponentFactory<?, ?>> compiled = new LinkedHashMap<>(this.beComponentFactories.getOrDefault(entityClass, Collections.emptyMap()));
             Map<ComponentKey<?>, Class<? extends Component>> compiledImpls = new LinkedHashMap<>(this.beComponentImpls.getOrDefault(entityClass, Collections.emptyMap()));
             Class<? extends BlockEntity> type = entityClass;
 
@@ -127,7 +123,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
 
             try {
                 Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(
-                    BlockEntityComponentFactory.class,
+                    ComponentFactory.class,
                     compiled,
                     compiledImpls,
                     implSuffix
@@ -145,24 +141,24 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         });
     }
 
-    public <C extends Component, E extends BlockEntity> void registerFor(Class<E> target, ComponentKey<C> type, BlockEntityComponentFactory<C, E> factory) {
+    public <C extends Component, E extends BlockEntity> void registerForBlockEntity(Class<E> target, ComponentKey<C> type, ComponentFactory<E, C> factory) {
         this.checkLoading(BlockComponentFactoryRegistry.class, "register");
         this.register0(target, type, factory, type.getComponentClass());
     }
 
-    private <C extends Component, F extends C, E extends BlockEntity> void register0(Class<? extends E> target, ComponentKey<? super C> type, BlockEntityComponentFactory<F, E> factory, Class<C> impl) {
-        Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>> specializedMap = this.beComponentFactories.computeIfAbsent(target, t -> new LinkedHashMap<>());
-        BlockEntityComponentFactory<?, ?> previousFactory = specializedMap.get(type);
+    private <C extends Component, F extends C, E extends BlockEntity> void register0(Class<? extends E> target, ComponentKey<? super C> type, ComponentFactory<E, F> factory, Class<C> impl) {
+        Map<ComponentKey<?>, ComponentFactory<?, ?>> specializedMap = this.beComponentFactories.computeIfAbsent(target, t -> new LinkedHashMap<>());
+        ComponentFactory<?, ?> previousFactory = specializedMap.get(type);
         if (previousFactory != null) {
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + target + ": " + factory + " and " + previousFactory);
         }
-        BlockEntityComponentFactory<Component, E> checked = entity -> Objects.requireNonNull(((BlockEntityComponentFactory<?, E>) factory).createForBlockEntity(entity), "Component factory " + factory + " for " + type.getId() + " returned null on " + entity.getClass().getSimpleName());
+        ComponentFactory<E, Component> checked = entity -> Objects.requireNonNull(((ComponentFactory<E, ?>) factory).createComponent(entity), "Component factory " + factory + " for " + type.getId() + " returned null on " + entity.getClass().getSimpleName());
         specializedMap.put(type, checked);
         this.beComponentImpls.computeIfAbsent(target, t -> new LinkedHashMap<>()).put(type, impl);
     }
 
     @Override
-    public <C extends Component> void registerFor(@Nullable Identifier blockId, ComponentKey<? super C> type, BlockComponentProvider<C> factory) {
+    public <C extends Component> void registerForBlock(@Nullable Identifier blockId, ComponentKey<? super C> type, BlockComponentProvider<C> factory) {
         this.checkLoading(BlockComponentFactoryRegistry.class, "register");
         Map<ComponentKey<?>, BlockComponentProvider<?>> specializedMap = this.blockComponentFactories.computeIfAbsent(blockId, t -> new Reference2ObjectOpenHashMap<>());
         BlockComponentProvider<?> previousFactory = specializedMap.get(type);
@@ -192,10 +188,10 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     private final class PredicatedComponentFactory<C extends Component> {
         private final Predicate<Class<? extends BlockEntity>> predicate;
         private final ComponentKey<? super C> type;
-        private final BlockEntityComponentFactory<C, BlockEntity> factory;
+        private final ComponentFactory<BlockEntity, C> factory;
         private final Class<C> impl;
 
-        public PredicatedComponentFactory(Predicate<Class<? extends BlockEntity>> predicate, ComponentKey<? super C> type, BlockEntityComponentFactory<C, BlockEntity> factory, Class<C> impl) {
+        public PredicatedComponentFactory(Predicate<Class<? extends BlockEntity>> predicate, ComponentKey<? super C> type, ComponentFactory<BlockEntity, C> factory, Class<C> impl) {
             this.type = type;
             this.factory = factory;
             this.predicate = predicate;
@@ -236,7 +232,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         }
 
         @Override
-        public void end(BlockEntityComponentFactory<C, E> factory) {
+        public void end(ComponentFactory<E, C> factory) {
             StaticBlockComponentPlugin.this.checkLoading(Registration.class, "end");
             if (this.test == null) {
                 StaticBlockComponentPlugin.this.register0(
@@ -249,7 +245,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
                 StaticBlockComponentPlugin.this.dynamicFactories.add(new PredicatedComponentFactory<>(
                     c -> this.target.isAssignableFrom(c) && this.test.test(c.asSubclass(this.target)),
                     this.key,
-                    entity -> factory.createForBlockEntity(this.target.cast(entity)),
+                    entity -> factory.createComponent(this.target.cast(entity)),
                     this.componentClass
                 ));
             }

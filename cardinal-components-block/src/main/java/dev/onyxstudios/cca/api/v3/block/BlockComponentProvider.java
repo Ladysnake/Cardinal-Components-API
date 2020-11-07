@@ -49,7 +49,7 @@ import org.jetbrains.annotations.Nullable;
  * }
  * }</pre>
  * Where {@code SIDED} is an internal {@link ComponentKey} that has been
- * {@link BlockComponentFactoryRegistry#registerFor(Class, ComponentKey, BlockEntityComponentFactory) registered}
+ * {@link BlockComponentFactoryRegistry#registerForBlockEntity(Class, ComponentKey, dev.onyxstudios.cca.api.v3.component.ComponentFactory) registered}
  * for the {@link BlockEntity} normally associated with the block.
  *
  * @see BlockComponents
