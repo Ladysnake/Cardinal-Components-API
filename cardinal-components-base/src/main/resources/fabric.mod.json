@@ -1,31 +1,31 @@
 {
-    "schemaVersion": 1,
-    "environment": "*",
-    "id": "cardinal-components-base",
-    "name": "Cardinal Components API (base)",
-    "description": "dynamically exposing components",
-    "version": "${version}",
-    "custom": {
-        "modmenu:api": true,
-        "modmenu:parent": "cardinal-components"
+  "schemaVersion": 1,
+  "environment": "*",
+  "id": "cardinal-components-base",
+  "name": "Cardinal Components API (base)",
+  "description": "dynamically exposing components",
+  "version": "${version}",
+  "custom": {
+    "modmenu:api": true,
+    "modmenu:parent": "cardinal-components"
+  },
+  "depends": {
+    "minecraft": ">=1.17-",
+    "fabric-api-base": ">=0.1.2"
+  },
+  "authors": [
+    {
+      "name": "UpcraftLP",
+      "contact": {
+        "homepage": "https://twitter.com/UpcraftLP"
+      }
     },
-    "depends": {
-        "minecraft": ">=1.17-",
-        "fabric-api-base": ">=0.1.2"
-    },
-    "authors": [
-        {
-            "name": "UpcraftLP",
-            "contact": {
-                "homepage": "https://twitter.com/UpcraftLP"
-            }
-        },
-      "Pyrofab"
-    ],
-    "contact": {
-        "homepage": "https://minecraft.curseforge.com/projects/318449",
-        "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
-        "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
-    },
-    "license": "MIT"
+    "Pyrofab"
+  ],
+  "contact": {
+    "homepage": "https://minecraft.curseforge.com/projects/318449",
+    "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
+    "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
+  },
+  "license": "MIT"
 }

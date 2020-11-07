@@ -1,49 +1,49 @@
 {
-    "schemaVersion": 1,
-    "environment": "*",
-    "id": "cardinal-components-level",
-    "name": "Cardinal Components API (world saves)",
-    "description": "dynamically exposing components",
-    "version": "${version}",
-    "entrypoints": {
-        "main": [
-            "dev.onyxstudios.cca.internal.level.ComponentsLevelNetworking::init"
-        ],
-        "client": [
-            "dev.onyxstudios.cca.internal.level.ComponentsLevelNetworking::initClient"
-        ]
-    },
-    "custom": {
-        "modmenu:api": true,
-        "modmenu:parent": "cardinal-components"
-    },
-    "depends": {
-        "minecraft": ">=1.16.2-",
-        "fabric-api-base": "*",
-        "cardinal-components-base": "<3.0.0-"
-    },
-    "recommends": {
-        "fabric-networking-v0": "*",
-        "cardinal-components-world": "*"
-    },
-    "authors": [
-        {
-            "name": "UpcraftLP",
-            "contact": {
-                "homepage": "https://twitter.com/UpcraftLP"
-            }
-        }
+  "schemaVersion": 1,
+  "environment": "*",
+  "id": "cardinal-components-level",
+  "name": "Cardinal Components API (world saves)",
+  "description": "dynamically exposing components",
+  "version": "${version}",
+  "entrypoints": {
+    "main": [
+      "dev.onyxstudios.cca.internal.level.ComponentsLevelNetworking::init"
     ],
-    "contact": {
-        "homepage": "https://minecraft.curseforge.com/projects/318449",
-        "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
-        "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
-    },
-    "license": "MIT",
-    "mixins": [
-        {
-            "environment": "*",
-            "config": "mixins.cardinal_components_level.json"
-        }
+    "client": [
+      "dev.onyxstudios.cca.internal.level.ComponentsLevelNetworking::initClient"
     ]
+  },
+  "custom": {
+    "modmenu:api": true,
+    "modmenu:parent": "cardinal-components"
+  },
+  "depends": {
+    "minecraft": ">=1.17-",
+    "fabric-api-base": "*",
+    "cardinal-components-base": "*"
+  },
+  "recommends": {
+    "fabric-networking-v0": "*",
+    "cardinal-components-world": "*"
+  },
+  "authors": [
+    {
+      "name": "UpcraftLP",
+      "contact": {
+        "homepage": "https://twitter.com/UpcraftLP"
+      }
+    }
+  ],
+  "contact": {
+    "homepage": "https://minecraft.curseforge.com/projects/318449",
+    "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
+    "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
+  },
+  "license": "MIT",
+  "mixins": [
+    {
+      "environment": "*",
+      "config": "mixins.cardinal_components_level.json"
+    }
+  ]
 }
