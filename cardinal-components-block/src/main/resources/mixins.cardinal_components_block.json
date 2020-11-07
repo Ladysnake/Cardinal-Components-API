@@ -8,7 +8,8 @@
     "common.MixinBlockEntity",
     "common.MixinChunkHolder",
     "common.MixinServerPlayerEntity",
-    "common.MixinThreadedAnvilChunkStorage"
+    "common.MixinThreadedAnvilChunkStorage",
+    "common.MixinWorldChunk"
   ],
   "client": [
   ],
