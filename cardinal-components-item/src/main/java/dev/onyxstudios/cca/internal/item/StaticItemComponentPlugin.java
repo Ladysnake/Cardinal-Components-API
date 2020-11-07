@@ -26,6 +26,7 @@ import dev.onyxstudios.cca.api.v3.component.*;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
+import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
@@ -50,6 +51,10 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     private final Map<@Nullable Identifier, ComponentContainer.Factory.Builder<ItemStack>> componentFactories = new HashMap<>();
     private final ComponentContainer.Factory<ItemStack> emptyFactory = stack -> ComponentContainer.EMPTY;
 
+    private static String getSuffix(Identifier itemId) {
+        return "ItemStackImpl_" + CcaAsmHelper.getJavaIdentifierName(itemId);
+    }
+
     public ComponentContainer.Factory<ItemStack> getFactoryClass(Item item, Identifier itemId) {
         this.ensureInitialized();
         Objects.requireNonNull(item);
@@ -59,7 +64,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         }
 
         if (this.componentFactories.containsKey(itemId)) {
-            return this.componentFactories.get(itemId).build();
+            return this.componentFactories.get(itemId).build(getSuffix(itemId));
         }
 
         return this.emptyFactory;

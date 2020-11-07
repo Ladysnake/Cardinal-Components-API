@@ -180,6 +180,10 @@ public interface ComponentContainer extends NbtSerializable {
             }
 
             public Factory<T> build() {
+                return this.build(null);
+            }
+
+            public Factory<T> build(@Nullable String factoryNameSuffix) {
                 if (this.built) {
                     throw new IllegalStateException("Cannot build more than one container factory with the same builder");
                 }
@@ -191,7 +195,7 @@ public interface ComponentContainer extends NbtSerializable {
                         return t -> EMPTY;
                     }
 
-                    String implNameSuffix = Integer.toString(counter++);
+                    String implNameSuffix = factoryNameSuffix != null ? factoryNameSuffix : Integer.toString(counter++);
                     Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(
                         ComponentFactory.class, this.factories, this.componentImpls, implNameSuffix
                     );
