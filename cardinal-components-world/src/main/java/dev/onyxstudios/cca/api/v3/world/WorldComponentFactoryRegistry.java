@@ -32,7 +32,7 @@ import net.minecraft.world.World;
  */
 public interface WorldComponentFactoryRegistry {
     /**
-     * Registers a {@link WorldComponentFactory}.
+     * Registers a {@link ComponentFactory}.
      *
      * @param factory the factory to use to create components of the given type
      */
