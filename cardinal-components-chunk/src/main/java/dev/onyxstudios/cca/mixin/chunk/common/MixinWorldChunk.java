@@ -34,6 +34,7 @@ import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -49,6 +50,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.function.Consumer;
 
 @Mixin(WorldChunk.class)
 public abstract class MixinWorldChunk implements Chunk, InternalComponentProvider {
@@ -90,8 +92,8 @@ public abstract class MixinWorldChunk implements Chunk, InternalComponentProvide
         return new CustomPayloadS2CPacket(ComponentsChunkNetworking.PACKET_ID, buf);
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/world/chunk/ProtoChunk;)V", at = @At("RETURN"))
-    private void copyFromProto(World world, ProtoChunk proto, CallbackInfo ci) {
+    @Inject(method = "<init>(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/chunk/ProtoChunk;Ljava/util/function/Consumer;)V", at = @At("RETURN"))
+    private void copyFromProto(ServerWorld world, ProtoChunk proto, Consumer<WorldChunk> consumer, CallbackInfo ci) {
         this.components.copyFrom(ComponentProvider.fromChunk(proto).getComponentContainer());
     }
 }

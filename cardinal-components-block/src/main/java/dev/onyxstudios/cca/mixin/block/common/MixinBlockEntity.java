@@ -68,7 +68,7 @@ public abstract class MixinBlockEntity implements InternalComponentProvider {
     private ComponentContainer components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(BlockEntityType<?> type, CallbackInfo ci) {
+    private void init(BlockEntityType<?> type, BlockPos pos, BlockState state, CallbackInfo ci) {
         this.components = CardinalBlockInternals.createComponents((BlockEntity) (Object) this);
     }
 
@@ -77,8 +77,9 @@ public abstract class MixinBlockEntity implements InternalComponentProvider {
         this.components.toTag(cir.getReturnValue());
     }
 
+    // FIXME modded and future BEs may not call super.fromTag()
     @Inject(method = "fromTag", at = @At(value = "RETURN"))
-    private void fromTag(BlockState state, CompoundTag tag, CallbackInfo ci) {
+    private void fromTag(CompoundTag tag, CallbackInfo ci) {
         this.components.fromTag(tag);
     }
 
