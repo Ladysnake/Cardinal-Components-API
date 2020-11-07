@@ -6,7 +6,7 @@
     "plugin": "dev.onyxstudios.cca.mixin.CardinalItemMixinPlugin",
     "mixins": [
         "common.MixinBookCloningRecipe",
-        "common.MixinCauldronBlock",
+        "common.MixinCauldronBehavior",
         "common.MixinItem",
         "common.MixinItemEntity",
         "common.MixinItemStack",
