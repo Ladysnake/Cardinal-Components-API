@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.internal.item;
 
 import dev.onyxstudios.cca.api.v3.component.*;
-import dev.onyxstudios.cca.api.v3.item.ItemComponentFactory;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
@@ -75,23 +74,23 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     }
 
     @Override
-    public <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ItemComponentFactory<? extends C> factory) {
+    public <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
         this.checkLoading(ItemComponentFactoryRegistry.class, "register");
         this.register0(itemId, type, factory);
     }
 
     @Override
-    public <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ItemComponentFactory<? extends C> factory) {
+    public <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
         this.dynamicFactories.add(new PredicatedComponentFactory<>(test, type, factory));
     }
 
-    private <C extends Component> void register0(Identifier itemId, ComponentKey<C> type, ItemComponentFactory<? extends C> factory) {
+    private <C extends Component> void register0(Identifier itemId, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
         Objects.requireNonNull(itemId);
 
         ComponentContainer.Factory.Builder<ItemStack> builder = this.componentFactories.computeIfAbsent(itemId, t -> ComponentContainer.Factory.builder(ItemStack.class));
         builder.checkDuplicate(type, previousFactory -> "Duplicate factory declarations for " + type.getId() + " on item '" + itemId + "': " + factory + " and " + previousFactory);
 
-        ComponentFactory<ItemStack, C> finalFactory;
+        ComponentFactory<ItemStack, ? extends C> finalFactory;
 
         if (VERIFY_EQUALS && ComponentV3.class.isAssignableFrom(type.getComponentClass())) {
             finalFactory = new ComponentFactory<ItemStack, C>() {
@@ -100,7 +99,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
                 @Nonnull
                 @Override
                 public C createComponent(ItemStack stack) {
-                    C component = factory.createForStack(stack);
+                    C component = factory.createComponent(stack);
 
                     if (!this.checked) {
                         try {
@@ -118,7 +117,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
                 }
             };
         } else {
-            finalFactory = factory::createForStack;
+            finalFactory = factory;
         }
 
         builder.component(type, finalFactory);
@@ -127,9 +126,9 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     private final class PredicatedComponentFactory<C extends Component> {
         private final Predicate<Item> predicate;
         private final ComponentKey<C> type;
-        private final ItemComponentFactory<? extends C> factory;
+        private final ComponentFactory<ItemStack, ? extends C> factory;
 
-        public PredicatedComponentFactory(Predicate<Item> predicate, ComponentKey<C> type, ItemComponentFactory<? extends C> factory) {
+        public PredicatedComponentFactory(Predicate<Item> predicate, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
             this.type = type;
             this.factory = factory;
             this.predicate = predicate;

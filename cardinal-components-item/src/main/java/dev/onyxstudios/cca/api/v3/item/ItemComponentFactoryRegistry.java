@@ -23,8 +23,10 @@
 package dev.onyxstudios.cca.api.v3.item;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 
 import java.util.function.Predicate;
@@ -34,21 +36,21 @@ import java.util.function.Predicate;
  */
 public interface ItemComponentFactoryRegistry {
     /**
-     * Registers an {@link ItemComponentFactory} for stacks of a specific item.
+     * Registers a {@link ComponentFactory} for stacks of a specific item.
      *
      * @param itemId  the id of an item to target
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ItemComponentFactory<? extends C> factory);
+    <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory);
 
     /**
-     * Registers an {@link ItemComponentFactory} for stacks of specific items, based on a predicate.
+     * Registers a {@link ComponentFactory} for stacks of specific items, based on a predicate.
      *
      * @param test  a predicate testing whether the Item can have the component attached to its stacks
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ItemComponentFactory<? extends C> factory);
+    <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory);
 
 }
