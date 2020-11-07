@@ -23,6 +23,7 @@
 package dev.onyxstudios.cca.api.v3.entity;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -36,7 +37,7 @@ import java.util.function.Predicate;
 public interface EntityComponentFactoryRegistry {
 
     /**
-     * Registers an {@link EntityComponentFactory} for all instances of a given entity class.
+     * Registers a {@link ComponentFactory} for all instances of a given entity class.
      *
      * <p> Callers of this method should always use the most specific entity
      * type for their use. For example, a factory which goal is to attach a component
@@ -50,10 +51,10 @@ public interface EntityComponentFactoryRegistry {
      * @param target  a class object representing the type of entities targeted by the factory
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> key, EntityComponentFactory<? extends C, E> factory);
+    <C extends Component, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> key, ComponentFactory<E, ? extends C> factory);
 
     /**
-     * Registers an {@link EntityComponentFactory} for all instances of classes that pass the {@code test}.
+     * Registers a {@link ComponentFactory} for all instances of classes that pass the {@code test}.
      *
      * @param test    a predicate testing whether the class can have the component attached to its instances
      * @param key     the key of components to attach
@@ -61,7 +62,7 @@ public interface EntityComponentFactoryRegistry {
      * @throws NullPointerException if any of the arguments is {@code null}
      */
     @Deprecated
-    <C extends Component> void registerFor(Predicate<Class<? extends Entity>> test, ComponentKey<C> key, EntityComponentFactory<C, Entity> factory);
+    <C extends Component> void registerFor(Predicate<Class<? extends Entity>> test, ComponentKey<C> key, ComponentFactory<Entity, C> factory);
 
     /**
      * Begin a factory registration, initially targeting all instances of the {@code target}.
@@ -74,7 +75,7 @@ public interface EntityComponentFactoryRegistry {
     <C extends Component, E extends Entity> Registration<C, E> beginRegistration(Class<E> target, ComponentKey<C> key);
 
     /**
-     * Registers an {@link EntityComponentFactory} for all {@link PlayerEntity} instances.
+     * Registers a {@link ComponentFactory} for all {@link PlayerEntity} instances.
      *
      * @param key     the key of components to attach
      * @param factory the factory to use to create components of the given key
@@ -82,10 +83,10 @@ public interface EntityComponentFactoryRegistry {
      * @since 2.6
      */
     @ApiStatus.Experimental
-    <C extends PlayerComponent<? super C>> void registerForPlayers(ComponentKey<? super C> key, EntityComponentFactory<C, PlayerEntity> factory);
+    <C extends PlayerComponent<? super C>> void registerForPlayers(ComponentKey<? super C> key, ComponentFactory<PlayerEntity, C> factory);
 
     /**
-     * Registers an {@link EntityComponentFactory} for all {@link PlayerEntity} instances, with a specific {@link RespawnCopyStrategy}.
+     * Registers a {@link ComponentFactory} for all {@link PlayerEntity} instances, with a specific {@link RespawnCopyStrategy}.
      *
      * @param key     the key of components to attach
      * @param factory the factory to use to create components of the given key
@@ -95,7 +96,7 @@ public interface EntityComponentFactoryRegistry {
      * @see RespawnCopyStrategy#INVENTORY
      * @see RespawnCopyStrategy#LOSSLESS_ONLY
      */
-    <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, EntityComponentFactory<P, PlayerEntity> factory, RespawnCopyStrategy<? super P> respawnStrategy);
+    <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, ComponentFactory<PlayerEntity, P> factory, RespawnCopyStrategy<? super P> respawnStrategy);
 
     /**
      * Set the respawn copy strategy used for components of a given type.
@@ -117,7 +118,7 @@ public interface EntityComponentFactoryRegistry {
     @ApiStatus.Experimental
     interface Registration<C extends Component, E extends Entity> {
         /**
-         * Registers an {@link EntityComponentFactory} for all instances of classes that pass the {@code test}.
+         * Registers a {@link ComponentFactory} for all instances of classes that pass the {@code test}.
          *
          * @param test a predicate testing whether the class can have the component attached to its instances
          */
@@ -149,6 +150,6 @@ public interface EntityComponentFactoryRegistry {
          *
          * @param factory a factory creating instances of {@code C} that will be attached to instances of {@code E}
          */
-        void end(EntityComponentFactory<C, E> factory);
+        void end(ComponentFactory<E, C> factory);
     }
 }
