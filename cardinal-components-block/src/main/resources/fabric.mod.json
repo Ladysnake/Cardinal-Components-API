@@ -1,46 +1,47 @@
 {
-    "schemaVersion": 1,
-    "environment": "*",
-    "id": "cardinal-components-block",
-    "name": "Cardinal Components API (blocks)",
-    "description": "dynamically exposing components",
-    "version": "${version}",
-    "entrypoints": {
-        "main": [
-            "dev.onyxstudios.cca.internal.CardinalComponentsBlock::init"
-        ],
-        "client": [
-            "dev.onyxstudios.cca.internal.CardinalComponentsBlock::initClient"
-        ]
-    },
-    "custom": {
-        "modmenu:api": true,
-        "modmenu:parent": "cardinal-components"
-    },
-    "depends": {
-        "fabric-api-base": "*",
-        "cardinal-components-base": "<3.0.0-"
-    },
-    "authors": [
-        {
-            "name": "UpcraftLP",
-            "contact": {
-                "homepage": "https://twitter.com/UpcraftLP"
-            }
-        },
-        "Pyrofab",
-        "B0undaryBreaker"
+  "schemaVersion": 1,
+  "environment": "*",
+  "id": "cardinal-components-block",
+  "name": "Cardinal Components API (blocks)",
+  "description": "dynamically exposing components",
+  "version": "${version}",
+  "entrypoints": {
+    "main": [
+      "dev.onyxstudios.cca.internal.CardinalComponentsBlock::init"
     ],
-    "contact": {
-        "homepage": "https://minecraft.curseforge.com/projects/318449",
-        "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
-        "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
-    },
-    "license": "MIT",
-    "mixins": [
-        {
-            "environment": "*",
-            "config": "mixins.cardinal_components_block.json"
-        }
+    "client": [
+      "dev.onyxstudios.cca.internal.CardinalComponentsBlock::initClient"
     ]
+  },
+  "custom": {
+    "modmenu:api": true,
+    "modmenu:parent": "cardinal-components"
+  },
+  "depends": {
+    "minecraft": ">=1.17-",
+    "fabric-api-base": "*",
+    "cardinal-components-base": "*"
+  },
+  "authors": [
+    {
+      "name": "UpcraftLP",
+      "contact": {
+        "homepage": "https://twitter.com/UpcraftLP"
+      }
+    },
+    "Pyrofab",
+    "B0undaryBreaker"
+  ],
+  "contact": {
+    "homepage": "https://minecraft.curseforge.com/projects/318449",
+    "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
+    "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
+  },
+  "license": "MIT",
+  "mixins": [
+    {
+      "environment": "*",
+      "config": "mixins.cardinal_components_block.json"
+    }
+  ]
 }
