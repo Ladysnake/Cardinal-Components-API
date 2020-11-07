@@ -25,7 +25,6 @@ package dev.onyxstudios.cca.mixin.world.common;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.world.ComponentPersistentState;
 import dev.onyxstudios.cca.internal.world.ComponentsWorldNetworking;
 import net.minecraft.network.PacketByteBuf;
@@ -63,7 +62,7 @@ public abstract class MixinServerWorld extends MixinWorld {
 
     @Inject(method = "tick", at = @At("RETURN"))
     private void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-        ((InternalComponentProvider) this).getComponentContainer().tickServerComponents();
+        this.getComponentContainer().tickServerComponents();
     }
 
     @Override

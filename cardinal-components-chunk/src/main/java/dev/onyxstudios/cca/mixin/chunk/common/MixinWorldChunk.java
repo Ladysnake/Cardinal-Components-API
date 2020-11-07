@@ -27,7 +27,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
 import net.fabricmc.fabric.api.server.PlayerStream;
@@ -53,7 +52,7 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 @Mixin(WorldChunk.class)
-public abstract class MixinWorldChunk implements Chunk, InternalComponentProvider {
+public abstract class MixinWorldChunk implements Chunk, ComponentProvider {
     @Shadow
     public abstract World getWorld();
 

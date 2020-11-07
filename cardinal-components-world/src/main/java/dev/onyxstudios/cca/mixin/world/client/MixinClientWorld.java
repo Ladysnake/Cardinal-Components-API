@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.mixin.world.client;
 
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.client.world.ClientWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,6 +35,6 @@ import java.util.function.BooleanSupplier;
 public abstract class MixinClientWorld {
     @Inject(method = "tick", at = @At("RETURN"))
     private void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-        ((InternalComponentProvider) this).getComponentContainer().tickClientComponents();
+        ((ComponentProvider) this).getComponentContainer().tickClientComponents();
     }
 }

@@ -25,9 +25,9 @@ package dev.onyxstudios.cca.mixin.entity.common;
 import com.google.common.collect.Iterators;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.entity.CardinalComponentsEntity;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
 import net.fabricmc.fabric.api.server.PlayerStream;
@@ -52,7 +52,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 @Mixin(Entity.class)
-public abstract class MixinEntity implements InternalComponentProvider {
+public abstract class MixinEntity implements ComponentProvider {
     @Unique
     private ComponentContainer components;
 

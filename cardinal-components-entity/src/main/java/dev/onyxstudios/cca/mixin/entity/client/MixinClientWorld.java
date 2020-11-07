@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.mixin.entity.client;
 
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,11 +35,11 @@ public abstract class MixinClientWorld {
 
     @Inject(method = "tickEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tick()V", shift = At.Shift.AFTER))
     private void tick(Entity entity, CallbackInfo ci) {
-        ((InternalComponentProvider) entity).getComponentContainer().tickClientComponents();
+        ((ComponentProvider) entity).getComponentContainer().tickClientComponents();
     }
 
     @Inject(method = "tickPassenger", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tickRiding()V", shift = At.Shift.AFTER))
     private void tickRiding(Entity vehicle, Entity passenger, CallbackInfo ci) {
-        ((InternalComponentProvider) passenger).getComponentContainer().tickClientComponents();
+        ((ComponentProvider) passenger).getComponentContainer().tickClientComponents();
     }
 }

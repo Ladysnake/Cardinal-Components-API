@@ -23,12 +23,12 @@
 package dev.onyxstudios.cca.internal.item;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.Nullable;
 
-public interface InternalStackComponentProvider extends InternalComponentProvider {
+public interface InternalStackComponentProvider extends ComponentProvider {
     @SuppressWarnings("ConstantConditions")
     static InternalStackComponentProvider get(ItemStack stack) {
         return (InternalStackComponentProvider) (Object) stack;

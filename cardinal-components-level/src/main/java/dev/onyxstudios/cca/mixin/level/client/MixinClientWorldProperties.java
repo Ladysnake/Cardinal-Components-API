@@ -23,7 +23,7 @@
 package dev.onyxstudios.cca.mixin.level.client;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.Difficulty;
@@ -37,7 +37,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import javax.annotation.Nonnull;
 
 @Mixin(ClientWorld.Properties.class)
-public abstract class MixinClientWorldProperties implements MutableWorldProperties, InternalComponentProvider {
+public abstract class MixinClientWorldProperties implements MutableWorldProperties, ComponentProvider {
     @Unique
     private ComponentContainer components;
 
