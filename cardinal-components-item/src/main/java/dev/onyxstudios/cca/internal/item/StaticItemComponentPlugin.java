@@ -22,17 +22,11 @@
  */
 package dev.onyxstudios.cca.internal.item;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
-import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
+import dev.onyxstudios.cca.api.v3.component.*;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactory;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
-import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
-import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
@@ -41,13 +35,11 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
 
 public final class StaticItemComponentPlugin extends LazyDispatcher implements ItemComponentFactoryRegistry {
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
-    public static final String WILDCARD_IMPL_SUFFIX = "ItemStackImpl_All";
     private static final boolean DEV = Boolean.getBoolean("fabric.development");
     private static final boolean VERIFY_EQUALS = DEV && !Boolean.getBoolean("cca.debug.noverifyequals");
 
@@ -55,15 +47,11 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         super("creating an ItemStack");
     }
 
-    private static String getSuffix(Identifier itemId) {
-        return "ItemStackImpl_" + CcaAsmHelper.getJavaIdentifierName(itemId);
-    }
-
     private final List<PredicatedComponentFactory<?>> dynamicFactories = new ArrayList<>();
-    private final Map<@Nullable Identifier, Map<ComponentKey<?>, ItemComponentFactory<?>>> componentFactories = new HashMap<>();
-    private Class<? extends DynamicContainerFactory<ItemStack>> wildcardFactoryClass;
+    private final Map<@Nullable Identifier, ComponentContainer.Factory.Builder<ItemStack>> componentFactories = new HashMap<>();
+    private final ComponentContainer.Factory<ItemStack> emptyFactory = stack -> ComponentContainer.EMPTY;
 
-    public Class<? extends DynamicContainerFactory<ItemStack>> getFactoryClass(Item item, Identifier itemId) {
+    public ComponentContainer.Factory<ItemStack> getFactoryClass(Item item, Identifier itemId) {
         this.ensureInitialized();
         Objects.requireNonNull(item);
 
@@ -72,19 +60,10 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         }
 
         if (this.componentFactories.containsKey(itemId)) {
-            try {
-                Map<ComponentKey<?>, ItemComponentFactory<?>> compiled = new LinkedHashMap<>(this.componentFactories.get(itemId));
-                this.getWildcard().forEach(compiled::putIfAbsent);
-                String implSuffix = getSuffix(itemId);
-                Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(ItemComponentFactory.class, compiled, implSuffix);
-                return StaticComponentPluginBase.spinContainerFactory(implSuffix, DynamicContainerFactory.class, containerCls, ItemStack.class);
-            } catch (IOException e) {
-                throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + itemId, e);
-            }
+            return this.componentFactories.get(itemId).build();
         }
 
-        assert this.wildcardFactoryClass != null;
-        return this.wildcardFactoryClass;
+        return this.emptyFactory;
     }
 
     @Override
@@ -93,23 +72,12 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
             FabricLoader.getInstance().getEntrypointContainers("cardinal-components-item", ItemComponentInitializer.class),
             initializer -> initializer.registerItemComponentFactories(this)
         );
-
-        try {
-            Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(ItemComponentFactory.class, this.getWildcard(), WILDCARD_IMPL_SUFFIX);
-            this.wildcardFactoryClass = StaticComponentPluginBase.spinContainerFactory(WILDCARD_IMPL_SUFFIX, DynamicContainerFactory.class, containerCls, ItemStack.class);
-        } catch (IOException e) {
-            throw new StaticComponentLoadingException("Failed to generate the fallback component container for item stacks", e);
-        }
-    }
-
-    private Map<ComponentKey<?>, ItemComponentFactory<?>> getWildcard() {
-        return this.componentFactories.getOrDefault(null, Collections.emptyMap());
     }
 
     @Override
     public <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ItemComponentFactory<? extends C> factory) {
-        Objects.requireNonNull(itemId);
-        this.register(itemId, type, factory);
+        this.checkLoading(ItemComponentFactoryRegistry.class, "register");
+        this.register0(itemId, type, factory);
     }
 
     @Override
@@ -117,31 +85,22 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         this.dynamicFactories.add(new PredicatedComponentFactory<>(test, type, factory));
     }
 
-    private <C extends Component> void register(@Nullable Identifier itemId, ComponentKey<C> type, ItemComponentFactory<? extends C> factory) {
-        this.checkLoading(ItemComponentFactoryRegistry.class, "register");
-        this.register0(itemId, type, factory);
-    }
+    private <C extends Component> void register0(Identifier itemId, ComponentKey<C> type, ItemComponentFactory<? extends C> factory) {
+        Objects.requireNonNull(itemId);
 
-    private <C extends Component> void register0(@Nullable Identifier itemId, ComponentKey<C> type, ItemComponentFactory<? extends C> factory) {
-        Map<ComponentKey<?>, ItemComponentFactory<?>> specializedMap = this.componentFactories.computeIfAbsent(itemId, t -> new LinkedHashMap<>());
-        ItemComponentFactory<?> previousFactory = specializedMap.get(type);
-        if (previousFactory != null) {
-            throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + (itemId == null ? "every item" : "item '" + itemId + "'") + ": " + factory + " and " + previousFactory);
-        }
-        ItemComponentFactory<Component> nonnullFactory = (stack) -> Objects.requireNonNull(
-            ((ItemComponentFactory<?>) factory).createForStack(stack),
-            "Component factory " + factory + " for " + type.getId() + " returned null on " + stack
-        );
-        ItemComponentFactory<Component> finalFactory;
+        ComponentContainer.Factory.Builder<ItemStack> builder = this.componentFactories.computeIfAbsent(itemId, t -> ComponentContainer.Factory.builder(ItemStack.class));
+        builder.checkDuplicate(type, previousFactory -> "Duplicate factory declarations for " + type.getId() + " on item '" + itemId + "': " + factory + " and " + previousFactory);
+
+        ComponentFactory<ItemStack, C> finalFactory;
 
         if (VERIFY_EQUALS && ComponentV3.class.isAssignableFrom(type.getComponentClass())) {
-            finalFactory = new ItemComponentFactory<Component>() {
+            finalFactory = new ComponentFactory<ItemStack, C>() {
                 private boolean checked;
 
                 @Nonnull
                 @Override
-                public Component createForStack(ItemStack stack) {
-                    Component component = nonnullFactory.createForStack(stack);
+                public C createComponent(ItemStack stack) {
+                    C component = factory.createForStack(stack);
 
                     if (!this.checked) {
                         try {
@@ -159,10 +118,10 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
                 }
             };
         } else {
-            finalFactory = nonnullFactory;
+            finalFactory = factory::createForStack;
         }
 
-        specializedMap.put(type, finalFactory);
+        builder.component(type, finalFactory);
     }
 
     private final class PredicatedComponentFactory<C extends Component> {

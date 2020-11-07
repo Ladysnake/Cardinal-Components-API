@@ -26,7 +26,6 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.entity.*;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
@@ -55,14 +54,14 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     private final Map<Class<? extends Entity>, Map<ComponentKey<?>, Class<? extends Component>>> componentImpls = new HashMap<>();
     private final Map<Class<? extends Entity>, Map<ComponentKey<?>, EntityComponentFactory<?, ?>>> componentFactories = new HashMap<>();
     private final Map<Class<? extends Entity>, Class<? extends ComponentContainer>> containerClasses = new HashMap<>();
-    private final Map<Class<? extends Entity>, Class<? extends DynamicContainerFactory<?>>> factoryClasses = new HashMap<>();
+    private final Map<Class<? extends Entity>, Class<? extends ComponentContainer.Factory<?>>> factoryClasses = new HashMap<>();
 
     public boolean requiresStaticFactory(Class<? extends Entity> entityClass) {
         this.ensureInitialized();
         return entityClass == Entity.class || this.componentFactories.containsKey(entityClass);
     }
 
-    public Class<? extends DynamicContainerFactory<?>> spinDedicatedFactory(Class<? extends Entity> key) {
+    public Class<? extends ComponentContainer.Factory<?>> spinDedicatedFactory(Class<? extends Entity> key) {
         this.ensureInitialized();
 
         // we need a cache as this method is called for a given class each time one of its subclasses is loaded.
@@ -89,7 +88,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
                     containerCls = CcaAsmHelper.spinComponentContainer(EntityComponentFactory.class, compiled, compiledImpls, implSuffix);
                     this.containerClasses.put(entityClass, containerCls);
                 }
-                return StaticComponentPluginBase.spinContainerFactory(implSuffix, DynamicContainerFactory.class, containerCls, entityClass);
+                return StaticComponentPluginBase.spinContainerFactory(implSuffix, ComponentContainer.Factory.class, containerCls, entityClass);
             } catch (IOException e) {
                 throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entityClass, e);
             }

@@ -32,7 +32,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
@@ -67,7 +66,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     private final List<PredicatedComponentFactory<?>> dynamicFactories = new ArrayList<>();
     private final Map<Class<? extends BlockEntity>, Map<ComponentKey<?>, Class<? extends Component>>> beComponentImpls = new HashMap<>();
     private final Map<Class<? extends BlockEntity>, Map<ComponentKey<?>, BlockEntityComponentFactory<?, ?>>> beComponentFactories = new Reference2ObjectOpenHashMap<>();
-    private final Map<Class<? extends BlockEntity>, Class<? extends DynamicContainerFactory<BlockEntity>>> factoryClasses = new Reference2ObjectOpenHashMap<>();
+    private final Map<Class<? extends BlockEntity>, Class<? extends ComponentContainer.Factory<BlockEntity>>> factoryClasses = new Reference2ObjectOpenHashMap<>();
     private final Set<Class<? extends BlockEntity>> clientTicking = new ReferenceOpenHashSet<>();
     private final Set<Class<? extends BlockEntity>> serverTicking = new ReferenceOpenHashSet<>();
 
@@ -100,7 +99,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         return entityClass == BlockEntity.class || this.beComponentFactories.containsKey(entityClass);
     }
 
-    public Class<? extends DynamicContainerFactory<BlockEntity>> spinDedicatedFactory(Class<? extends BlockEntity> key) {
+    public Class<? extends ComponentContainer.Factory<BlockEntity>> spinDedicatedFactory(Class<? extends BlockEntity> key) {
         StaticBlockComponentPlugin.INSTANCE.ensureInitialized();
 
         // we need a cache as this method is called for a given class each time one of its subclasses is loaded.
@@ -136,7 +135,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
 
                 return StaticComponentPluginBase.spinContainerFactory(
                     implSuffix,
-                    DynamicContainerFactory.class,
+                    ComponentContainer.Factory.class,
                     containerCls,
                     entityClass
                 );
