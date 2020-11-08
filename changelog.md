@@ -1,4 +1,19 @@
 ------------------------------------------------------
+Version 3.0.0
+------------------------------------------------------
+**The breaking changes are here !**
+
+- Updated to 20w45a
+
+Additions
+- Ticking components now work on any `BlockEntity`, not just those that already tick in vanilla
+
+Changes
+- Every class deprecated in 2.7.0 has been **completely removed**
+- Every class remaining in the `nerdhub.component.*` packages has been moved to a `dev.onyxstudios.cca.*` package
+- Replaced specific factory interfaces with a generic variant (eg. `ComponentFactory`)
+
+------------------------------------------------------
 Version 2.7.4
 ------------------------------------------------------
 Additions

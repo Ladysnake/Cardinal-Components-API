@@ -55,7 +55,6 @@ public final class ComponentsLevelNetworking {
                     ComponentProvider provider = ComponentProvider.fromLevel(world.getLevelProperties());
 
                     for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
-                        // TODO implement relevant methods on LevelProperties
                         key.syncWith(player, provider);
                     }
                 });
