@@ -38,6 +38,16 @@ public interface ItemComponentFactoryRegistry {
     /**
      * Registers a {@link ComponentFactory} for stacks of a specific item.
      *
+     * @param item  the item to target
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
+     * @throws IllegalStateException if the {@code item} was not previously registered
+     */
+    <C extends Component> void registerFor(Item item, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory);
+
+    /**
+     * Registers a {@link ComponentFactory} for stacks of a specific item.
+     *
      * @param itemId  the id of an item to target
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
