@@ -1,4 +1,14 @@
 ------------------------------------------------------
+Version 2.7.4
+------------------------------------------------------
+Additions
+- Added a `TransientComponent` utility interface, for components that do not store any data
+- Added a registration overload to `ItemComponentFactoryRegistry#registerFor` that takes an item directly
+
+Fixes
+- Fixed potential concurrency issues with `ComponentContainer.Factory.Builder`
+
+------------------------------------------------------
 Version 2.7.3
 ------------------------------------------------------
 - Updated to 1.16.4
