@@ -39,6 +39,7 @@ import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
@@ -141,7 +142,7 @@ public interface ComponentContainer extends NbtSerializable {
          * @see Factory#builder(Class)
          */
         final class Builder<T> {
-            private static int counter;
+            private static final AtomicInteger nextId = new AtomicInteger();
 
             private boolean built;
             private final Class<T> argClass;
@@ -195,7 +196,7 @@ public interface ComponentContainer extends NbtSerializable {
                         return t -> EMPTY;
                     }
 
-                    String implNameSuffix = factoryNameSuffix != null ? factoryNameSuffix : Integer.toString(counter++);
+                    String implNameSuffix = factoryNameSuffix != null ? factoryNameSuffix : Integer.toString(nextId.getAndIncrement());
                     Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(
                         ComponentFactory.class, this.factories, this.componentImpls, implNameSuffix
                     );

@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.item;
 
+import com.google.common.collect.Iterables;
 import dev.onyxstudios.cca.api.v3.component.*;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
@@ -32,6 +33,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -82,6 +84,15 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     public <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
         this.checkLoading(ItemComponentFactoryRegistry.class, "register");
         this.register0(itemId, type, factory);
+    }
+
+    @Override
+    public <C extends Component> void registerFor(Item item, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
+        if (!Iterables.contains(Registry.ITEM, item)) {
+            throw new IllegalStateException(item + " must be registered to Registry.ITEM before using it for component registration");
+        }
+        Identifier id = Registry.ITEM.getId(item);
+        this.registerFor(id, type, factory);
     }
 
     @Override
