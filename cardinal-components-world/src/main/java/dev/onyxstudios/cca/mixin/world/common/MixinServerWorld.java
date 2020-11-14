@@ -56,8 +56,11 @@ public abstract class MixinServerWorld extends MixinWorld {
 
     @Inject(at = @At("RETURN"), method = "<init>*")
     private void constructor(CallbackInfo ci) {
-        PersistentStateManager persistentStateManager = this.getPersistentStateManager();
-        persistentStateManager.getOrCreate(() -> new ComponentPersistentState(PERSISTENT_STATE_KEY, this.components), PERSISTENT_STATE_KEY);
+        this.getPersistentStateManager().getOrCreate(
+            tag -> ComponentPersistentState.fromTag(this.components, tag),
+            () -> new ComponentPersistentState(this.components),
+            PERSISTENT_STATE_KEY
+        );
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
@@ -77,5 +80,4 @@ public abstract class MixinServerWorld extends MixinWorld {
         writer.writeSyncPacket(buf, recipient);
         return new CustomPayloadS2CPacket(ComponentsWorldNetworking.PACKET_ID, buf);
     }
-
 }
