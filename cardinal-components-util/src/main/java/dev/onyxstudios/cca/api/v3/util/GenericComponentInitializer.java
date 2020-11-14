@@ -22,18 +22,19 @@
  */
 package dev.onyxstudios.cca.api.v3.util;
 
+import dev.onyxstudios.cca.internal.base.ComponentRegistrationInitializer;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> generic (typically for third party providers)
  * component factories.
  *
- * <p>The entrypoint is exposed as {@code "cardinal-components-util"} in the mod json and runs for any environment.
+ * <p>The entrypoint is exposed as either {@code "cardinal-components"} or {@code "cardinal-components-util"} in the mod json and runs for any environment.
  *
  * @since 2.4.0
  */
 @ApiStatus.Experimental
-public interface GenericComponentInitializer {
+public interface GenericComponentInitializer extends ComponentRegistrationInitializer {
     /**
      * Called to register component factories for statically declared component types.
      *

@@ -26,13 +26,11 @@ import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.util.ComponentContainerMetafactory;
-import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.componenttest.vita.BaseVita;
 import dev.onyxstudios.componenttest.vita.Vita;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
-import nerdhub.cardinal.components.api.component.extension.SyncedComponent;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -117,15 +115,6 @@ public class CardinalComponentsTest {
             ).create(UUID.randomUUID(), null));
             assert false : "Only one factory should be created for any given provider type";
         } catch (IllegalStateException ignored) { }
-
-        try {
-            LOGGER.info(ComponentContainerMetafactory.metafactory(
-                TestComponents.CUSTOM_PROVIDER_2,
-                new TypeToken<BiFunction<UUID, PlayerEntity, ? extends ComponentContainer>>() {},
-                new TypeToken<BiFunction<UUID, PlayerEntity, ? extends SyncedComponent>>() {}
-            ).apply(UUID.randomUUID(), null));
-            assert false : "Registered factory does not return " + SyncedComponent.class;
-        } catch (StaticComponentLoadingException ignored) { }
 
         LOGGER.info(ComponentContainerMetafactory.metafactory(
             TestComponents.CUSTOM_PROVIDER_2,

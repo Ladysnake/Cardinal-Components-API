@@ -31,7 +31,6 @@ import dev.onyxstudios.cca.api.v3.scoreboard.TeamComponentFactory;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
-import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.scoreboard.Scoreboard;
 
@@ -50,7 +49,7 @@ public final class StaticScoreboardComponentPlugin extends StaticComponentPlugin
 
     @Override
     protected Collection<EntrypointContainer<ScoreboardComponentInitializer>> getEntrypoints() {
-        return FabricLoader.getInstance().getEntrypointContainers("cardinal-components-scoreboard", ScoreboardComponentInitializer.class);
+        return getComponentEntrypoints("cardinal-components-scoreboard", ScoreboardComponentInitializer.class);
     }
 
     @Override

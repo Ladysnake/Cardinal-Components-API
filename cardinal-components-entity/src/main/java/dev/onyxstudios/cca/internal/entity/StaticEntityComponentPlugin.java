@@ -36,7 +36,6 @@ import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 
@@ -106,7 +105,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     @Override
     protected void init() {
         StaticComponentPluginBase.processInitializers(
-            FabricLoader.getInstance().getEntrypointContainers("cardinal-components-entity", EntityComponentInitializer.class),
+            StaticComponentPluginBase.getComponentEntrypoints("cardinal-components-entity", EntityComponentInitializer.class),
             initializer -> initializer.registerEntityComponentFactories(this)
         );
     }

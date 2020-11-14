@@ -1,4 +1,11 @@
 ------------------------------------------------------
+Version 2.7.5
+------------------------------------------------------
+Additions
+- Added the universal `cardinal-components` entrypoint key
+    - This new key can be used for any CCA registration initializer (replaces eg. `cardinal-components-entity`)
+
+------------------------------------------------------
 Version 2.7.4
 ------------------------------------------------------
 Additions
