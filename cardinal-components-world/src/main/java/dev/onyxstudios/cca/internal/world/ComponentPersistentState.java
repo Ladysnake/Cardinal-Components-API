@@ -29,8 +29,8 @@ import net.minecraft.world.PersistentState;
 public class ComponentPersistentState extends PersistentState {
     private final ComponentContainer components;
 
-    public ComponentPersistentState(String id, ComponentContainer components) {
-        super(id);
+    public ComponentPersistentState(ComponentContainer components) {
+        super();
         this.components = components;
     }
 
@@ -40,12 +40,13 @@ public class ComponentPersistentState extends PersistentState {
     }
 
     @Override
-    public void fromTag(CompoundTag tag) {
-        this.components.fromTag(tag);
-    }
-
-    @Override
     public CompoundTag toTag(CompoundTag tag) {
         return this.components.toTag(tag);
+    }
+
+    public static ComponentPersistentState fromTag(ComponentContainer components, CompoundTag tag) {
+        ComponentPersistentState state = new ComponentPersistentState(components);
+        state.components.fromTag(tag);
+        return state;
     }
 }

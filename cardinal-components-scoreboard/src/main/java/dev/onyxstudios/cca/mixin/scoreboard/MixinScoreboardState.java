@@ -28,6 +28,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardState;
 import net.minecraft.scoreboard.Team;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,18 +42,19 @@ import java.util.Iterator;
 
 @Mixin(ScoreboardState.class)
 public abstract class MixinScoreboardState {
+    @Final
     @Shadow
-    private Scoreboard scoreboard;
+    private Scoreboard field_27936;
 
     @Inject(method = "toTag", at = @At("RETURN"))
     private void saveComponents(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
-        ((ComponentProvider) this.scoreboard).getComponentContainer().toTag(tag);
+        ((ComponentProvider) this.field_27936).getComponentContainer().toTag(tag);
     }
 
-    @Inject(method = "fromTag", at = @At("RETURN"))
-    private void loadComponents(CompoundTag tag, CallbackInfo ci) {
-        if (this.scoreboard != null) {  // weird deferred loading thing
-            ((ComponentProvider) this.scoreboard).getComponentContainer().fromTag(tag);
+    @Inject(method = "method_32481", at = @At("RETURN"))
+    private void loadComponents(CompoundTag tag, CallbackInfoReturnable<ScoreboardState> ci) {
+        if (this.field_27936 != null) {  // weird deferred loading thing
+            ((ComponentProvider) this.field_27936).getComponentContainer().fromTag(tag);
         }
     }
 
