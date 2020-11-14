@@ -1,4 +1,38 @@
 ------------------------------------------------------
+Version 2.7.5
+------------------------------------------------------
+Additions
+- Added the universal `cardinal-components` entrypoint key
+    - This new key can be used for any CCA registration initializer (replaces eg. `cardinal-components-entity`)
+
+------------------------------------------------------
+Version 2.7.4
+------------------------------------------------------
+Additions
+- Added a `TransientComponent` utility interface, for components that do not store any data
+- Added a registration overload to `ItemComponentFactoryRegistry#registerFor` that takes an item directly
+
+Fixes
+- Fixed potential concurrency issues with `ComponentContainer.Factory.Builder`
+
+------------------------------------------------------
+Version 2.7.3
+------------------------------------------------------
+- Updated to 1.16.4
+
+Changes
+- `cardinal-components-item` will now verify that components attached to `ItemStack`s redefine `equals`
+    - This behaviour can be disabled by adding `-Dcca.debug.noverifyequals=true` to your VM options
+
+Fixes
+- Fixed cardinal-components-block crashing on dedicated servers
+
+------------------------------------------------------
+Version 2.7.2
+------------------------------------------------------
+- Fixed components attached to a block entity not stacking with the superclass' components
+
+------------------------------------------------------
 Version 2.7.1
 ------------------------------------------------------
 - Remove the `ScheduledForRemoval` annotation from the legacy `Component` interface

@@ -22,8 +22,10 @@
  */
 package dev.onyxstudios.cca.internal.item;
 
+import com.google.common.collect.Iterables;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentV3;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactory;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryV2;
@@ -34,10 +36,10 @@ import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -49,8 +51,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
     public static final String WILDCARD_IMPL_SUFFIX = "ItemStackImpl_All";
     private static final boolean DEV = Boolean.getBoolean("fabric.development");
-    // TODO enable by default when Component#isComponentEqual is gone
-    private static final boolean ENABLE_CHECKS = Boolean.getBoolean("cca.debug.verifyequals");
+    private static final boolean VERIFY_EQUALS = DEV && !Boolean.getBoolean("cca.debug.noverifyequals");
 
     private StaticItemComponentPlugin() {
         super("creating an ItemStack");
@@ -91,7 +92,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     @Override
     protected void init() {
         StaticComponentPluginBase.processInitializers(
-            FabricLoader.getInstance().getEntrypointContainers("cardinal-components-item", ItemComponentInitializer.class),
+            StaticComponentPluginBase.getComponentEntrypoints("cardinal-components-item", ItemComponentInitializer.class),
             initializer -> initializer.registerItemComponentFactories(this)
         );
 
@@ -115,6 +116,15 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     @Override
     public <C extends Component> void registerForAll(ComponentKey<C> type, ItemComponentFactoryV2<? extends C> factory) {
         this.register(null, type, factory);
+    }
+
+    @Override
+    public <C extends Component> void registerFor(Item item, ComponentKey<C> type, ItemComponentFactory<? extends C> factory) {
+        if (!Iterables.contains(Registry.ITEM, item)) {
+            throw new IllegalStateException(item + " must be registered to Registry.ITEM before using it for component registration");
+        }
+        Identifier id = Registry.ITEM.getId(item);
+        this.registerFor(id, type, factory);
     }
 
     @Override
@@ -156,7 +166,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         );
         ItemComponentFactoryV2<Component> finalFactory;
 
-        if (DEV && ENABLE_CHECKS) {
+        if (VERIFY_EQUALS && ComponentV3.class.isAssignableFrom(type.getComponentClass())) {
             finalFactory = new ItemComponentFactoryV2<Component>() {
                 private boolean checked;
 
@@ -168,7 +178,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
                     if (!this.checked) {
                         try {
                             if (component.getClass().getMethod("equals", Object.class).getDeclaringClass() == Object.class) {
-                                throw new IllegalStateException("Component implementation " + component.getClass().getTypeName() + " attached to " + stack + " does not override Object#equals!");
+                                throw new IllegalStateException("Component implementation " + component.getClass().getTypeName() + " attached to " + stack + " should override Object#equals.\nMore information: https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Item");
                             }
                         } catch (NoSuchMethodException e) {
                             throw new AssertionError("Object#equals not found ?!");

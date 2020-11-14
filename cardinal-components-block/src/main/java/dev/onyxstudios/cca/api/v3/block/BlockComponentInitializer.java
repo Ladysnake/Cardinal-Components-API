@@ -22,19 +22,20 @@
  */
 package dev.onyxstudios.cca.api.v3.block;
 
+import dev.onyxstudios.cca.internal.base.ComponentRegistrationInitializer;
 import net.minecraft.block.entity.BlockEntity;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> block component factories.
  *
- * <p>The entrypoint is exposed as {@code cardinal-components-block} in the mod json and runs for any environment.
+ * <p>The entrypoint is exposed as either {@code "cardinal-components"} or {@code "cardinal-components-block"} in the mod json and runs for any environment.
  * It usually executes right before the first {@link BlockEntity} instance is created.
  *
  * @since 2.5.0
  */
 @ApiStatus.Experimental
-public interface BlockComponentInitializer {
+public interface BlockComponentInitializer extends ComponentRegistrationInitializer {
     /**
      * Called to register component factories for statically declared component types.
      *

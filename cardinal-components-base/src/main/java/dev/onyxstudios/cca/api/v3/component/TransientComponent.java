@@ -20,27 +20,34 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.item;
+package dev.onyxstudios.cca.api.v3.component;
 
-import dev.onyxstudios.cca.internal.base.ComponentRegistrationInitializer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Entrypoint getting invoked to register <em>static</em> item component factories.
- *
- * <p>The entrypoint is exposed as either {@code "cardinal-components"} or {@code "cardinal-components-item"} in the mod json and runs for any environment.
- * It usually executes right before the first {@link ItemStack} instance is created.
- *
- * @since 2.4.0
+ * Utility interface for components that do not hold any data
  */
-public interface ItemComponentInitializer extends ComponentRegistrationInitializer {
-    /**
-     * Called to register component factories for statically declared component types.
-     *
-     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
-     * must not be registered outside of this method.
-     *
-     * @param registry an {@link ItemComponentFactoryRegistry} for <em>statically declared</em> components
-     */
-    void registerItemComponentFactories(ItemComponentFactoryRegistry registry);
+public interface TransientComponent extends Component {
+    @Override
+    default void readFromNbt(CompoundTag tag) {
+        // Nothing to read
+    }
+
+    @Override
+    default void writeToNbt(CompoundTag tag) {
+        // Nothing to write
+    }
+
+    abstract class SimpleImpl implements TransientComponent {
+        @Override
+        public int hashCode() {
+            return 1337;
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            return obj != null && obj.getClass() == this.getClass();
+        }
+    }
 }
