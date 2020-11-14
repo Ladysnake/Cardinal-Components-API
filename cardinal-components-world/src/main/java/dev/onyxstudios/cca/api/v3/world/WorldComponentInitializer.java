@@ -22,16 +22,17 @@
  */
 package dev.onyxstudios.cca.api.v3.world;
 
+import dev.onyxstudios.cca.internal.base.ComponentRegistrationInitializer;
 import net.minecraft.world.World;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> world component factories.
  *
- * <p>The entrypoint is exposed as {@code cardinal-components-world} in the mod json and runs for any environment.
+ * <p>The entrypoint is exposed as either {@code "cardinal-components"} or {@code "cardinal-components-world"} in the mod json and runs for any environment.
  * It usually executes right before the first {@link World} instance is created.
  *
  * @since 2.4.0
  */
-public interface WorldComponentInitializer {
+public interface WorldComponentInitializer extends ComponentRegistrationInitializer {
     void registerWorldComponentFactories(WorldComponentFactoryRegistry registry);
 }

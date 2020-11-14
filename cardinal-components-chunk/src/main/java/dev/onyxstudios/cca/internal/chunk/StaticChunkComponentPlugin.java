@@ -51,7 +51,7 @@ public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<
 
     @Override
     protected Collection<EntrypointContainer<ChunkComponentInitializer>> getEntrypoints() {
-        return FabricLoader.getInstance().getEntrypointContainers("cardinal-components-chunk", ChunkComponentInitializer.class);
+        return getComponentEntrypoints("cardinal-components-chunk", ChunkComponentInitializer.class);
     }
 
     @Override

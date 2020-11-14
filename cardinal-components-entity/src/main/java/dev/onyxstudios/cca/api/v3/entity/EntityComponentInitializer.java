@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.entity;
 
+import dev.onyxstudios.cca.internal.base.ComponentRegistrationInitializer;
 import net.minecraft.entity.Entity;
 
 /**
@@ -32,7 +33,7 @@ import net.minecraft.entity.Entity;
  *
  * @since 2.4.0
  */
-public interface EntityComponentInitializer {
+public interface EntityComponentInitializer extends ComponentRegistrationInitializer {
     /**
      * Called to register component factories for statically declared component types.
      *

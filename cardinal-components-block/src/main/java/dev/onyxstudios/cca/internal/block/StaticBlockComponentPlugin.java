@@ -176,7 +176,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     @Override
     protected void init() {
         StaticComponentPluginBase.processInitializers(
-            FabricLoader.getInstance().getEntrypointContainers("cardinal-components-block", BlockComponentInitializer.class),
+            StaticComponentPluginBase.getComponentEntrypoints("cardinal-components-block", BlockComponentInitializer.class),
             initializer -> initializer.registerBlockComponentFactories(this)
         );
         this.wildcard = this.blockComponentFactories.getOrDefault(null, Collections.emptyMap());

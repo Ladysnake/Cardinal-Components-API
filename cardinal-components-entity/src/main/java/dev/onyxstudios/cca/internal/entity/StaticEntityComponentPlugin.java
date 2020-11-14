@@ -102,7 +102,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     @Override
     protected void init() {
         StaticComponentPluginBase.processInitializers(
-            FabricLoader.getInstance().getEntrypointContainers("cardinal-components-entity", EntityComponentInitializer.class),
+            StaticComponentPluginBase.getComponentEntrypoints("cardinal-components-entity", EntityComponentInitializer.class),
             initializer -> initializer.registerEntityComponentFactories(this)
         );
     }
