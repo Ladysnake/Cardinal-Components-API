@@ -47,7 +47,7 @@ public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<
 
     @Override
     protected Collection<EntrypointContainer<WorldComponentInitializer>> getEntrypoints() {
-        return FabricLoader.getInstance().getEntrypointContainers("cardinal-components-world", WorldComponentInitializer.class);
+        return getComponentEntrypoints("cardinal-components-world", WorldComponentInitializer.class);
     }
 
     @Override

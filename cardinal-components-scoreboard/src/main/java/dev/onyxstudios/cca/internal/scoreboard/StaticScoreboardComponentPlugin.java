@@ -48,7 +48,7 @@ public final class StaticScoreboardComponentPlugin extends StaticComponentPlugin
 
     @Override
     protected Collection<EntrypointContainer<ScoreboardComponentInitializer>> getEntrypoints() {
-        return FabricLoader.getInstance().getEntrypointContainers("cardinal-components-scoreboard", ScoreboardComponentInitializer.class);
+        return getComponentEntrypoints("cardinal-components-scoreboard", ScoreboardComponentInitializer.class);
     }
 
     @Override

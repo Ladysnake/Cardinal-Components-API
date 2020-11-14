@@ -75,7 +75,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     @Override
     protected void init() {
         StaticComponentPluginBase.processInitializers(
-            FabricLoader.getInstance().getEntrypointContainers("cardinal-components-item", ItemComponentInitializer.class),
+            StaticComponentPluginBase.getComponentEntrypoints("cardinal-components-item", ItemComponentInitializer.class),
             initializer -> initializer.registerItemComponentFactories(this)
         );
     }

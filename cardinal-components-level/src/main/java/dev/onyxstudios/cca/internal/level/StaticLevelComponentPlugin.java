@@ -51,7 +51,7 @@ public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<
 
     @Override
     protected Collection<EntrypointContainer<LevelComponentInitializer>> getEntrypoints() {
-        return FabricLoader.getInstance().getEntrypointContainers("cardinal-components-level", LevelComponentInitializer.class);
+        return getComponentEntrypoints("cardinal-components-level", LevelComponentInitializer.class);
     }
 
     @Override
