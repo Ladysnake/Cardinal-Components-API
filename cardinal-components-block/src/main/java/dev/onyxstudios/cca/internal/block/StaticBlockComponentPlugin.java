@@ -35,7 +35,6 @@ import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import nerdhub.cardinal.components.api.component.Component;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -88,8 +87,8 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
 
             while (type != BlockEntity.class) {
                 type = type.getSuperclass().asSubclass(BlockEntity.class);
-                this.beComponentFactories.getOrDefault(entityClass, Collections.emptyMap()).forEach(compiled::putIfAbsent);
-                this.beComponentImpls.getOrDefault(entityClass, Collections.emptyMap()).forEach(compiledImpls::putIfAbsent);
+                this.beComponentFactories.getOrDefault(type, Collections.emptyMap()).forEach(compiled::putIfAbsent);
+                this.beComponentImpls.getOrDefault(type, Collections.emptyMap()).forEach(compiledImpls::putIfAbsent);
             }
 
             String implSuffix = getSuffix(entityClass);
@@ -151,7 +150,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     @Override
     protected void init() {
         StaticComponentPluginBase.processInitializers(
-            FabricLoader.getInstance().getEntrypointContainers("cardinal-components-block", BlockComponentInitializer.class),
+            StaticComponentPluginBase.getComponentEntrypoints("cardinal-components-block", BlockComponentInitializer.class),
             initializer -> initializer.registerBlockComponentFactories(this)
         );
         this.wildcard = this.blockComponentFactories.getOrDefault(null, Collections.emptyMap());

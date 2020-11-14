@@ -24,12 +24,14 @@ package dev.onyxstudios.cca.internal.base.asm;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.internal.base.ComponentRegistrationInitializer;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.ComponentCallback;
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.Identifier;
@@ -290,6 +292,18 @@ public abstract class StaticComponentPluginBase<T, I, F> extends LazyDispatcher 
                 throw new StaticComponentLoadingException(String.format("Exception while registering static component factories for %s (%s)", metadata.getName(), metadata.getId()), e);
             }
         }
+    }
+
+    public static <I extends ComponentRegistrationInitializer> Collection<EntrypointContainer<I>> getComponentEntrypoints(String key, Class<I> type) {
+        Collection<EntrypointContainer<ComponentRegistrationInitializer>> generic = FabricLoader.getInstance().getEntrypointContainers("cardinal-components", ComponentRegistrationInitializer.class);
+        Collection<EntrypointContainer<I>> specific = new ArrayList<>(FabricLoader.getInstance().getEntrypointContainers(key, type));
+        for (EntrypointContainer<ComponentRegistrationInitializer> container : generic) {
+            if (type.isInstance(container.getEntrypoint())) {
+                @SuppressWarnings("unchecked") EntrypointContainer<I> c = (EntrypointContainer<I>) container;
+                specific.add(c);
+            }
+        }
+        return specific;
     }
 
     protected abstract Collection<EntrypointContainer<I>> getEntrypoints();

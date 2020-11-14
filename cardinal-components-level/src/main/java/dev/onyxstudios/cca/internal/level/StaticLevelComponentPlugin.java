@@ -29,7 +29,6 @@ import dev.onyxstudios.cca.api.v3.level.LevelComponentInitializer;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
-import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.world.WorldProperties;
 
@@ -47,7 +46,7 @@ public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<
 
     @Override
     protected Collection<EntrypointContainer<LevelComponentInitializer>> getEntrypoints() {
-        return FabricLoader.getInstance().getEntrypointContainers("cardinal-components-level", LevelComponentInitializer.class);
+        return getComponentEntrypoints("cardinal-components-level", LevelComponentInitializer.class);
     }
 
     @Override
