@@ -36,7 +36,6 @@ import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.event.ItemComponentCallbackV2;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -93,7 +92,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     @Override
     protected void init() {
         StaticComponentPluginBase.processInitializers(
-            FabricLoader.getInstance().getEntrypointContainers("cardinal-components-item", ItemComponentInitializer.class),
+            StaticComponentPluginBase.getComponentEntrypoints("cardinal-components-item", ItemComponentInitializer.class),
             initializer -> initializer.registerItemComponentFactories(this)
         );
 

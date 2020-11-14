@@ -15,28 +15,7 @@
         "cardinal-components:static-init": [
             "dev.onyxstudios.componenttest.TestStaticComponentInitializer"
         ],
-        "cardinal-components-block": [
-            "dev.onyxstudios.componenttest.TestComponents"
-        ],
-        "cardinal-components-chunk": [
-            "dev.onyxstudios.componenttest.TestComponents"
-        ],
-        "cardinal-components-entity": [
-            "dev.onyxstudios.componenttest.TestComponents"
-        ],
-        "cardinal-components-item": [
-            "dev.onyxstudios.componenttest.TestComponents"
-        ],
-        "cardinal-components-level": [
-            "dev.onyxstudios.componenttest.TestComponents"
-        ],
-        "cardinal-components-scoreboard": [
-            "dev.onyxstudios.componenttest.TestComponents"
-        ],
-        "cardinal-components-util": [
-            "dev.onyxstudios.componenttest.TestComponents"
-        ],
-        "cardinal-components-world": [
+        "cardinal-components": [
             "dev.onyxstudios.componenttest.TestComponents"
         ]
     },

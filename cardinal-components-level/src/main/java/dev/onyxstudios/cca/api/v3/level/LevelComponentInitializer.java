@@ -22,19 +22,20 @@
  */
 package dev.onyxstudios.cca.api.v3.level;
 
+import dev.onyxstudios.cca.internal.base.ComponentRegistrationInitializer;
 import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> item component factories.
  *
- * <p>The entrypoint is exposed as {@code cardinal-components-level} in the mod json and runs for any environment.
+ * <p>The entrypoint is exposed as either {@code "cardinal-components"} or {@code "cardinal-components-level"} in the mod json and runs for any environment.
  * It usually executes right before the first {@linkplain WorldProperties save properties object} gets loaded.
  *
  * @since 2.4.0
  */
 @ApiStatus.Experimental
-public interface LevelComponentInitializer {
+public interface LevelComponentInitializer extends ComponentRegistrationInitializer {
     /**
      * Called to register component factories for statically declared component types.
      *
