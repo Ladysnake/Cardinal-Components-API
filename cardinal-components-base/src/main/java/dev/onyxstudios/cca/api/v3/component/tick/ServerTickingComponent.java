@@ -25,7 +25,6 @@ package dev.onyxstudios.cca.api.v3.component.tick;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A component that gets ticked alongside the provider it is attached to.
@@ -37,7 +36,6 @@ import org.jetbrains.annotations.ApiStatus;
  * @see ClientTickingComponent
  * @see CommonTickingComponent
  */
-@ApiStatus.Experimental
 public interface ServerTickingComponent extends Component {
     void serverTick();
 }
