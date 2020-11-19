@@ -1,4 +1,12 @@
 ------------------------------------------------------
+Version 2.7.6
+------------------------------------------------------
+Changes
+- Optimized ItemStack component initialization
+- Promoted `ComponentKey#syncWith` to (experimental) public API
+- Promoted `ClientTickingComponent`, `ServerTickingComponent` and `CommonTickingComponent` to stable API
+
+------------------------------------------------------
 Version 2.7.5
 ------------------------------------------------------
 Additions
