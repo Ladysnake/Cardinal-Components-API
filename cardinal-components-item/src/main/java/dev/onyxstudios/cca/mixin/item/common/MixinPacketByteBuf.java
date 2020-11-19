@@ -45,7 +45,8 @@ public abstract class MixinPacketByteBuf {
         CompoundTag syncedComponents = stack.getSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS);
 
         if (syncedComponents != null) {
-            InternalStackComponentProvider.get(stack).getComponentContainer().fromTag(syncedComponents);
+            // assumes components have not been deserialized yet
+            InternalStackComponentProvider.get(stack).cca_setSerializedComponentData(syncedComponents);
             stack.removeSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS);
         }
     }

@@ -39,14 +39,24 @@ public abstract class MixinWritePacketByteBuf {
     @Nullable
     @ModifyVariable(method = "writeItemStack(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/network/PacketByteBuf;", at = @At(value = "LOAD"))
     private CompoundTag writeItemStack(@Nullable CompoundTag tag, ItemStack stack) {
-        ComponentContainer componentContainer = InternalStackComponentProvider.get(stack).getComponentContainer();
+        InternalStackComponentProvider provider = InternalStackComponentProvider.get(stack);
+        CompoundTag serializedComponents;
+        CompoundTag frozenData = provider.cca_getSerializedComponentData();
 
-        if (componentContainer.keys().isEmpty()) {
-            return tag;
+        if (frozenData == null) {
+            ComponentContainer componentContainer = provider.getActualComponentContainer();
+
+            if (componentContainer == null || componentContainer.keys().isEmpty()) {
+                return tag;
+            }
+
+            serializedComponents = componentContainer.toTag(new CompoundTag());
+        } else {
+            serializedComponents = frozenData;
         }
 
         CompoundTag newTag = tag == null ? new CompoundTag() : tag.copy();
-        newTag.put(CardinalItemInternals.CCA_SYNCED_COMPONENTS, componentContainer.toTag(new CompoundTag()));
+        newTag.put(CardinalItemInternals.CCA_SYNCED_COMPONENTS, serializedComponents);
         return newTag;
     }
 }
