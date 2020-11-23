@@ -120,6 +120,8 @@ public abstract class ComponentKey<C extends Component> {
             if (c instanceof AutoSyncedComponent) {
                 AutoSyncedComponent synced = (AutoSyncedComponent) c;
                 this.sync(provider, synced, synced);
+            } else if (c instanceof SyncedComponent) {
+                ((SyncedComponent) c).sync();
             }
         } else {
             // backwards compatibility
@@ -212,6 +214,8 @@ public abstract class ComponentKey<C extends Component> {
             if (c instanceof AutoSyncedComponent) {
                 AutoSyncedComponent synced = (AutoSyncedComponent) c;
                 this.syncWith(player, provider, synced, synced);
+            } else if (c instanceof SyncedComponent) {
+                ((SyncedComponent) c).syncWith(player);
             }
         } else {
             // backwards compatibility
