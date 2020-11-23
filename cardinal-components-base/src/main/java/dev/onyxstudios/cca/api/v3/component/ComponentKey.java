@@ -73,7 +73,6 @@ public abstract class ComponentKey<C extends Component> {
      */
     // overridden by generated types
     @Contract(pure = true)
-    @ApiStatus.Experimental
     public abstract <V> @Nullable C getNullable(V provider);
 
     /**
@@ -98,7 +97,6 @@ public abstract class ComponentKey<C extends Component> {
     public abstract <V> Optional<C> maybeGet(@Nullable V provider);
 
     @Contract(pure = true)
-    @ApiStatus.Experimental
     public <V> boolean isProvidedBy(V provider) {
         return this.getNullable(provider) != null;
     }
@@ -164,7 +162,6 @@ public abstract class ComponentKey<C extends Component> {
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
-    @ApiStatus.Experimental
     public <V> void sync(V provider, ComponentPacketWriter packetWriter) {
         C c = this.get(provider);
         if (c instanceof AutoSyncedComponent) {
@@ -185,7 +182,6 @@ public abstract class ComponentKey<C extends Component> {
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
-    @ApiStatus.Experimental
     public <V> void sync(V provider, ComponentPacketWriter packetWriter, PlayerSyncPredicate predicate) {
         ComponentProvider prov = (ComponentProvider) provider;
         if (!prov.supportsCustomComponentPacketWriters()) {
