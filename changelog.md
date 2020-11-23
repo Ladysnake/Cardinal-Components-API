@@ -1,4 +1,14 @@
 ------------------------------------------------------
+Version 2.7.8
+------------------------------------------------------
+Changes
+- Promoted `ComponentKey#sync(provider, writer)`, `ComponentKey#sync(provider, writer, predicate)`,
+ `ComponentKey#isProvidedBy`, and `ComponentKey#getNullable` to stable API
+
+Fixes
+- Fixed backward compatibility with SyncedComponent
+
+------------------------------------------------------
 Version 2.7.7
 ------------------------------------------------------
 Fixes
