@@ -36,6 +36,7 @@ import java.util.Set;
 
 public final class CardinalItemInternals {
     public static final String CCA_SYNCED_COMPONENTS = "cca_synced_components";
+    public static final String CCA_SHARED_TAG = "cardinal-components-item:sharedTag";
 
     /**
      * Creates a container factory for an item id.
@@ -61,16 +62,18 @@ public final class CardinalItemInternals {
                 // only the original stack's components are initialized
                 CompoundTag tag = new CompoundTag();
                 originalComponents.toTag(tag);
-                copiedProvider.cca_setSerializedComponentData(tag);
+                copiedProvider.cca_setSerializedComponentData(tag); // new tag, so not marked as shared
             }
         } else if ((serializedComponents = originalProvider.cca_getSerializedComponentData()) != null) {
             // the original stack has frozen components
             if (copiedComponents != null) {
                 // only the copied stack's components are initialized (unlikely)
-                copiedComponents.fromTag(serializedComponents);
+                copiedComponents.fromTag(copyIfNeeded(serializedComponents));
             } else {
                 // no components are initialized
-                copiedProvider.cca_setSerializedComponentData(serializedComponents.copy());
+                // we are not immediately copying the tag, as it's costly and only necessary if the components end up being deserialized
+                markSharedTag(serializedComponents);
+                copiedProvider.cca_setSerializedComponentData(serializedComponents);
             }
         }
     }
@@ -94,5 +97,15 @@ public final class CardinalItemInternals {
         }
 
         return false;
+    }
+
+    public static void markSharedTag(CompoundTag serializedComponents) {
+        serializedComponents.putBoolean(CCA_SHARED_TAG, true);
+    }
+
+    public static CompoundTag copyIfNeeded(CompoundTag serializedComponents) {
+        return serializedComponents.contains(CCA_SHARED_TAG)
+            ? serializedComponents.copy()
+            : serializedComponents;
     }
 }

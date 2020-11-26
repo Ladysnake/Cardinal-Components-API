@@ -76,7 +76,8 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
         if (this.components != null) {
             this.components.toTag(cir.getReturnValue());
         } else if (this.serializedComponents != null) {
-            cir.getReturnValue().copyFrom(this.serializedComponents);
+            CardinalItemInternals.markSharedTag(this.serializedComponents);
+            cir.getReturnValue().put(AbstractComponentContainer.NBT_KEY, this.serializedComponents.get(AbstractComponentContainer.NBT_KEY));
         }
     }
 
@@ -97,9 +98,10 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
         // Keep data without deserializing
         Tag componentData = tag.get(AbstractComponentContainer.NBT_KEY);
         if (componentData != null) {
-            this.serializedComponents = new CompoundTag();
+            CompoundTag serializedComponents = new CompoundTag();
             // the vanilla tag is not copied, so we don't copy our data either
-            this.serializedComponents.put(AbstractComponentContainer.NBT_KEY, componentData);
+            serializedComponents.put(AbstractComponentContainer.NBT_KEY, componentData);
+            this.serializedComponents = serializedComponents;
         }
     }
 
@@ -109,7 +111,9 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
         if (this.components == null) {
             this.components = ((ItemCaller) this.getItem()).cardinal_createComponents((ItemStack) (Object) this);
             if (this.serializedComponents != null) {
-                this.components.fromTag(this.serializedComponents);
+                // If the tag is shared, we need to copy it before deserialization
+                // Components may keep direct references to the serialized data, especially in the case of inventories
+                this.components.fromTag(CardinalItemInternals.copyIfNeeded(this.serializedComponents));
                 this.serializedComponents = null;
             }
         }
