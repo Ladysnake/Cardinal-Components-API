@@ -3,7 +3,7 @@ Version 3.0.0
 ------------------------------------------------------
 **The breaking changes are here !**
 
-- Updated to 20w45a
+- Updated to 20w48a
 
 Additions
 - Ticking components now work on any `BlockEntity`, not just those that already tick in vanilla

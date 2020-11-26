@@ -44,35 +44,33 @@ import java.util.Iterator;
 public abstract class MixinScoreboardState {
     @Final
     @Shadow
-    private Scoreboard field_27936;
+    private Scoreboard scoreboard;
 
     @Inject(method = "toTag", at = @At("RETURN"))
     private void saveComponents(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
-        ((ComponentProvider) this.field_27936).getComponentContainer().toTag(tag);
+        ((ComponentProvider) this.scoreboard).getComponentContainer().toTag(tag);
     }
 
-    @Inject(method = "method_32481", at = @At("RETURN"))
+    @Inject(method = "fromTag", at = @At("RETURN"))
     private void loadComponents(CompoundTag tag, CallbackInfoReturnable<ScoreboardState> ci) {
-        if (this.field_27936 != null) {  // weird deferred loading thing
-            ((ComponentProvider) this.field_27936).getComponentContainer().fromTag(tag);
-        }
+        ((ComponentProvider) this.scoreboard).getComponentContainer().fromTag(tag);
     }
 
     @Inject(
-        method = "deserializeTeams",
+        method = "teamsFromTag",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/scoreboard/ScoreboardState;deserializeTeamPlayers(Lnet/minecraft/scoreboard/Team;Lnet/minecraft/nbt/ListTag;)V",
+            target = "Lnet/minecraft/scoreboard/ScoreboardState;teamPlayersFromTag(Lnet/minecraft/scoreboard/Team;Lnet/minecraft/nbt/ListTag;)V",
             shift = At.Shift.AFTER
         ),
         locals = LocalCapture.CAPTURE_FAILEXCEPTION
     )
-    private void loadTeamComponents(ListTag listTag, CallbackInfo ci, int i, CompoundTag teamData, String name, Team team) {
+    private void loadTeamComponents(ListTag teamsData, CallbackInfo ci, int i, CompoundTag teamData, String name, Team team) {
         ((ComponentProvider) team).getComponentContainer().fromTag(teamData);
     }
 
     @Inject(
-        method = "serializeTeams",
+        method = "teamsToTag",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/scoreboard/Team;getPlayerList()Ljava/util/Collection;"
@@ -81,7 +79,7 @@ public abstract class MixinScoreboardState {
     )
     private void saveTeamComponents(
         CallbackInfoReturnable<ListTag> cir,
-        ListTag listTag,
+        ListTag teamsData,
         Collection<Team> teams,
         Iterator<Team> it,
         Team team,
