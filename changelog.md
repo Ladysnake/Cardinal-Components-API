@@ -14,6 +14,35 @@ Changes
 - Replaced specific factory interfaces with a generic variant (eg. `ComponentFactory`)
 
 ------------------------------------------------------
+Version 2.7.9
+------------------------------------------------------
+- Mcdev annotations are no longer a transitive dependency
+
+------------------------------------------------------
+Version 2.7.8
+------------------------------------------------------
+Changes
+- Promoted `ComponentKey#sync(provider, writer)`, `ComponentKey#sync(provider, writer, predicate)`,
+ `ComponentKey#isProvidedBy`, and `ComponentKey#getNullable` to stable API
+
+Fixes
+- Fixed backward compatibility with SyncedComponent
+
+------------------------------------------------------
+Version 2.7.7
+------------------------------------------------------
+Fixes
+- Fixed NBT deserialization not respecting component registration order
+
+------------------------------------------------------
+Version 2.7.6
+------------------------------------------------------
+Changes
+- Optimized ItemStack component initialization
+- Promoted `ComponentKey#syncWith` to (experimental) public API
+- Promoted `ClientTickingComponent`, `ServerTickingComponent` and `CommonTickingComponent` to stable API
+
+------------------------------------------------------
 Version 2.7.5
 ------------------------------------------------------
 Additions
