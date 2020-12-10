@@ -135,4 +135,9 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
     public void cca_setSerializedComponentData(@Nullable CompoundTag components) {
         this.serializedComponents = components;
     }
+
+    @Override
+    public boolean cca_hasNoComponentData() {
+        return this.components == null && this.serializedComponents == null;
+    }
 }

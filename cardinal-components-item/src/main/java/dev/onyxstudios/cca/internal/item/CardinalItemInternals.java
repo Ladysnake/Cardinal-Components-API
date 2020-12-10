@@ -25,7 +25,6 @@ package dev.onyxstudios.cca.internal.item;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
@@ -114,14 +113,17 @@ public final class CardinalItemInternals {
     public static boolean areComponentsIncompatible(ItemStack stack1, ItemStack stack2) {
         // this method should only be called to supplement an equals check, not to check if 2
         // unrelated stacks have compatible components
-        if (stack1.getItem() != stack2.getItem()) {
-            return true;
-        }
+        assert stack1.getItem() != stack2.getItem();
 
         if (stack1.isEmpty()) return false;
 
         // Possibly initialize components
-        Set<ComponentKey<?>> keys1 = ((InternalComponentProvider) ComponentProvider.fromItemStack(stack1)).getComponentContainer().keys();
+        InternalStackComponentProvider iStack1 = (InternalStackComponentProvider) ComponentProvider.fromItemStack(stack1);
+        InternalStackComponentProvider iStack2 = (InternalStackComponentProvider) ComponentProvider.fromItemStack(stack2);
+
+        if (iStack1.cca_hasNoComponentData() && iStack2.cca_hasNoComponentData()) return false;
+
+        Set<ComponentKey<?>> keys1 = iStack1.getComponentContainer().keys();
 
         for(ComponentKey<?> key : keys1) {
             @Nullable Component otherComponent = key.getNullable(stack2);
