@@ -87,6 +87,12 @@ allprojects {
             projectDisplayName = rootProject.archivesBaseName
         }
     }
+
+    jar {
+        from(rootProject.file("LICENSE.md")) {
+            rename { "LICENSE_${project.archivesBaseName.replace('-', '_')}"}
+        }
+    }
 }
 
 subprojects {
