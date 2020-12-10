@@ -24,10 +24,8 @@ package dev.onyxstudios.cca.api.v3.component.sync;
 
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
-@ApiStatus.Experimental
 @FunctionalInterface
 public interface ComponentPacketWriter {
     @Contract(mutates = "param1")
