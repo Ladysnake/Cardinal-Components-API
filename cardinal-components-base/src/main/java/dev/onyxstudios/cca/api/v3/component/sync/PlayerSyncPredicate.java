@@ -24,10 +24,8 @@ package dev.onyxstudios.cca.api.v3.component.sync;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
-@ApiStatus.Experimental
 public interface PlayerSyncPredicate {
     @Contract(pure = true)
     boolean shouldSyncWith(ServerPlayerEntity player);
