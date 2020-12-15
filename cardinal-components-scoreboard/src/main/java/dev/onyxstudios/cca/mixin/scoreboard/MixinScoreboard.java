@@ -27,9 +27,9 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking;
+import dev.onyxstudios.cca.internal.scoreboard.ScoreboardComponentContainerFactory;
 import dev.onyxstudios.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -51,14 +51,14 @@ import java.util.Iterator;
 @Mixin(Scoreboard.class)
 public abstract class MixinScoreboard implements InternalComponentProvider {
     @Unique
-    private static final Lazy<DynamicContainerFactory<Scoreboard>> componentsContainerFactory
+    private static final Lazy<ScoreboardComponentContainerFactory> componentsContainerFactory
         = new Lazy<>(() -> ComponentsInternals.createFactory(StaticScoreboardComponentPlugin.INSTANCE.getContainerFactoryClass()));
     @Unique
     private ComponentContainer components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
-        this.components = componentsContainerFactory.get().create((Scoreboard) (Object) this);
+        this.components = componentsContainerFactory.get().create((Scoreboard) (Object) this, this instanceof ServerScoreboardAccessor ? ((ServerScoreboardAccessor) this).getServer() : null);
     }
 
     @Nonnull
