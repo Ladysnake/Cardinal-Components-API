@@ -20,39 +20,22 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.scoreboard;
+package dev.onyxstudios.cca.internal.scoreboard;
 
-import nerdhub.cardinal.components.api.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * A component factory for {@linkplain Team teams}.
- *
- * <p>When invoked, the factory must return a {@link Component} of the right type.
- *
- * @since 2.4.2
- */
-@ApiStatus.Experimental
 @FunctionalInterface
-public interface TeamComponentFactory<C extends Component> extends TeamComponentFactoryV2<C> {
-    @Override
-    default C createForTeam(Team team, Scoreboard scoreboard, @Nullable MinecraftServer server) {
-        return this.createForTeam(team);
-    }
+public interface TeamComponentContainerFactory extends DynamicContainerFactory<Team> {
+    ComponentContainer create(Team team, Scoreboard scoreboard, @Nullable MinecraftServer server);
 
-    /**
-     * Initialize components for the given team.
-     *
-     * <p>The component returned by this method will be available
-     * on the team as soon as all component factories have been invoked.
-     *
-     * @param team      the team being constructed
-     */
-    @Contract(pure = true)
-    C createForTeam(Team team);
+    @Deprecated
+    @Override   // just a dumb hack because I'm too lazy to refactor everything rn
+    default ComponentContainer create(Team obj) {
+        throw new UnsupportedOperationException("Not supposed to be called :(");
+    }
 }

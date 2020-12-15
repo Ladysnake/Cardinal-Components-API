@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p>When invoked, the factory must return a {@link Component} of the right type.
  *
- * @since 2.4.2
+ * @since 2.7.10
  */
 @ApiStatus.Experimental
 @FunctionalInterface
