@@ -96,4 +96,14 @@ public final class StaticScoreboardComponentPlugin extends StaticComponentPlugin
     public <C extends Component> void registerForTeams(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactory<? extends C> factory) {
         StaticTeamComponentPlugin.INSTANCE.register(type, impl, factory);
     }
+
+    @Override
+    public <C extends Component> void registerForTeams(ComponentKey<? super C> type, TeamComponentFactoryV2<? extends C> factory) {
+        StaticTeamComponentPlugin.INSTANCE.register(type, factory);
+    }
+
+    @Override
+    public <C extends Component> void registerForTeams(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactoryV2<? extends C> factory) {
+        StaticTeamComponentPlugin.INSTANCE.register(type, impl, factory);
+    }
 }

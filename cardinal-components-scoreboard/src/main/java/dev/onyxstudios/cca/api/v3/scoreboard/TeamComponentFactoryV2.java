@@ -35,24 +35,22 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p>When invoked, the factory must return a {@link Component} of the right type.
  *
- * @since 2.4.2
+ * @since 2.7.10
  */
 @ApiStatus.Experimental
 @FunctionalInterface
-public interface TeamComponentFactory<C extends Component> extends TeamComponentFactoryV2<C> {
-    @Override
-    default C createForTeam(Team team, Scoreboard scoreboard, @Nullable MinecraftServer server) {
-        return this.createForTeam(team);
-    }
-
+public interface TeamComponentFactoryV2<C extends Component> {
     /**
      * Initialize components for the given team.
      *
      * <p>The component returned by this method will be available
      * on the team as soon as all component factories have been invoked.
      *
-     * @param team      the team being constructed
+     * @param team       the team being constructed
+     * @param scoreboard the scoreboard to which the team will be added
+     * @param server     the server for which the scoreboard is being constructed, or
+     *                   {@code null} if the scoreboard is clientside
      */
     @Contract(pure = true)
-    C createForTeam(Team team);
+    C createForTeam(Team team, Scoreboard scoreboard, @Nullable MinecraftServer server);
 }
