@@ -20,13 +20,21 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.internal.item;
+package dev.onyxstudios.cca.internal.scoreboard;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.server.MinecraftServer;
+import org.jetbrains.annotations.Nullable;
 
 @FunctionalInterface
-public interface ItemComponentContainerFactory {
-    ComponentContainer create(Item item, ItemStack stack);
+public interface ScoreboardComponentContainerFactory extends DynamicContainerFactory<Scoreboard> {
+    ComponentContainer create(Scoreboard scoreboard, @Nullable MinecraftServer server);
+
+    @Deprecated
+    @Override   // just a dumb hack because I'm too lazy to refactor everything rn
+    default ComponentContainer create(Scoreboard obj) {
+        throw new UnsupportedOperationException("Not supposed to be called :(");
+    }
 }
