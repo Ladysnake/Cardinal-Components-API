@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.mixin.scoreboard;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import dev.onyxstudios.cca.internal.scoreboard.ScoreboardComponentContainerFactory;
 import dev.onyxstudios.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
@@ -41,8 +40,7 @@ import javax.annotation.Nonnull;
 @Mixin(Scoreboard.class)
 public abstract class MixinScoreboard implements InternalComponentProvider {
     @Unique
-    protected static final Lazy<ScoreboardComponentContainerFactory> componentsContainerFactory
-        = new Lazy<>(() -> ComponentsInternals.createFactory(StaticScoreboardComponentPlugin.INSTANCE.getContainerFactoryClass()));
+    private static final Lazy<ScoreboardComponentContainerFactory> componentsContainerFactory = StaticScoreboardComponentPlugin.INSTANCE.componentsContainerFactory;
     @Unique
     protected ComponentContainer components;
 

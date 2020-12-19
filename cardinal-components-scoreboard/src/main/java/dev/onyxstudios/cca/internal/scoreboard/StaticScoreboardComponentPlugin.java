@@ -25,11 +25,13 @@ package dev.onyxstudios.cca.internal.scoreboard;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.scoreboard.*;
+import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.util.Lazy;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -39,6 +41,10 @@ public final class StaticScoreboardComponentPlugin extends StaticComponentPlugin
     public static final String SCOREBOARD_IMPL_SUFFIX = "ScoreboardImpl";
 
     public static final StaticScoreboardComponentPlugin INSTANCE = new StaticScoreboardComponentPlugin();
+
+    public final Lazy<ScoreboardComponentContainerFactory> componentsContainerFactory
+        = new Lazy<>(() -> ComponentsInternals.createFactory(INSTANCE.getContainerFactoryClass()));
+
 
     private StaticScoreboardComponentPlugin() {
         super("made a scoreboard", Scoreboard.class, ScoreboardComponentFactoryV2.class, SCOREBOARD_IMPL_SUFFIX);
@@ -78,13 +84,13 @@ public final class StaticScoreboardComponentPlugin extends StaticComponentPlugin
     @Override
     public <C extends Component> void registerForScoreboards(ComponentKey<? super C> type, ScoreboardComponentFactoryV2<? extends C> factory) {
         this.checkLoading(ScoreboardComponentFactoryRegistry.class, "register");
-        super.register(type, (scoreboard, server) -> Objects.requireNonNull(((ScoreboardComponentFactory<?>) factory).createForScoreboard(scoreboard, server), "Component factory "+ factory + " for " + type.getId() + " returned null on " + scoreboard.getClass().getSimpleName()));
+        super.register(type, (scoreboard, server) -> Objects.requireNonNull(((ScoreboardComponentFactory<?>) factory).createForScoreboard(scoreboard, server), "Component factory " + factory + " for " + type.getId() + " returned null on " + scoreboard.getClass().getSimpleName()));
     }
 
     @Override
     public <C extends Component> void registerForScoreboards(ComponentKey<? super C> type, Class<C> impl, ScoreboardComponentFactoryV2<? extends C> factory) {
         this.checkLoading(ScoreboardComponentFactoryRegistry.class, "registerForScoreboards");
-        super.register(type, impl, (scoreboard, server) -> Objects.requireNonNull(((ScoreboardComponentFactoryV2<?>) factory).createForScoreboard(scoreboard, server), "Component factory "+ factory + " for " + type.getId() + " returned null on " + scoreboard.getClass().getSimpleName()));
+        super.register(type, impl, (scoreboard, server) -> Objects.requireNonNull(((ScoreboardComponentFactoryV2<?>) factory).createForScoreboard(scoreboard, server), "Component factory " + factory + " for " + type.getId() + " returned null on " + scoreboard.getClass().getSimpleName()));
     }
 
     @Override
