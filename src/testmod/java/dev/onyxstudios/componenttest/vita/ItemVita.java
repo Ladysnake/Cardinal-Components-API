@@ -22,21 +22,21 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
-import dev.onyxstudios.componenttest.TestComponents;
+import dev.onyxstudios.cca.api.v3.item.ItemComponent;
+import net.minecraft.item.ItemStack;
 
-public interface Vita extends ComponentV3 {
-
-    static <T> Vita get(T provider) {
-        return TestComponents.VITA.get(provider);
+public class ItemVita extends ItemComponent implements Vita {
+    public ItemVita(ItemStack stack) {
+        super(stack);
     }
 
-    int getVitality();
-    void setVitality(int value);
-    default void transferTo(Vita dest, int amount) {
-        int sourceVitality = this.getVitality();
-        int actualAmount = Math.min(sourceVitality, amount);
-        this.setVitality(sourceVitality - actualAmount);
-        dest.setVitality(dest.getVitality() + actualAmount);
+    @Override
+    public int getVitality() {
+        return this.getInt("vitality");
+    }
+
+    @Override
+    public void setVitality(int value) {
+        this.putInt("vitality", value);
     }
 }

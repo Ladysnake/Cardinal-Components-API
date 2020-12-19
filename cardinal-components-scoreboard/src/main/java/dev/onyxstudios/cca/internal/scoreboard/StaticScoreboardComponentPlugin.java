@@ -31,6 +31,7 @@ import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Lazy;
 
 import java.io.IOException;
@@ -62,7 +63,7 @@ public final class StaticScoreboardComponentPlugin extends StaticComponentPlugin
 
     @Override
     protected Class<? extends DynamicContainerFactory<Scoreboard>> spinContainerFactory(Class<? extends ComponentContainer> containerCls) throws IOException {
-        return spinContainerFactory(this.implSuffix, ScoreboardComponentContainerFactory.class, containerCls, null, 0, this.providerClass);
+        return spinContainerFactory(this.implSuffix, ScoreboardComponentContainerFactory.class, containerCls, null, 0, this.providerClass, MinecraftServer.class);
     }
 
     @Override
