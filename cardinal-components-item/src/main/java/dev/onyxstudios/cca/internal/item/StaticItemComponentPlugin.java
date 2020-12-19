@@ -26,10 +26,7 @@ import com.google.common.collect.Iterables;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentV3;
-import dev.onyxstudios.cca.api.v3.item.ItemComponentFactory;
-import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryV2;
-import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
+import dev.onyxstudios.cca.api.v3.item.*;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
@@ -131,6 +128,25 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     public <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ItemComponentFactory<? extends C> factory) {
         Objects.requireNonNull(itemId);
         this.register(itemId, type, factory);
+    }
+
+    @Override
+    public <C extends ItemComponent> void registerForV3(Predicate<Item> test, ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
+        this.registerFor(test, type, wrapV3(type, factory));
+    }
+
+    private static <C extends ItemComponent> ItemComponentFactory<C> wrapV3(ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
+        String rootTagKey = type.getId().toString();
+        return i -> {
+            C c = factory.createForStack(i);
+            c.setRootTagKey(rootTagKey);
+            return c;
+        };
+    }
+
+    @Override
+    public <C extends ItemComponent> void registerForV3(Item item, ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
+        this.registerFor(item, type, wrapV3(type, factory));
     }
 
     @Override

@@ -4,7 +4,7 @@
     "id": "cardinal-components-base",
     "name": "Cardinal Components API (base)",
     "description": "dynamically exposing components",
-    "version": "${version}",
+    "version": "2.0.0",
     "custom": {
         "modmenu:api": true,
         "modmenu:parent": "cardinal-components"

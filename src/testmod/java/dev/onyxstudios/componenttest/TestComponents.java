@@ -135,7 +135,7 @@ public final class TestComponents implements
         // this first line adds data to every stack, which is a fairly bad idea for several reasons
         // it also initializes the component with volatile data (stack count), which is an even worse idea and will cause desync
         registry.registerFor(i -> true, ALT_VITA, (stack) -> new BaseVita(stack.getItem() == Items.DIAMOND_CHESTPLATE ? 3 : stack.getCount()));
-        registry.registerFor(CardinalComponentsTest.VITALITY_STICK, VITA, stack -> new BaseVita());
+        registry.registerForV3(CardinalComponentsTest.VITALITY_STICK, VITA, ItemVita::new);
     }
 
     @Override
