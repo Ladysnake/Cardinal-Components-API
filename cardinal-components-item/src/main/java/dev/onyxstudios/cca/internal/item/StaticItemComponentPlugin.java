@@ -132,31 +132,22 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     }
 
     @Override
-    public <C extends ItemComponent> void registerForV3(Predicate<Item> test, ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
-        this.registerFor(test, type, wrapV3(type, factory));
-    }
-
-    private static <C extends ItemComponent> ItemComponentFactory<C> wrapV3(ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
-        String rootTagKey = type.getId().toString();
-        return i -> {
-            C c = factory.createForStack(i);
-            c.setRootTagKey(rootTagKey);
-            return c;
-        };
+    public <C extends ItemComponent> void register(Predicate<Item> test, ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
+        this.registerFor(test, type, ItemComponent.wrapFactory(type, factory));
     }
 
     @Override
-    public <C extends ItemComponent> void registerForV3(Item item, ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
-        this.registerFor(item, type, wrapV3(type, factory));
+    public <C extends ItemComponent> void register(Item item, ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
+        this.registerFor(item, type, ItemComponent.wrapFactory(type, factory));
     }
 
     @Override
-    public <C extends TransientComponent> void registerForV3(Predicate<Item> test, ComponentKey<? super C> type, TransientItemComponentFactory<C> factory) {
+    public <C extends TransientComponent> void registerTransient(Predicate<Item> test, ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
         this.registerFor(test, type, factory);
     }
 
     @Override
-    public <C extends TransientComponent> void registerForV3(Item item, ComponentKey<? super C> type, TransientItemComponentFactory<C> factory) {
+    public <C extends TransientComponent> void registerTransient(Item item, ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
         this.registerFor(item, type, factory);
     }
 
