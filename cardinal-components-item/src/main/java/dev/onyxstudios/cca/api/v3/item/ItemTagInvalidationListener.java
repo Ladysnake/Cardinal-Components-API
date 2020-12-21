@@ -20,14 +20,15 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.sync;
+package dev.onyxstudios.cca.api.v3.item;
 
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.ApiStatus;
 
-@FunctionalInterface
-public interface ComponentPacketWriter {
-    @Contract(mutates = "param1")
-    void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient);
+/**
+ * An item stack {@link dev.onyxstudios.cca.api.v3.component.Component} that implements this interface
+ * will be notified when the stack's NBT tag is set.
+ */
+@ApiStatus.Experimental
+public interface ItemTagInvalidationListener {
+    void onTagInvalidated();
 }

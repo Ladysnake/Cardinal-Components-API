@@ -48,8 +48,8 @@ allprojects {
         testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
         testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.0-M1"
         compileOnly "com.google.code.findbugs:jsr305:3.0.2"
-        api "com.demonwav.mcdev:annotations:1.0"
-        api "org.jetbrains:annotations:19.0.0"
+        compileOnly "com.demonwav.mcdev:annotations:1.0"
+        compileOnly "org.jetbrains:annotations:19.0.0"
     }
 
     processResources {
@@ -85,6 +85,12 @@ allprojects {
         ext {
             year = Year.now()
             projectDisplayName = rootProject.archivesBaseName
+        }
+    }
+
+    jar {
+        from(rootProject.file("LICENSE.md")) {
+            rename { "LICENSE_${project.archivesBaseName.replace('-', '_')}"}
         }
     }
 }
@@ -123,11 +129,13 @@ dependencies {
     modImplementation fabricApi.module("fabric-lifecycle-events-v1", rootProject.fabric_api_version)
     modImplementation fabricApi.module("fabric-item-api-v1", rootProject.fabric_api_version)
     modImplementation fabricApi.module("fabric-item-groups-v0", rootProject.fabric_api_version)
+    modImplementation fabricApi.module("fabric-events-interaction-v0", rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-networking-v0", rootProject.rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-resource-loader-v0", rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-mining-levels-v0", rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-tag-extensions-v0", rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-tool-attribute-api-v1", rootProject.fabric_api_version)
+    modRuntime fabricApi.module("fabric-events-interaction-v0", rootProject.fabric_api_version)
 
     // Optibad
 //    modRuntime 'com.github.modmuss50:OptiFabric:1.1.0-beta2'

@@ -26,6 +26,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+@FunctionalInterface
 public interface ItemComponentContainerFactory {
     ComponentContainer create(Item item, ItemStack stack);
 }

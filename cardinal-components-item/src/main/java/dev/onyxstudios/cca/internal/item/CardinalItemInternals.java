@@ -25,7 +25,6 @@ package dev.onyxstudios.cca.internal.item;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.InternalComponentProvider;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.ComponentProvider;
 import nerdhub.cardinal.components.api.event.ItemComponentCallback;
@@ -45,6 +44,7 @@ public final class CardinalItemInternals {
     public static final Event<ItemComponentCallbackV2> WILDCARD_ITEM_EVENT_V2 = createItemComponentsEventV2();
     public static final Event<ItemComponentCallback> WILDCARD_ITEM_EVENT = createItemComponentsEvent(WILDCARD_ITEM_EVENT_V2);
     public static final String CCA_SYNCED_COMPONENTS = "cca_synced_components";
+    public static final String CCA_SHARED_TAG = "cardinal-components-item:sharedTag";
 
     public static Event<ItemComponentCallbackV2> createItemComponentsEventV2() {
         return EventFactory.createArrayBacked(ItemComponentCallbackV2.class,
@@ -94,16 +94,18 @@ public final class CardinalItemInternals {
                 // only the original stack's components are initialized
                 CompoundTag tag = new CompoundTag();
                 originalComponents.toTag(tag);
-                copiedProvider.cca_setSerializedComponentData(tag);
+                copiedProvider.cca_setSerializedComponentData(tag); // new tag, so not marked as shared
             }
         } else if ((serializedComponents = originalProvider.cca_getSerializedComponentData()) != null) {
             // the original stack has frozen components
             if (copiedComponents != null) {
                 // only the copied stack's components are initialized (unlikely)
-                copiedComponents.fromTag(serializedComponents);
+                copiedComponents.fromTag(copyIfNeeded(serializedComponents));
             } else {
                 // no components are initialized
-                copiedProvider.cca_setSerializedComponentData(serializedComponents.copy());
+                // we are not immediately copying the tag, as it's costly and only necessary if the components end up being deserialized
+                markSharedTag(serializedComponents);
+                copiedProvider.cca_setSerializedComponentData(serializedComponents);
             }
         }
     }
@@ -111,14 +113,17 @@ public final class CardinalItemInternals {
     public static boolean areComponentsIncompatible(ItemStack stack1, ItemStack stack2) {
         // this method should only be called to supplement an equals check, not to check if 2
         // unrelated stacks have compatible components
-        if (stack1.getItem() != stack2.getItem()) {
-            return true;
-        }
+        assert stack1.getItem() != stack2.getItem();
 
         if (stack1.isEmpty()) return false;
 
         // Possibly initialize components
-        Set<ComponentKey<?>> keys1 = ((InternalComponentProvider) ComponentProvider.fromItemStack(stack1)).getComponentContainer().keys();
+        InternalStackComponentProvider iStack1 = (InternalStackComponentProvider) ComponentProvider.fromItemStack(stack1);
+        InternalStackComponentProvider iStack2 = (InternalStackComponentProvider) ComponentProvider.fromItemStack(stack2);
+
+        if (iStack1.cca_hasNoComponentData() && iStack2.cca_hasNoComponentData()) return false;
+
+        Set<ComponentKey<?>> keys1 = iStack1.getComponentContainer().keys();
 
         for(ComponentKey<?> key : keys1) {
             @Nullable Component otherComponent = key.getNullable(stack2);
@@ -129,5 +134,15 @@ public final class CardinalItemInternals {
         }
 
         return false;
+    }
+
+    public static void markSharedTag(CompoundTag serializedComponents) {
+        serializedComponents.putBoolean(CCA_SHARED_TAG, true);
+    }
+
+    public static CompoundTag copyIfNeeded(CompoundTag serializedComponents) {
+        return serializedComponents.contains(CCA_SHARED_TAG)
+            ? serializedComponents.copy()
+            : serializedComponents;
     }
 }

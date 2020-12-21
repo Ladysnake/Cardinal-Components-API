@@ -73,7 +73,6 @@ public abstract class ComponentKey<C extends Component> {
      */
     // overridden by generated types
     @Contract(pure = true)
-    @ApiStatus.Experimental
     public abstract <V> @Nullable C getNullable(V provider);
 
     /**
@@ -98,7 +97,6 @@ public abstract class ComponentKey<C extends Component> {
     public abstract <V> Optional<C> maybeGet(@Nullable V provider);
 
     @Contract(pure = true)
-    @ApiStatus.Experimental
     public <V> boolean isProvidedBy(V provider) {
         return this.getNullable(provider) != null;
     }
@@ -115,11 +113,13 @@ public abstract class ComponentKey<C extends Component> {
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
     public <V> void sync(V provider) {
-        if (((ComponentProvider)provider).supportsCustomComponentPacketWriters()) {
+        if (((ComponentProvider) provider).supportsCustomComponentPacketWriters()) {
             C c = this.get(provider);
             if (c instanceof AutoSyncedComponent) {
                 AutoSyncedComponent synced = (AutoSyncedComponent) c;
                 this.sync(provider, synced, synced);
+            } else if (c instanceof SyncedComponent) {
+                ((SyncedComponent) c).sync();
             }
         } else {
             // backwards compatibility
@@ -162,7 +162,6 @@ public abstract class ComponentKey<C extends Component> {
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
-    @ApiStatus.Experimental
     public <V> void sync(V provider, ComponentPacketWriter packetWriter) {
         C c = this.get(provider);
         if (c instanceof AutoSyncedComponent) {
@@ -183,14 +182,40 @@ public abstract class ComponentKey<C extends Component> {
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
-    @ApiStatus.Experimental
     public <V> void sync(V provider, ComponentPacketWriter packetWriter, PlayerSyncPredicate predicate) {
         ComponentProvider prov = (ComponentProvider) provider;
         if (!prov.supportsCustomComponentPacketWriters()) {
             throw new UnsupportedOperationException(prov + " does not support custom packet writers, please update the relevant Cardinal Components module to 2.7.0 or later.");
         }
-        for (Iterator<ServerPlayerEntity> it = prov.getRecipientsForComponentSync(); it.hasNext();) {
+        for (Iterator<ServerPlayerEntity> it = prov.getRecipientsForComponentSync(); it.hasNext(); ) {
             this.syncWith(it.next(), prov, packetWriter, predicate);
+        }
+    }
+
+    /**
+     * Attempts to synchronize the component attached to the given provider with the given {@code player}.
+     *
+     * <p>This method has no visible effect if the given provider does not support synchronization, or
+     * the associated component does not implement an adequate synchronization interface.
+     *
+     * @param player   the player with which the component should be synchronized
+     * @param provider a component provider
+     * @throws NoSuchElementException if the provider does not provide this type of component
+     * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
+     */
+    @ApiStatus.Experimental
+    public void syncWith(ServerPlayerEntity player, ComponentProvider provider) {
+        if (provider.supportsCustomComponentPacketWriters()) {
+            C c = this.get(provider);
+            if (c instanceof AutoSyncedComponent) {
+                AutoSyncedComponent synced = (AutoSyncedComponent) c;
+                this.syncWith(player, provider, synced, synced);
+            } else if (c instanceof SyncedComponent) {
+                ((SyncedComponent) c).syncWith(player);
+            }
+        } else {
+            // backwards compatibility
+            this.syncWith(player, provider, dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent.FULL_SYNC);
         }
     }
 
@@ -240,20 +265,6 @@ public abstract class ComponentKey<C extends Component> {
     @ApiStatus.Internal
     public C getFromContainer(ComponentContainer container) {
         return Objects.requireNonNull(this.getInternal(container));
-    }
-
-    @ApiStatus.Internal
-    public void syncWith(ServerPlayerEntity player, ComponentProvider provider) {
-        if (provider.supportsCustomComponentPacketWriters()) {
-            C c = this.get(provider);
-            if (c instanceof AutoSyncedComponent) {
-                AutoSyncedComponent synced = (AutoSyncedComponent) c;
-                this.syncWith(player, provider, synced, synced);
-            }
-        } else {
-            // backwards compatibility
-            this.syncWith(player, provider, dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent.FULL_SYNC);
-        }
     }
 
     @Deprecated

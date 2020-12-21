@@ -132,9 +132,10 @@ public final class TestComponents implements
 
     @Override
     public void registerItemComponentFactories(ItemComponentFactoryRegistry registry) {
-        // this first line adds data to every stack, which is an awful idea for several reasons
+        // this first line adds data to every stack, which is a fairly bad idea for several reasons
+        // it also initializes the component with volatile data (stack count), which is an even worse idea and will cause desync
         registry.registerFor(i -> true, ALT_VITA, (stack) -> new BaseVita(stack.getItem() == Items.DIAMOND_CHESTPLATE ? 3 : stack.getCount()));
-        registry.registerFor(CardinalComponentsTest.VITALITY_STICK, VITA, stack -> new BaseVita());
+        registry.register(CardinalComponentsTest.VITALITY_STICK, VITA, ItemVita::new);
     }
 
     @Override

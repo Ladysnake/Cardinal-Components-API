@@ -25,8 +25,7 @@ package dev.onyxstudios.cca.internal.scoreboard;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
-import dev.onyxstudios.cca.api.v3.scoreboard.TeamComponentFactory;
-import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
+import dev.onyxstudios.cca.api.v3.scoreboard.TeamComponentFactoryV2;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
@@ -36,13 +35,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Objects;
 
-public final class StaticTeamComponentPlugin extends StaticComponentPluginBase<Team, ScoreboardComponentInitializer, TeamComponentFactory<?>> {
+public final class StaticTeamComponentPlugin extends StaticComponentPluginBase<Team, ScoreboardComponentInitializer, TeamComponentFactoryV2<?>> {
     public static final String TEAM_IMPL_SUFFIX = "TeamImpl";
 
     public static final StaticTeamComponentPlugin INSTANCE = new StaticTeamComponentPlugin();
 
     private StaticTeamComponentPlugin() {
-        super("made a team", Team.class, TeamComponentFactory.class, TEAM_IMPL_SUFFIX);
+        super("made a team", Team.class, TeamComponentFactoryV2.class, TEAM_IMPL_SUFFIX);
     }
 
     @Override
@@ -56,20 +55,21 @@ public final class StaticTeamComponentPlugin extends StaticComponentPluginBase<T
     }
 
     @Override
-    protected Class<? extends DynamicContainerFactory<Team>> spinContainerFactory(Class<? extends ComponentContainer> containerCls) throws IOException {
-        return spinContainerFactory(this.implSuffix, DynamicContainerFactory.class, containerCls, null, 0, this.providerClass);
+    protected Class<? extends TeamComponentContainerFactory> spinContainerFactory(Class<? extends ComponentContainer> containerCls) throws IOException {
+        return spinContainerFactory(this.implSuffix, TeamComponentContainerFactory.class, containerCls, null, 0, this.providerClass);
     }
 
     @Override
-    public Class<? extends DynamicContainerFactory<Team>> getContainerFactoryClass() {
-        return super.getContainerFactoryClass();
+    public Class<? extends TeamComponentContainerFactory> getContainerFactoryClass() {
+        @SuppressWarnings("unchecked") Class<? extends TeamComponentContainerFactory> t = (Class<? extends TeamComponentContainerFactory>) super.getContainerFactoryClass();
+        return t;
     }
 
-    public <C extends Component> void register(ComponentKey<C> type, TeamComponentFactory<? extends C> factory) {
-        super.register(type, (team) -> Objects.requireNonNull(((TeamComponentFactory<?>) factory).createForTeam(team), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
+    public <C extends Component> void register(ComponentKey<C> type, TeamComponentFactoryV2<? extends C> factory) {
+        super.register(type, (team, scoreboard, server) -> Objects.requireNonNull(((TeamComponentFactoryV2<?>) factory).createForTeam(team, scoreboard, server), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
     }
 
-    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactory<? extends C> factory) {
-        super.register(type, impl, (team) -> Objects.requireNonNull(((TeamComponentFactory<?>) factory).createForTeam(team), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
+    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactoryV2<? extends C> factory) {
+        super.register(type, impl, (team, scoreboard, server) -> Objects.requireNonNull(((TeamComponentFactoryV2<?>) factory).createForTeam(team, scoreboard, server), "Component factory "+ factory + " for " + type.getId() + " returned null on " + team.getClass().getSimpleName()));
     }
 }
