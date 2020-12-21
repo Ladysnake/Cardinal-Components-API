@@ -1,4 +1,17 @@
 ------------------------------------------------------
+Version 2.7.10
+------------------------------------------------------
+Additions
+- Added `ItemComponent`, an experimental component implementation that stores all its data in the stack's tag
+- Added `ScoreboardComponentFactoryV2`, giving access to the server holding the scoreboard (if any)
+- Added `TeamComponentFactoryV2`, giving access to the scoreboard holding the team and its server (if any)
+
+Changes
+- Promoted `ComponentPacketWriter` and `PlayerSyncPredicate` to stable API
+- Further optimized ItemStack components
+- A copy of the MIT license is now bundled with every CCA jar
+
+------------------------------------------------------
 Version 2.7.9
 ------------------------------------------------------
 - Mcdev annotations are no longer a transitive dependency
