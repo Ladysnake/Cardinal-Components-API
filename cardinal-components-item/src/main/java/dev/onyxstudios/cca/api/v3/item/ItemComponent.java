@@ -27,6 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -34,8 +35,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public abstract class ItemComponent implements Component {
+public abstract class ItemComponent implements Component, ItemTagInvalidationListener {
     private String rootTagKey;
+    private @Nullable CompoundTag rootTag;
     protected final ItemStack stack;
 
     public ItemComponent(ItemStack stack) {
@@ -43,11 +45,12 @@ public abstract class ItemComponent implements Component {
     }
 
     protected @Nullable CompoundTag getRootTag() {
-        return this.stack.getSubTag(this.rootTagKey);
+        return this.rootTag;
     }
 
     protected CompoundTag getOrCreateRootTag() {
-        return this.stack.getOrCreateSubTag(this.rootTagKey);
+        if (this.rootTag != null) return this.rootTag;
+        return this.rootTag = this.stack.getOrCreateSubTag(this.rootTagKey);
     }
 
     /**
@@ -219,6 +222,13 @@ public abstract class ItemComponent implements Component {
 
     public void setRootTagKey(String rootTagKey) {
         this.rootTagKey = rootTagKey;
+        this.onTagInvalidated();
+    }
+
+    @ApiStatus.Experimental
+    @Override
+    public void onTagInvalidated() {
+        this.rootTag = this.stack.getSubTag(this.rootTagKey);
     }
 
     @Override

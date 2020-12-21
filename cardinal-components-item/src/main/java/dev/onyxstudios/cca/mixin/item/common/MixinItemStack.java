@@ -23,10 +23,13 @@
 package dev.onyxstudios.cca.mixin.item.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.item.ItemTagInvalidationListener;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.util.container.AbstractComponentContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -79,6 +82,20 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
         } else if (this.serializedComponents != null) {
             CardinalItemInternals.markSharedTag(this.serializedComponents);
             cir.getReturnValue().put(AbstractComponentContainer.NBT_KEY, this.serializedComponents.get(AbstractComponentContainer.NBT_KEY));
+        }
+    }
+
+    @Inject(method = "setTag", at = @At("RETURN"))
+    private void invalidateCaches(CompoundTag tag, CallbackInfo ci) {
+        ComponentContainer components = this.components;
+
+        if (components != null) {
+            for (ComponentKey<?> key : components.keys()) {
+                Component c = key.getInternal(components);
+                if (c instanceof ItemTagInvalidationListener) {
+                    ((ItemTagInvalidationListener) c).onTagInvalidated();
+                }
+            }
         }
     }
 
