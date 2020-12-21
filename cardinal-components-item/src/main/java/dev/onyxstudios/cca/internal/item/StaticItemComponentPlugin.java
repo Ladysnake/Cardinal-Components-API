@@ -26,6 +26,7 @@ import com.google.common.collect.Iterables;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentV3;
+import dev.onyxstudios.cca.api.v3.component.TransientComponent;
 import dev.onyxstudios.cca.api.v3.item.*;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
@@ -147,6 +148,16 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
     @Override
     public <C extends ItemComponent> void registerForV3(Item item, ComponentKey<? super C> type, ItemComponentFactory<C> factory) {
         this.registerFor(item, type, wrapV3(type, factory));
+    }
+
+    @Override
+    public <C extends TransientComponent> void registerForV3(Predicate<Item> test, ComponentKey<? super C> type, TransientItemComponentFactory<C> factory) {
+        this.registerFor(test, type, factory);
+    }
+
+    @Override
+    public <C extends TransientComponent> void registerForV3(Item item, ComponentKey<? super C> type, TransientItemComponentFactory<C> factory) {
+        this.registerFor(item, type, factory);
     }
 
     @Override

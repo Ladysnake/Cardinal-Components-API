@@ -68,7 +68,7 @@ public class CardinalComponentsTest {
     public static final Identifier VITA_STICK_ID = id("vita_stick");
     // inline self component callback registration
     public static final VitalityStickItem VITALITY_STICK = Registry.register(Registry.ITEM, VITA_STICK_ID,
-            new VitalityStickItem(new Item.Settings().group(ITEM_GROUP)));
+            new VitalityStickItem(new Item.Settings().group(ITEM_GROUP).maxDamage(50)));
 
     public static final VitalityCondenser VITALITY_CONDENSER = Registry.register(Registry.BLOCK, "componenttest:vita_condenser",
             new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().lightLevel(5).ticksRandomly()));

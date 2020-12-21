@@ -23,6 +23,7 @@
 package dev.onyxstudios.cca.api.v3.item;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.TransientComponent;
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -55,7 +56,28 @@ public interface ItemComponentFactoryRegistry {
     <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ItemComponentFactory<? extends C> factory);
 
     /**
-     * Registers an {@link ItemComponentFactoryV2} for stacks of specific items, based on a predicate.
+     * Registers an {@link ItemComponentFactory} for stacks of specific items, based on a predicate.
+     *
+     * @param test  a predicate testing whether the Item can have the component attached to its stacks
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
+     */
+    @ApiStatus.Experimental
+    <C extends TransientComponent> void registerForV3(Predicate<Item> test, ComponentKey<? super C> type, TransientItemComponentFactory<C> factory);
+
+    /**
+     * Registers an {@link ItemComponentFactory} for stacks of a specific item.
+     *
+     * @param item  the item to target
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
+     * @throws IllegalStateException if the {@code item} was not previously registered
+     */
+    @ApiStatus.Experimental
+    <C extends TransientComponent> void registerForV3(Item item, ComponentKey<? super C> type, TransientItemComponentFactory<C> factory);
+
+    /**
+     * Registers an {@link ItemComponentFactory} for stacks of specific items, based on a predicate.
      *
      * @param test  a predicate testing whether the Item can have the component attached to its stacks
      * @param factory the factory to use to create components of the given type
@@ -76,7 +98,7 @@ public interface ItemComponentFactoryRegistry {
     <C extends ItemComponent> void registerForV3(Item item, ComponentKey<? super C> type, ItemComponentFactory<C> factory);
 
     /**
-     * Registers an {@link ItemComponentFactoryV2} for stacks of specific items, based on a predicate.
+     * Registers an {@link ItemComponentFactory} for stacks of specific items, based on a predicate.
      *
      * @param test  a predicate testing whether the Item can have the component attached to its stacks
      * @param factory the factory to use to create components of the given type
