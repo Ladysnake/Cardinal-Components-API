@@ -20,15 +20,22 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.mixin.scoreboard;
+package dev.onyxstudios.cca.internal.scoreboard;
 
-import net.minecraft.scoreboard.ServerScoreboard;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.internal.base.DynamicContainerFactory;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.jetbrains.annotations.Nullable;
 
-@Mixin(ServerScoreboard.class)
-public interface ServerScoreboardAccessor {
-    @Accessor
-    MinecraftServer getServer();
+@FunctionalInterface
+public interface TeamComponentContainerFactory extends DynamicContainerFactory<Team> {
+    ComponentContainer create(Team team, Scoreboard scoreboard, @Nullable MinecraftServer server);
+
+    @Deprecated
+    @Override   // just a dumb hack because I'm too lazy to refactor everything rn
+    default ComponentContainer create(Team obj) {
+        throw new UnsupportedOperationException("Not supposed to be called :(");
+    }
 }

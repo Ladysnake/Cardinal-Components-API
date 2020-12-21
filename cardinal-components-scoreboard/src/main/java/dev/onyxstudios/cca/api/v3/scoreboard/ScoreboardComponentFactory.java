@@ -24,8 +24,10 @@ package dev.onyxstudios.cca.api.v3.scoreboard;
 
 import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A component factory for {@linkplain Scoreboard scoreboards}.
@@ -36,7 +38,12 @@ import org.jetbrains.annotations.Contract;
  */
 @ApiStatus.Experimental
 @FunctionalInterface
-public interface ScoreboardComponentFactory<C extends Component> {
+public interface ScoreboardComponentFactory<C extends Component> extends ScoreboardComponentFactoryV2<C> {
+    @Override
+    default C createForScoreboard(Scoreboard scoreboard, @Nullable MinecraftServer server) {
+        return this.createForScoreboard(scoreboard);
+    }
+
     /**
      * Initialize components for the given scoreboard.
      *

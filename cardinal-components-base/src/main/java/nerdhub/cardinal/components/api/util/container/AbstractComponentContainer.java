@@ -35,7 +35,6 @@ import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
 
 import javax.annotation.Nullable;
 import java.util.AbstractMap;
@@ -144,6 +143,7 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
 
     @Override
     public abstract C put(ComponentType<?> key, C value);
+
     /**
      * {@inheritDoc}
      *
@@ -170,20 +170,20 @@ public abstract class AbstractComponentContainer<C extends Component> extends Ab
             }
         } else if (tag.contains("cardinal_components", NbtType.COMPOUND)) {
             CompoundTag componentMap = tag.getCompound(NBT_KEY);
-            for (String keyId : componentMap.getKeys()) {
-                try {
-                    ComponentKey<?> key = ComponentRegistry.INSTANCE.get(new Identifier(keyId));
-                    if (key != null) {
-                        Component component = key.getInternal(this);
-                        if (component != null) {
-                            component.fromTag(componentMap.getCompound(keyId));
-                        }
-                    } else {
-                        ComponentsInternals.LOGGER.warn("Failed to deserialize component: unregistered key " + keyId);
-                    }
-                } catch (InvalidIdentifierException e) {
-                    ComponentsInternals.LOGGER.warn("Failed to deserialize component: invalid id " + keyId);
+
+            for (ComponentKey<?> key : this.keys()) {
+                String keyId = key.getId().toString();
+
+                if (componentMap.contains(keyId, NbtType.COMPOUND)) {
+                    Component component = key.getInternal(this);
+                    assert component != null;
+                    component.fromTag(componentMap.getCompound(keyId));
+                    componentMap.remove(keyId);
                 }
+            }
+
+            for (String missedKeyId : componentMap.getKeys()) {
+                ComponentsInternals.LOGGER.warn("Failed to deserialize component: unregistered key " + missedKeyId);
             }
         }
     }

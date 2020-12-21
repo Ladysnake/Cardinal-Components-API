@@ -23,9 +23,12 @@
 package dev.onyxstudios.cca.api.v3.scoreboard;
 
 import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A component factory for {@linkplain Team teams}.
@@ -36,7 +39,12 @@ import org.jetbrains.annotations.Contract;
  */
 @ApiStatus.Experimental
 @FunctionalInterface
-public interface TeamComponentFactory<C extends Component> {
+public interface TeamComponentFactory<C extends Component> extends TeamComponentFactoryV2<C> {
+    @Override
+    default C createForTeam(Team team, Scoreboard scoreboard, @Nullable MinecraftServer server) {
+        return this.createForTeam(team);
+    }
+
     /**
      * Initialize components for the given team.
      *

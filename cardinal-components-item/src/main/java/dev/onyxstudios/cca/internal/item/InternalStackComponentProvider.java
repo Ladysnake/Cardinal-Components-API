@@ -37,4 +37,5 @@ public interface InternalStackComponentProvider extends InternalComponentProvide
     @Nullable ComponentContainer getActualComponentContainer();
     @Nullable CompoundTag cca_getSerializedComponentData();
     void cca_setSerializedComponentData(@Nullable CompoundTag components);
+    boolean cca_hasNoComponentData();
 }

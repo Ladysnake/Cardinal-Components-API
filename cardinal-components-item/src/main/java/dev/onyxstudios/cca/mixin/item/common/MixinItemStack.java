@@ -23,10 +23,13 @@
 package dev.onyxstudios.cca.mixin.item.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.item.ItemTagInvalidationListener;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
+import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.util.container.AbstractComponentContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -77,7 +80,22 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
         if (this.components != null) {
             this.components.toTag(cir.getReturnValue());
         } else if (this.serializedComponents != null) {
-            cir.getReturnValue().copyFrom(this.serializedComponents);
+            CardinalItemInternals.markSharedTag(this.serializedComponents);
+            cir.getReturnValue().put(AbstractComponentContainer.NBT_KEY, this.serializedComponents.get(AbstractComponentContainer.NBT_KEY));
+        }
+    }
+
+    @Inject(method = "setTag", at = @At("RETURN"))
+    private void invalidateCaches(CompoundTag tag, CallbackInfo ci) {
+        ComponentContainer components = this.components;
+
+        if (components != null) {
+            for (ComponentKey<?> key : components.keys()) {
+                Component c = key.getInternal(components);
+                if (c instanceof ItemTagInvalidationListener) {
+                    ((ItemTagInvalidationListener) c).onTagInvalidated();
+                }
+            }
         }
     }
 
@@ -98,9 +116,10 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
         // Keep data without deserializing
         Tag componentData = tag.get(AbstractComponentContainer.NBT_KEY);
         if (componentData != null) {
-            this.serializedComponents = new CompoundTag();
+            CompoundTag serializedComponents = new CompoundTag();
             // the vanilla tag is not copied, so we don't copy our data either
-            this.serializedComponents.put(AbstractComponentContainer.NBT_KEY, componentData);
+            serializedComponents.put(AbstractComponentContainer.NBT_KEY, componentData);
+            this.serializedComponents = serializedComponents;
         }
     }
 
@@ -110,7 +129,9 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
         if (this.components == null) {
             this.components = ((ItemCaller) this.getItem()).cardinal_createComponents((ItemStack) (Object) this);
             if (this.serializedComponents != null) {
-                this.components.fromTag(this.serializedComponents);
+                // If the tag is shared, we need to copy it before deserialization
+                // Components may keep direct references to the serialized data, especially in the case of inventories
+                this.components.fromTag(CardinalItemInternals.copyIfNeeded(this.serializedComponents));
                 this.serializedComponents = null;
             }
         }
@@ -130,5 +151,10 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
     @Override
     public void cca_setSerializedComponentData(@Nullable CompoundTag components) {
         this.serializedComponents = components;
+    }
+
+    @Override
+    public boolean cca_hasNoComponentData() {
+        return this.components == null && this.serializedComponents == null;
     }
 }

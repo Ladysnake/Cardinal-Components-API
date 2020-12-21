@@ -29,6 +29,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -86,6 +87,8 @@ public class VitalityStickItem extends Item {
             }
             vita.ifPresent(v -> v.transferTo(Vita.get(team), 1));
         }
+
+        stack.damage(1, holder, e -> e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
         return true;
     }
 
