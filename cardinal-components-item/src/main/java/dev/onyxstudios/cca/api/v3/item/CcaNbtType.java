@@ -40,6 +40,24 @@ public final class CcaNbtType<T extends Tag> {
     public static final CcaNbtType<IntArrayTag> INT_ARRAY = new CcaNbtType<>(NbtType.INT_ARRAY);
     public static final CcaNbtType<LongArrayTag> LONG_ARRAY = new CcaNbtType<>(NbtType.LONG_ARRAY);
 
+    public static CcaNbtType<?> byId(int id) {
+        switch (id) {
+            case NbtType.BYTE: return BYTE;
+            case NbtType.SHORT: return SHORT;
+            case NbtType.INT: return INT;
+            case NbtType.LONG: return LONG;
+            case NbtType.FLOAT: return FLOAT;
+            case NbtType.DOUBLE: return DOUBLE;
+            case NbtType.BYTE_ARRAY: return BYTE_ARRAY;
+            case NbtType.STRING: return STRING;
+            case NbtType.LIST: return LIST;
+            case NbtType.COMPOUND: return COMPOUND;
+            case NbtType.INT_ARRAY: return INT_ARRAY;
+            case NbtType.LONG_ARRAY: return LONG_ARRAY;
+            default: throw new IllegalArgumentException("Unsupported NBT Type " + id);
+        }
+    }
+
     private final int type;
 
     private CcaNbtType(int type) {
