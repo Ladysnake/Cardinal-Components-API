@@ -63,6 +63,11 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
 
     public boolean requiresStaticFactory(Class<? extends Entity> entityClass) {
         this.ensureInitialized();
+
+        for (PredicatedComponentFactory<?> dynamicFactory : this.dynamicFactories) {
+            dynamicFactory.tryRegister(entityClass);
+        }
+
         return entityClass == Entity.class || this.componentFactories.containsKey(entityClass);
     }
 
@@ -71,10 +76,6 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
 
         // we need a cache as this method is called for a given class each time one of its subclasses is loaded.
         return this.factoryClasses.computeIfAbsent(key, k -> {
-            for (PredicatedComponentFactory<?> dynamicFactory : this.dynamicFactories) {
-                dynamicFactory.tryRegister(k.entityClass);
-            }
-
             Class<? extends Entity> entityClass = k.entityClass;
 
             Map<ComponentKey<?>, EntityComponentFactory<?, ?>> compiled = new LinkedHashMap<>(this.componentFactories.getOrDefault(entityClass, Collections.emptyMap()));
