@@ -29,7 +29,9 @@ import dev.onyxstudios.cca.api.v3.scoreboard.TeamComponentFactoryV2;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import nerdhub.cardinal.components.api.component.Component;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.server.MinecraftServer;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -56,7 +58,7 @@ public final class StaticTeamComponentPlugin extends StaticComponentPluginBase<T
 
     @Override
     protected Class<? extends TeamComponentContainerFactory> spinContainerFactory(Class<? extends ComponentContainer> containerCls) throws IOException {
-        return spinContainerFactory(this.implSuffix, TeamComponentContainerFactory.class, containerCls, null, 0, this.providerClass);
+        return spinContainerFactory(this.implSuffix, TeamComponentContainerFactory.class, containerCls, null, 0, this.providerClass, Scoreboard.class, MinecraftServer.class);
     }
 
     @Override
