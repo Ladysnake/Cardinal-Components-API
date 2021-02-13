@@ -111,9 +111,8 @@ public final class StaticScoreboardComponentPlugin extends LazyDispatcher implem
     }
 
     @Override
-    public <C extends Component> void registerScoreboardComponent(ComponentKey<? super C> type, ScoreboardComponentFactoryV2<? extends C> factory) {
-        this.checkLoading(ScoreboardComponentFactoryRegistry.class, "register");
-        this.scoreboardFactories.put(type, (scoreboard, server) -> Objects.requireNonNull(((ScoreboardComponentFactoryV2<?>) factory).createForScoreboard(scoreboard, server), "Component factory " + factory + " for " + type.getId() + " returned null on " + scoreboard.getClass().getSimpleName()));
+    public <C extends Component> void registerScoreboardComponent(ComponentKey<C> type, ScoreboardComponentFactoryV2<? extends C> factory) {
+        this.registerScoreboardComponent(type, type.getComponentClass(), factory);
     }
 
     @Override
@@ -124,9 +123,8 @@ public final class StaticScoreboardComponentPlugin extends LazyDispatcher implem
     }
 
     @Override
-    public <C extends Component> void registerTeamComponent(ComponentKey<? super C> type, TeamComponentFactoryV2<? extends C> factory) {
-        this.checkLoading(ScoreboardComponentFactoryRegistry.class, "register");
-        this.teamFactories.put(type, (team, scoreboard, server) -> Objects.requireNonNull(((TeamComponentFactoryV2<?>) factory).createForTeam(team, scoreboard, server), "Component factory " + factory + " for " + type.getId() + " returned null on " + scoreboard.getClass().getSimpleName()));
+    public <C extends Component> void registerTeamComponent(ComponentKey<C> type, TeamComponentFactoryV2<? extends C> factory) {
+        this.registerTeamComponent(type, type.getComponentClass(), factory);
     }
 
     @Override
