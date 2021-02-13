@@ -73,9 +73,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         this.ensureInitialized();
 
         // we need a cache as this method is called for a given class each time one of its subclasses is loaded.
-        return this.factoryClasses.computeIfAbsent(key, k -> {
-            Class<? extends Entity> entityClass = k.entityClass;
-
+        return this.factoryClasses.computeIfAbsent(key, entityClass -> {
             Map<ComponentKey<?>, ComponentFactory<?, ?>> compiled = new LinkedHashMap<>(this.componentFactories.getOrDefault(entityClass, Collections.emptyMap()));
             Map<ComponentKey<?>, Class<? extends Component>> compiledImpls = new LinkedHashMap<>(this.componentImpls.getOrDefault(entityClass, Collections.emptyMap()));
             Class<?> type = entityClass;
