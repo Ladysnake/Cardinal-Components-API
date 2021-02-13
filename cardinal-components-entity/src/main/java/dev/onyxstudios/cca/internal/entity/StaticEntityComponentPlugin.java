@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2020 OnyxStudios
+ * Copyright (C) 2019-2021 OnyxStudios
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,6 @@ import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 
