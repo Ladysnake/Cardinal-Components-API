@@ -59,8 +59,11 @@ public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
-        // FIXME
-        this.components = StaticScoreboardComponentPlugin.teamComponentsContainerFactory.get().createContainer((Team) (Object) this);
+        this.components = StaticScoreboardComponentPlugin.teamComponentsContainerFactory.get().create(
+            (Team) (Object) this,
+            this.scoreboard,
+            this.scoreboard instanceof ServerScoreboardAccessor ? ((ServerScoreboardAccessor) this.scoreboard).getServer() : null
+        );
     }
 
     @Nonnull
