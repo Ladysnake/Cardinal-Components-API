@@ -32,7 +32,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 import java.util.Objects;
-import java.util.Set;
 
 public final class CardinalItemInternals {
     public static final String CCA_SYNCED_COMPONENTS = "cca_synced_components";
@@ -81,16 +80,17 @@ public final class CardinalItemInternals {
     public static boolean areComponentsIncompatible(ItemStack stack1, ItemStack stack2) {
         // this method should only be called to supplement an equals check, not to check if 2
         // unrelated stacks have compatible components
-        if (stack1.getItem() != stack2.getItem()) {
-            return true;
-        }
+        assert stack1.getItem() != stack2.getItem();
 
         if (stack1.isEmpty()) return false;
 
         // Possibly initialize components
-        Set<ComponentKey<?>> keys = ComponentProvider.fromItemStack(stack1).getComponentContainer().keys();
+        InternalStackComponentProvider iStack1 = (InternalStackComponentProvider) ComponentProvider.fromItemStack(stack1);
+        InternalStackComponentProvider iStack2 = (InternalStackComponentProvider) ComponentProvider.fromItemStack(stack2);
 
-        for(ComponentKey<?> key : keys) {
+        if (iStack1.cca_hasNoComponentData() && iStack2.cca_hasNoComponentData()) return false;
+
+        for(ComponentKey<?> key : iStack1.getComponentContainer().keys()) {
             if(!Objects.equals(key.getNullable(stack1), key.getNullable(stack2))) {
                 return true;
             }

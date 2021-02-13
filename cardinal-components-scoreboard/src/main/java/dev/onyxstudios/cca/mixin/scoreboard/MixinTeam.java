@@ -28,7 +28,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking;
-import dev.onyxstudios.cca.internal.scoreboard.StaticTeamComponentPlugin;
+import dev.onyxstudios.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Scoreboard;
@@ -59,7 +59,8 @@ public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
-        this.components = StaticTeamComponentPlugin.componentsContainerFactory.get().createContainer((Team) (Object) this);
+        // FIXME
+        this.components = StaticScoreboardComponentPlugin.teamComponentsContainerFactory.get().createContainer((Team) (Object) this);
     }
 
     @Nonnull

@@ -22,7 +22,10 @@
  */
 package dev.onyxstudios.cca.mixin.item.common;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.item.ItemTagInvalidationListener;
 import dev.onyxstudios.cca.internal.base.AbstractComponentContainer;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
@@ -81,6 +84,20 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
         }
     }
 
+    @Inject(method = "setTag", at = @At("RETURN"))
+    private void invalidateCaches(CompoundTag tag, CallbackInfo ci) {
+        ComponentContainer components = this.components;
+
+        if (components != null) {
+            for (ComponentKey<?> key : components.keys()) {
+                Component c = key.getInternal(components);
+                if (c instanceof ItemTagInvalidationListener) {
+                    ((ItemTagInvalidationListener) c).onTagInvalidated();
+                }
+            }
+        }
+    }
+
     @Shadow
     public abstract Item getItem();
 
@@ -133,5 +150,10 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
     @Override
     public void cca_setSerializedComponentData(@Nullable CompoundTag components) {
         this.serializedComponents = components;
+    }
+
+    @Override
+    public boolean cca_hasNoComponentData() {
+        return this.components == null && this.serializedComponents == null;
     }
 }

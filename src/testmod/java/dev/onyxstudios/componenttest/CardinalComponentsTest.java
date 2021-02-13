@@ -32,6 +32,9 @@ import dev.onyxstudios.cca.api.v3.util.ComponentContainerMetafactory;
 import dev.onyxstudios.componenttest.vita.BaseVita;
 import dev.onyxstudios.componenttest.vita.Vita;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -45,6 +48,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,7 +68,7 @@ public class CardinalComponentsTest {
     public static final Identifier VITA_STICK_ID = id("vita_stick");
     // inline self component callback registration
     public static final VitalityStickItem VITALITY_STICK = Registry.register(Registry.ITEM, VITA_STICK_ID,
-            new VitalityStickItem(new Item.Settings().group(ITEM_GROUP)));
+            new VitalityStickItem(new Item.Settings().group(ITEM_GROUP).maxDamage(50)));
 
     public static final VitalityCondenser VITALITY_CONDENSER = Registry.register(Registry.BLOCK, "componenttest:vita_condenser",
             new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().lightLevel(5).ticksRandomly()));
@@ -122,6 +126,12 @@ public class CardinalComponentsTest {
             TypeToken.of(TestContainerFactory.class),
             new TypeToken<BiFunction<UUID, PlayerEntity, ? extends Component>>() {}
         ).create(UUID.randomUUID(), null));
+
+        UseItemCallback.EVENT.register((playerEntity, world, hand) -> {
+            ItemStack stack = playerEntity.getStackInHand(hand);
+            LOGGER.info("{} vitality: {}", stack, TestComponents.ALT_VITA.get(stack).getVitality()); // init components
+            return TypedActionResult.pass(stack);
+        });
     }
 
     public interface TestContainerFactory {

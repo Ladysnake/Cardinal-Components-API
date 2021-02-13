@@ -25,9 +25,11 @@ package dev.onyxstudios.cca.api.v3.item;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.TransientComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Predicate;
 
@@ -43,6 +45,7 @@ public interface ItemComponentFactoryRegistry {
      * @throws NullPointerException if any of the arguments is {@code null}
      * @throws IllegalStateException if the {@code item} was not previously registered
      */
+    @Deprecated
     <C extends Component> void registerFor(Item item, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory);
 
     /**
@@ -52,6 +55,7 @@ public interface ItemComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      */
+    @Deprecated
     <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory);
 
     /**
@@ -61,6 +65,53 @@ public interface ItemComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      */
+    @Deprecated
     <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory);
 
+
+    /**
+     * Registers a {@link ComponentFactory} for stacks of specific items, based on a predicate.
+     *
+     * @param test  a predicate testing whether the Item can have the component attached to its stacks
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
+     * @since 2.7.10
+     */
+    @ApiStatus.Experimental
+    <C extends ItemComponent> void register(Predicate<Item> test, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory);
+
+    /**
+     * Registers a {@link ComponentFactory} for stacks of a specific item.
+     *
+     * @param item  the item to target
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
+     * @throws IllegalStateException if the {@code item} was not previously registered
+     * @since 2.7.10
+     */
+    @ApiStatus.Experimental
+    <C extends ItemComponent> void register(Item item, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory);
+
+    /**
+     * Registers a {@link ComponentFactory} for stacks of specific items, based on a predicate.
+     *
+     * @param test  a predicate testing whether the Item can have the component attached to its stacks
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
+     * @since 2.7.10
+     */
+    @ApiStatus.Experimental
+    <C extends TransientComponent> void registerTransient(Predicate<Item> test, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory);
+
+    /**
+     * Registers a {@link ComponentFactory} for stacks of a specific item.
+     *
+     * @param item  the item to target
+     * @param factory the factory to use to create components of the given type
+     * @throws NullPointerException if any of the arguments is {@code null}
+     * @throws IllegalStateException if the {@code item} was not previously registered
+     * @since 2.7.10
+     */
+    @ApiStatus.Experimental
+    <C extends TransientComponent> void registerTransient(Item item, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory);
 }

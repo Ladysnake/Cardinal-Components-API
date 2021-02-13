@@ -24,12 +24,12 @@ package dev.onyxstudios.cca.internal.item;
 
 import com.google.common.collect.Iterables;
 import dev.onyxstudios.cca.api.v3.component.*;
+import dev.onyxstudios.cca.api.v3.item.ItemComponent;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -93,6 +93,26 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         }
         Identifier id = Registry.ITEM.getId(item);
         this.registerFor(id, type, factory);
+    }
+
+    @Override
+    public <C extends ItemComponent> void register(Predicate<Item> test, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory) {
+        this.registerFor(test, type, ItemComponent.wrapFactory(type, factory));
+    }
+
+    @Override
+    public <C extends ItemComponent> void register(Item item, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory) {
+        this.registerFor(item, type, ItemComponent.wrapFactory(type, factory));
+    }
+
+    @Override
+    public <C extends TransientComponent> void registerTransient(Predicate<Item> test, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory) {
+        this.registerFor(test, type, factory);
+    }
+
+    @Override
+    public <C extends TransientComponent> void registerTransient(Item item, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory) {
+        this.registerFor(item, type, factory);
     }
 
     @Override

@@ -23,10 +23,7 @@
 package dev.onyxstudios.cca.api.v3.scoreboard;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
-import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.Team;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -35,16 +32,30 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.Experimental
 public interface ScoreboardComponentFactoryRegistry {
     /**
-     * Registers a {@link ComponentFactory} for {@link Team}s.
+     * Registers a {@link TeamComponentFactory}.
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void registerTeamComponent(ComponentKey<C> type, ComponentFactory<Team, ? extends C> factory);
+    <C extends Component> void registerTeamComponent(ComponentKey<? super C> type, TeamComponentFactoryV2<? extends C> factory);
 
     /**
-     * Registers a {@link ComponentFactory} for {@link Scoreboard}s.
+     * Registers a {@link TeamComponentFactory}.
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void registerScoreboardComponent(ComponentKey<C> type, ComponentFactory<Scoreboard, ? extends C> factory);
+    <C extends Component> void registerTeamComponent(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactoryV2<? extends C> factory);
+
+    /**
+     * Registers a {@link ScoreboardComponentFactoryV2}.
+     *
+     * @param factory the factory to use to create components of the given type
+     */
+    <C extends Component> void registerScoreboardComponent(ComponentKey<? super C> type, ScoreboardComponentFactoryV2<? extends C> factory);
+
+    /**
+     * Registers a {@link ScoreboardComponentFactoryV2}.
+     *
+     * @param factory the factory to use to create components of the given type
+     */
+    <C extends Component> void registerScoreboardComponent(ComponentKey<? super C> type, Class<C> impl, ScoreboardComponentFactoryV2<? extends C> factory);
 }

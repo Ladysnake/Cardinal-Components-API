@@ -40,4 +40,3 @@ public interface Vita extends ComponentV3 {
         dest.setVitality(dest.getVitality() + actualAmount);
     }
 }
-

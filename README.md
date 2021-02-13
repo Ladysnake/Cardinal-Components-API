@@ -1,4 +1,4 @@
-# Cardinal Components API
+# ![Cardinal Components API](banner.svg)
 A components API for Fabric that is easy, modular, and extremely fast.
 
 *Cardinal Components API is a library for Minecraft mods to create data
