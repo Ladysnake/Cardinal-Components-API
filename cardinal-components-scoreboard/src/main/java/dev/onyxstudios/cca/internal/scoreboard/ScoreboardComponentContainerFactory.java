@@ -20,14 +20,20 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.sync;
+package dev.onyxstudios.cca.internal.scoreboard;
 
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.Contract;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.server.MinecraftServer;
+import org.jetbrains.annotations.Nullable;
 
 @FunctionalInterface
-public interface ComponentPacketWriter {
-    @Contract(mutates = "param1")
-    void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient);
+public interface ScoreboardComponentContainerFactory extends ComponentContainer.Factory<Scoreboard> {
+    ComponentContainer create(Scoreboard scoreboard, @Nullable MinecraftServer server);
+
+    @Deprecated
+    @Override   // just a dumb hack because I'm too lazy to refactor everything rn
+    default ComponentContainer createContainer(Scoreboard obj) {
+        throw new UnsupportedOperationException("Not supposed to be called :(");
+    }
 }

@@ -20,14 +20,23 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.sync;
+package dev.onyxstudios.componenttest.vita;
 
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.Contract;
+import dev.onyxstudios.cca.api.v3.item.ItemComponent;
+import net.minecraft.item.ItemStack;
 
-@FunctionalInterface
-public interface ComponentPacketWriter {
-    @Contract(mutates = "param1")
-    void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient);
+public class ItemVita extends ItemComponent implements Vita {
+    public ItemVita(ItemStack stack) {
+        super(stack);
+    }
+
+    @Override
+    public int getVitality() {
+        return this.getInt("vitality");
+    }
+
+    @Override
+    public void setVitality(int value) {
+        this.putInt("vitality", value);
+    }
 }
