@@ -262,6 +262,13 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     }
 
     /**
+     * @see CompoundTag#putUuid(String, UUID)
+     */
+    protected void putUuid(String key, UUID value) {
+        this.getOrCreateRootTag().putUuid(key, value);
+    }
+
+    /**
      * @see CompoundTag#remove(String)
      */
     protected void remove(String key) {
