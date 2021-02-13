@@ -14,6 +14,16 @@ Changes
 - Replaced specific factory interfaces with a generic variant (eg. `ComponentFactory`)
 
 ------------------------------------------------------
+Version 2.7.11
+------------------------------------------------------
+Additions
+- Added the missing helper method `ItemComponent#putUuid`
+
+Fixes
+- Fixed dynamic entity component registration
+- Fixed a crash with the scoreboard plugin when a save file has scoreboard teams
+
+------------------------------------------------------
 Version 2.7.10
 ------------------------------------------------------
 Additions

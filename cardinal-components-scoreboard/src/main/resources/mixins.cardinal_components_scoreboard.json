@@ -10,6 +10,7 @@
     "MixinScoreboardState",
     "MixinServerScoreboard",
     "MixinTeam",
+    "ServerScoreboardAccessor",
     "TeamAccessor"
   ],
   "injectors": {
