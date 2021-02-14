@@ -30,7 +30,7 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.entity.CardinalComponentsEntity;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
-import net.fabricmc.fabric.api.server.PlayerStream;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundTag;
@@ -89,7 +89,7 @@ public abstract class MixinEntity implements ComponentProvider {
     public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
         Entity holder = (Entity) (Object) this;
         if (!this.world.isClient) {
-            Iterator<ServerPlayerEntity> watchers = PlayerStream.watching(holder).map(ServerPlayerEntity.class::cast).iterator();
+            Iterator<ServerPlayerEntity> watchers = PlayerLookup.tracking(holder).iterator();
             //noinspection ConstantConditions
             if (holder instanceof ServerPlayerEntity && ((ServerPlayerEntity) holder).networkHandler != null) {
                 return Iterators.concat(Iterators.singletonIterator((ServerPlayerEntity)holder), watchers);

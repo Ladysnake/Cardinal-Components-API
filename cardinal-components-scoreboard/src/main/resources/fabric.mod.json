@@ -10,7 +10,7 @@
       "dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking::init"
     ],
     "client": [
-      "dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking::initClient"
+      "dev.onyxstudios.cca.internal.scoreboard.CcaScoreboardClientNw::initClient"
     ]
   },
   "custom": {

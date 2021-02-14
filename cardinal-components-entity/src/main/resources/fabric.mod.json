@@ -10,7 +10,7 @@
       "dev.onyxstudios.cca.internal.entity.CardinalComponentsEntity::init"
     ],
     "client": [
-      "dev.onyxstudios.cca.internal.entity.CardinalComponentsEntity::initClient"
+      "dev.onyxstudios.cca.internal.entity.CcaEntityClientNw::initClient"
     ]
   },
   "custom": {
@@ -23,7 +23,7 @@
     "cardinal-components-base": "*"
   },
   "recommends": {
-    "fabric-networking-v0": "*"
+    "fabric-networking-api-v1": "*"
   },
   "authors": [
     {

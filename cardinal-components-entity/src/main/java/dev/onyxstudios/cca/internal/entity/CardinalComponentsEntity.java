@@ -25,13 +25,10 @@ package dev.onyxstudios.cca.internal.entity;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerCopyCallback;
 import dev.onyxstudios.cca.api.v3.entity.PlayerSyncCallback;
 import dev.onyxstudios.cca.api.v3.entity.TrackingStartCallback;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
@@ -46,7 +43,7 @@ public final class CardinalComponentsEntity {
     /**
      * {@link CustomPayloadS2CPacket} channel for default entity component synchronization.
      *
-     * <p> Packets emitted on this channel must begin with, in order, the {@link Entity#getEntityId() entity id} (as an int),
+     * <p> Packets emitted on this channel must begin with, in order, the {@link Entity#getId() entity id} (as an int),
      * and the {@link ComponentKey#getId() component's type} (as an Identifier).
      *
      * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
@@ -55,7 +52,7 @@ public final class CardinalComponentsEntity {
     public static final Identifier PACKET_ID = new Identifier("cardinal-components", "entity_sync");
 
     public static void init() {
-        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
             TrackingStartCallback.EVENT.register(CardinalComponentsEntity::syncEntityComponents);
         }
@@ -85,32 +82,4 @@ public final class CardinalComponentsEntity {
         }
     }
 
-    // Safe to put in the same class as no client-only class is directly referenced
-    public static void initClient() {
-        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            ClientSidePacketRegistry.INSTANCE.register(PACKET_ID, (context, buffer) -> {
-                try {
-                    int entityId = buffer.readInt();
-                    Identifier componentTypeId = buffer.readIdentifier();
-                    ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
-                    if (componentType == null) {
-                        return;
-                    }
-                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-                    context.getTaskQueue().execute(() -> {
-                        try {
-                            componentType.maybeGet(context.getPlayer().world.getEntityById(entityId))
-                                .filter(c -> c instanceof AutoSyncedComponent)
-                                .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(copy));
-                        } finally {
-                            copy.release();
-                        }
-                    });
-                } catch (Exception e) {
-                    ComponentsInternals.LOGGER.error("Error while reading entity components from network", e);
-                    throw e;
-                }
-            });
-        }
-    }
 }

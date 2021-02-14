@@ -22,16 +22,10 @@
  */
 package dev.onyxstudios.cca.internal.world;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.world.WorldSyncCallback;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 
 public final class ComponentsWorldNetworking {
@@ -46,37 +40,6 @@ public final class ComponentsWorldNetworking {
                 }
             });
         }
-    }
-
-    // Safe to put in the same class as no client-only class is directly referenced
-    public static void initClient() {
-        ClientSidePacketRegistry.INSTANCE.register(PACKET_ID, (context, buffer) -> {
-            try {
-                Identifier componentTypeId = buffer.readIdentifier();
-                ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
-
-                if (componentType == null) {
-                    return;
-                }
-
-                buffer.retain();
-
-                context.getTaskQueue().execute(() -> {
-                    try {
-                        assert MinecraftClient.getInstance().world != null;
-                        Component c = componentType.get(MinecraftClient.getInstance().world);
-                        if (c instanceof AutoSyncedComponent) {
-                            ((AutoSyncedComponent) c).applySyncPacket(buffer);
-                        }
-                    } finally {
-                        buffer.release();
-                    }
-                });
-            } catch (Exception e) {
-                ComponentsInternals.LOGGER.error("Error while reading world components from network", e);
-                throw e;
-            }
-        });
     }
 
 }

@@ -25,19 +25,14 @@ package dev.onyxstudios.cca.internal.chunk;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkSyncCallback;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
 public final class ComponentsChunkNetworking {
     public static final Identifier PACKET_ID = new Identifier("cardinal-components", "chunk_sync");
 
     public static void init() {
-        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             ChunkSyncCallback.EVENT.register((player, tracked) -> {
                 ComponentProvider provider = (ComponentProvider) tracked;
 
@@ -48,34 +43,4 @@ public final class ComponentsChunkNetworking {
         }
     }
 
-    // Safe to put in the same class as no client-only class is directly referenced
-    public static void initClient() {
-        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            ClientSidePacketRegistry.INSTANCE.register(PACKET_ID, (context, buffer) -> {
-                try {
-                    int chunkX = buffer.readInt();
-                    int chunkZ = buffer.readInt();
-                    Identifier componentTypeId = buffer.readIdentifier();
-                    ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
-                    if (componentType == null) {
-                        return;
-                    }
-                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-                    context.getTaskQueue().execute(() -> {
-                        try {
-                            // Note: on the client, unloaded chunks return EmptyChunk
-                            componentType.maybeGet(context.getPlayer().world.getChunk(chunkX, chunkZ))
-                                .filter(c -> c instanceof AutoSyncedComponent)
-                                .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(copy));
-                        } finally {
-                            copy.release();
-                        }
-                    });
-                } catch (Exception e) {
-                    ComponentsInternals.LOGGER.error("Error while reading chunk components from network", e);
-                    throw e;
-                }
-            });
-        }
-    }
 }
