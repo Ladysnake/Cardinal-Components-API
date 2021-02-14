@@ -8,6 +8,7 @@ plugins {
     id "org.cadixdev.licenser" version "0.6.0"
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "com.jfrog.bintray" version '1.8.4'
+    id "com.jfrog.artifactory" version "4.20.0"
     id 'org.ajoberstar.grgit' version '3.1.1'
     id 'com.github.breadmoirai.github-release' version '2.2.9'
     id "maven-publish"
