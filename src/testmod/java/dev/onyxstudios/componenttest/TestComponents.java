@@ -97,7 +97,7 @@ public final class TestComponents implements
         registry.registerForBlock(CardinalComponentsTest.id("vita_condenser"), VITA,
             (state, world, pos, side) -> {
                 if (world instanceof CollisionView)
-                    return VITA.get(Objects.requireNonNull(((CollisionView) world).getExistingChunk(pos.getX() >> 4, pos.getZ() >> 4)));
+                    return VITA.get(Objects.requireNonNull(((CollisionView) world).getChunkAsView(pos.getX() >> 4, pos.getZ() >> 4)));
                 if (world instanceof Chunk) return VITA.get(world);
                 return null;
             });

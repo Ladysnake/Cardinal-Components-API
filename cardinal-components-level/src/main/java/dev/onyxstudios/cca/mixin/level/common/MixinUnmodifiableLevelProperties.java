@@ -35,11 +35,11 @@ import javax.annotation.Nonnull;
 @Mixin(UnmodifiableLevelProperties.class)
 public abstract class MixinUnmodifiableLevelProperties implements ComponentProvider {
 
-    @Shadow @Final private ServerWorldProperties properties;
+    @Shadow @Final private ServerWorldProperties worldProperties;
 
     @Nonnull
     @Override
     public ComponentContainer getComponentContainer() {
-        return ((ComponentProvider) this.properties).getComponentContainer();
+        return ((ComponentProvider) this.worldProperties).getComponentContainer();
     }
 }

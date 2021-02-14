@@ -40,11 +40,11 @@ public class ComponentPersistentState extends PersistentState {
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag tag) {
+    public CompoundTag toNbt(CompoundTag tag) {
         return this.components.toTag(tag);
     }
 
-    public static ComponentPersistentState fromTag(ComponentContainer components, CompoundTag tag) {
+    public static ComponentPersistentState fromNbt(ComponentContainer components, CompoundTag tag) {
         ComponentPersistentState state = new ComponentPersistentState(components);
         state.components.fromTag(tag);
         return state;

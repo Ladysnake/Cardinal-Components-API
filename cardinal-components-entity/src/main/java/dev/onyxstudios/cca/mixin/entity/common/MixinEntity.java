@@ -62,8 +62,7 @@ public abstract class MixinEntity implements ComponentProvider {
     @Shadow
     public World world;
 
-    @Shadow
-    public abstract int getEntityId();
+    @Shadow public abstract int getId();
 
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void initDataTracker(CallbackInfo ci) {
@@ -103,7 +102,7 @@ public abstract class MixinEntity implements ComponentProvider {
     @Nullable
     @Override
     public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
-        buf.writeInt(this.getEntityId());
+        buf.writeInt(this.getId());
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
         return new CustomPayloadS2CPacket(CardinalComponentsEntity.PACKET_ID, buf);
