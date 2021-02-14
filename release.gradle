@@ -64,6 +64,31 @@ def configureGithubRelease(task, String repoOwner) {
 configureGithubRelease(project.tasks.githubRelease, 'OnyxStudios')
 configureGithubRelease(project.tasks.ladysnakeGithubRelease, 'Ladysnake')
 
+artifactory {
+	if (project.hasProperty("artifactory_user")) {
+		contextUrl = "https://ladysnake.jfrog.io/artifactory/"
+		publish {
+			repository {
+				repoKey = "mods"
+
+				username = artifactory_user
+				password = artifactory_api_key
+			}
+			defaults {
+				publications("mavenJava")
+
+				publishArtifacts = true
+				publishPom = true
+			}
+		}
+	} else {
+		println "Cannot configure artifactory; please define ext.artifactory_user and ext.artifactory_api_key before running artifactoryPublish"
+	}
+}
+
+artifactoryPublish.dependsOn(rootProject.tasks.checkGitStatus)
+artifactoryPublish.dependsOn build
+
 allprojects {
     bintray {
         user = rootProject.findProperty('bintray_user')
@@ -84,31 +109,6 @@ allprojects {
 
     bintrayUpload.dependsOn(rootProject.tasks.checkGitStatus)
     bintrayUpload.dependsOn build
-
-    artifactory {
-        if (project.hasProperty("artifactory_user")) {
-            contextUrl = "https://ladysnake.jfrog.io/artifactory/"
-            publish {
-                repository {
-                    repoKey = "mods"
-
-                    username = artifactory_user
-                    password = artifactory_api_key
-                }
-                defaults {
-                    publications("maven")
-
-                    publishArtifacts = true
-                    publishPom = true
-                }
-            }
-        } else {
-            println "Cannot configure artifactory; please define ext.artifactory_user and ext.artifactory_api_key before running artifactoryPublish"
-        }
-    }
-
-    artifactoryPublish.dependsOn(rootProject.tasks.checkGitStatus)
-    artifactoryPublish.dependsOn build
 }
 
 curseforge {
