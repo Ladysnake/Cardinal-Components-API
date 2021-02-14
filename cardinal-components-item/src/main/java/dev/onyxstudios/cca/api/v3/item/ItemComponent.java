@@ -279,6 +279,7 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
 
             if (rootTag.isEmpty()) {
                 this.stack.removeSubTag(this.getRootTagKey());
+                this.rootTag = null;
             }
         }
     }
