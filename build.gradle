@@ -23,6 +23,7 @@ subprojects {
     apply plugin: 'org.cadixdev.licenser'
     apply plugin: 'com.matthewprenger.cursegradle'
     apply plugin: 'com.jfrog.bintray'
+    apply plugin: 'com.jfrog.artifactory'
     apply plugin: 'maven-publish'
     apply plugin: 'java-library'
 
