@@ -84,6 +84,31 @@ allprojects {
 
     bintrayUpload.dependsOn(rootProject.tasks.checkGitStatus)
     bintrayUpload.dependsOn build
+
+    artifactory {
+        if (project.hasProperty("artifactory_user")) {
+            contextUrl = "https://ladysnake.jfrog.io/artifactory/"
+            publish {
+                repository {
+                    repoKey = "mods"
+
+                    username = artifactory_user
+                    password = artifactory_api_key
+                }
+                defaults {
+                    publications("maven")
+
+                    publishArtifacts = true
+                    publishPom = true
+                }
+            }
+        } else {
+            println "Cannot configure artifactory; please define ext.artifactory_user and ext.artifactory_api_key before running artifactoryPublish"
+        }
+    }
+
+    artifactoryPublish.dependsOn(rootProject.tasks.checkGitStatus)
+    artifactoryPublish.dependsOn build
 }
 
 curseforge {
@@ -161,7 +186,7 @@ curseforge {
 
 tasks.curseforge.dependsOn(checkGitStatus)
 
-task release(dependsOn: [tasks.publish, tasks.githubRelease, tasks.ladysnakeGithubRelease, tasks.bintrayUpload, tasks.curseforge]) {
+task release(dependsOn: [tasks.publish, tasks.githubRelease, tasks.ladysnakeGithubRelease, tasks.bintrayUpload, tasks.curseforge, tasks.artifactoryPublish]) {
     group = 'publishing'
     description = 'Releases a new version to Maven, Github and Curseforge'
 }
