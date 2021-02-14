@@ -46,7 +46,7 @@ public abstract class MixinScoreboardState {
     @Shadow
     private Scoreboard scoreboard;
 
-    @Inject(method = "toTag", at = @At("RETURN"))
+    @Inject(method = "toNbt", at = @At("RETURN"))
     private void saveComponents(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
         ((ComponentProvider) this.scoreboard).getComponentContainer().toTag(tag);
     }

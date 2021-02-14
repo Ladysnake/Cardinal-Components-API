@@ -57,7 +57,7 @@ public abstract class MixinServerWorld extends MixinWorld {
     @Inject(at = @At("RETURN"), method = "<init>*")
     private void constructor(CallbackInfo ci) {
         this.getPersistentStateManager().getOrCreate(
-            tag -> ComponentPersistentState.fromTag(this.components, tag),
+            tag -> ComponentPersistentState.fromNbt(this.components, tag),
             () -> new ComponentPersistentState(this.components),
             PERSISTENT_STATE_KEY
         );
