@@ -23,9 +23,10 @@
 package dev.onyxstudios.cca.mixin.chunk.common;
 
 import dev.onyxstudios.cca.api.v3.chunk.ChunkSyncCallback;
-import net.fabricmc.fabric.api.server.PlayerStream;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkHolder;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.chunk.WorldChunk;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -49,7 +50,8 @@ public abstract class MixinChunkHolder {
             )
     )
     private void onPlayerLogIn(WorldChunk chunk, CallbackInfo ci) {
-        PlayerStream.watching(chunk.getWorld(), chunk.getPos()).forEach(p ->
-            ChunkSyncCallback.EVENT.invoker().onChunkSync((ServerPlayerEntity) p, chunk));
+        for (ServerPlayerEntity p : PlayerLookup.tracking((ServerWorld) chunk.getWorld(), chunk.getPos())) {
+            ChunkSyncCallback.EVENT.invoker().onChunkSync(p, chunk);
+        }
     }
 }

@@ -27,7 +27,6 @@ import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
 import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -257,7 +256,7 @@ public abstract class ComponentKey<C extends Component> {
             Packet<?> packet = provider.toComponentPacket(buf, this, writer, player);
 
             if (packet != null) {
-                ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, packet);
+                player.networkHandler.sendPacket(packet);
             }
         }
     }

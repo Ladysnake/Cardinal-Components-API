@@ -22,25 +22,16 @@
  */
 package dev.onyxstudios.cca.internal.scoreboard;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardSyncCallback;
 import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
-import net.fabricmc.fabric.api.network.PacketContext;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Identifier;
-
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public final class ComponentsScoreboardNetworking {
     /**
@@ -64,7 +55,7 @@ public final class ComponentsScoreboardNetworking {
     public static final Identifier TEAM_PACKET_ID = new Identifier("cardinal-components", "team_sync");
 
     public static void init() {
-        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             ScoreboardSyncCallback.EVENT.register((player, tracked) -> {
                 for (ComponentKey<?> key : ((ComponentProvider) tracked).getComponentContainer().keys()) {
                     key.syncWith(player, ComponentProvider.fromScoreboard(tracked));
@@ -86,42 +77,4 @@ public final class ComponentsScoreboardNetworking {
         }
     }
 
-    // Safe to put in the same class as no client-only class is directly referenced
-    public static void initClient() {
-        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
-            registerScoreboardSync(TEAM_PACKET_ID, (ctx, buf) -> {
-                String teamName = buf.readString();
-                return (componentType) -> componentType.maybeGet(ctx.getPlayer().world.getScoreboard().getTeam(teamName));
-            });
-            registerScoreboardSync(SCOREBOARD_PACKET_ID,
-                (ctx, buf) -> (componentType) -> componentType.maybeGet(ctx.getPlayer().world.getScoreboard())
-            );
-        }
-    }
-
-    private static void registerScoreboardSync(Identifier packetId, BiFunction<PacketContext, PacketByteBuf, Function<ComponentKey<?>, Optional<? extends Component>>> reader) {
-        ClientSidePacketRegistry.INSTANCE.register(packetId, (context, buffer) -> {
-            try {
-                Function<ComponentKey<?>, Optional<? extends Component>> getter = reader.apply(context, buffer);
-                Identifier componentTypeId = buffer.readIdentifier();
-                ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
-
-                if (componentType != null) {
-                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-                    context.getTaskQueue().execute(() -> {
-                        try {
-                            getter.apply(componentType)
-                                .filter(c -> c instanceof AutoSyncedComponent)
-                                .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(copy));
-                        } finally {
-                            copy.release();
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                ComponentsInternals.LOGGER.error("Error while reading scoreboard components from network", e);
-                throw e;
-            }
-        });
-    }
 }

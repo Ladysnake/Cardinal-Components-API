@@ -10,7 +10,7 @@
       "dev.onyxstudios.cca.internal.world.ComponentsWorldNetworking::init"
     ],
     "client": [
-      "dev.onyxstudios.cca.internal.world.ComponentsWorldNetworking::initClient"
+      "dev.onyxstudios.cca.internal.world.CcaWorldClientNw::initClient"
     ]
   },
   "custom": {
@@ -20,10 +20,8 @@
   "depends": {
     "minecraft": ">=1.17-",
     "fabric-api-base": "*",
-    "cardinal-components-base": "*"
-  },
-  "recommends": {
-    "fabric-networking-v0": "*"
+    "cardinal-components-base": "*",
+    "fabric-networking-api-v1": "*"
   },
   "authors": [
     {

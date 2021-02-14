@@ -29,7 +29,7 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
-import net.fabricmc.fabric.api.server.PlayerStream;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -76,7 +76,7 @@ public abstract class MixinWorldChunk implements Chunk, ComponentProvider {
     @Override
     public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
         if (!this.getWorld().isClient()) {
-            return PlayerStream.watching(this.getWorld(), this.getPos()).map(ServerPlayerEntity.class::cast).iterator();
+            return PlayerLookup.tracking((ServerWorld) this.getWorld(), this.getPos()).iterator();
         }
         return Collections.emptyIterator();
     }

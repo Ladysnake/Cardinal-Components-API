@@ -22,39 +22,46 @@
  */
 package dev.onyxstudios.cca.internal.level;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.world.WorldSyncCallback;
+import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
 
-public final class ComponentsLevelNetworking {
-    /**
-     * {@link CustomPayloadS2CPacket} channel for default level component synchronization.
-     *
-     * <p> Packets emitted on this channel must begin with the
-     * {@link ComponentKey#getId() component's type} (as an Identifier).
-     *
-     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
-     * called on the game thread.
-     */
-    public static final Identifier PACKET_ID = new Identifier("cardinal-components", "level_sync");
-
-    public static void init() {
+public final class CcaLevelClientNw {
+    public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
-            if (FabricLoader.getInstance().isModLoaded("cardinal-components-world")) {
-                WorldSyncCallback.EVENT.register((player, world) -> {
-                    ComponentProvider provider = ComponentProvider.fromLevel(world.getLevelProperties());
+            ClientPlayNetworking.registerGlobalReceiver(ComponentsLevelNetworking.PACKET_ID, (client, handler, buffer, res) -> {
+                try {
+                    Identifier componentTypeId = buffer.readIdentifier();
+                    ComponentKey<?> componentKey = ComponentRegistry.get(componentTypeId);
 
-                    for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
-                        key.syncWith(player, provider);
+                    if (componentKey == null) {
+                        return;
                     }
-                });
-            }
+
+                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                    client.execute(() -> {
+                        try {
+                            assert client.world != null;
+                            Component c = componentKey.get(client.world.getLevelProperties());
+
+                            if (c instanceof AutoSyncedComponent) {
+                                ((AutoSyncedComponent) c).applySyncPacket(copy);
+                            }
+                        } finally {
+                            copy.release();
+                        }
+                    });
+                } catch (Exception e) {
+                    ComponentsInternals.LOGGER.error("Error while reading world save components from network", e);
+                    throw e;
+                }
+            });
         }
     }
-
 }

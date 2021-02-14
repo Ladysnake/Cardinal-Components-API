@@ -29,7 +29,7 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.CardinalComponentsBlock;
 import dev.onyxstudios.cca.internal.block.CardinalBlockInternals;
-import net.fabricmc.fabric.api.server.PlayerStream;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -94,7 +94,7 @@ public abstract class MixinBlockEntity implements ComponentProvider {
         World world = this.getWorld();
 
         if (world != null && !world.isClient) {
-            return PlayerStream.watching((BlockEntity) (Object) this).map(ServerPlayerEntity.class::cast).iterator();
+            return PlayerLookup.tracking((BlockEntity) (Object) this).iterator();
         }
         return Collections.emptyIterator();
     }

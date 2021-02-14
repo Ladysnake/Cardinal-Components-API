@@ -1,48 +1,46 @@
 {
-    "schemaVersion": 1,
-    "environment": "*",
-    "id": "cardinal-components-chunk",
-    "name": "Cardinal Components API (chunks)",
-    "description": "dynamically exposing components",
-    "version": "${version}",
-    "entrypoints": {
-        "main": [
-            "dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking::init"
-        ],
-        "client": [
-            "dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking::initClient"
-        ]
-    },
-    "custom": {
-        "modmenu:api": true,
-        "modmenu:parent": "cardinal-components"
-    },
-    "depends": {
-        "minecraft": ">=1.17-",
-        "fabric-api-base": "*",
-        "cardinal-components-base": "*"
-    },
-    "recommends": {
-        "fabric-networking-v0": "*"
-    },
-    "authors": [
-        {
-            "name": "UpcraftLP",
-            "contact": {
-                "homepage": "https://twitter.com/UpcraftLP"
-            }
-        }
+  "schemaVersion": 1,
+  "environment": "*",
+  "id": "cardinal-components-chunk",
+  "name": "Cardinal Components API (chunks)",
+  "description": "dynamically exposing components",
+  "version": "${version}",
+  "entrypoints": {
+    "main": [
+      "dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking::init"
     ],
-    "contact": {
-        "homepage": "https://minecraft.curseforge.com/projects/318449",
-        "issues": "https://github.com/NerdHubMC/Cardinal-Components-API/issues",
-        "sources": "https://github.com/NerdHubMC/Cardinal-Components-API"
-    },
-    "license": "MIT",
-    "mixins": [
-        {
-            "environment": "*",
-            "config": "mixins.cardinal_components_chunk.json"
-        }
+    "client": [
+      "dev.onyxstudios.cca.internal.chunk.CcaChunkClientNw::initClient"
     ]
+  },
+  "custom": {
+    "modmenu:api": true,
+    "modmenu:parent": "cardinal-components"
+  },
+  "depends": {
+    "minecraft": ">=1.17-",
+    "fabric-api-base": "*",
+    "cardinal-components-base": "*",
+    "fabric-networking-api-v1": "*"
+  },
+  "authors": [
+    {
+      "name": "UpcraftLP",
+      "contact": {
+        "homepage": "https://twitter.com/UpcraftLP"
+      }
+    }
+  ],
+  "contact": {
+    "homepage": "https://minecraft.curseforge.com/projects/318449",
+    "issues": "https://github.com/NerdHubMC/Cardinal-Components-API/issues",
+    "sources": "https://github.com/NerdHubMC/Cardinal-Components-API"
+  },
+  "license": "MIT",
+  "mixins": [
+    {
+      "environment": "*",
+      "config": "mixins.cardinal_components_chunk.json"
+    }
+  ]
 }
