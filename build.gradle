@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.time.Year
 
 plugins {
-    id "fabric-loom" version "0.4.24" apply false
+    id "fabric-loom" version "0.6-SNAPSHOT" apply false
     id "net.minecrell.licenser" version "0.2.1"
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "maven-publish"
@@ -31,6 +31,10 @@ allprojects {
     apply plugin: "fabric-loom"
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
     version = System.getenv("TRAVIS_TAG") ?: rootProject.mod_version
+
+    configurations {
+        dev
+    }
 
     repositories {
         maven {
@@ -148,8 +152,8 @@ dependencies {
 
     afterEvaluate {
         subprojects.each {
-            api it
-            include it
+            compile project(path: ":${it.name}", configuration: "dev")
+            include project(":${it.name}")
         }
     }
 }
