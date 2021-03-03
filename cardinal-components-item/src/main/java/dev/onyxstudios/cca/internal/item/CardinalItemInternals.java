@@ -94,14 +94,17 @@ public final class CardinalItemInternals {
                 // only the original stack's components are initialized
                 CompoundTag tag = new CompoundTag();
                 originalComponents.toTag(tag);
-                copiedProvider.cca_setSerializedComponentData(tag); // new tag, so not marked as shared
+
+                if (!tag.isEmpty()) {   // no components -> empty tag
+                    copiedProvider.cca_setSerializedComponentData(tag); // new tag, so not marked as shared
+                }
             }
         } else if ((serializedComponents = originalProvider.cca_getSerializedComponentData()) != null) {
             // the original stack has frozen components
             if (copiedComponents != null) {
                 // only the copied stack's components are initialized (unlikely)
                 copiedComponents.fromTag(copyIfNeeded(serializedComponents));
-            } else {
+            } else if (!serializedComponents.isEmpty()) {
                 // no components are initialized
                 // we are not immediately copying the tag, as it's costly and only necessary if the components end up being deserialized
                 markSharedTag(serializedComponents);
