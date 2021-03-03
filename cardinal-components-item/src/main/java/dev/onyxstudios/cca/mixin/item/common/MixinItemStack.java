@@ -105,12 +105,6 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
     @Shadow
     private boolean empty;
 
-    @Shadow @Nullable public abstract CompoundTag getTag();
-
-    @Shadow public abstract CompoundTag getOrCreateTag();
-
-    @Shadow public abstract void removeSubTag(String key);
-
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
         // Keep data without deserializing
