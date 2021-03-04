@@ -1,4 +1,11 @@
 ------------------------------------------------------
+Version 2.7.13
+------------------------------------------------------
+Fixes
+- Fixed a crash when registering scoreboard components
+- Fixed a serialization issue when an item stack got initialized with an empty component container
+
+------------------------------------------------------
 Version 2.7.12
 ------------------------------------------------------
 Fixes
