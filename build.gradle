@@ -93,8 +93,15 @@ allprojects {
     }
 
     jar {
+        classifier = "dev"
         from(rootProject.file("LICENSE.md")) {
             rename { "LICENSE_${project.archivesBaseName.replace('-', '_')}"}
+        }
+    }
+
+    afterEvaluate {
+        artifacts {
+            dev file: file("${project.buildDir}/libs/$archivesBaseName-${version}-dev.jar"), type: "jar", builtBy: jar
         }
     }
 }
