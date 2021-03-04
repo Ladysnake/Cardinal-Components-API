@@ -52,8 +52,14 @@ public final class StaticTeamComponentPlugin extends StaticComponentPluginBase<T
     }
 
     @Override
+    protected void init() {
+        StaticScoreboardComponentPlugin.INSTANCE.ensureInitialized();
+        super.init();
+    }
+
+    @Override
     protected void dispatchRegistration(ScoreboardComponentInitializer entrypoint) {
-        StaticScoreboardComponentPlugin.INSTANCE.dispatchRegistration(entrypoint);
+        // NO-OP
     }
 
     @Override

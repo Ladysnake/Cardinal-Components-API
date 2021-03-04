@@ -140,6 +140,7 @@ public final class TestComponents implements
 
     @Override
     public void registerScoreboardComponentFactories(ScoreboardComponentFactoryRegistry registry) {
+        registry.registerForScoreboards(VITA, (scoreboard, server) -> new BaseVita());
         registry.register(VITA, TeamVita::new);
     }
 }
