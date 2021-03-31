@@ -25,12 +25,12 @@ The information below is a condensed form of the latter.
 *\*Non exhaustive, refer to the wiki and javadoc for the full list.*
 
 ## Adding the API to your buildscript:
-Latest versions of Cardinal Components API are available on Bintray:
+Latest versions of Cardinal Components API are available on Artifactory:
 ```gradle
 repositories {
     maven {
-        name = "Ladysnake Libs"
-        url = "https://dl.bintray.com/ladysnake/libs"
+        name = 'Ladysnake Mods'
+        url = 'https://ladysnake.jfrog.io/artifactory/mods'
     }
 }
 
