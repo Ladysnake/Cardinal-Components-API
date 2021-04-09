@@ -44,17 +44,14 @@ import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
 import dev.onyxstudios.componenttest.vita.*;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
+import net.minecraft.block.entity.EndGatewayBlockEntity;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.CollisionView;
-import net.minecraft.world.chunk.Chunk;
 
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
@@ -97,19 +94,8 @@ public final class TestComponents implements
 
     @Override
     public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
-        registry.registerFor(CardinalComponentsTest.id("vita_condenser"), VITA,
-            (state, world, pos, side) -> {
-                if (world instanceof CollisionView)
-                    return VITA.get(Objects.requireNonNull(((CollisionView) world).getExistingChunk(pos.getX() >> 4, pos.getZ() >> 4)));
-                if (world instanceof Chunk) return VITA.get(world);
-                return null;
-            });
+        registry.registerFor(EndGatewayBlockEntity.class, VitaCompound.KEY, VitaCompound::new);
         registry.registerFor(EndPortalBlockEntity.class, VITA, SyncedVita::new);
-        registry.registerFor(
-            new Identifier("end_gateway"),
-            VITA,
-            (state, world, pos, side) -> side != Direction.UP ? VITA.maybeGet(world.getBlockEntity(pos)).orElse(null) : null
-        );
     }
 
     @Override

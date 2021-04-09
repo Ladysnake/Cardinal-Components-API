@@ -34,10 +34,12 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
@@ -71,6 +73,23 @@ public class VitalityStickItem extends Item {
             }
         }
         return TypedActionResult.pass(stack);
+    }
+
+    @Override
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        // only on client side, to confirm that sync works
+        if (context.getWorld().isClient && context.getPlayer() != null) {
+            Vita vita = CardinalComponentsTest.VITA_API_LOOKUP.find(
+                context.getWorld(),
+                context.getBlockPos(),
+                context.getSide()
+            );
+            if (vita != null) {
+                context.getPlayer().sendMessage(new TranslatableText("componenttest:action.block_vitality",
+                    vita.getVitality()), true);
+            }
+        }
+        return ActionResult.SUCCESS;
     }
 
     @Override
