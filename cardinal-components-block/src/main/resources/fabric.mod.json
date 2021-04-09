@@ -19,6 +19,7 @@
     },
     "depends": {
         "fabric-api-base": "*",
+        "fabric-api-lookup-api-v1": "*",
         "cardinal-components-base": "<3.0.0-"
     },
     "authors": [

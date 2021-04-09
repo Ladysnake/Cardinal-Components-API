@@ -4,5 +4,6 @@
   "componenttest:tooltip.self_vitality": "Your vitality: %d",
   "componenttest:title.world_vitality": "Current vitality: %d + %d",
   "componenttest:action.chunk_vitality": "Chunk vitality: %d",
+  "componenttest:action.block_vitality": "Block vitality: %d",
   "item.componenttest.vita_stick": "Vita Stick"
 }

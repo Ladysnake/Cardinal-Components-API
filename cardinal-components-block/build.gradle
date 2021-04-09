@@ -1,4 +1,5 @@
 dependencies {
     api project(":cardinal-components-base")
     api project(":cardinal-components-util")
+    modApi fabricApi.module("fabric-api-lookup-api-v1", rootProject.fabric_api_version)
 }

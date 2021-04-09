@@ -1,4 +1,14 @@
 ------------------------------------------------------
+Version 2.8.0
+------------------------------------------------------
+Additions
+- Added helper methods in `BlockComponents` to expose block components through Fabric API API-API API
+
+Changes
+- Methods and classes in `cardinal-components-block` which purpose was to access components on regular blocks have been
+  scheduled for removal as they are now superseded by API²
+
+------------------------------------------------------
 Version 2.7.13
 ------------------------------------------------------
 Fixes
