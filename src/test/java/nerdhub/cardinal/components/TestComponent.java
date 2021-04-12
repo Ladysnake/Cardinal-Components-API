@@ -23,7 +23,7 @@
 package nerdhub.cardinal.components;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 import java.util.Objects;
 
@@ -37,12 +37,12 @@ public interface TestComponent extends Component {
         }
 
         @Override
-        public void readFromNbt(CompoundTag tag) {
+        public void readFromNbt(NbtCompound tag) {
             this.i = tag.getInt("i");
         }
 
         @Override
-        public void writeToNbt(CompoundTag tag) {
+        public void writeToNbt(NbtCompound tag) {
             tag.putInt("i", i);
         }
 

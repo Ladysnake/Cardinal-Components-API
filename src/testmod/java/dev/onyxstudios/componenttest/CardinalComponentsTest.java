@@ -51,6 +51,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.chunk.ChunkStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -138,7 +139,7 @@ public class CardinalComponentsTest {
         });
 
         VITA_API_LOOKUP.registerForBlocks(
-            (world, pos, state, blockEntity, context) -> TestComponents.VITA.get(Objects.requireNonNull(world.getExistingChunk(pos.getX() >> 4, pos.getZ() >> 4))),
+            (world, pos, state, blockEntity, context) -> TestComponents.VITA.get(Objects.requireNonNull(world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.FULL, false))),
             VITALITY_CONDENSER
         );
         BlockComponents.exposeApi(TestComponents.VITA, VITA_API_LOOKUP, (vita, side) -> side == Direction.UP ? vita : null, BlockEntityType.END_PORTAL);

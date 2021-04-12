@@ -27,7 +27,7 @@ import com.demonwav.mcdev.annotations.Env;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
@@ -67,7 +67,7 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      * @param buf       the buffer to write the data to
      * @param recipient the player to which the packet will be sent
      * @implSpec The default implementation writes the whole NBT representation
-     * of this component to the buffer using {@link #writeToNbt(CompoundTag)}.
+     * of this component to the buffer using {@link #writeToNbt(NbtCompound)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation sends possibly hidden
      * information to clients, uses a wasteful data format, and does not support
@@ -80,23 +80,23 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
     @Contract(mutates = "param1")
     @Override
     default void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
-        CompoundTag tag = new CompoundTag();
+        NbtCompound tag = new NbtCompound();
         this.writeToNbt(tag);
-        buf.writeCompoundTag(tag);
+        buf.writeNbt(tag);
     }
 
     /**
      * Reads this component's data from {@code buf}.
      *
      * @implSpec The default implementation converts the buffer's content
-     * to a {@link CompoundTag} and calls {@link #readFromNbt(CompoundTag)}.
+     * to a {@link NbtCompound} and calls {@link #readFromNbt(NbtCompound)}.
      * @implNote any implementing class overriding {@link #writeSyncPacket(PacketByteBuf, ServerPlayerEntity)}
      * such that it uses a different data format must override this method.
      * @see #writeSyncPacket(PacketByteBuf, ServerPlayerEntity)
      */
     @CheckEnv(Env.CLIENT)
     default void applySyncPacket(PacketByteBuf buf) {
-        CompoundTag tag = buf.readCompoundTag();
+        NbtCompound tag = buf.readNbt();
         if (tag != null) {
             this.readFromNbt(tag);
         }

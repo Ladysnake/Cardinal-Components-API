@@ -28,9 +28,9 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +47,7 @@ import java.util.function.Predicate;
  * @see ItemComponentFactoryRegistry#register(Predicate, ComponentKey, ComponentFactory)
  */
 public abstract class ItemComponent implements Component, ItemTagInvalidationListener {
-    private @Nullable CompoundTag rootTag;
+    private @Nullable NbtCompound rootTag;
     protected final ItemStack stack;
     private String rootTagKey;
 
@@ -73,7 +73,7 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
      *
      * @return the tag storing this component's data, or {@code null} if it does not exist
      */
-    protected @Nullable CompoundTag getRootTag() {
+    protected @Nullable NbtCompound getRootTag() {
         return this.rootTag;
     }
 
@@ -86,95 +86,95 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
      *
      * @return the tag storing this component's data
      */
-    protected CompoundTag getOrCreateRootTag() {
+    protected NbtCompound getOrCreateRootTag() {
         if (this.rootTag != null) return this.rootTag;
         return this.rootTag = this.stack.getOrCreateSubTag(this.getRootTagKey());
     }
 
     /**
-     * @see CompoundTag#getBoolean(String)
+     * @see NbtCompound#getBoolean(String)
      */
     protected boolean getBoolean(String key) {
-        CompoundTag rootTag = this.getRootTag();
+        NbtCompound rootTag = this.getRootTag();
         return rootTag != null && rootTag.getBoolean(key);
     }
 
     /**
-     * @see CompoundTag#getInt(String)
+     * @see NbtCompound#getInt(String)
      */
     protected int getInt(String key) {
-        CompoundTag rootTag = this.getRootTag();
+        NbtCompound rootTag = this.getRootTag();
         return rootTag == null ? 0 : rootTag.getInt(key);
     }
 
     /**
-     * @see CompoundTag#getLong(String)
+     * @see NbtCompound#getLong(String)
      */
     protected long getLong(String key) {
-        CompoundTag rootTag = this.getRootTag();
+        NbtCompound rootTag = this.getRootTag();
         return rootTag == null ? 0 : rootTag.getLong(key);
     }
 
     /**
-     * @see CompoundTag#getFloat(String)
+     * @see NbtCompound#getFloat(String)
      */
     protected float getFloat(String key) {
-        CompoundTag rootTag = this.getRootTag();
+        NbtCompound rootTag = this.getRootTag();
         return rootTag == null ? 0 : rootTag.getFloat(key);
     }
 
     /**
-     * @see CompoundTag#getDouble(String)
+     * @see NbtCompound#getDouble(String)
      */
     protected double getDouble(String key) {
-        CompoundTag rootTag = this.getRootTag();
+        NbtCompound rootTag = this.getRootTag();
         return rootTag == null ? 0 : rootTag.getDouble(key);
     }
 
     /**
-     * @see CompoundTag#getString(String)
+     * @see NbtCompound#getString(String)
      */
     protected String getString(String key) {
-        CompoundTag rootTag = this.getRootTag();
+        NbtCompound rootTag = this.getRootTag();
         return rootTag == null ? "" : rootTag.getString(key);
     }
 
     /**
-     * @see CompoundTag#getList(String, int)
+     * @see NbtCompound#getList(String, int)
      */
-    protected <T extends Tag> List<T> getList(String key, CcaNbtType<T> type) {
-        CompoundTag rootTag = this.getRootTag();
+    protected <T extends NbtElement> List<T> getList(String key, CcaNbtType<T> type) {
+        NbtCompound rootTag = this.getRootTag();
         @SuppressWarnings("unchecked") List<T> ts = rootTag == null ? Collections.emptyList() : (List<T>) rootTag.getList(key, type.getId());
         return ts;
     }
 
     /**
-     * @see CompoundTag#getList(String, int)
-     * @see net.fabricmc.fabric.api.util.NbtType
+     * @see NbtCompound#getList(String, int)
+     * @see NbtType
      */
-    protected ListTag getList(String key, int type) {
-        CompoundTag rootTag = this.getRootTag();
-        return rootTag == null ? new ListTag() : rootTag.getList(key, type);
+    protected NbtList getList(String key, int type) {
+        NbtCompound rootTag = this.getRootTag();
+        return rootTag == null ? new NbtList() : rootTag.getList(key, type);
     }
 
     /**
-     * @see CompoundTag#getCompound(String)
+     * @see NbtCompound#getCompound(String)
      */
-    protected CompoundTag getCompound(String key) {
-        CompoundTag rootTag = this.getRootTag();
-        return rootTag == null ? new CompoundTag() : rootTag.getCompound(key);
+    protected NbtCompound getCompound(String key) {
+        NbtCompound rootTag = this.getRootTag();
+        return rootTag == null ? new NbtCompound() : rootTag.getCompound(key);
     }
 
     /**
-     * @see CompoundTag#getUuid(String)
+     * @see NbtCompound#getUuid(String)
      */
     protected @Nullable UUID getUuid(String key) {
-        CompoundTag rootTag = this.getRootTag();
+        NbtCompound rootTag = this.getRootTag();
         return rootTag != null && rootTag.containsUuid(key) ? rootTag.getUuid(key) : null;
     }
 
     /**
-     * @see CompoundTag#putBoolean(String, boolean)
+     * @see NbtCompound#putBoolean(String, boolean)
      */
     protected void putBoolean(String key, boolean value) {
         if (value) {
@@ -185,7 +185,7 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     }
 
     /**
-     * @see CompoundTag#putInt(String, int)
+     * @see NbtCompound#putInt(String, int)
      */
     protected void putInt(String key, int value) {
         if (value != 0) {
@@ -196,7 +196,7 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     }
 
     /**
-     * @see CompoundTag#putLong(String, long)
+     * @see NbtCompound#putLong(String, long)
      */
     protected void putLong(String key, long value) {
         if (value != 0) {
@@ -207,7 +207,7 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     }
 
     /**
-     * @see CompoundTag#putFloat(String, float)
+     * @see NbtCompound#putFloat(String, float)
      */
     protected void putFloat(String key, float value) {
         if (value != 0) {
@@ -218,7 +218,7 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     }
 
     /**
-     * @see CompoundTag#putDouble(String, double)
+     * @see NbtCompound#putDouble(String, double)
      */
     protected void putDouble(String key, double value) {
         if (value != 0) {
@@ -229,7 +229,7 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     }
 
     /**
-     * @see CompoundTag#putString(String, String)
+     * @see NbtCompound#putString(String, String)
      */
     protected void putString(String key, String value) {
         if (!value.isEmpty()) {
@@ -240,9 +240,9 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     }
 
     /**
-     * @see CompoundTag#put(String, Tag)
+     * @see NbtCompound#put(String, NbtElement)
      */
-    protected void putList(String key, ListTag value) {
+    protected void putList(String key, NbtList value) {
         if (!value.isEmpty()) {
             this.getOrCreateRootTag().put(key, value);
         } else {
@@ -251,9 +251,9 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     }
 
     /**
-     * @see CompoundTag#put(String, Tag)
+     * @see NbtCompound#put(String, NbtElement)
      */
-    protected void putCompound(String key, CompoundTag value) {
+    protected void putCompound(String key, NbtCompound value) {
         if (!value.isEmpty()) {
             this.getOrCreateRootTag().put(key, value);
         } else {
@@ -262,17 +262,17 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     }
 
     /**
-     * @see CompoundTag#putUuid(String, UUID)
+     * @see NbtCompound#putUuid(String, UUID)
      */
     protected void putUuid(String key, UUID value) {
         this.getOrCreateRootTag().putUuid(key, value);
     }
 
     /**
-     * @see CompoundTag#remove(String)
+     * @see NbtCompound#remove(String)
      */
     protected void remove(String key) {
-        CompoundTag rootTag = this.getRootTag();
+        NbtCompound rootTag = this.getRootTag();
 
         if (rootTag != null) {
             rootTag.remove(key);
@@ -285,73 +285,73 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     }
 
     /**
-     * @return {@code true} if the {@link CompoundTag} storing this component's data has a subtag with the given {@code key},
+     * @return {@code true} if the {@link NbtCompound} storing this component's data has a subtag with the given {@code key},
      * {@code false} otherwise
-     * @see CompoundTag#contains(String)
+     * @see NbtCompound#contains(String)
      */
     protected boolean hasTag(String key) {
-        CompoundTag rootTag = this.getRootTag();
+        NbtCompound rootTag = this.getRootTag();
         return rootTag != null && rootTag.contains(key);
     }
 
     /**
-     * @return {@code true} if the {@link CompoundTag} storing this component's data has a subtag with the given {@code key}
+     * @return {@code true} if the {@link NbtCompound} storing this component's data has a subtag with the given {@code key}
      * and of the appropriate {@code type}, {@code false} otherwise
-     * @see CompoundTag#contains(String, int)
+     * @see NbtCompound#contains(String, int)
      * @see NbtType
      */
     protected boolean hasTag(String key, int type) {
-        CompoundTag rootTag = this.getRootTag();
+        NbtCompound rootTag = this.getRootTag();
         return rootTag != null && rootTag.contains(key, type);
     }
 
     /**
-     * @return {@code true} if the {@link CompoundTag} storing this component's data has a subtag with the given {@code key}
+     * @return {@code true} if the {@link NbtCompound} storing this component's data has a subtag with the given {@code key}
      * and of the appropriate {@code type}, {@code false} otherwise
-     * @see CompoundTag#contains(String, int)
+     * @see NbtCompound#contains(String, int)
      */
     protected boolean hasTag(String key, CcaNbtType<?> type) {
         return this.hasTag(key, type.getId());
     }
 
     /**
-     * @return the subtag with the given {@code key} from the {@link CompoundTag} storing this component's data,
+     * @return the subtag with the given {@code key} from the {@link NbtCompound} storing this component's data,
      * or {@code null} if no such tag exists
-     * @see CompoundTag#get(String)
+     * @see NbtCompound#get(String)
      */
-    protected @Nullable Tag getTag(String key) {
-        CompoundTag rootTag = this.getRootTag();
+    protected @Nullable NbtElement getTag(String key) {
+        NbtCompound rootTag = this.getRootTag();
         if (rootTag == null) return null;
         return rootTag.get(key);
     }
 
     /**
-     * @return the subtag with the given {@code key} from the {@link CompoundTag} storing this component's data,
+     * @return the subtag with the given {@code key} from the {@link NbtCompound} storing this component's data,
      * or {@code null} if no such tag exists or is not of the right {@code type}
-     * @see CompoundTag#get(String)
+     * @see NbtCompound#get(String)
      * @see NbtType
      */
-    protected @Nullable Tag getTag(String key, int type) {
-        Tag tag = this.getTag(key);
+    protected @Nullable NbtElement getTag(String key, int type) {
+        NbtElement tag = this.getTag(key);
         if (tag == null || tag.getType() != type) return null;
         return tag;
     }
 
     /**
-     * @return the subtag with the given {@code key} from the {@link CompoundTag} storing this component's data,
+     * @return the subtag with the given {@code key} from the {@link NbtCompound} storing this component's data,
      * or {@code null} if no such tag exists or is not of the right {@code type}
-     * @see CompoundTag#get(String)
+     * @see NbtCompound#get(String)
      */
-    protected <T extends Tag> @Nullable T getTag(String key, CcaNbtType<T> type) {
+    protected <T extends NbtElement> @Nullable T getTag(String key, CcaNbtType<T> type) {
         @SuppressWarnings("unchecked") T ret = (T) this.getTag(key, type.getId());
         return ret;
     }
 
     /**
-     * @see CompoundTag#getKeys()
+     * @see NbtCompound#getKeys()
      */
     protected Set<String> getKeys() {
-        CompoundTag rootTag = this.getRootTag();
+        NbtCompound rootTag = this.getRootTag();
         return rootTag == null ? Collections.emptySet() : rootTag.getKeys();
     }
 
@@ -363,14 +363,14 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
 
     @Deprecated
     @Override
-    public final void readFromNbt(CompoundTag tag) {
+    public final void readFromNbt(NbtCompound tag) {
         // Port from older external data
         this.getOrCreateRootTag().copyFrom(tag);
     }
 
     @Deprecated
     @Override
-    public final void writeToNbt(CompoundTag tag) {
+    public final void writeToNbt(NbtCompound tag) {
         // NO-OP
     }
 

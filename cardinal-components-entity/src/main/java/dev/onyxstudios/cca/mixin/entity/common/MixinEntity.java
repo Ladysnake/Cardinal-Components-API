@@ -33,7 +33,7 @@ import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -69,13 +69,13 @@ public abstract class MixinEntity implements ComponentProvider {
         this.components = CardinalEntityInternals.createEntityComponentContainer((Entity) (Object) this);
     }
 
-    @Inject(method = "toTag", at = @At("RETURN"))
-    private void toTag(CompoundTag inputTag, CallbackInfoReturnable<CompoundTag> cir) {
+    @Inject(method = "writeNbt", at = @At("RETURN"))
+    private void toTag(NbtCompound inputTag, CallbackInfoReturnable<NbtCompound> cir) {
         this.components.toTag(cir.getReturnValue());
     }
 
-    @Inject(method = "fromTag", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V", shift = At.Shift.AFTER))
-    private void fromTag(CompoundTag tag, CallbackInfo ci) {
+    @Inject(method = "readNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
+    private void fromTag(NbtCompound tag, CallbackInfo ci) {
         this.components.fromTag(tag);
     }
 

@@ -24,7 +24,7 @@ package dev.onyxstudios.cca.internal.base;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -62,10 +62,10 @@ class ComponentRegistryImplTest {
 
     static class TestComponentNotItf implements Component {
         @Override
-        public void readFromNbt(CompoundTag tag) { }
+        public void readFromNbt(NbtCompound tag) { }
 
         @Override
-        public void writeToNbt(CompoundTag tag) { throw new UnsupportedOperationException(); }
+        public void writeToNbt(NbtCompound tag) { throw new UnsupportedOperationException(); }
     }
 
     interface TestComponentItf extends Component {}

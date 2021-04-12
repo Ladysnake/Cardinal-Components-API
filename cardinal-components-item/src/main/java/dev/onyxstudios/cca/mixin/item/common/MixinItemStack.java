@@ -32,8 +32,8 @@ import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,7 +51,7 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
     @Unique
     private @Nullable ComponentContainer components;
     @Unique
-    private @Nullable CompoundTag serializedComponents;
+    private @Nullable NbtCompound serializedComponents;
 
     @Inject(method = "areTagsEqual", at = @At("RETURN"), cancellable = true)
     private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
@@ -74,8 +74,8 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
         CardinalItemInternals.copyComponents(((ItemStack)(Object) this), cir.getReturnValue());
     }
 
-    @Inject(method = "toTag", at = @At("RETURN"))
-    private void serialize(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
+    @Inject(method = "writeNbt", at = @At("RETURN"))
+    private void serialize(NbtCompound tag, CallbackInfoReturnable<NbtCompound> cir) {
         if (this.components != null) {
             this.components.toTag(cir.getReturnValue());
         } else if (this.serializedComponents != null) {
@@ -85,7 +85,7 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
     }
 
     @Inject(method = "setTag", at = @At("RETURN"))
-    private void invalidateCaches(CompoundTag tag, CallbackInfo ci) {
+    private void invalidateCaches(NbtCompound tag, CallbackInfo ci) {
         ComponentContainer components = this.components;
 
         if (components != null) {
@@ -104,12 +104,12 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
     @Shadow
     private boolean empty;
 
-    @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
-    private void initComponentsNBT(CompoundTag tag, CallbackInfo ci) {
+    @Inject(method = "<init>(Lnet/minecraft/nbt/NbtCompound;)V", at = @At("RETURN"))
+    private void initComponentsNBT(NbtCompound tag, CallbackInfo ci) {
         // Keep data without deserializing
-        Tag componentData = tag.get(AbstractComponentContainer.NBT_KEY);
+        NbtElement componentData = tag.get(AbstractComponentContainer.NBT_KEY);
         if (componentData != null) {
-            CompoundTag serializedComponents = new CompoundTag();
+            NbtCompound serializedComponents = new NbtCompound();
             // the vanilla tag is not copied, so we don't copy our data either
             serializedComponents.put(AbstractComponentContainer.NBT_KEY, componentData);
             this.serializedComponents = serializedComponents;
@@ -137,12 +137,12 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
     }
 
     @Override
-    public @Nullable CompoundTag cca_getSerializedComponentData() {
+    public @Nullable NbtCompound cca_getSerializedComponentData() {
         return this.serializedComponents;
     }
 
     @Override
-    public void cca_setSerializedComponentData(@Nullable CompoundTag components) {
+    public void cca_setSerializedComponentData(@Nullable NbtCompound components) {
         this.serializedComponents = components;
     }
 

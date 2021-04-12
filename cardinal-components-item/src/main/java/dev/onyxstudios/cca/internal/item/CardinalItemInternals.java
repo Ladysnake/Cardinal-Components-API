@@ -27,7 +27,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -50,7 +50,7 @@ public final class CardinalItemInternals {
         InternalStackComponentProvider copiedProvider = InternalStackComponentProvider.get(copy);
         ComponentContainer originalComponents = originalProvider.getActualComponentContainer();
         ComponentContainer copiedComponents = copiedProvider.getActualComponentContainer();
-        CompoundTag serializedComponents;
+        NbtCompound serializedComponents;
 
         if (originalComponents != null) {
             // the original stack has live components
@@ -59,7 +59,7 @@ public final class CardinalItemInternals {
                 copiedComponents.copyFrom(originalComponents);
             } else if (originalComponents.hasComponents()) {
                 // only the original stack's components are initialized
-                CompoundTag tag = new CompoundTag();
+                NbtCompound tag = new NbtCompound();
                 originalComponents.toTag(tag);
 
                 if (!tag.isEmpty()) {   // no components -> empty tag
@@ -102,11 +102,11 @@ public final class CardinalItemInternals {
         return false;
     }
 
-    public static void markSharedTag(CompoundTag serializedComponents) {
+    public static void markSharedTag(NbtCompound serializedComponents) {
         serializedComponents.putBoolean(CCA_SHARED_TAG, true);
     }
 
-    public static CompoundTag copyIfNeeded(CompoundTag serializedComponents) {
+    public static NbtCompound copyIfNeeded(NbtCompound serializedComponents) {
         return serializedComponents.contains(CCA_SHARED_TAG)
             ? serializedComponents.copy()
             : serializedComponents;

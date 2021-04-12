@@ -26,7 +26,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,10 +38,10 @@ import javax.annotation.Nullable;
 public abstract class MixinWritePacketByteBuf {
     @Nullable
     @ModifyVariable(method = "writeItemStack(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/network/PacketByteBuf;", at = @At(value = "LOAD"))
-    private CompoundTag writeItemStack(@Nullable CompoundTag tag, ItemStack stack) {
+    private NbtCompound writeItemStack(@Nullable NbtCompound tag, ItemStack stack) {
         InternalStackComponentProvider provider = InternalStackComponentProvider.get(stack);
-        CompoundTag serializedComponents;
-        CompoundTag frozenData = provider.cca_getSerializedComponentData();
+        NbtCompound serializedComponents;
+        NbtCompound frozenData = provider.cca_getSerializedComponentData();
 
         if (frozenData == null) {
             ComponentContainer componentContainer = provider.getActualComponentContainer();
@@ -50,12 +50,12 @@ public abstract class MixinWritePacketByteBuf {
                 return tag;
             }
 
-            serializedComponents = componentContainer.toTag(new CompoundTag());
+            serializedComponents = componentContainer.toTag(new NbtCompound());
         } else {
             serializedComponents = frozenData;
         }
 
-        CompoundTag newTag = tag == null ? new CompoundTag() : tag.copy();
+        NbtCompound newTag = tag == null ? new NbtCompound() : tag.copy();
         newTag.put(CardinalItemInternals.CCA_SYNCED_COMPONENTS, serializedComponents);
         return newTag;
     }

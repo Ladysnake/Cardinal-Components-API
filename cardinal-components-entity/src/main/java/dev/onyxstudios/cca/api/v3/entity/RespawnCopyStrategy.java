@@ -25,7 +25,7 @@ package dev.onyxstudios.cca.api.v3.entity;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.GameRules;
 
 /**
@@ -97,7 +97,7 @@ public interface RespawnCopyStrategy<C extends Component> {
         if (to instanceof CopyableComponent) {
             CardinalEntityInternals.copyAsCopyable(from, (CopyableComponent<?>) to);
         } else {
-            CompoundTag tag = new CompoundTag();
+            NbtCompound tag = new NbtCompound();
             from.writeToNbt(tag);
             to.readFromNbt(tag);
         }

@@ -23,8 +23,8 @@
 package dev.onyxstudios.cca.mixin.scoreboard;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardState;
 import net.minecraft.scoreboard.Team;
@@ -46,31 +46,31 @@ public abstract class MixinScoreboardState {
     @Shadow
     private Scoreboard scoreboard;
 
-    @Inject(method = "toNbt", at = @At("RETURN"))
-    private void saveComponents(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
+    @Inject(method = "writeNbt", at = @At("RETURN"))
+    private void saveComponents(NbtCompound tag, CallbackInfoReturnable<NbtCompound> cir) {
         ((ComponentProvider) this.scoreboard).getComponentContainer().toTag(tag);
     }
 
-    @Inject(method = "fromTag", at = @At("RETURN"))
-    private void loadComponents(CompoundTag tag, CallbackInfoReturnable<ScoreboardState> ci) {
+    @Inject(method = "readNbt", at = @At("RETURN"))
+    private void loadComponents(NbtCompound tag, CallbackInfoReturnable<ScoreboardState> ci) {
         ((ComponentProvider) this.scoreboard).getComponentContainer().fromTag(tag);
     }
 
     @Inject(
-        method = "teamsFromTag",
+        method = "readTeamsNbt",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/scoreboard/ScoreboardState;teamPlayersFromTag(Lnet/minecraft/scoreboard/Team;Lnet/minecraft/nbt/ListTag;)V",
+            target = "Lnet/minecraft/scoreboard/ScoreboardState;readTeamPlayersNbt(Lnet/minecraft/scoreboard/Team;Lnet/minecraft/nbt/NbtList;)V",
             shift = At.Shift.AFTER
         ),
         locals = LocalCapture.CAPTURE_FAILEXCEPTION
     )
-    private void loadTeamComponents(ListTag teamsData, CallbackInfo ci, int i, CompoundTag teamData, String name, Team team) {
+    private void loadTeamComponents(NbtList teamsData, CallbackInfo ci, int i, NbtCompound teamData, String name, Team team) {
         ((ComponentProvider) team).getComponentContainer().fromTag(teamData);
     }
 
     @Inject(
-        method = "teamsToTag",
+        method = "teamsToNbt",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/scoreboard/Team;getPlayerList()Ljava/util/Collection;"
@@ -78,12 +78,12 @@ public abstract class MixinScoreboardState {
         locals = LocalCapture.CAPTURE_FAILEXCEPTION
     )
     private void saveTeamComponents(
-        CallbackInfoReturnable<ListTag> cir,
-        ListTag teamsData,
+        CallbackInfoReturnable<NbtList> cir,
+        NbtList teamsData,
         Collection<Team> teams,
         Iterator<Team> it,
         Team team,
-        CompoundTag teamData
+        NbtCompound teamData
     ) {
         ((ComponentProvider) team).getComponentContainer().toTag(teamData);
     }

@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 /**
  * A component that can copy its data from another component of the same type.
@@ -34,8 +34,8 @@ public interface CopyableComponent<C extends Component> extends Component {
     /**
      * Copies the data from {@code other} into {@code this}.
      *
-     * @implSpec The default implementation {@linkplain #writeToNbt(CompoundTag) serializes}
-     * the component data to a {@link CompoundTag} and calls {@link #readFromNbt(CompoundTag)}.
+     * @implSpec The default implementation {@linkplain #writeToNbt(NbtCompound) serializes}
+     * the component data to a {@link NbtCompound} and calls {@link #readFromNbt(NbtCompound)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation assumes NBT consistency
      * between implementations, and is generally slower than a direct copy.

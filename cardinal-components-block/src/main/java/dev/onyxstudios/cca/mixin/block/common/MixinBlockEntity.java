@@ -33,7 +33,7 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -72,14 +72,14 @@ public abstract class MixinBlockEntity implements ComponentProvider {
         this.components = CardinalBlockInternals.createComponents((BlockEntity) (Object) this);
     }
 
-    @Inject(method = "toTag", at = @At("RETURN"))
-    private void toTag(CompoundTag inputTag, CallbackInfoReturnable<CompoundTag> cir) {
+    @Inject(method = "writeNbt", at = @At("RETURN"))
+    private void writeNbt(NbtCompound inputTag, CallbackInfoReturnable<NbtCompound> cir) {
         this.components.toTag(cir.getReturnValue());
     }
 
     // FIXME modded and future BEs may not call super.fromTag()
-    @Inject(method = "fromTag", at = @At(value = "RETURN"))
-    private void fromTag(CompoundTag tag, CallbackInfo ci) {
+    @Inject(method = "readNbt", at = @At(value = "RETURN"))
+    private void readNbt(NbtCompound tag, CallbackInfo ci) {
         this.components.fromTag(tag);
     }
 

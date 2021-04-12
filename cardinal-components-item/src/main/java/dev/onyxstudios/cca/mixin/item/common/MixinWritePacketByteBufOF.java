@@ -26,7 +26,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,7 +40,7 @@ public abstract class MixinWritePacketByteBufOF {
 
         if (!componentContainer.keys().isEmpty()) {
             ItemStack copy = stack.copy();
-            copy.putSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS, componentContainer.toTag(new CompoundTag()));
+            copy.putSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS, componentContainer.toTag(new NbtCompound()));
             return copy;
         }
 

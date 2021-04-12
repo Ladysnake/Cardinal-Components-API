@@ -91,8 +91,8 @@ public final class TestComponents implements
 
     @Override
     public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
-        registry.registerFor(EndGatewayBlockEntity.class, VitaCompound.KEY, VitaCompound::new);
-        registry.registerFor(EndPortalBlockEntity.class, VITA, SyncedVita::new);
+        registry.registerForBlockEntity(EndGatewayBlockEntity.class, VitaCompound.KEY, VitaCompound::new);
+        registry.registerForBlockEntity(EndPortalBlockEntity.class, VITA, SyncedVita::new);
     }
 
     @Override
@@ -123,7 +123,7 @@ public final class TestComponents implements
 
     @Override
     public void registerScoreboardComponentFactories(ScoreboardComponentFactoryRegistry registry) {
-        registry.registerForScoreboards(VITA, (scoreboard, server) -> new BaseVita());
+        registry.registerScoreboardComponent(VITA, (scoreboard, server) -> new BaseVita());
         registry.registerTeamComponent(VITA, (t, sc, s) -> new TeamVita(t));
     }
 }

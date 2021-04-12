@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -30,12 +30,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface TransientComponent extends Component {
     @Override
-    default void readFromNbt(CompoundTag tag) {
+    default void readFromNbt(NbtCompound tag) {
         // Nothing to read
     }
 
     @Override
-    default void writeToNbt(CompoundTag tag) {
+    default void writeToNbt(NbtCompound tag) {
         // Nothing to write
     }
 

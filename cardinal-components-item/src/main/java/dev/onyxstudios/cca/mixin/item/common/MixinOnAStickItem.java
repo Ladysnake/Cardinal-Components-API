@@ -36,7 +36,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public abstract class MixinOnAStickItem {
     @ModifyVariable(
         method = "use",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;setTag(Lnet/minecraft/nbt/CompoundTag;)V"),
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;setTag(Lnet/minecraft/nbt/NbtCompound;)V"),
         ordinal = 1
     )
     private ItemStack addStack(ItemStack stick, World world, PlayerEntity user, Hand hand) {
