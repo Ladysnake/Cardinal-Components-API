@@ -3,13 +3,18 @@ Version 3.0.0
 ------------------------------------------------------
 **The breaking changes are here !**
 
-- Updated to 20w48a
+## 3.0.0-nightly.21w14a
+- Updated to 21w14a
+- Removed the classes and methods deprecated in 2.8.0
+    - Users should migrate their BE-less block components to Fabric API's API Lookup API
+
+## 3.0.0 General Changelog
 
 Additions
 - Ticking components now work on any `BlockEntity`, not just those that already tick in vanilla
 
 Changes
-- Every class deprecated in 2.7.0 has been **completely removed**
+- Every class and method deprecated in 2.7.0 has been **completely removed**
 - Every class remaining in the `nerdhub.component.*` packages has been moved to a `dev.onyxstudios.cca.*` package
 - Replaced specific factory interfaces with a generic variant (eg. `ComponentFactory`)
 
