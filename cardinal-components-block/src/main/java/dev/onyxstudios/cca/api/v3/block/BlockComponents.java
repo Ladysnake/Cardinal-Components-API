@@ -23,18 +23,13 @@
 package dev.onyxstudios.cca.api.v3.block;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.internal.block.InternalBlockComponentProvider;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
@@ -55,6 +50,7 @@ public final class BlockComponents {
      * @return a {@link BlockApiLookup} for retrieving instances of {@code C}
      * @see #exposeApi(ComponentKey, BlockApiLookup)
      * @see #exposeApi(ComponentKey, BlockApiLookup, BiFunction)
+     * @since 2.8.0
      */
     @ApiStatus.Experimental
     public static <C extends Component> BlockApiLookup<C, Void> getApiLookup(ComponentKey<C> key) {
@@ -65,6 +61,7 @@ public final class BlockComponents {
      * Exposes an API for all block entities to which a given component is attached.
      *
      * @see #exposeApi(ComponentKey, BlockApiLookup, BiFunction)
+     * @since 2.8.0
      */
     @ApiStatus.Experimental
     public static <A, T> void exposeApi(ComponentKey<? extends A> key, BlockApiLookup<A, T> apiLookup) {
@@ -102,6 +99,8 @@ public final class BlockComponents {
      *     );
      * }
      * }</pre>
+     *
+     * @since 2.8.0
      */
     @ApiStatus.Experimental
     public static <A, T, C extends Component> void exposeApi(ComponentKey<C> key, BlockApiLookup<A, T> apiLookup, BiFunction<? super C, ? super T, ? extends A> mapper) {
@@ -118,91 +117,15 @@ public final class BlockComponents {
      * Exposes an API for block entities of a given type, assuming the given component is attached.
      *
      * <p>This method should be preferred to other overloads as it is more performant than the more generic alternatives.
-     * If the component is not {@linkplain BlockComponentFactoryRegistry#registerFor(Class, ComponentKey, BlockEntityComponentFactory) attached}
+     * If the component is not {@linkplain BlockComponentFactoryRegistry#registerFor(Class, ComponentKey, ComponentFactory)  attached}
      * to one of the {@code types}, calling {@link BlockApiLookup#find(World, BlockPos, Object)}
      * on the corresponding block will throw a {@link NoSuchElementException}.
      *
      * @see #exposeApi(ComponentKey, BlockApiLookup, BiFunction)
+     * @since 2.8.0
      */
     @ApiStatus.Experimental
     public static <A, T, C extends Component> void exposeApi(ComponentKey<C> key, BlockApiLookup<A, T> apiLookup, BiFunction<? super C, ? super T, ? extends A> mapper, BlockEntityType<?>... types) {
         apiLookup.registerForBlockEntities((blockEntity, context) -> mapper.apply(key.get(blockEntity), context), types);
-    }
-
-    /**
-     * @deprecated use {@link ComponentKey#get(Object) KEY.get(blockEntity)} instead
-     */
-    @Deprecated
-    public static <C extends Component> @Nullable C get(ComponentKey<C> key, BlockEntity blockEntity) {
-        return get(key, blockEntity, null);
-    }
-
-    /**
-     * @deprecated use {@link BlockApiLookup} if you need additional context, otherwise call {@link ComponentKey#get(Object) KEY.get(blockEntity)}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public static <C extends Component> @Nullable C get(ComponentKey<C> key, BlockEntity blockEntity, @Nullable Direction side) {
-        World world = blockEntity.getWorld();
-
-        if (world != null) {
-            @Nullable C res = getFromBlock(key, world, blockEntity.getPos(), side, blockEntity.getCachedState());
-
-            if (res != null) {
-                return res;
-            }
-        }
-
-        return key.getNullable(blockEntity);
-    }
-
-    /**
-     * @deprecated use {@link BlockApiLookup} if you need additional context or if you want to query a BE-less block, otherwise call {@link ComponentKey#get(Object) KEY.get(world.getBlockEntity(pos))}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public static <C extends Component> @Nullable C get(ComponentKey<C> key, BlockView world, BlockPos pos) {
-        return get(key, world, pos, null);
-    }
-
-    /**
-     * @deprecated use {@link BlockApiLookup} if you need additional context or if you want to query a BE-less block, otherwise call {@link ComponentKey#get(Object) KEY.get(world.getBlockEntity(pos))}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public static <C extends Component> @Nullable C get(ComponentKey<C> key, BlockState blockState, BlockView world, BlockPos pos) {
-        return get(key, blockState, world, pos, null);
-    }
-
-    /**
-     * @deprecated use {@link BlockApiLookup} if you need additional context or if you want to query a BE-less block, otherwise call {@link ComponentKey#get(Object) KEY.get(world.getBlockEntity(pos))}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public static <C extends Component> @Nullable C get(ComponentKey<C> key, BlockView world, BlockPos pos, @Nullable Direction side) {
-        return get(key, world.getBlockState(pos), world, pos, side);
-    }
-
-    /**
-     * @deprecated use {@link BlockApiLookup} if you need additional context or if you want to query a BE-less block, otherwise call {@link ComponentKey#get(Object) KEY.get(world.getBlockEntity(pos))}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public static <C extends Component> @Nullable C get(ComponentKey<C> key, BlockState blockState, BlockView world, BlockPos pos, @Nullable Direction side) {
-        @Nullable C res = getFromBlock(key, world, pos, side, blockState);
-
-        if (res != null) {
-            return res;
-        }
-
-        return getFromBlockEntity(key, world.getBlockEntity(pos));
-    }
-
-    private static <C extends Component> @Nullable C getFromBlockEntity(ComponentKey<C> key, @Nullable BlockEntity blockEntity) {
-        return blockEntity != null ? key.getNullable(blockEntity) : null;
-    }
-
-    private static <C extends Component> @Nullable C getFromBlock(ComponentKey<C> key, BlockView world, BlockPos pos, @Nullable Direction side, BlockState state) {
-        return ((InternalBlockComponentProvider) state.getBlock()).getComponent(key, state, world, pos, side);
     }
 }

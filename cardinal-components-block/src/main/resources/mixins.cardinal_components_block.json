@@ -4,7 +4,6 @@
   "compatibilityLevel": "JAVA_8",
   "package": "dev.onyxstudios.cca.mixin.block",
   "mixins": [
-    "common.MixinBlock",
     "common.MixinBlockEntity",
     "common.MixinChunkHolder",
     "common.MixinServerPlayerEntity",

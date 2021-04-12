@@ -91,8 +91,8 @@ public final class TestComponents implements
 
     @Override
     public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
-        registry.registerForBlockEntity(EndGatewayBlockEntity.class, VitaCompound.KEY, VitaCompound::new);
-        registry.registerForBlockEntity(EndPortalBlockEntity.class, VITA, SyncedVita::new);
+        registry.registerFor(EndGatewayBlockEntity.class, VitaCompound.KEY, VitaCompound::new);
+        registry.registerFor(EndPortalBlockEntity.class, VITA, SyncedVita::new);
     }
 
     @Override
