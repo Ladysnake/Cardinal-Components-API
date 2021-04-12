@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.internal.block;
 
 import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
-import dev.onyxstudios.cca.api.v3.block.BlockComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.*;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
@@ -36,7 +35,6 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,20 +54,12 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         super("creating a BlockEntity");
     }
 
-    private Map<ComponentKey<?>, BlockComponentProvider<?>> wildcard;
-    private final Map<Identifier, Map<ComponentKey<?>, BlockComponentProvider<?>>> blockComponentFactories = new HashMap<>();
     private final List<PredicatedComponentFactory<?>> dynamicFactories = new ArrayList<>();
     private final Map<Class<? extends BlockEntity>, Map<ComponentKey<?>, Class<? extends Component>>> beComponentImpls = new HashMap<>();
     private final Map<Class<? extends BlockEntity>, Map<ComponentKey<?>, ComponentFactory<?, ?>>> beComponentFactories = new Reference2ObjectOpenHashMap<>();
     private final Map<Class<? extends BlockEntity>, Class<? extends ComponentContainer.Factory<BlockEntity>>> factoryClasses = new Reference2ObjectOpenHashMap<>();
     private final Set<Class<? extends BlockEntity>> clientTicking = new ReferenceOpenHashSet<>();
     private final Set<Class<? extends BlockEntity>> serverTicking = new ReferenceOpenHashSet<>();
-
-    public Map<ComponentKey<?>, BlockComponentProvider<?>> getComponentFactories(Identifier blockId) {
-        this.ensureInitialized();
-        assert this.wildcard != null;
-        return this.blockComponentFactories.getOrDefault(blockId, this.wildcard);
-    }
 
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getComponentTicker(World world, T be, @Nullable BlockEntityTicker<T> base) {
@@ -140,7 +130,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         });
     }
 
-    public <C extends Component, E extends BlockEntity> void registerForBlockEntity(Class<E> target, ComponentKey<C> type, ComponentFactory<E, C> factory) {
+    public <C extends Component, E extends BlockEntity> void registerFor(Class<E> target, ComponentKey<C> type, ComponentFactory<E, C> factory) {
         this.checkLoading(BlockComponentFactoryRegistry.class, "register");
         this.register0(target, type, factory, type.getComponentClass());
     }
@@ -157,17 +147,6 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     }
 
     @Override
-    public <C extends Component> void registerForBlock(@Nullable Identifier blockId, ComponentKey<? super C> type, BlockComponentProvider<C> factory) {
-        this.checkLoading(BlockComponentFactoryRegistry.class, "register");
-        Map<ComponentKey<?>, BlockComponentProvider<?>> specializedMap = this.blockComponentFactories.computeIfAbsent(blockId, t -> new Reference2ObjectOpenHashMap<>());
-        BlockComponentProvider<?> previousFactory = specializedMap.get(type);
-        if (previousFactory != null) {
-            throw new StaticComponentLoadingException("Duplicate factory declarations for " + type.getId() + " on " + (blockId == null ? "every block" : "block '" + blockId + "'") + ": " + factory + " and " + previousFactory);
-        }
-        specializedMap.put(type, factory);
-    }
-
-    @Override
     public <C extends Component, B extends BlockEntity> Registration<C, B> beginRegistration(Class<B> target, ComponentKey<C> key) {
         return new RegistrationImpl<>(target, key);
     }
@@ -178,10 +157,6 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
             StaticComponentPluginBase.getComponentEntrypoints("cardinal-components-block", BlockComponentInitializer.class),
             initializer -> initializer.registerBlockComponentFactories(this)
         );
-        this.wildcard = this.blockComponentFactories.getOrDefault(null, Collections.emptyMap());
-        this.blockComponentFactories.forEach((id, map) -> {
-            if (id != null) this.wildcard.forEach(map::putIfAbsent);
-        });
     }
 
     private final class PredicatedComponentFactory<C extends Component> {

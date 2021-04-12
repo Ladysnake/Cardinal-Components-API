@@ -26,7 +26,6 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Predicate;
@@ -36,20 +35,6 @@ import java.util.function.Predicate;
  */
 @ApiStatus.Experimental
 public interface BlockComponentFactoryRegistry {
-
-    /**
-     * Registers a {@link BlockComponentProvider} for a specific block.
-     *
-     * @param blockId  the id of a block to target
-     * @param factory the factory to use to create components of the given type
-     * @throws NullPointerException if any of the arguments is {@code null}
-     * @see BlockComponent
-     * @see BlockComponents
-     * @deprecated use {@link net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup} instead
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
-    <C extends Component> void registerForBlock(Identifier blockId, ComponentKey<? super C> key, BlockComponentProvider<C> factory);
 
     /**
      * Registers a {@link ComponentFactory} for all instances of a given {@link BlockEntity} class.
@@ -65,7 +50,7 @@ public interface BlockComponentFactoryRegistry {
      *  @param target  a class object representing the type of entities targeted by the factory
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component, BE extends BlockEntity> void registerForBlockEntity(Class<BE> target, ComponentKey<C> key, ComponentFactory<BE, C> factory);
+    <C extends Component, BE extends BlockEntity> void registerFor(Class<BE> target, ComponentKey<C> key, ComponentFactory<BE, C> factory);
 
     /**
      * Begin a factory registration, initially targeting all instances of the {@code target}.
