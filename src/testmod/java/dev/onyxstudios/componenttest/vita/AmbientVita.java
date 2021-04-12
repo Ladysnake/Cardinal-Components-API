@@ -58,8 +58,9 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
                 Vita.get(world.getLevelProperties()).getVitality()
         );
         InGameHud inGameHud = MinecraftClient.getInstance().inGameHud;
-        inGameHud.setTitles(null, worldVita, -1, -1, -1);
-        inGameHud.setTitles(worldName, null, -1, -1, -1);
+        inGameHud.setTitleTicks(-1, -1, -1);
+        inGameHud.setTitle(worldName);
+        inGameHud.setSubtitle(worldVita);
     }
 
     /**

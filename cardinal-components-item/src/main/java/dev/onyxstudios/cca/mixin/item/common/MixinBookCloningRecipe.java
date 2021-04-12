@@ -36,7 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class MixinBookCloningRecipe {
     @Inject(
         method = "craft",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;setTag(Lnet/minecraft/nbt/CompoundTag;)V"),
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;setTag(Lnet/minecraft/nbt/NbtCompound;)V"),
         locals = LocalCapture.CAPTURE_FAILSOFT
     )
     private void craft(CraftingInventory craftingInventory, CallbackInfoReturnable<ItemStack> cir, int copies, ItemStack original, ItemStack copy) {

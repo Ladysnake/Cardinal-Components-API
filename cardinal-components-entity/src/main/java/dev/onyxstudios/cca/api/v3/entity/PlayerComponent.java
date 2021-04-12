@@ -24,7 +24,7 @@ package dev.onyxstudios.cca.api.v3.entity;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.GameRules;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -59,7 +59,7 @@ public interface PlayerComponent<C extends Component> extends Component, Copyabl
 
     @Override
     default void copyFrom(C other) {
-        CompoundTag tag = new CompoundTag();
+        NbtCompound tag = new NbtCompound();
         other.writeToNbt(tag);
         this.readFromNbt(tag);
     }

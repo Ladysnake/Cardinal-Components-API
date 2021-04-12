@@ -23,7 +23,7 @@
 package dev.onyxstudios.cca.mixin.chunk.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureManager;
 import net.minecraft.util.math.ChunkPos;
@@ -40,17 +40,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ChunkSerializer.class)
 public abstract class MixinChunkSerializer {
     @Inject(method = "deserialize", at = @At("RETURN"))
-    private static void deserialize(ServerWorld world, StructureManager structureManager, PointOfInterestStorage poiStorage, ChunkPos pos, CompoundTag tag, CallbackInfoReturnable<ProtoChunk> cir) {
+    private static void deserialize(ServerWorld world, StructureManager structureManager, PointOfInterestStorage poiStorage, ChunkPos pos, NbtCompound tag, CallbackInfoReturnable<ProtoChunk> cir) {
         ProtoChunk ret = cir.getReturnValue();
         Chunk chunk = ret instanceof ReadOnlyChunk ? ((ReadOnlyChunk) ret).getWrappedChunk() : ret;
-        CompoundTag levelData = tag.getCompound("Level");
+        NbtCompound levelData = tag.getCompound("Level");
         ((ComponentProvider)chunk).getComponentContainer().fromTag(levelData);
     }
 
     @Inject(method = "serialize", at = @At("RETURN"))
-    private static void serialize(ServerWorld world, Chunk chunk, CallbackInfoReturnable<CompoundTag> cir) {
-        CompoundTag ret = cir.getReturnValue();
-        CompoundTag levelData = ret.getCompound("Level");
+    private static void serialize(ServerWorld world, Chunk chunk, CallbackInfoReturnable<NbtCompound> cir) {
+        NbtCompound ret = cir.getReturnValue();
+        NbtCompound levelData = ret.getCompound("Level");
         ((ComponentProvider)chunk).getComponentContainer().toTag(levelData);
     }
 }

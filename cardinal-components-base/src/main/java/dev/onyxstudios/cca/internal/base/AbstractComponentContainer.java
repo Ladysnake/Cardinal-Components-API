@@ -24,8 +24,8 @@ package dev.onyxstudios.cca.internal.base;
 
 import dev.onyxstudios.cca.api.v3.component.*;
 import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
 
 import java.util.Iterator;
@@ -49,7 +49,7 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
                     @SuppressWarnings("unchecked") CopyableComponent<Component> copyable = (CopyableComponent<Component>) ours;
                     copyable.copyFrom(theirs);
                 } else {
-                    CompoundTag tag = new CompoundTag();
+                    NbtCompound tag = new NbtCompound();
                     theirs.writeToNbt(tag);
                     ours.readFromNbt(tag);
                 }
@@ -62,17 +62,17 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
      *
      * @implSpec This implementation first checks if {@code tag} has a tag list
      * mapped to the "cardinal_components" key; if not it returns immediately.
-     * Then it iterates over the list's tags, casts them to {@code CompoundTag},
+     * Then it iterates over the list's tags, casts them to {@code NbtCompound},
      * and passes them to the associated component's {@code fromTag} method.
      * If this container lacks a corresponding component for a serialized component
      * type, the component tag is skipped.
      */
     @Override
-    public void fromTag(CompoundTag tag) {
+    public void fromTag(NbtCompound tag) {
         if(tag.contains(NBT_KEY, NbtType.LIST)) {
-            ListTag componentList = tag.getList(NBT_KEY, NbtType.COMPOUND);
+            NbtList componentList = tag.getList(NBT_KEY, NbtType.COMPOUND);
             for (int i = 0; i < componentList.size(); i++) {
-                CompoundTag nbt = componentList.getCompound(i);
+                NbtCompound nbt = componentList.getCompound(i);
                 ComponentKey<?> type = ComponentRegistry.get(new Identifier(nbt.getString("componentId")));
                 if (type != null) {
                     Component component = type.getInternal(this);
@@ -82,7 +82,7 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
                 }
             }
         } else if (tag.contains("cardinal_components", NbtType.COMPOUND)) {
-            CompoundTag componentMap = tag.getCompound(NBT_KEY);
+            NbtCompound componentMap = tag.getCompound(NBT_KEY);
 
             for (ComponentKey<?> key : this.keys()) {
                 String keyId = key.getId().toString();
@@ -107,15 +107,15 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
      * @implSpec This implementation first checks if the container is empty; if so it
      * returns immediately. Then, it iterates over this container's mappings, and creates
      * a compound tag for each component. The tag is then passed to the component's
-     * {@link Component#writeToNbt(CompoundTag)} method. Every such serialized component is appended
-     * to a {@code CompoundTag}, using the component type's identifier as the key.
+     * {@link Component#writeToNbt(NbtCompound)} method. Every such serialized component is appended
+     * to a {@code NbtCompound}, using the component type's identifier as the key.
      * The serialized map is finally appended to the passed in tag using the "cardinal_components" key.
      */
     @Override
-    public CompoundTag toTag(CompoundTag tag) {
+    public NbtCompound toTag(NbtCompound tag) {
         if(this.hasComponents()) {
-            CompoundTag componentMap = null;
-            CompoundTag componentTag = new CompoundTag();
+            NbtCompound componentMap = null;
+            NbtCompound componentTag = new NbtCompound();
 
             for (ComponentKey<?> type : this.keys()) {
                 Component component = type.getFromContainer(this);
@@ -123,12 +123,12 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
 
                 if (!componentTag.isEmpty()) {
                     if (componentMap == null) {
-                        componentMap = new CompoundTag();
+                        componentMap = new NbtCompound();
                         tag.put(NBT_KEY, componentMap);
                     }
 
                     componentMap.put(type.getId().toString(), componentTag);
-                    componentTag = new CompoundTag();   // recycle tag objects if possible
+                    componentTag = new NbtCompound();   // recycle tag objects if possible
                 }
             }
         }

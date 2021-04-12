@@ -24,7 +24,7 @@ package dev.onyxstudios.cca.api.v3.block.util;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import nerdhub.cardinal.components.api.util.NbtSerializable;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Direction;
 
 import javax.annotation.Nullable;
@@ -41,7 +41,7 @@ import javax.annotation.Nullable;
 public interface SidedContainerCompound extends NbtSerializable {
     ComponentContainer get(@Nullable Direction side);
 
-    void fromTag(CompoundTag serialized);
+    void fromTag(NbtCompound serialized);
 
-    CompoundTag toTag(CompoundTag tag);
+    NbtCompound toTag(NbtCompound tag);
 }

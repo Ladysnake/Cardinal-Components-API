@@ -24,7 +24,7 @@ package dev.onyxstudios.componenttest.vita;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 public class BaseVita implements Vita, Component, CopyableComponent<BaseVita> {
     protected int vitality;
@@ -48,12 +48,12 @@ public class BaseVita implements Vita, Component, CopyableComponent<BaseVita> {
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag) {
+    public void readFromNbt(NbtCompound tag) {
         this.vitality = tag.getInt("vitality");
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag) {
+    public void writeToNbt(NbtCompound tag) {
         tag.putInt("vitality", this.vitality);
     }
 

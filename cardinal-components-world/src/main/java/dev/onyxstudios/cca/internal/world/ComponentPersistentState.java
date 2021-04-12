@@ -23,7 +23,7 @@
 package dev.onyxstudios.cca.internal.world;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.PersistentState;
 
 public class ComponentPersistentState extends PersistentState {
@@ -40,11 +40,11 @@ public class ComponentPersistentState extends PersistentState {
     }
 
     @Override
-    public CompoundTag toNbt(CompoundTag tag) {
+    public NbtCompound writeNbt(NbtCompound tag) {
         return this.components.toTag(tag);
     }
 
-    public static ComponentPersistentState fromNbt(ComponentContainer components, CompoundTag tag) {
+    public static ComponentPersistentState fromNbt(ComponentContainer components, NbtCompound tag) {
         ComponentPersistentState state = new ComponentPersistentState(components);
         state.components.fromTag(tag);
         return state;

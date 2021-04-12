@@ -24,7 +24,7 @@ package dev.onyxstudios.cca.api.v3.block;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -35,12 +35,12 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface BlockComponent extends Component {
     @Override
-    default void readFromNbt(CompoundTag tag) {
+    default void readFromNbt(NbtCompound tag) {
         // NO-OP, block components must be serialized separately
     }
 
     @Override
-    default void writeToNbt(CompoundTag tag) {
+    default void writeToNbt(NbtCompound tag) {
         // NO-OP, block components must be serialized separately
     }
 }

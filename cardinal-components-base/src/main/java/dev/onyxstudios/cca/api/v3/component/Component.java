@@ -23,7 +23,7 @@
 package dev.onyxstudios.cca.api.v3.component;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.Contract;
 
 /**
@@ -38,23 +38,23 @@ import org.jetbrains.annotations.Contract;
 public interface Component {
 
     /**
-     * Reads this component's properties from a {@link CompoundTag}.
+     * Reads this component's properties from a {@link NbtCompound}.
      *
-     * @param tag a {@code CompoundTag} on which this component's serializable data has been written
+     * @param tag a {@code NbtCompound} on which this component's serializable data has been written
      * @implNote implementations should not assert that the data written on the tag corresponds to any
      * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
      * version.
      */
     @Contract(mutates = "this")
-    void readFromNbt(CompoundTag tag);
+    void readFromNbt(NbtCompound tag);
 
     /**
-     * Writes this component's properties to a {@link CompoundTag}.
+     * Writes this component's properties to a {@link NbtCompound}.
      *
-     * @param tag a {@code CompoundTag} on which to write this component's serializable data
+     * @param tag a {@code NbtCompound} on which to write this component's serializable data
      */
     @Contract(mutates = "param")
-    void writeToNbt(CompoundTag tag);
+    void writeToNbt(NbtCompound tag);
 
     /**
      * Indicates whether some other object is "equal to" this component.

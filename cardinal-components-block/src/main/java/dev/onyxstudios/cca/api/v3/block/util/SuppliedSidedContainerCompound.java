@@ -23,7 +23,7 @@
 package dev.onyxstudios.cca.api.v3.block.util;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Direction;
 
 import javax.annotation.Nullable;
@@ -53,15 +53,15 @@ public final class SuppliedSidedContainerCompound implements SidedContainerCompo
     }
 
     @Override
-    public void fromTag(CompoundTag serialized) {
+    public void fromTag(NbtCompound serialized) {
         sides.forEach((direction, componentContainer) -> componentContainer.fromTag(serialized.getCompound(direction.name())));
         core.fromTag(serialized.getCompound("core"));
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag tag) {
-        sides.forEach((direction, componentContainer) -> tag.put(direction.name(), componentContainer.toTag(new CompoundTag())));
-        tag.put("core", core.toTag(new CompoundTag()));
+    public NbtCompound toTag(NbtCompound tag) {
+        sides.forEach((direction, componentContainer) -> tag.put(direction.name(), componentContainer.toTag(new NbtCompound())));
+        tag.put("core", core.toTag(new NbtCompound()));
         return tag;
     }
 }

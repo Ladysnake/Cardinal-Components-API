@@ -29,7 +29,7 @@ import dev.onyxstudios.componenttest.vita.SyncedVita;
 import dev.onyxstudios.componenttest.vita.Vita;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Util;
@@ -50,12 +50,12 @@ public class VitaCompound implements AutoSyncedComponent {
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag) {
-        storage.forEach((side, vita) -> tag.put(side.name(), Util.make(new CompoundTag(), vita::writeToNbt)));
+    public void readFromNbt(NbtCompound tag) {
+        storage.forEach((side, vita) -> tag.put(side.name(), Util.make(new NbtCompound(), vita::writeToNbt)));
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag) {
+    public void writeToNbt(NbtCompound tag) {
         for (Map.Entry<Direction, SyncedVita> entry : this.storage.entrySet()) {
             if (tag.contains(entry.getKey().name(), NbtType.COMPOUND)) {
                 entry.getValue().readFromNbt(tag.getCompound(entry.getKey().name()));
