@@ -45,7 +45,10 @@ public interface BlockComponentFactoryRegistry {
      * @throws NullPointerException if any of the arguments is {@code null}
      * @see BlockComponent
      * @see BlockComponents
+     * @deprecated use {@link net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup} instead
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
     <C extends Component> void registerForBlock(Identifier blockId, ComponentKey<? super C> key, BlockComponentProvider<C> factory);
 
     /**

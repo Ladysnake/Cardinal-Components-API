@@ -21,7 +21,8 @@
     },
     "custom": {
         "cardinal-components": [
-            "componenttest:vita"
+            "componenttest:vita",
+            "componenttest:vita_compound"
         ]
     },
     "depends": {

@@ -23,6 +23,7 @@
 package dev.onyxstudios.componenttest;
 
 import com.google.common.reflect.TypeToken;
+import dev.onyxstudios.cca.api.v3.block.BlockComponents;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
@@ -32,11 +33,13 @@ import dev.onyxstudios.componenttest.vita.BaseVita;
 import dev.onyxstudios.componenttest.vita.Vita;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.mob.ZombieEntity;
@@ -46,11 +49,13 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
@@ -72,6 +77,8 @@ public class CardinalComponentsTest {
 
     public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(Registry.ENTITY_TYPE, "componenttest:vita_zombie",
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, VitalityZombieEntity::new).dimensions(EntityType.ZOMBIE.getDimensions()).build());
+
+    public static final BlockApiLookup<Vita, Direction> VITA_API_LOOKUP = BlockApiLookup.get(CardinalComponentsTest.id("sided_vita"), Vita.class, Direction.class);
 
     public static Identifier id(String path) {
         return new Identifier("componenttest", path);
@@ -129,6 +136,13 @@ public class CardinalComponentsTest {
             LOGGER.info("{} vitality: {}", stack, TestComponents.ALT_VITA.get(stack).getVitality()); // init components
             return TypedActionResult.pass(stack);
         });
+
+        VITA_API_LOOKUP.registerForBlocks(
+            (world, pos, state, blockEntity, context) -> TestComponents.VITA.get(Objects.requireNonNull(world.getExistingChunk(pos.getX() >> 4, pos.getZ() >> 4))),
+            VITALITY_CONDENSER
+        );
+        BlockComponents.exposeApi(TestComponents.VITA, VITA_API_LOOKUP, (vita, side) -> side == Direction.UP ? vita : null, BlockEntityType.END_PORTAL);
+        BlockComponents.exposeApi(VitaCompound.KEY, VITA_API_LOOKUP, VitaCompound::get, BlockEntityType.END_GATEWAY);
     }
 
     public interface TestContainerFactory {

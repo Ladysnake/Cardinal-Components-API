@@ -20,6 +20,7 @@
   "depends": {
     "minecraft": ">=1.17-",
     "fabric-api-base": "*",
+    "fabric-api-lookup-api-v1": "*",
     "fabric-networking-api-v1": "*",
     "cardinal-components-base": "*"
   },

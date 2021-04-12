@@ -25,10 +25,14 @@ package dev.onyxstudios.cca.api.v3.block;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A helper interface for components that entirely rely on contextual information like {@link BlockState}s.
+ * @deprecated use {@link net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup} instead
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 public interface BlockComponent extends Component {
     @Override
     default void readFromNbt(CompoundTag tag) {

@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.componenttest;
 
-import dev.onyxstudios.cca.api.v3.block.BlockComponents;
 import dev.onyxstudios.componenttest.vita.Vita;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -58,7 +57,7 @@ public class VitalityCondenser extends Block {
         // only on client side, to confirm that sync works
         if (world.isClient) {
             player.sendMessage(new TranslatableText("componenttest:action.chunk_vitality",
-                Objects.requireNonNull(BlockComponents.get(TestComponents.VITA, world, pos)).getVitality()), true);
+                Objects.requireNonNull(CardinalComponentsTest.VITA_API_LOOKUP.find(world, pos, state, null, hitInfo.getSide())).getVitality()), true);
         }
         return ActionResult.SUCCESS;
     }
