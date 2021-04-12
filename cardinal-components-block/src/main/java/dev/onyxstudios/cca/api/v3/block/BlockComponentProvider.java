@@ -29,6 +29,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -55,7 +56,10 @@ import org.jetbrains.annotations.Nullable;
  * @see BlockComponents
  * @see BlockComponentFactoryRegistry
  * @since 2.5.0
+ * @deprecated use {@link net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup} instead
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "3.0.0")
 @FunctionalInterface
 public interface BlockComponentProvider<C extends Component> {
     /**

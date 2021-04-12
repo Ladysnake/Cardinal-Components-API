@@ -14,6 +14,29 @@ Changes
 - Replaced specific factory interfaces with a generic variant (eg. `ComponentFactory`)
 
 ------------------------------------------------------
+Version 2.8.0
+------------------------------------------------------
+Additions
+- Added helper methods in `BlockComponents` to expose block components through Fabric API API-API API
+
+Changes
+- Methods and classes in `cardinal-components-block` which purpose was to access components on regular blocks have been
+  scheduled for removal as they are now superseded by API²
+
+------------------------------------------------------
+Version 2.7.13
+------------------------------------------------------
+Fixes
+- Fixed a crash when registering scoreboard components
+- Fixed a serialization issue when an item stack got initialized with an empty component container
+
+------------------------------------------------------
+Version 2.7.12
+------------------------------------------------------
+Fixes
+- Fixed a potential issue with `ItemComponent`'s tag invalidation
+
+------------------------------------------------------
 Version 2.7.11
 ------------------------------------------------------
 Additions
