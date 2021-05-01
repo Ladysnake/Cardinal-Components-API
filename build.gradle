@@ -158,11 +158,9 @@ dependencies {
     include fabricApi.module("fabric-api-base", fabric_api_version)
     include fabricApi.module("fabric-networking-v0", fabric_api_version)
 
-    afterEvaluate {
-        subprojects.each {
-            compile project(path: ":${it.name}", configuration: "dev")
-            include project(":${it.name}")
-        }
+    subprojects.each {
+        compile project(path: ":${it.name}", configuration: "dev")
+        include project(":${it.name}")
     }
 }
 

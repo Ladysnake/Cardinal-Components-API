@@ -42,15 +42,15 @@ import java.util.function.Function;
 public final class ComponentsInternals {
     public static final Logger LOGGER = LogManager.getLogger("Cardinal Components API");
 
-    private static final Field EVENT$TYPE;
+    private static final Field EVENT$HANDLERS;
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     private static final Map<Event<? extends ComponentCallback<?, ?>>, MethodHandle> FACTORY_CACHE = new HashMap<>();
     private static final MethodHandle IMPL_HANDLE;
 
     static {
         try {
-            EVENT$TYPE = Class.forName("net.fabricmc.fabric.impl.base.event.ArrayBackedEvent").getDeclaredField("type");
-            EVENT$TYPE.setAccessible(true);
+            EVENT$HANDLERS = Class.forName("net.fabricmc.fabric.impl.base.event.ArrayBackedEvent").getDeclaredField("handlers");
+            EVENT$HANDLERS.setAccessible(true);
             IMPL_HANDLE = LOOKUP.findStatic(ComponentsInternals.class, "initComponents", MethodType.methodType(void.class, ComponentType.class, Function.class, Object.class, ComponentContainer.class));
         } catch (NoSuchFieldException | ClassNotFoundException e) {
             throw new RuntimeException("Failed to hack fabric API", e);
@@ -75,7 +75,7 @@ public final class ComponentsInternals {
     @SuppressWarnings("unchecked")
     private static MethodHandle createCallbackFactory(Event<?> event) {
         try {
-            Class<? extends ComponentCallback<?, ?>> eventType = (Class<? extends ComponentCallback<?, ?>>) EVENT$TYPE.get(event);
+            Class<? extends ComponentCallback<?, ?>> eventType = (Class<? extends ComponentCallback<?, ?>>) EVENT$HANDLERS.get(event).getClass().getComponentType();
             MethodType eventSamType = findSam(eventType);
             return LambdaMetafactory.metafactory(
                 LOOKUP,
