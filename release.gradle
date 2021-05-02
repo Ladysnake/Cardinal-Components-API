@@ -89,28 +89,6 @@ artifactory {
 artifactoryPublish.dependsOn(rootProject.tasks.checkGitStatus)
 artifactoryPublish.dependsOn build
 
-allprojects {
-    bintray {
-        user = rootProject.findProperty('bintray_user')
-        key = rootProject.findProperty('bintray_api_key')
-        publications = ['mavenJava']
-        publish = true //[Default: false] Whether version should be auto published after an upload
-        pkg {
-            repo = 'libs'
-            name = rootProject.name
-            userOrg = 'ladysnake'
-            version {
-                name = rootProject.version
-                vcsTag = rootProject.version
-                released  = new Date()
-            }
-        }
-    }
-
-    bintrayUpload.dependsOn(rootProject.tasks.checkGitStatus)
-    bintrayUpload.dependsOn build
-}
-
 curseforge {
     apiKey = project.findProperty('curse_key') ?: ""
 
@@ -186,7 +164,7 @@ curseforge {
 
 tasks.curseforge.dependsOn(checkGitStatus)
 
-task release(dependsOn: [tasks.publish, tasks.githubRelease, tasks.ladysnakeGithubRelease, tasks.bintrayUpload, tasks.curseforge, tasks.artifactoryPublish]) {
+task release(dependsOn: [tasks.publish, tasks.githubRelease, tasks.ladysnakeGithubRelease, tasks.curseforge, tasks.artifactoryPublish]) {
     group = 'publishing'
     description = 'Releases a new version to Maven, Github and Curseforge'
 }
