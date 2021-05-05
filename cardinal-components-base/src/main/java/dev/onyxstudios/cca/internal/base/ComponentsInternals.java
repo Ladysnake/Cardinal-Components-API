@@ -42,6 +42,7 @@ import java.util.function.Function;
 public final class ComponentsInternals {
     public static final Logger LOGGER = LogManager.getLogger("Cardinal Components API");
 
+    private static final Field EVENT$TYPE;
     private static final Field EVENT$HANDLERS;
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     private static final Map<Event<? extends ComponentCallback<?, ?>>, MethodHandle> FACTORY_CACHE = new HashMap<>();
@@ -49,7 +50,15 @@ public final class ComponentsInternals {
 
     static {
         try {
-            EVENT$HANDLERS = Class.forName("net.fabricmc.fabric.impl.base.event.ArrayBackedEvent").getDeclaredField("handlers");
+            Class<?> impl = Class.forName("net.fabricmc.fabric.impl.base.event.ArrayBackedEvent");
+            Field eventType;
+            try {
+                eventType = impl.getDeclaredField("type");  // FAPI < 0.34.0
+            } catch (NoSuchFieldException e) {
+                eventType = null;   // FAPI >= 0.34.0
+            }
+            EVENT$TYPE = eventType;
+            EVENT$HANDLERS = impl.getDeclaredField("handlers");
             EVENT$HANDLERS.setAccessible(true);
             IMPL_HANDLE = LOOKUP.findStatic(ComponentsInternals.class, "initComponents", MethodType.methodType(void.class, ComponentType.class, Function.class, Object.class, ComponentContainer.class));
         } catch (NoSuchFieldException | ClassNotFoundException e) {
@@ -75,7 +84,11 @@ public final class ComponentsInternals {
     @SuppressWarnings("unchecked")
     private static MethodHandle createCallbackFactory(Event<?> event) {
         try {
-            Class<? extends ComponentCallback<?, ?>> eventType = (Class<? extends ComponentCallback<?, ?>>) EVENT$HANDLERS.get(event).getClass().getComponentType();
+            Class<? extends ComponentCallback<?, ?>> eventType = (Class<? extends ComponentCallback<?, ?>>) (
+                EVENT$TYPE == null
+                    ? EVENT$HANDLERS.get(event).getClass().getComponentType()   // FAPI >= 0.34.0
+                    : EVENT$TYPE.get(event)                                     // FAPI  < 0.34.0
+            );
             MethodType eventSamType = findSam(eventType);
             return LambdaMetafactory.metafactory(
                 LOOKUP,
