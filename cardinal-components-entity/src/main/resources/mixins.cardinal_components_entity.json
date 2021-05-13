@@ -5,6 +5,7 @@
   "package": "dev.onyxstudios.cca.mixin.entity",
   "mixins": [
     "common.MixinEntity",
+    "common.MixinEntityTrackerEntry",
     "common.MixinPlayerManager",
     "common.MixinServerPlayerEntity",
     "common.MixinServerWorld"

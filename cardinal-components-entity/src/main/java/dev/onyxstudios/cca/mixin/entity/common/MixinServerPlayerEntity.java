@@ -23,8 +23,6 @@
 package dev.onyxstudios.cca.mixin.entity.common;
 
 import dev.onyxstudios.cca.api.v3.entity.PlayerCopyCallback;
-import dev.onyxstudios.cca.api.v3.entity.TrackingStartCallback;
-import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,11 +31,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class MixinServerPlayerEntity {
-    @Inject(method = "onStartedTracking", at = @At("HEAD"))
-    private void onStartedTracking(Entity tracked, CallbackInfo info) {
-        TrackingStartCallback.EVENT.invoker().onPlayerStartTracking((ServerPlayerEntity)(Object)this, tracked);
-    }
-
     @Inject(method = "copyFrom", at = @At("RETURN"))
     private void copyDataFrom(ServerPlayerEntity original, boolean lossless, CallbackInfo ci) {
         PlayerCopyCallback.EVENT.invoker().copyData(original, (ServerPlayerEntity) (Object) this, lossless);

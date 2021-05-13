@@ -4,8 +4,8 @@ import java.nio.charset.StandardCharsets
 import java.time.Year
 
 plugins {
-    id "fabric-loom" version "0.6-SNAPSHOT" apply false
-    id "net.minecrell.licenser" version "0.2.1"
+    id "fabric-loom" version "0.8-SNAPSHOT" apply false
+    id "org.cadixdev.licenser" version "0.5.0"
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "maven-publish"
     id "java-library"
@@ -16,7 +16,7 @@ archivesBaseName = "Cardinal-Components-API"
 
 subprojects {
     apply plugin: 'fabric-loom'
-    apply plugin: 'net.minecrell.licenser'
+    apply plugin: 'org.cadixdev.licenser'
     apply plugin: 'com.matthewprenger.cursegradle'
     apply plugin: 'maven-publish'
     apply plugin: 'java-library'
@@ -29,7 +29,7 @@ subprojects {
 
 allprojects {
     apply plugin: "fabric-loom"
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_16
     version = System.getenv("TRAVIS_TAG") ?: rootProject.mod_version
 
     configurations {
@@ -37,10 +37,6 @@ allprojects {
     }
 
     repositories {
-        maven {
-            name = "FabricMC"
-            url = "https://maven.fabricmc.net"
-        }
     }
 
     dependencies {
@@ -57,20 +53,10 @@ allprojects {
     }
 
     processResources {
-        // this will ensure that this task is redone when there"s a change
         inputs.property "version", project.version
 
-        // replace stuff in fabric.mod.json, nothing else
-        from(sourceSets.main.resources.srcDirs) {
-            include "fabric.mod.json"
-
-            // add mod metadata
+        filesMatching("fabric.mod.json") {
             expand "version": project.version
-        }
-
-        // copy everything else, that"s not the fabric.mod.json
-        from(sourceSets.main.resources.srcDirs) {
-            exclude "fabric.mod.json"
         }
     }
 
@@ -92,8 +78,23 @@ allprojects {
         }
     }
 
+    // ensure that the encoding is set to UTF-8, no matter what the system default is
+    // this fixes some edge cases with special characters not displaying correctly
+    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+    tasks.withType(JavaCompile).configureEach {
+        it.options.encoding = "UTF-8"
+        it.options.release = 16
+    }
+
+    java {
+        // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+        // if it is present.
+        // If you remove this line, sources will not be generated.
+        withSourcesJar()
+    }
+
     jar {
-        classifier = "dev"
+        archiveClassifier = "dev"
         from(rootProject.file("LICENSE.md")) {
             rename { "LICENSE_${project.archivesBaseName.replace('-', '_')}"}
         }
@@ -159,7 +160,7 @@ dependencies {
     include fabricApi.module("fabric-networking-v0", fabric_api_version)
 
     subprojects.each {
-        compile project(path: ":${it.name}", configuration: "dev")
+        api project(path: ":${it.name}", configuration: "dev")
         include project(":${it.name}")
     }
 }

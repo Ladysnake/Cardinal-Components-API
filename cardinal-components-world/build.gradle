@@ -1,3 +1,3 @@
 dependencies {
-    compile project(":cardinal-components-base")
+    api project(":cardinal-components-base")
 }
