@@ -19,6 +19,18 @@ Changes
 - Replaced specific factory interfaces with a generic variant (eg. `ComponentFactory`)
 
 ------------------------------------------------------
+Version 2.8.2
+------------------------------------------------------
+Fixes
+- Fixed a crash with mods using the deprecated API on Fabric API versions older than 0.34.0
+
+------------------------------------------------------
+Version 2.8.1
+------------------------------------------------------
+Fixes
+- Fixed a crash at launch with Fabric API 0.34.0 and up (1.17 versions are unaffected)
+
+------------------------------------------------------
 Version 2.8.0
 ------------------------------------------------------
 Additions
