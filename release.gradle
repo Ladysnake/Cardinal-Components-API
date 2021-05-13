@@ -58,6 +58,7 @@ def configureGithubRelease(task, String repoOwner) {
         setOverwrite ext.overwriteProvider
         setAllowUploadToExisting ext.allowUploadToExistingProvider
         setApiEndpoint ext.apiEndpointProvider
+        setDryRun ext.dryRun
     }
     task.dependsOn(checkGitStatus)
 }
