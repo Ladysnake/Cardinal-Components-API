@@ -54,6 +54,7 @@ public final class ComponentsInternals {
             Field eventType;
             try {
                 eventType = impl.getDeclaredField("type");  // FAPI < 0.34.0
+                eventType.setAccessible(true);
             } catch (NoSuchFieldException e) {
                 eventType = null;   // FAPI >= 0.34.0
             }
