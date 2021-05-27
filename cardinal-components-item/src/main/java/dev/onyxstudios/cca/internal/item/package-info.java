@@ -24,6 +24,6 @@
 @ParametersAreNonnullByDefault
 package dev.onyxstudios.cca.internal.item;
 
-import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
+import dev.onyxstudios.cca.api.v3.util.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

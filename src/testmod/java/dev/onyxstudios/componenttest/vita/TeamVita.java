@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.componenttest.vita;
 
-import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -35,7 +35,7 @@ public class TeamVita extends SyncedVita implements AutoSyncedComponent {
     }
 
     @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player, int syncOp) {
+    public boolean shouldSyncWith(ServerPlayerEntity player) {
         return player.getScoreboardTeam() == this.team;
     }
 

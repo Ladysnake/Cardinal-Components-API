@@ -20,29 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package dev.onyxstudios.cca.api.v3.util.util.impl;
 
-import javax.annotation.Nonnull;
-import javax.annotation.meta.TypeQualifierDefault;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import dev.onyxstudios.cca.api.v3.util.MethodsReturnNonnullByDefault;
 
-/**
- * This annotation can be applied to a package, class or method to indicate that
- * the method in that element are nonnull by default unless there is:
- * <ul>
- * <li>An explicit nullness annotation
- * <li>The method overrides a method in a superclass (in which case the
- * annotation of the corresponding method in the superclass applies)
- * <li> there is a default parameter annotation applied to a more tightly nested
- * element.
- * </ul>
- *
- */
-@Documented
-@Nonnull
-@TypeQualifierDefault(ElementType.METHOD) // Note: This is a copy of javax.annotation.ParametersAreNonnullByDefault with target changed to METHOD
-@Retention(RetentionPolicy.RUNTIME)
-public @interface MethodsReturnNonnullByDefault {}
+import javax.annotation.ParametersAreNonnullByDefault;

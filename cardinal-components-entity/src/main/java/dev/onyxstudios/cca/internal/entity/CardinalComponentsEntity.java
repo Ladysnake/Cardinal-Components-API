@@ -28,6 +28,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerCopyCallback;
 import dev.onyxstudios.cca.api.v3.entity.PlayerSyncCallback;
+import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import dev.onyxstudios.cca.api.v3.entity.TrackingStartCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
@@ -71,7 +72,7 @@ public final class CardinalComponentsEntity {
     private static <C extends Component> void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless, boolean keepInventory, ComponentKey<C> key) {
         C from = key.get(original);
         C to = key.get(clone);
-        CardinalEntityInternals.getRespawnCopyStrategy(key).copyForRespawn(from, to, lossless, keepInventory);
+        RespawnCopyStrategy.get(key).copyForRespawn(from, to, lossless, keepInventory);
     }
 
     private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {

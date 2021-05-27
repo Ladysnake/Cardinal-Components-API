@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package nerdhub.cardinal.components.api.util;
+package dev.onyxstudios.cca.api.v3.util;
 
 import com.mojang.serialization.Dynamic;
 import net.minecraft.nbt.NbtCompound;
@@ -28,6 +28,7 @@ import net.minecraft.nbt.NbtOps;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
+@ApiStatus.Experimental
 public interface NbtSerializable {
     /**
      * Reads this object's properties from a {@link NbtCompound}.

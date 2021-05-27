@@ -133,18 +133,6 @@ public abstract class ComponentKey<C extends Component> {
         }
     }
 
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    public <V> void sync(V provider, int syncOp) {
-        C c = this.get(provider);
-        if (c instanceof dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent) {
-            dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent synced = (dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent) c;
-            this.sync(provider, (buf, recipient) -> synced.writeToPacket(buf, recipient, syncOp), p -> synced.shouldSyncWith(p, syncOp));
-        } else {
-            throw new IllegalStateException("syncOp parameter supplied despite absence of legacy synced component");
-        }
-    }
-
     /**
      * Attempts to synchronize the component attached to the given provider.
      *
