@@ -3,10 +3,17 @@ Version 3.0.0
 ------------------------------------------------------
 **The breaking changes are here !**
 
-## 3.0.0-nightly.21w14a
-- Updated to 21w14a
-- Removed the classes and methods deprecated in 2.8.0
-    - Users should migrate their BE-less block components to Fabric API's API Lookup API
+## 3.0.0-nightly.1.17-pre1
+- Updated to 1.17-pre1
+
+Additions
+- Exposed a way to retrieve the `RespawnCopyStrategy` for a given component
+
+Changes
+- `RespawnCopyStrategy` now considers whether the player is switching to another character
+    - this can be used by mods which allow switching to another body or taking over the body of another player (e.g. Requiem)
+    - Mods that previously used `RespawnCopyStrategy.ALWAYS` may be interested in using `RespawnCopyStrategy.CHARACTER` instead.
+- Updated Mod Menu metadata
 
 ## 3.0.0 General Changelog
 
@@ -14,9 +21,13 @@ Additions
 - Ticking components now work on any `BlockEntity`, not just those that already tick in vanilla
 
 Changes
-- Every class and method deprecated in 2.7.0 has been **completely removed**
 - Every class remaining in the `nerdhub.component.*` packages has been moved to a `dev.onyxstudios.cca.*` package
 - Replaced specific factory interfaces with a generic variant (eg. `ComponentFactory`)
+
+Removed
+- Every class and method deprecated in 2.7.0 has been **completely removed**
+- Every class and method deprecated in 2.8.0 has been **completely removed**
+    - Users should migrate their BE-less block components to Fabric API's API Lookup API
 
 ------------------------------------------------------
 Version 2.8.2
