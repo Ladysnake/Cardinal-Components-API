@@ -20,32 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.mixin.entity.common;
+package dev.onyxstudios.cca.internal.entity;
 
-import dev.onyxstudios.cca.api.v3.entity.PlayerCopyCallback;
-import dev.onyxstudios.cca.internal.entity.SwitchablePlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-@Mixin(ServerPlayerEntity.class)
-public abstract class MixinServerPlayerEntity implements SwitchablePlayerEntity {
-    private transient boolean switchingCharacter = false;
-
-    @Override
-    public void cca$markAsSwitchingCharacter() {
-        this.switchingCharacter = true;
-    }
-
-    @Override
-    public boolean cca$isSwitchingCharacter() {
-        return this.switchingCharacter;
-    }
-
-    @Inject(method = "copyFrom", at = @At("RETURN"))
-    private void copyDataFrom(ServerPlayerEntity original, boolean lossless, CallbackInfo ci) {
-        PlayerCopyCallback.EVENT.invoker().copyData(original, (ServerPlayerEntity) (Object) this, lossless);
-    }
+public interface SwitchablePlayerEntity {
+    // Can be used by mods as an unofficial API for now
+    @SuppressWarnings("unused") void cca$markAsSwitchingCharacter();
+    boolean cca$isSwitchingCharacter();
 }

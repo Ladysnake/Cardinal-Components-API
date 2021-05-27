@@ -94,13 +94,13 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
     }
 
     @Override
-    public boolean shouldCopyForRespawn(boolean lossless, boolean keepInventory) {
+    public boolean shouldCopyForRespawn(boolean lossless, boolean keepInventory, boolean switchingCharacter) {
         return lossless || keepInventory;
     }
 
     @Override
-    public void copyForRespawn(BaseVita original, boolean lossless, boolean keepInventory) {
-        PlayerComponent.super.copyForRespawn(original, lossless, keepInventory);
+    public void copyForRespawn(BaseVita original, boolean lossless, boolean keepInventory, boolean switchingCharacter) {
+        PlayerComponent.super.copyForRespawn(original, lossless, keepInventory, switchingCharacter);
         if (!lossless && !keepInventory) {
             this.vitality -= 5;
         }
