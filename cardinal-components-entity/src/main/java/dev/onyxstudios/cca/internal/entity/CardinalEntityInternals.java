@@ -87,18 +87,18 @@ public final class CardinalEntityInternals {
         return (RespawnCopyStrategy<? super C>) RESPAWN_COPY_STRATEGIES.getOrDefault(type, DEFAULT_COPY_STRATEGY);
     }
 
-    private static void defaultCopyStrategy(Component from, Component to, boolean lossless, boolean keepInventory) {
+    private static void defaultCopyStrategy(Component from, Component to, boolean lossless, boolean keepInventory, boolean sameCharacter) {
         if (to instanceof PlayerComponent) {
-            playerComponentCopy(from, (PlayerComponent<?>) to, lossless, keepInventory);
+            playerComponentCopy(from, (PlayerComponent<?>) to, lossless, keepInventory, sameCharacter);
         } else {
-            RespawnCopyStrategy.LOSSLESS_ONLY.copyForRespawn(from, to, lossless, keepInventory);
+            RespawnCopyStrategy.LOSSLESS_ONLY.copyForRespawn(from, to, lossless, keepInventory, sameCharacter);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static <C extends Component> void playerComponentCopy(Component from, PlayerComponent<C> to, boolean lossless, boolean keepInventory) {
-        if (to.shouldCopyForRespawn(lossless, keepInventory)) {
-            to.copyForRespawn((C) from, lossless, keepInventory);
+    private static <C extends Component> void playerComponentCopy(Component from, PlayerComponent<C> to, boolean lossless, boolean keepInventory, boolean sameCharacter) {
+        if (to.shouldCopyForRespawn(lossless, keepInventory, sameCharacter)) {
+            to.copyForRespawn((C) from, lossless, keepInventory, sameCharacter);
         }
     }
 

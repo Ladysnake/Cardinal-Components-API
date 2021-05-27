@@ -37,10 +37,12 @@ public interface PlayerComponent<C extends Component> extends Component, Copyabl
      * @param lossless      {@code true} if the player is copied exactly, such as when coming back from the End
      * @param keepInventory {@code true} if the player's inventory and XP are kept, such as when
      *                      {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
+     * @param sameCharacter {@code true} if the player is not switching to an unrelated body.
+     *                      Can only be {@code false} with other mods installed.
      * @return {@code true} if {@link #copyForRespawn} should be called for the current respawn situation
      */
     @Contract(pure = true)
-    default boolean shouldCopyForRespawn(boolean lossless, boolean keepInventory) {
+    default boolean shouldCopyForRespawn(boolean lossless, boolean keepInventory, boolean sameCharacter) {
         return lossless;
     }
 
@@ -51,9 +53,11 @@ public interface PlayerComponent<C extends Component> extends Component, Copyabl
      * @param lossless      {@code true} if the player is copied exactly, such as when coming back from the End
      * @param keepInventory {@code true} if the player's inventory and XP are kept, such as when
      *                      {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
+     * @param sameCharacter {@code true} if the player is not switching to an unrelated body.
+     *                      Can only be {@code false} with other mods installed.
      * @implNote the default implementation delegates to {@link #copyFrom}
      */
-    default void copyForRespawn(C original, boolean lossless, boolean keepInventory) {
+    default void copyForRespawn(C original, boolean lossless, boolean keepInventory, boolean sameCharacter) {
         this.copyFrom(original);
     }
 

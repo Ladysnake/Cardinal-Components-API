@@ -65,14 +65,14 @@ public final class CardinalComponentsEntity {
         Set<ComponentKey<?>> keys = ((ComponentProvider) original).getComponentContainer().keys();
 
         for (ComponentKey<?> key : keys) {
-            copyData(original, clone, lossless, keepInventory, key);
+            copyData(original, clone, lossless, keepInventory, key, !((SwitchablePlayerEntity) original).cca$isSwitchingCharacter());
         }
     }
 
-    private static <C extends Component> void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless, boolean keepInventory, ComponentKey<C> key) {
+    private static <C extends Component> void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless, boolean keepInventory, ComponentKey<C> key, boolean sameCharacter) {
         C from = key.get(original);
         C to = key.get(clone);
-        RespawnCopyStrategy.get(key).copyForRespawn(from, to, lossless, keepInventory);
+        RespawnCopyStrategy.get(key).copyForRespawn(from, to, lossless, keepInventory, sameCharacter);
     }
 
     private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {
@@ -82,5 +82,4 @@ public final class CardinalComponentsEntity {
             key.syncWith(player, provider);
         }
     }
-
 }

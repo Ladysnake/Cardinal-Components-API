@@ -93,6 +93,7 @@ public interface EntityComponentFactoryRegistry {
      * @throws NullPointerException if any of the arguments is {@code null}
      * @since 2.5.1
      * @see RespawnCopyStrategy#ALWAYS_COPY
+     * @see RespawnCopyStrategy#CHARACTER
      * @see RespawnCopyStrategy#INVENTORY
      * @see RespawnCopyStrategy#LOSSLESS_ONLY
      */
