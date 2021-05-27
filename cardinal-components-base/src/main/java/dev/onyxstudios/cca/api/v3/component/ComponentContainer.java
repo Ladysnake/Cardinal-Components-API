@@ -24,11 +24,12 @@ package dev.onyxstudios.cca.api.v3.component;
 
 import com.demonwav.mcdev.annotations.CheckEnv;
 import com.demonwav.mcdev.annotations.Env;
+import dev.onyxstudios.cca.api.v3.util.NbtSerializable;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
-import nerdhub.cardinal.components.api.util.NbtSerializable;
+import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -65,6 +66,27 @@ public interface ComponentContainer extends NbtSerializable {
 
     @CheckEnv(Env.CLIENT)
     void tickClientComponents();
+
+    /**
+     * Reads this object's properties from a {@link NbtCompound}.
+     *
+     * @param tag a {@code NbtCompound} on which this object's serializable data has been written
+     * @implNote implementations must not assert that the data written on the tag corresponds to any
+     * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
+     * version. They should also store values into {@code tag} using only unique namespaced keys, as other
+     * information may be stored in said tag.
+     */
+    @Contract(mutates = "this")
+    void fromTag(NbtCompound tag);
+
+    /**
+     * Writes this object's properties to a {@link NbtCompound}.
+     *
+     * @param tag a {@code NbtCompound} on which to write this component's serializable data
+     * @return {@code tag} for easy chaining
+     */
+    @Contract(mutates = "param")
+    NbtCompound toTag(NbtCompound tag);
 
     /**
      * A factory for {@link ComponentContainer}s.

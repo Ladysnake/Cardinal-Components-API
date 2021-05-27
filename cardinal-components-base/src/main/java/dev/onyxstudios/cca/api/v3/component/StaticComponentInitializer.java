@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.api.v3.component;
 
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -41,7 +40,6 @@ import java.util.Collections;
  * and runs for any environment. It usually executes right before the first {@link ComponentKey}
  * is created, but can be triggered at any time by another module.
  */
-@ApiStatus.Experimental
 public interface StaticComponentInitializer {
     /**
      * @return the identifiers of the {@link ComponentKey}s this initializer supports

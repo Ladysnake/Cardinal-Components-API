@@ -23,10 +23,12 @@
 package dev.onyxstudios.cca.api.v3.entity;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.GameRules;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Represents a strategy to copy a component from a player to another.
@@ -51,13 +53,15 @@ public interface RespawnCopyStrategy<C extends Component> {
 
     /**
      * Always copy a component no matter the cause of respawn.
-     * This strategy is relevant for persistent metadata such as stats.
+     *
+     * <p>This strategy is relevant for persistent metadata such as statistics.
      */
     RespawnCopyStrategy<Component> ALWAYS_COPY = (from, to, lossless, keepInventory) -> copy(from, to);
 
     /**
      * Copy a component whenever the player's inventory would be copied.
-     * This strategy is relevant for any data storage tied to items or experience.
+     *
+     * <p>This strategy is relevant for any data storage tied to items or experience.
      */
     RespawnCopyStrategy<Component> INVENTORY = (from, to, lossless, keepInventory) -> {
         if (lossless || keepInventory) {
@@ -67,7 +71,8 @@ public interface RespawnCopyStrategy<C extends Component> {
 
     /**
      * Copy a component only when the entire data is transferred from a player to the other (eg. return from the End).
-     * This strategy is the default.
+     *
+     * <p>This strategy is the default.
      */
     RespawnCopyStrategy<Component> LOSSLESS_ONLY = (from, to, lossless, keepInventory) -> {
         if (lossless) {
@@ -77,11 +82,17 @@ public interface RespawnCopyStrategy<C extends Component> {
 
     /**
      * Never copy a component no matter the cause of respawn.
-     * This strategy can be used when {@code RespawnCopyStrategy} does not offer enough context,
+     *
+     * <p>This strategy can be used when {@code RespawnCopyStrategy} does not offer enough context,
      * in which case {@link PlayerCopyCallback} may be used directly.
      */
     RespawnCopyStrategy<Component> NEVER_COPY = (from, to, lossless, keepInventory) -> {
     };
+
+    @ApiStatus.Experimental
+    static <C extends Component> RespawnCopyStrategy<? super C> get(ComponentKey<C> key) {
+        return CardinalEntityInternals.getRespawnCopyStrategy(key);
+    }
 
     /**
      * Copies data from one component to the other.

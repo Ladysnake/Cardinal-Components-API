@@ -23,7 +23,7 @@
 package dev.onyxstudios.cca.api.v3.block.util;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import nerdhub.cardinal.components.api.util.NbtSerializable;
+import dev.onyxstudios.cca.api.v3.util.NbtSerializable;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Direction;
 

@@ -25,7 +25,7 @@
 @ParametersAreNonnullByDefault
 package dev.onyxstudios.cca.mixin.scoreboard;
 
-import nerdhub.cardinal.components.api.util.MethodsReturnNonnullByDefault;
+import dev.onyxstudios.cca.api.v3.util.MethodsReturnNonnullByDefault;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.ParametersAreNonnullByDefault;
