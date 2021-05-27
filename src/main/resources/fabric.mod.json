@@ -3,10 +3,10 @@
     "environment": "*",
     "id": "cardinal-components",
     "name": "Cardinal Components API",
-    "description": "dynamically exposing components",
+    "description": "Attaching more data to various game objects",
     "version": "${version}",
     "custom": {
-        "modmenu:api": true
+      "badges": [ "library" ]
     },
     "authors": [
         {
