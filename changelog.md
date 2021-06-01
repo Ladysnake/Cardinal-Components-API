@@ -3,17 +3,9 @@ Version 3.0.0
 ------------------------------------------------------
 **The breaking changes are here !**
 
-## 3.0.0-nightly.1.17-pre1
-- Updated to 1.17-pre1
-
-Additions
-- Exposed a way to retrieve the `RespawnCopyStrategy` for a given component
-
-Changes
-- `RespawnCopyStrategy` now considers whether the player is switching to another character
-    - this can be used by mods which allow switching to another body or taking over the body of another player (e.g. Requiem)
-    - Mods that previously used `RespawnCopyStrategy.ALWAYS` may be interested in using `RespawnCopyStrategy.CHARACTER` instead.
-- Updated Mod Menu metadata
+## 3.0.0-nightly.1.17-pre2
+- Updated to 1.17-pre2
+- Fixed networking error in `cardinal-components-scoreboard` when loading a world
 
 ## 3.0.0 General Changelog
 
@@ -23,6 +15,11 @@ Additions
 Changes
 - Every class remaining in the `nerdhub.component.*` packages has been moved to a `dev.onyxstudios.cca.*` package
 - Replaced specific factory interfaces with a generic variant (eg. `ComponentFactory`)
+- Added `RespawnCopyStrategy#get(ComponentKey)` to retrieve the strategy for a given component
+- `RespawnCopyStrategy` now considers whether the player is switching to another character
+    - this can be used by mods which allow switching to another body or taking over the body of another player (e.g. Requiem)
+    - Mods that previously used `RespawnCopyStrategy.ALWAYS` may be interested in using `RespawnCopyStrategy.CHARACTER` instead.
+- Updated Mod Menu metadata
 
 Removed
 - Every class and method deprecated in 2.7.0 has been **completely removed**
