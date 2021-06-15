@@ -23,7 +23,19 @@
 package dev.onyxstudios.cca.api.v3.item;
 
 import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NbtByte;
+import net.minecraft.nbt.NbtByteArray;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtDouble;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtFloat;
+import net.minecraft.nbt.NbtInt;
+import net.minecraft.nbt.NbtIntArray;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtLong;
+import net.minecraft.nbt.NbtLongArray;
+import net.minecraft.nbt.NbtShort;
+import net.minecraft.nbt.NbtString;
 
 @SuppressWarnings("unused")
 public final class CcaNbtType<T extends NbtElement> {
@@ -41,21 +53,21 @@ public final class CcaNbtType<T extends NbtElement> {
     public static final CcaNbtType<NbtLongArray> LONG_ARRAY = new CcaNbtType<>(NbtType.LONG_ARRAY);
 
     public static CcaNbtType<?> byId(int id) {
-        switch (id) {
-            case NbtType.BYTE: return BYTE;
-            case NbtType.SHORT: return SHORT;
-            case NbtType.INT: return INT;
-            case NbtType.LONG: return LONG;
-            case NbtType.FLOAT: return FLOAT;
-            case NbtType.DOUBLE: return DOUBLE;
-            case NbtType.BYTE_ARRAY: return BYTE_ARRAY;
-            case NbtType.STRING: return STRING;
-            case NbtType.LIST: return LIST;
-            case NbtType.COMPOUND: return COMPOUND;
-            case NbtType.INT_ARRAY: return INT_ARRAY;
-            case NbtType.LONG_ARRAY: return LONG_ARRAY;
-            default: throw new IllegalArgumentException("Unsupported NBT Type " + id);
-        }
+        return switch (id) {
+            case NbtType.BYTE -> BYTE;
+            case NbtType.SHORT -> SHORT;
+            case NbtType.INT -> INT;
+            case NbtType.LONG -> LONG;
+            case NbtType.FLOAT -> FLOAT;
+            case NbtType.DOUBLE -> DOUBLE;
+            case NbtType.BYTE_ARRAY -> BYTE_ARRAY;
+            case NbtType.STRING -> STRING;
+            case NbtType.LIST -> LIST;
+            case NbtType.COMPOUND -> COMPOUND;
+            case NbtType.INT_ARRAY -> INT_ARRAY;
+            case NbtType.LONG_ARRAY -> LONG_ARRAY;
+            default -> throw new IllegalArgumentException("Unsupported NBT Type " + id);
+        };
     }
 
     private final int type;

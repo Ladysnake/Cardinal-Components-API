@@ -41,7 +41,13 @@ import dev.onyxstudios.cca.api.v3.util.GenericComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.util.GenericComponentInitializer;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
-import dev.onyxstudios.componenttest.vita.*;
+import dev.onyxstudios.componenttest.vita.AmbientVita;
+import dev.onyxstudios.componenttest.vita.BaseVita;
+import dev.onyxstudios.componenttest.vita.ItemVita;
+import dev.onyxstudios.componenttest.vita.PlayerVita;
+import dev.onyxstudios.componenttest.vita.SyncedVita;
+import dev.onyxstudios.componenttest.vita.TeamVita;
+import dev.onyxstudios.componenttest.vita.Vita;
 import net.minecraft.block.entity.EndGatewayBlockEntity;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.LivingEntity;
@@ -67,7 +73,8 @@ public final class TestComponents implements
     public static final Identifier CUSTOM_PROVIDER_2 = new Identifier("componenttest:custom/2");
     public static final Identifier CUSTOM_PROVIDER_3 = new Identifier("componenttest:custom/3");
 
-    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>>() {};
+    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<>() {
+    };
 
     public static final ComponentKey<Vita> VITA = ComponentRegistryV3.INSTANCE.getOrCreate(CardinalComponentsTest.id("vita"), Vita.class);
     public static final ComponentKey<Vita> ALT_VITA = ComponentRegistryV3.INSTANCE.getOrCreate(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);

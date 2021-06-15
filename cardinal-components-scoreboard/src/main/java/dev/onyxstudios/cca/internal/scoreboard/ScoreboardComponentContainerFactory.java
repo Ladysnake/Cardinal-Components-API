@@ -33,7 +33,7 @@ public interface ScoreboardComponentContainerFactory extends ComponentContainer.
 
     @Deprecated
     @Override   // just a dumb hack because I'm too lazy to refactor everything rn
-    default ComponentContainer createContainer(Scoreboard obj) {
+    default ComponentContainer createContainer(@Nullable Scoreboard obj) {
         throw new UnsupportedOperationException("Not supposed to be called :(");
     }
 }
