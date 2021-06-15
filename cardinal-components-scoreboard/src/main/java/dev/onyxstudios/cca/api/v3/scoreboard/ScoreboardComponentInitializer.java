@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.api.v3.scoreboard;
 
 import dev.onyxstudios.cca.internal.base.ComponentRegistrationInitializer;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> team component factories.
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @since 2.4.2
  */
-@ApiStatus.Experimental
 public interface ScoreboardComponentInitializer extends ComponentRegistrationInitializer {
     /**
      * Called to register component factories for statically declared component types.

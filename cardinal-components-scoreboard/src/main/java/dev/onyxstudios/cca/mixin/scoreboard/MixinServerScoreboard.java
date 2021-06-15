@@ -29,6 +29,7 @@ import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
 import dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking;
 import dev.onyxstudios.cca.internal.scoreboard.ScoreboardComponentContainerFactory;
 import dev.onyxstudios.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Scoreboard;
@@ -36,7 +37,6 @@ import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Lazy;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -48,11 +48,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.function.Supplier;
 
 @Mixin(ServerScoreboard.class)
 public abstract class MixinServerScoreboard extends MixinScoreboard {
     @Unique
-    private static final Lazy<ScoreboardComponentContainerFactory> componentsContainerFactory = StaticScoreboardComponentPlugin.scoreboardComponentsContainerFactory;
+    private static final Supplier<ScoreboardComponentContainerFactory> componentsContainerFactory = StaticScoreboardComponentPlugin.scoreboardComponentsContainerFactory;
 
     @Shadow
     @Final
@@ -70,7 +71,8 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
 
     @Nullable
     @Override
-    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+        PacketByteBuf buf = PacketByteBufs.create();
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
         return new CustomPayloadS2CPacket(ComponentsScoreboardNetworking.SCOREBOARD_PACKET_ID, buf);

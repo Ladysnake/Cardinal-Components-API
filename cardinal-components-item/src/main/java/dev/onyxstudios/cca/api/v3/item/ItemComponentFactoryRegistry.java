@@ -34,6 +34,9 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.function.Predicate;
 
 /**
+ * Note: Item components are experimental and may be phased out entirely once an item implementation
+ * of the Fabric API Lookup API exists.
+ *
  * @since 2.4.0
  */
 public interface ItemComponentFactoryRegistry {
@@ -44,7 +47,8 @@ public interface ItemComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException  if any of the arguments is {@code null}
      * @throws IllegalStateException if the {@code item} was not previously registered
-     * @deprecated stateful item components will be removed in MC 1.18, please store data in the tag
+     * @deprecated stateful item components will be removed in MC 1.18, please store data in the tag.
+     * Migration to tag-based components is handled automatically for old saves.
      */
     @Deprecated(since = "3.0.0", forRemoval = true)
     <C extends Component> void registerFor(Item item, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory);
@@ -56,6 +60,7 @@ public interface ItemComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      * @deprecated stateful item components will be removed in MC 1.18, please store data in the tag
+     * Migration to tag-based components is handled automatically for old saves.
      */
     @Deprecated(since = "3.0.0", forRemoval = true)
     <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory);
@@ -67,6 +72,7 @@ public interface ItemComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      * @deprecated stateful item components will be removed in MC 1.18, please store data in the tag
+     * Migration to tag-based components is handled automatically for old saves.
      */
     @Deprecated(since = "3.0.0", forRemoval = true)
     <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory);
@@ -102,6 +108,7 @@ public interface ItemComponentFactoryRegistry {
      * @param factory the factory to use to create components of the given type
      * @throws NullPointerException if any of the arguments is {@code null}
      * @since 2.7.10
+     * @see TransientComponent.SimpleImpl
      */
     @ApiStatus.Experimental
     <C extends TransientComponent> void registerTransient(Predicate<Item> test, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory);
@@ -114,6 +121,7 @@ public interface ItemComponentFactoryRegistry {
      * @throws NullPointerException  if any of the arguments is {@code null}
      * @throws IllegalStateException if the {@code item} was not previously registered
      * @since 2.7.10
+     * @see TransientComponent.SimpleImpl
      */
     @ApiStatus.Experimental
     <C extends TransientComponent> void registerTransient(Item item, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory);

@@ -52,13 +52,11 @@ public interface NbtSerializable {
     NbtCompound toTag(NbtCompound tag);
 
     @Contract(mutates = "this")
-    @ApiStatus.Experimental
     default void fromDynamic(Dynamic<?> dynamic) {
         this.fromTag((NbtCompound) dynamic.convert(NbtOps.INSTANCE).getValue());
     }
 
     @Contract(pure = true)
-    @ApiStatus.Experimental
     default <T> Dynamic<T> toDynamic(Dynamic<T> dynamic) {
         return dynamic.convert(NbtOps.INSTANCE).map(tag -> this.toTag((NbtCompound)tag)).convert(dynamic.getOps());
     }

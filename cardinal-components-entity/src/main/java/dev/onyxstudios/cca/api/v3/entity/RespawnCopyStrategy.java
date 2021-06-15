@@ -28,7 +28,6 @@ import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.GameRules;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Represents a strategy to copy a component from a player to another.
@@ -92,7 +91,6 @@ public interface RespawnCopyStrategy<C extends Component> {
      */
     RespawnCopyStrategy<Component> NEVER_COPY = (from, to, lossless, keepInventory, sameCharacter) -> { };
 
-    @ApiStatus.Experimental
     static <C extends Component> RespawnCopyStrategy<? super C> get(ComponentKey<C> key) {
         return CardinalEntityInternals.getRespawnCopyStrategy(key);
     }

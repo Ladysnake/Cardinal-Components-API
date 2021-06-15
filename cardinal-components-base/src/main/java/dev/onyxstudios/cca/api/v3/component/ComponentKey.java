@@ -26,9 +26,7 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
-import io.netty.buffer.Unpooled;
 import net.minecraft.network.Packet;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
@@ -126,9 +124,7 @@ public abstract class ComponentKey<C extends Component> {
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
     public <V> void sync(V provider) {
-        C c = this.get(provider);
-        if (c instanceof AutoSyncedComponent) {
-            AutoSyncedComponent synced = (AutoSyncedComponent) c;
+        if (this.get(provider) instanceof AutoSyncedComponent synced) {
             this.sync(provider, synced, synced);
         }
     }
@@ -185,9 +181,7 @@ public abstract class ComponentKey<C extends Component> {
      */
     @ApiStatus.Experimental
     public void syncWith(ServerPlayerEntity player, ComponentProvider provider) {
-        C c = this.get(provider);
-        if (c instanceof AutoSyncedComponent) {
-            AutoSyncedComponent synced = (AutoSyncedComponent) c;
+        if (this.get(provider) instanceof AutoSyncedComponent synced) {
             this.syncWith(player, provider, synced, synced);
         }
     }
@@ -240,8 +234,7 @@ public abstract class ComponentKey<C extends Component> {
     @ApiStatus.Internal
     public void syncWith(ServerPlayerEntity player, ComponentProvider provider, ComponentPacketWriter writer, PlayerSyncPredicate predicate) {
         if (predicate.shouldSyncWith(player)) {
-            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-            Packet<?> packet = provider.toComponentPacket(buf, this, writer, player);
+            Packet<?> packet = provider.toComponentPacket(this, writer, player);
 
             if (packet != null) {
                 player.networkHandler.sendPacket(packet);

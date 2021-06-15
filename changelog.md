@@ -3,22 +3,18 @@ Version 3.0.0
 ------------------------------------------------------
 **The breaking changes are here !**
 
-## 3.0.0-nightly.1.17-pre2
-- Updated to 1.17-pre2
-- Fixed networking error in `cardinal-components-scoreboard` when loading a world
-
-## 3.0.0 General Changelog
-
 Additions
 - Ticking components now work on any `BlockEntity`, not just those that already tick in vanilla
 
 Changes
+- Most experimental classes and methods have been promoted to stable
 - Every class remaining in the `nerdhub.component.*` packages has been moved to a `dev.onyxstudios.cca.*` package
-- Replaced specific factory interfaces with a generic variant (eg. `ComponentFactory`)
+- Replaced specific factory interfaces with a generic variant (e.g. `ComponentFactory`)
 - Added `RespawnCopyStrategy#get(ComponentKey)` to retrieve the strategy for a given component
 - `RespawnCopyStrategy` now considers whether the player is switching to another character
     - this can be used by mods which allow switching to another body or taking over the body of another player (e.g. Requiem)
     - Mods that previously used `RespawnCopyStrategy.ALWAYS` may be interested in using `RespawnCopyStrategy.CHARACTER` instead.
+- Initialization errors should now be way less cryptic
 - Updated Mod Menu metadata
 
 Removed

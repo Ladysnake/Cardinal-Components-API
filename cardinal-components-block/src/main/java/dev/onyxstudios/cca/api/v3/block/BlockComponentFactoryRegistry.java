@@ -26,14 +26,12 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.block.entity.BlockEntity;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Predicate;
 
 /**
  * @since 2.5.0
  */
-@ApiStatus.Experimental
 public interface BlockComponentFactoryRegistry {
 
     /**
@@ -59,13 +57,11 @@ public interface BlockComponentFactoryRegistry {
      * @param key    the key of components to attach
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    @ApiStatus.Experimental
     <C extends Component, B extends BlockEntity> Registration<C, B> beginRegistration(Class<B> target, ComponentKey<C> key);
 
-    @ApiStatus.Experimental
     interface Registration<C extends Component, BE extends BlockEntity> {
         /**
-         * Registers a {@link BlockEntityComponentFactory} for all instances of classes that pass the {@code test}.
+         * Registers a {@link ComponentFactory} for all instances of classes that pass the {@code test}.
          *
          * @param test a predicate testing whether the class can have the component attached to its instances
          */

@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.api.v3.level;
 
 import dev.onyxstudios.cca.internal.base.ComponentRegistrationInitializer;
 import net.minecraft.world.WorldProperties;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> item component factories.
@@ -34,7 +33,6 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @since 2.4.0
  */
-@ApiStatus.Experimental
 public interface LevelComponentInitializer extends ComponentRegistrationInitializer {
     /**
      * Called to register component factories for statically declared component types.

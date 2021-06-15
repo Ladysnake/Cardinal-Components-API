@@ -25,13 +25,11 @@ package dev.onyxstudios.cca.api.v3.scoreboard;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.scoreboard.Team;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * The callback interface for receiving global team synchronization events.
  */
 @FunctionalInterface
-@ApiStatus.Experimental
 public interface TeamAddCallback {
     Event<TeamAddCallback> EVENT = EventFactory.createArrayBacked(TeamAddCallback.class, (t) -> {}, listeners -> (team) -> {
         for (TeamAddCallback callback : listeners) {

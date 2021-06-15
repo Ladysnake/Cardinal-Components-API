@@ -38,7 +38,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public final class StaticEntityComponentPlugin extends LazyDispatcher implements EntityComponentFactoryRegistry {
@@ -132,11 +138,6 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     public <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, ComponentFactory<PlayerEntity, P> factory, RespawnCopyStrategy<? super P> respawnStrategy) {
         this.registerFor(PlayerEntity.class, key, factory);
         CardinalEntityInternals.registerRespawnCopyStrat(key, respawnStrategy);
-    }
-
-    @Override
-    public <C extends Component> void setRespawnCopyStrategy(ComponentKey<C> type, RespawnCopyStrategy<? super C> strategy) {
-        CardinalEntityInternals.registerRespawnCopyStrat(type, strategy);
     }
 
     private <C extends Component, F extends C, E extends Entity> void register0(Class<? extends E> target, ComponentKey<? super C> key, ComponentFactory<E, F> factory, Class<C> impl) {

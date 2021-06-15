@@ -32,6 +32,7 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.level.ComponentsLevelNetworking;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
@@ -92,7 +93,8 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Com
 
     @Nullable
     @Override
-    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+        PacketByteBuf buf = PacketByteBufs.create();
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
         return new CustomPayloadS2CPacket(ComponentsLevelNetworking.PACKET_ID, buf);
