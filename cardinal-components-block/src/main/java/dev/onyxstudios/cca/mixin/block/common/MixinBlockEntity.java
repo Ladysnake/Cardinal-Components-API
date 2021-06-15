@@ -29,6 +29,7 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.CardinalComponentsBlock;
 import dev.onyxstudios.cca.internal.block.CardinalBlockInternals;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -101,7 +102,8 @@ public abstract class MixinBlockEntity implements ComponentProvider {
 
     @Nullable
     @Override
-    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+        PacketByteBuf buf = PacketByteBufs.create();
         buf.writeIdentifier(BlockEntityType.getId(this.getType()));
         buf.writeBlockPos(this.getPos());
         buf.writeIdentifier(key.getId());

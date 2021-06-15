@@ -26,12 +26,10 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.world.WorldProperties;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * @since 2.4.0
  */
-@ApiStatus.Experimental
 public interface LevelComponentFactoryRegistry {
     /**
      * Registers a {@link ComponentFactory} for {@link WorldProperties}.

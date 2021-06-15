@@ -29,6 +29,7 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -82,7 +83,8 @@ public abstract class MixinWorldChunk implements Chunk, ComponentProvider {
     }
 
     @Override
-    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+        PacketByteBuf buf = PacketByteBufs.create();
         ChunkPos pos = this.getPos();
         buf.writeInt(pos.x);
         buf.writeInt(pos.z);

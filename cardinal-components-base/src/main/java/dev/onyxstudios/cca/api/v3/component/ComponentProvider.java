@@ -24,6 +24,8 @@ package dev.onyxstudios.cca.api.v3.component;
 
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
+import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -37,7 +39,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.level.LevelProperties;
-import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -116,15 +117,44 @@ public interface ComponentProvider {
     /**
      * @return a runtime-generated component container storing statically declared components.
      */
-    @ApiStatus.Experimental
     ComponentContainer getComponentContainer();
 
+    /**
+     * Retrieves an iterator describing the list of players who may receive
+     * component sync packets from this provider.
+     *
+     * <p>Individual components can {@linkplain PlayerSyncPredicate#shouldSyncWith(ServerPlayerEntity) filter
+     * which players among the returned list should receive their packets};
+     * this method does <em>not</em> take current components into account, so callers should perform
+     * additional checks as needed.
+     *
+     * @return a list of player candidates for receiving component sync packets
+     */
     default Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
+        // TODO 4.0.0 replace with Iterable
         return Collections.emptyIterator();
     }
 
+    /**
+     * Produces a sync packet using the given information.
+     *
+     * @param key the key describing the component being synchronized
+     * @param writer a {@link ComponentPacketWriter} writing the component's data to the packet
+     * @param recipient the player receiving the packet
+     * @return a {@link net.minecraft.network.Packet} that has all the information required to perform the component sync
+     * @since 3.0.0
+     */
     @Nullable
-    @ApiStatus.Experimental
+    default <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+        // TODO 4.0.0 inline
+        return toComponentPacket(PacketByteBufs.create(), key, writer, recipient);
+    }
+
+    /**
+     * @deprecated override/call {@link #toComponentPacket(ComponentKey, ComponentPacketWriter, ServerPlayerEntity)} instead
+     */
+    @SuppressWarnings("unused") @Deprecated(since = "3.0.0", forRemoval = true)
+    @Nullable
     default <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
         return null;
     }

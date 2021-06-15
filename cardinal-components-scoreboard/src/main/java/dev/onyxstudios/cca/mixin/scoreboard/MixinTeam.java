@@ -29,6 +29,7 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking;
 import dev.onyxstudios.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Scoreboard;
@@ -79,7 +80,8 @@ public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
 
     @Nullable
     @Override
-    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+        PacketByteBuf buf = PacketByteBufs.create();
         buf.writeString(this.getName());
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);

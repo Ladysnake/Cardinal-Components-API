@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.scoreboard;
 
+import com.google.common.base.Suppliers;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
@@ -36,20 +37,20 @@ import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Lazy;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public final class StaticScoreboardComponentPlugin extends LazyDispatcher implements ScoreboardComponentFactoryRegistry {
     public static final StaticScoreboardComponentPlugin INSTANCE = new StaticScoreboardComponentPlugin();
-    public static final Lazy<ScoreboardComponentContainerFactory> scoreboardComponentsContainerFactory
-        = new Lazy<>(INSTANCE::buildScoreboardContainerFactory);
-    public static final Lazy<TeamComponentContainerFactory> teamComponentsContainerFactory
-        = new Lazy<>(INSTANCE::buildTeamContainerFactory);
+    public static final Supplier<ScoreboardComponentContainerFactory> scoreboardComponentsContainerFactory
+        = Suppliers.memoize(INSTANCE::buildScoreboardContainerFactory);
+    public static final Supplier<TeamComponentContainerFactory> teamComponentsContainerFactory
+        = Suppliers.memoize(INSTANCE::buildTeamContainerFactory);
 
     private final Map<ComponentKey<?>, ScoreboardComponentFactoryV2<?>> scoreboardFactories = new LinkedHashMap<>();
     private final Map<ComponentKey<?>, Class<? extends Component>> scoreboardComponentImpls = new LinkedHashMap<>();

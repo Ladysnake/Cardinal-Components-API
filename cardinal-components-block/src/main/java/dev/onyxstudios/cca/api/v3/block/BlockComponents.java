@@ -29,7 +29,6 @@ import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
@@ -37,7 +36,6 @@ import java.util.function.BiFunction;
 /**
  * This class consists exclusively of static methods that return a {@link Component} by querying some block context.
  */
-@ApiStatus.Experimental
 public final class BlockComponents {
     /**
      * Retrieves a context-less {@link BlockApiLookup} for the given {@link ComponentKey}.
@@ -52,7 +50,6 @@ public final class BlockComponents {
      * @see #exposeApi(ComponentKey, BlockApiLookup, BiFunction)
      * @since 2.8.0
      */
-    @ApiStatus.Experimental
     public static <C extends Component> BlockApiLookup<C, Void> getApiLookup(ComponentKey<C> key) {
         return BlockApiLookup.get(key.getId(), key.getComponentClass(), Void.class);
     }
@@ -63,7 +60,6 @@ public final class BlockComponents {
      * @see #exposeApi(ComponentKey, BlockApiLookup, BiFunction)
      * @since 2.8.0
      */
-    @ApiStatus.Experimental
     public static <A, T> void exposeApi(ComponentKey<? extends A> key, BlockApiLookup<A, T> apiLookup) {
         apiLookup.registerFallback((world, pos, state, blockEntity, context) -> {
             if (blockEntity != null) {
@@ -102,7 +98,6 @@ public final class BlockComponents {
      *
      * @since 2.8.0
      */
-    @ApiStatus.Experimental
     public static <A, T, C extends Component> void exposeApi(ComponentKey<C> key, BlockApiLookup<A, T> apiLookup, BiFunction<? super C, ? super T, ? extends A> mapper) {
         apiLookup.registerFallback((world, pos, state, blockEntity, context) -> {
             if (blockEntity != null) {
@@ -124,7 +119,6 @@ public final class BlockComponents {
      * @see #exposeApi(ComponentKey, BlockApiLookup, BiFunction)
      * @since 2.8.0
      */
-    @ApiStatus.Experimental
     public static <A, T, C extends Component> void exposeApi(ComponentKey<C> key, BlockApiLookup<A, T> apiLookup, BiFunction<? super C, ? super T, ? extends A> mapper, BlockEntityType<?>... types) {
         apiLookup.registerForBlockEntities((blockEntity, context) -> mapper.apply(key.get(blockEntity), context), types);
     }

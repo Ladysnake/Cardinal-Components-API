@@ -26,13 +26,11 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * The callback interface for receiving scoreboard synchronization events.
  */
 @FunctionalInterface
-@ApiStatus.Experimental
 public interface ScoreboardSyncCallback {
     Event<ScoreboardSyncCallback> EVENT = EventFactory.createArrayBacked(ScoreboardSyncCallback.class, (p, t) -> {}, listeners -> (player, scoreboard) -> {
         for (ScoreboardSyncCallback callback : listeners) {

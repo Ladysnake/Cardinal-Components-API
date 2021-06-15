@@ -115,7 +115,6 @@ public interface ComponentContainer extends NbtSerializable {
          *
          * @return a new container factory builder
          */
-        @ApiStatus.Experimental
         @Contract(value = "-> new", pure = true)
         static Builder<@Nullable Void> builder() {
             return new Builder<>(Void.class);

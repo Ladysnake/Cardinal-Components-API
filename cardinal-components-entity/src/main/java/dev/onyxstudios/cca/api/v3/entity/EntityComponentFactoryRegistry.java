@@ -27,7 +27,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Predicate;
 
@@ -71,7 +70,6 @@ public interface EntityComponentFactoryRegistry {
      * @param key    the key of components to attach
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    @ApiStatus.Experimental
     <C extends Component, E extends Entity> Registration<C, E> beginRegistration(Class<E> target, ComponentKey<C> key);
 
     /**
@@ -82,7 +80,6 @@ public interface EntityComponentFactoryRegistry {
      * @throws NullPointerException if any of the arguments is {@code null}
      * @since 2.6
      */
-    @ApiStatus.Experimental
     <C extends PlayerComponent<? super C>> void registerForPlayers(ComponentKey<? super C> key, ComponentFactory<PlayerEntity, C> factory);
 
     /**
@@ -91,32 +88,15 @@ public interface EntityComponentFactoryRegistry {
      * @param key     the key of components to attach
      * @param factory the factory to use to create components of the given key
      * @throws NullPointerException if any of the arguments is {@code null}
-     * @since 2.5.1
      * @see RespawnCopyStrategy#ALWAYS_COPY
      * @see RespawnCopyStrategy#CHARACTER
      * @see RespawnCopyStrategy#INVENTORY
      * @see RespawnCopyStrategy#LOSSLESS_ONLY
+     * @see Registration#respawnStrategy(RespawnCopyStrategy)
+     * @since 2.5.1
      */
     <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, ComponentFactory<PlayerEntity, P> factory, RespawnCopyStrategy<? super P> respawnStrategy);
 
-    /**
-     * Set the respawn copy strategy used for components of a given type.
-     *
-     * <p> When a player is cloned as part of the respawn process, its components are copied using
-     * a {@link RespawnCopyStrategy}. By default, the strategy used is {@link RespawnCopyStrategy#LOSSLESS_ONLY}.
-     * Calling this method allows one to customize the copy process.
-     *
-     * @param key      the representation of the registered type
-     * @param strategy a copy strategy to use when copying components between player instances
-     * @param <C>      the type of components affected
-     * @see PlayerCopyCallback
-     * @deprecated use {@link Registration#respawnStrategy(RespawnCopyStrategy)}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval
-    <C extends Component> void setRespawnCopyStrategy(ComponentKey<C> key, RespawnCopyStrategy<? super C> strategy);
-
-    @ApiStatus.Experimental
     interface Registration<C extends Component, E extends Entity> {
         /**
          * Registers a {@link ComponentFactory} for all instances of classes that pass the {@code test}.
@@ -143,6 +123,10 @@ public interface EntityComponentFactoryRegistry {
          *
          * @param strategy a copy strategy to use when copying components between player instances
          * @see PlayerCopyCallback
+         * @see RespawnCopyStrategy#ALWAYS_COPY
+         * @see RespawnCopyStrategy#CHARACTER
+         * @see RespawnCopyStrategy#INVENTORY
+         * @see RespawnCopyStrategy#LOSSLESS_ONLY
          */
         Registration<C, E> respawnStrategy(RespawnCopyStrategy<? super C> strategy);
 

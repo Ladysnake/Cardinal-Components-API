@@ -24,12 +24,10 @@ package dev.onyxstudios.cca.api.v3.scoreboard;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * @since 2.4.2
  */
-@ApiStatus.Experimental
 public interface ScoreboardComponentFactoryRegistry {
     /**
      * Registers a {@link TeamComponentFactory}.

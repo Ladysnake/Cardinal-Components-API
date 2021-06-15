@@ -26,7 +26,6 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +36,6 @@ import org.jetbrains.annotations.Nullable;
  *
  * @since 2.4.2
  */
-@ApiStatus.Experimental
 @FunctionalInterface
 public interface TeamComponentFactory<C extends Component> extends TeamComponentFactoryV2<C> {
     @Override
