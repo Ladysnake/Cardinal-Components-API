@@ -25,8 +25,7 @@ package dev.onyxstudios.cca.internal.base;
 import org.jetbrains.annotations.ApiStatus;
 
 public abstract class LazyDispatcher {
-    private volatile boolean requiresInitialization = true;
-    private volatile boolean loading = false;
+    private volatile State state = State.UNLOADED;
     private final String likelyInitTrigger;
 
     protected LazyDispatcher(String likelyInitTrigger) {
@@ -34,22 +33,23 @@ public abstract class LazyDispatcher {
     }
 
     public void ensureInitialized() {
-        if (this.requiresInitialization) {
+        if (this.state == State.ERRED) {
+            throw new IllegalStateException("Initialization failed, check the log above for likely causes");
+        } else if (this.state != State.LOADED) {
             synchronized (this) {
-                if (this.requiresInitialization) {
-                    if (this.loading) {
-                        this.onCircularLoading();
-                    } else {
-                        this.loading = true;
+                if (this.state == State.LOADING) {
+                    this.onCircularLoading();
+                } else if (this.state == State.UNLOADED) {
+                    this.state = State.LOADING;
 
-                        try {
-                            this.init();
-                        } finally {
-                            this.loading = false;
-                        }
-
-                        this.requiresInitialization = false;
+                    try {
+                        this.init();
+                        this.state = State.LOADED;
                         this.postInit();
+                    } catch (Throwable t) {
+                        this.state = State.ERRED;
+                        ComponentsInternals.LOGGER.fatal("[Cardinal Components API] Initialization failed: ", t);
+                        throw t;
                     }
                 }
             }
@@ -57,23 +57,27 @@ public abstract class LazyDispatcher {
     }
 
     protected void onCircularLoading() {
-        throw new IllegalStateException("Circular loading issue, a mod is probably "  + this.likelyInitTrigger + " in the wrong place");
+        throw new IllegalStateException("Circular loading issue, a mod is probably " + this.likelyInitTrigger + " in the wrong place");
     }
 
     protected boolean requiresInitialization() {
-        return this.requiresInitialization;
+        return this.state == State.UNLOADED;
     }
 
     @ApiStatus.OverrideOnly
     protected abstract void init();
 
     public void checkLoading(Class<?> ownerClass, String methodName) {
-        if (!this.loading) {
+        if (this.state != State.LOADING) {
             throw new IllegalStateException(ownerClass.getSimpleName() + "#" + methodName + " called at the wrong time");
         }
     }
 
     protected void postInit() {
         // NO-OP
+    }
+
+    enum State {
+        UNLOADED, LOADING, LOADED, ERRED
     }
 }
