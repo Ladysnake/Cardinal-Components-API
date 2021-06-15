@@ -101,7 +101,7 @@ public class VitalityStickItem extends Item {
         AbstractTeam team = holder.getScoreboardTeam();
         if (team != null) {
             Optional<Vita> vita = TestComponents.VITA.maybeGet(target.getScoreboardTeam());
-            if (!vita.isPresent()) {
+            if (vita.isEmpty()) {
                 vita = TestComponents.VITA.maybeGet(target);
             }
             vita.ifPresent(v -> v.transferTo(Vita.get(team), 1));

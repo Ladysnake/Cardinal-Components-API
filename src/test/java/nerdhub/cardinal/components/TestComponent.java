@@ -24,6 +24,7 @@ package nerdhub.cardinal.components;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.nbt.NbtCompound;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -56,7 +57,7 @@ public interface TestComponent extends Component {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             Impl impl = (Impl) o;

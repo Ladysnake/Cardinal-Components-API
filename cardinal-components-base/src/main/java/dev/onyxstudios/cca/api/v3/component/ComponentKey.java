@@ -142,9 +142,8 @@ public abstract class ComponentKey<C extends Component> {
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
     public <V> void sync(V provider, ComponentPacketWriter packetWriter) {
-        C c = this.get(provider);
-        if (c instanceof AutoSyncedComponent) {
-            this.sync(provider, packetWriter, (AutoSyncedComponent) c);
+        if (this.get(provider) instanceof AutoSyncedComponent synced) {
+            this.sync(provider, packetWriter, synced);
         }
     }
 

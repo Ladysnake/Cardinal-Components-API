@@ -34,7 +34,7 @@ public interface TeamComponentContainerFactory extends ComponentContainer.Factor
 
     @Deprecated
     @Override   // just a dumb hack because I'm too lazy to refactor everything rn
-    default ComponentContainer createContainer(Team obj) {
+    default ComponentContainer createContainer(@Nullable Team obj) {
         throw new UnsupportedOperationException("Not supposed to be called :(");
     }
 }

@@ -39,7 +39,7 @@ public abstract class MixinWorldChunk {
 
     @Shadow
     @Final
-    private World world;
+    World world;
 
     @Nullable
     @ModifyVariable(method = "updateTicker", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/block/BlockState;getBlockEntityTicker(Lnet/minecraft/world/World;Lnet/minecraft/block/entity/BlockEntityType;)Lnet/minecraft/block/entity/BlockEntityTicker;"))
