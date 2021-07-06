@@ -76,13 +76,37 @@ class RandomIntComponent implements IntComponent {
 ```
 *Note: a component class can be reused for several component types*
 
-If you want your component to be **automatically synchronized with watching clients**, you can also add the [`AutoSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/AutoSyncedComponent.java) interface to your implementation.
+If you want your component to be **automatically synchronized with watching clients**, you can also add the [`AutoSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/AutoSyncedComponent.java) interface to your implementation:
+
+```java
+class SyncedIntComponent implements IntComponent, AutoSyncedComponent {
+    private int value;
+    private final Entity provider;  // or World, or whatever you are attaching to
+
+    public SyncedIntComponent(Entity provider) { this.provider = provider; }
+
+    public void setValue(int value) {
+        this.value = value;
+        MyComponents.MAGIK.sync(this.provider); // assuming MAGIK is the right key for this component
+    }
+    // implement everything else
+}
+```
 
 **[[More information on component synchronization]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components)**
 
 If you want your component to **tick alongside its provider**, you can add the [`ServerTickingComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/ServerTickingComponent.java) or [`ClientTickingComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/ClientTickingComponent.java)
 (or both) to your *component interface* (here, `IntComponent`). If you'd rather add the ticking interface to a single
 component subclass, you can use one of the specific methods provided in the individual modules.
+
+```java
+class IncrementingIntComponent implements IntComponent, ServerTickingComponent {
+    private int value;
+    @Override public void serverTick() { this.value++; }
+    // implement everything else
+}
+```
+
 *This feature is still experimental. Serverside ticking is implemented for all providers except item stacks.
  Clientside ticking is only implemented for entities, block entities, and worlds.*
 
