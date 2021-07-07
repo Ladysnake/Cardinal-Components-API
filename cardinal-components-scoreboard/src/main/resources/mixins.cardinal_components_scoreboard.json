@@ -5,6 +5,7 @@
   "package": "dev.onyxstudios.cca.mixin.scoreboard",
   "mixins": [
     "MixinMinecraftServer",
+    "MixinPersistentState",
     "MixinPlayerManager",
     "MixinScoreboard",
     "MixinScoreboardState",
