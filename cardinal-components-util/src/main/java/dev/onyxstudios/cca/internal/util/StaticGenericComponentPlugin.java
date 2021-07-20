@@ -38,7 +38,14 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.Identifier;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public final class StaticGenericComponentPlugin extends LazyDispatcher implements GenericComponentFactoryRegistry {
     public static final StaticGenericComponentPlugin INSTANCE = new StaticGenericComponentPlugin();
@@ -72,7 +79,7 @@ public final class StaticGenericComponentPlugin extends LazyDispatcher implement
             @SuppressWarnings("unchecked") I i = (I) object;
             resolved.put(entry.getKey(), i);
         }
-        Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(componentFactoryType.getRawType(), resolved, getSuffix(genericTypeId));
+        Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(componentFactoryType.getRawType(), resolved, resolved.keySet().stream().collect(Collectors.toMap(Function.identity(), ComponentKey::getComponentClass)), getSuffix(genericTypeId));
         this.claimedFactories.add(genericTypeId);
         return containerClass;
     }
