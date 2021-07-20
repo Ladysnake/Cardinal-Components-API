@@ -63,7 +63,7 @@ public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
         this.components = StaticScoreboardComponentPlugin.teamComponentsContainerFactory.get().create(
             (Team) (Object) this,
             this.scoreboard,
-            this.scoreboard instanceof ServerScoreboardAccessor ? ((ServerScoreboardAccessor) this.scoreboard).getServer() : null
+            this.scoreboard instanceof ServerScoreboardAccessor acc ? acc.getServer() : null
         );
     }
 

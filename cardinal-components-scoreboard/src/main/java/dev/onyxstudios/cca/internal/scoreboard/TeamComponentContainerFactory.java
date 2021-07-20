@@ -29,12 +29,6 @@ import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 
 @FunctionalInterface
-public interface TeamComponentContainerFactory extends ComponentContainer.Factory<Team> {
+public interface TeamComponentContainerFactory {
     ComponentContainer create(Team team, Scoreboard scoreboard, @Nullable MinecraftServer server);
-
-    @Deprecated
-    @Override   // just a dumb hack because I'm too lazy to refactor everything rn
-    default ComponentContainer createContainer(@Nullable Team obj) {
-        throw new UnsupportedOperationException("Not supposed to be called :(");
-    }
 }
