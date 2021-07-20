@@ -27,6 +27,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Predicate;
 
@@ -104,6 +105,17 @@ public interface EntityComponentFactoryRegistry {
          * @param test a predicate testing whether the class can have the component attached to its instances
          */
         Registration<C, E> filter(Predicate<Class<? extends E>> test);
+
+        /**
+         * Require that the component factory being registered gets called after the component factory for the given dependency.
+         *
+         * <p>An error will be thrown if a circular dependency appears,
+         * or if the dependency cannot be satisfied.
+         *
+         * @param dependency the {@link ComponentKey} describing the component on which to depend
+         */
+        @ApiStatus.Experimental
+        Registration<C, E> after(ComponentKey<?> dependency);
 
         /**
          * Specify the implementation class that will be produced by the factory.

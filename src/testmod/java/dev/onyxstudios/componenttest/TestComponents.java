@@ -85,7 +85,7 @@ public final class TestComponents implements
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.registerFor(HostileEntity.class, ALT_VITA, e -> new BaseVita());
+        registry.beginRegistration(HostileEntity.class, ALT_VITA).after(VITA).end(e -> new BaseVita());
         registry.registerFor(LivingEntity.class, VITA, TestComponents::createForEntity);
         registry.beginRegistration(PlayerEntity.class, VITA).impl(PlayerVita.class).end(PlayerVita::new);
         registry.registerFor(VitalityZombieEntity.class, VITA, VitalityZombieEntity::createVitaComponent);

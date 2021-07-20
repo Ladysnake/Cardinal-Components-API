@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
+import com.google.common.collect.Lists;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
@@ -33,7 +34,11 @@ import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 
@@ -44,9 +49,14 @@ import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class CcaAsmHelper {
@@ -148,12 +158,17 @@ public final class CcaAsmHelper {
      * <strong>This method must not be called before the static component container interface has been defined!</strong>
      *
      * @param componentFactoryType the interface implemented by the component factories used to initialize this container
-     * @param componentFactories   a map of {@link ComponentKey} ids to factories for components of that type
+     * @param componentFactories   a map of {@link ComponentKey}s to factories for components of that type
+     * @param componentImpls       a map of {@link ComponentKey}s to their actual implementation classes for the container
      * @param implNameSuffix       a unique suffix for the generated class
      * @return the generated container class
      */
-    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, String implNameSuffix) throws IOException {
-        return spinComponentContainer(componentFactoryType, componentFactories, componentFactories.keySet().stream().collect(Collectors.toMap(Function.identity(), ComponentKey::getComponentClass)), implNameSuffix);
+    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, Map<ComponentKey<?>, Class<? extends Component>> componentImpls, String implNameSuffix) throws IOException {
+        Map<ComponentKey<?>, QualifiedComponentFactory<I>> merged = new LinkedHashMap<>();
+        for (var entry : componentFactories.entrySet()) {
+            merged.put(entry.getKey(), new QualifiedComponentFactory<>(entry.getValue(), componentImpls.get(entry.getKey()), Set.of()));
+        }
+        return spinComponentContainer(componentFactoryType, merged, implNameSuffix);
     }
 
     /**
@@ -163,14 +178,14 @@ public final class CcaAsmHelper {
      * <strong>This method must not be called before the static component container interface has been defined!</strong>
      *
      * @param componentFactoryType the interface implemented by the component factories used to initialize this container
-     * @param componentFactories   a map of {@link ComponentKey}s to factories for components of that type
-     * @param componentImpls       a map of {@link ComponentKey}s to their actual implementation classes for the container
+     * @param componentFactories   a map of {@link ComponentKey} ids to factories for components of that type
      * @param implNameSuffix       a unique suffix for the generated class
      * @return the generated container class
      */
-    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, Map<ComponentKey<?>, Class<? extends Component>> componentImpls, String implNameSuffix) throws IOException {
+    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, QualifiedComponentFactory<I>> componentFactories, String implNameSuffix) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
 
+        Map<ComponentKey<?>, QualifiedComponentFactory<I>> sorted = sort(componentFactories);
         checkValidJavaIdentifier(implNameSuffix);
         String containerImplName = STATIC_COMPONENT_CONTAINER + '_' + implNameSuffix;
         String componentFactoryName = Type.getInternalName(componentFactoryType);
@@ -205,7 +220,7 @@ public final class CcaAsmHelper {
 
         MethodVisitor hasComponents = classNode.visitMethod(Opcodes.ACC_PUBLIC, "hasComponents", "()Z", null, null);
         hasComponents.visitCode();
-        hasComponents.visitLdcInsn(!componentFactories.isEmpty());
+        hasComponents.visitLdcInsn(!sorted.isEmpty());
         hasComponents.visitInsn(Opcodes.IRETURN);
         hasComponents.visitEnd();
 
@@ -219,10 +234,10 @@ public final class CcaAsmHelper {
         MethodVisitor clientTick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickClientComponents", "()V", null, null);
         clientTick.visitCode();
 
-        for (ComponentKey<?> key : componentFactories.keySet()) {
-            Identifier identifier = key.getId();
+        for (var entry : sorted.entrySet()) {
+            Identifier identifier = entry.getKey().getId();
             String componentFieldName = getJavaIdentifierName(identifier);
-            Class<? extends Component> impl = componentImpls.get(key);
+            Class<? extends Component> impl = entry.getValue().impl();
             String componentFieldDescriptor = Type.getDescriptor(impl);
             String factoryFieldName = getFactoryFieldName(identifier);
             /* field declaration */
@@ -298,21 +313,80 @@ public final class CcaAsmHelper {
             Field keySet = ret.getDeclaredField("componentKeys");
             keySet.setAccessible(true);
             // TODO use a custom class with baked in immutability + BitSet contains + array iterator
-            keySet.set(null, Collections.unmodifiableSet(new ReferenceArraySet<>(componentFactories.keySet())));
+            keySet.set(null, Collections.unmodifiableSet(new ReferenceArraySet<>(sorted.keySet())));
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new StaticComponentLoadingException("Failed to initialize the set of component keys for " + ret, e);
         }
 
-        for (Map.Entry<ComponentKey<?>, I> entry : componentFactories.entrySet()) {
+        for (var entry : sorted.entrySet()) {
             try {
                 Field factoryField = ret.getDeclaredField(getFactoryFieldName(entry.getKey().getId()));
                 factoryField.setAccessible(true);
-                factoryField.set(null, entry.getValue());
+                factoryField.set(null, entry.getValue().factory());
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new StaticComponentLoadingException("Failed to initialize factory field for component type " + entry.getKey(), e);
             }
         }
         return ret;
+    }
+
+    /**
+     * Sorts factories according to their dependencies using Depth-First Search Topological Sorting
+     *
+     * @param factories the list of factories being sorted
+     * @return a sorted list of factories
+     */
+    private static <I> Map<ComponentKey<?>, QualifiedComponentFactory<I>> sort(Map<ComponentKey<?>, QualifiedComponentFactory<I>> factories) {
+        checkDependenciesSatisfied(factories);
+        // reset
+        factories.values().forEach(f -> f.sortingState = QualifiedComponentFactory.SortingState.UNSORTED);
+        // If there is no explicit dependency, we want everything to stay in the same order
+        // We are *prepending* visited nodes to the output list, so we need to visit in reverse order
+        List<Map.Entry<ComponentKey<?>, QualifiedComponentFactory<I>>> in = Lists.reverse(new ArrayList<>(factories.entrySet()));
+        Deque<Map.Entry<ComponentKey<?>, QualifiedComponentFactory<I>>> out = new ArrayDeque<>();
+        while (!in.isEmpty()) { // can't use an iterator because sweet CME's
+            visitComponentNode(in, in.get(0), out);
+        }
+        return out.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (c1, c2) -> c1, LinkedHashMap::new));
+    }
+
+    private static <I> void checkDependenciesSatisfied(Map<ComponentKey<?>, QualifiedComponentFactory<I>> factories) {
+        RuntimeException ex = null;
+        for (var checked : factories.entrySet()) {
+            for (ComponentKey<?> dependency : checked.getValue().dependencies()) {
+                if (!factories.containsKey(dependency)) {
+                    RuntimeException ex1 = new StaticComponentLoadingException("Unsatisfied dependency for " + checked.getKey() + ": " + dependency);
+                    if (ex == null) {
+                        ex = ex1;
+                    } else {
+                        ex.addSuppressed(ex1);
+                    }
+                }
+            }
+        }
+        if (ex != null) throw ex;
+    }
+
+    private static <I> void visitComponentNode(List<Map.Entry<ComponentKey<?>, QualifiedComponentFactory<I>>> factories, Map.Entry<ComponentKey<?>, QualifiedComponentFactory<I>> node, Deque<Map.Entry<ComponentKey<?>, QualifiedComponentFactory<I>>> out) {
+        switch (node.getValue().sortingState) {
+            case SORTED -> {}
+            case SORTING -> throw new StaticComponentLoadingException("Circular dependency detected: " + node.getKey());
+            case UNSORTED -> {
+                node.getValue().sortingState = QualifiedComponentFactory.SortingState.SORTING;
+                // OPTI: indexing dependencies beforehand would let us run in linear time
+                try {
+                    // Beware, CME's ahoy
+                    for (var dependant : factories.stream().filter(entry -> entry.getValue().dependencies().contains(node.getKey())).toList()) {
+                        visitComponentNode(factories, dependant, out);
+                    }
+                } catch (StaticComponentLoadingException e) {
+                    throw new StaticComponentLoadingException(e.getMessage() + " <- " + node.getKey());
+                }
+                factories.remove(node);
+                node.getValue().sortingState = QualifiedComponentFactory.SortingState.SORTED;
+                out.addFirst(node);
+            }
+        }
     }
 
     private static void generateTickImpl(String containerImplName, MethodVisitor tick, String componentFieldName, Class<? extends Component> impl, String componentFieldDescriptor, String target) {
@@ -338,4 +412,5 @@ public final class CcaAsmHelper {
             }
         }
     }
+
 }
