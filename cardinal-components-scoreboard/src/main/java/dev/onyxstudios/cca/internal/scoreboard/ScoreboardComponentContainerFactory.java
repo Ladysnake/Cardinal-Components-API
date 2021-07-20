@@ -28,12 +28,6 @@ import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 
 @FunctionalInterface
-public interface ScoreboardComponentContainerFactory extends ComponentContainer.Factory<Scoreboard> {
+public interface ScoreboardComponentContainerFactory {
     ComponentContainer create(Scoreboard scoreboard, @Nullable MinecraftServer server);
-
-    @Deprecated
-    @Override   // just a dumb hack because I'm too lazy to refactor everything rn
-    default ComponentContainer createContainer(@Nullable Scoreboard obj) {
-        throw new UnsupportedOperationException("Not supposed to be called :(");
-    }
 }

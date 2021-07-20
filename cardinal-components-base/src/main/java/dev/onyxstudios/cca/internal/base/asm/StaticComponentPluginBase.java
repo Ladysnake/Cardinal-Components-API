@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
 public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
@@ -59,13 +60,26 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
      * the given implementation type, using an argument of the given {@code factoryArg} type.
      *
      * <p>The generated class has a single constructor, taking {@code eventCount} parameters of type {@link Event}.
+     *  @param implNameSuffix       a unique suffix for the generated class
+     * @param containerFactoryType the factory interface that is to be implemented by the returned class
+     * @param containerImpl        the type of containers that is to be instantiated by the generated factory
+     */
+    public static <I> Class<? extends I> spinContainerFactory(String implNameSuffix, Class<? super I> containerFactoryType, Class<? extends ComponentContainer> containerImpl, Class<?>... actualFactoryParams) throws IOException {
+        return spinContainerFactory(implNameSuffix, containerFactoryType, containerImpl, List.of(actualFactoryParams));
+    }
+
+    /**
+     * Defines an implementation of {@code I} which creates component containers of
+     * the given implementation type, using an argument of the given {@code factoryArg} type.
+     *
+     * <p>The generated class has a single constructor, taking {@code eventCount} parameters of type {@link Event}.
      *
      * @param implNameSuffix       a unique suffix for the generated class
      * @param containerFactoryType the factory interface that is to be implemented by the returned class
      * @param containerImpl        the type of containers that is to be instantiated by the generated factory
      * @param actualFactoryParams  the actual type of the arguments taken by the {@link ComponentContainer} constructor
      */
-    public static <I> Class<? extends I> spinContainerFactory(String implNameSuffix, Class<? super I> containerFactoryType, Class<? extends ComponentContainer> containerImpl, Class<?>... actualFactoryParams) throws IOException {
+    public static <I> Class<? extends I> spinContainerFactory(String implNameSuffix, Class<? super I> containerFactoryType, Class<? extends ComponentContainer> containerImpl, List<Class<?>> actualFactoryParams) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
 
         CcaAsmHelper.checkValidJavaIdentifier(implNameSuffix);
@@ -77,8 +91,8 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
 
         Method factorySam = CcaAsmHelper.findSam(containerFactoryType);
 
-        if (factorySam.getParameterCount() != actualFactoryParams.length) {
-            throw new IllegalArgumentException("Actual argument list length mismatches with factory SAM: " + Arrays.toString(actualFactoryParams) + " and " + factorySam);
+        if (factorySam.getParameterCount() != actualFactoryParams.size()) {
+            throw new IllegalArgumentException("Actual argument list length mismatches with factory SAM: " + actualFactoryParams + " and " + factorySam);
         }
 
         if (constructors[0].getParameterCount() != factorySam.getParameterCount()) {
@@ -91,8 +105,8 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
             factoryArgs = new Type[factoryParamClasses.length];
 
             for (int i = 0; i < factoryParamClasses.length; i++) {
-                if (!factoryParamClasses[i].isAssignableFrom(actualFactoryParams[i])) {
-                    throw new IllegalArgumentException("Container factory parameter " + factoryParamClasses[i].getSimpleName() + " is not assignable from specified actual parameter " + actualFactoryParams[i].getSimpleName() + "(" + factorySam + ", " + Arrays.toString(actualFactoryParams) + ")");
+                if (!factoryParamClasses[i].isAssignableFrom(actualFactoryParams.get(i))) {
+                    throw new IllegalArgumentException("Container factory parameter %s is not assignable from specified actual parameter %s(%s, %s)".formatted(factoryParamClasses[i].getSimpleName(), actualFactoryParams.get(i).getSimpleName(), factorySam, actualFactoryParams));
                 }
                 factoryArgs[i] = Type.getType(factoryParamClasses[i]);
             }
@@ -112,10 +126,10 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
         createContainer.visitTypeInsn(Opcodes.NEW, containerImplName);
         createContainer.visitInsn(Opcodes.DUP);
         // stack: container, container
-        for (int i = 0; i < actualFactoryParams.length; i++) {
+        for (int i = 0; i < actualFactoryParams.size(); i++) {
             createContainer.visitVarInsn(factoryArgs[i].getOpcode(Opcodes.ILOAD), i + 1);
             if (factoryArgs[i].getSort() == Type.OBJECT || factoryArgs[i].getSort() == Type.ARRAY) {
-                createContainer.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(actualFactoryParams[i]));
+                createContainer.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(actualFactoryParams.get(i)));
             }
         }
         // stack: container, container, actualFactoryArgs...
