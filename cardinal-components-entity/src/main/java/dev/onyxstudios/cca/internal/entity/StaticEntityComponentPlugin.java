@@ -145,6 +145,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
 
         @SuppressWarnings("unchecked") var factory1 = (QualifiedComponentFactory<ComponentFactory<? extends Entity, ?>>) (QualifiedComponentFactory<?>) factory;
         specializedMap.put(key, factory1);
+        QualifiedComponentFactory.checkDependencies(specializedMap);
     }
 
     private final class PredicatedComponentFactory<C extends Component> {
