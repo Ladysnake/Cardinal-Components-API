@@ -57,7 +57,11 @@ public abstract class GenericContainerBuilder<I, R> {
 
     @Contract(mutates = "this")
     protected <C extends Component> void addComponent(ComponentKey<? super C> key, Class<C> implClass, I factory) {
-        this.factories.put(key, new QualifiedComponentFactory<>(factory, implClass, Set.of()));
+        addComponent(key, new QualifiedComponentFactory<I>(factory, implClass, Set.of()));
+    }
+
+    protected <C extends Component> void addComponent(ComponentKey<? super C> key, QualifiedComponentFactory<I> value) {
+        this.factories.put(key, value);
     }
 
     protected R build(@Nullable String factoryNameSuffix, R emptyFactory, Class<? super I> componentFactoryClass, Class<? super R> containerFactoryType, List<Class<?>> argClasses) {
@@ -89,6 +93,11 @@ public abstract class GenericContainerBuilder<I, R> {
         @Override
         public <C extends Component> void addComponent(ComponentKey<? super C> key, Class<C> implClass, I factory) {
             super.addComponent(key, implClass, factory);
+        }
+
+        @Override
+        public <C extends Component> void addComponent(ComponentKey<? super C> key, QualifiedComponentFactory<I> value) {
+            super.addComponent(key, value);
         }
 
         @Override

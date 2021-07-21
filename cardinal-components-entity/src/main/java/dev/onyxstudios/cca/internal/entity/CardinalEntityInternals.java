@@ -61,7 +61,9 @@ public final class CardinalEntityInternals {
 
     // can be called from both client and server thread, see issue #26
     private static synchronized ComponentContainer.Factory<Entity> getEntityFactory(Class<? extends Entity> entityClass) {
-        // need to check again despite synchronization, because the factory may have been generated while waiting
+        // need to check again despite synchronization, because
+        // 1- recursive calls
+        // 2- the factory may have been generated while waiting from createComponents
         ComponentContainer.Factory<Entity> existing = entityContainerFactories.get(entityClass);
         if (existing != null) return existing;
 

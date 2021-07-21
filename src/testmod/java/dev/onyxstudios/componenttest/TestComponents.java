@@ -52,6 +52,7 @@ import net.minecraft.block.entity.EndGatewayBlockEntity;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
@@ -89,6 +90,7 @@ public final class TestComponents implements
         registry.registerFor(LivingEntity.class, VITA, TestComponents::createForEntity);
         registry.beginRegistration(PlayerEntity.class, VITA).impl(PlayerVita.class).end(PlayerVita::new);
         registry.registerFor(VitalityZombieEntity.class, VITA, VitalityZombieEntity::createVitaComponent);
+        registry.beginRegistration(LivingEntity.class, ALT_VITA).filter(CowEntity.class::isAssignableFrom).end(TestComponents::createForEntity);
     }
 
     @Override
