@@ -23,7 +23,12 @@
 package dev.onyxstudios.cca.internal.item;
 
 import com.google.common.collect.Iterables;
-import dev.onyxstudios.cca.api.v3.component.*;
+import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentV3;
+import dev.onyxstudios.cca.api.v3.component.TransientComponent;
 import dev.onyxstudios.cca.api.v3.item.ItemComponent;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
@@ -37,7 +42,11 @@ import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public final class StaticItemComponentPlugin extends LazyDispatcher implements ItemComponentFactoryRegistry {
@@ -66,7 +75,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         }
 
         if (this.componentFactories.containsKey(itemId)) {
-            return this.componentFactories.get(itemId).build(getSuffix(itemId));
+            return this.componentFactories.get(itemId).factoryNameSuffix(getSuffix(itemId)).build();
         }
 
         return this.emptyFactory;

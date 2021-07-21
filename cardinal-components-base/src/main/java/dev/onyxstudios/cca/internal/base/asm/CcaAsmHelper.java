@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
-import com.google.common.collect.Lists;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
@@ -30,6 +29,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.internal.base.AbstractComponentContainer;
+import dev.onyxstudios.cca.internal.base.QualifiedComponentFactory;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
@@ -49,15 +49,10 @@ import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class CcaAsmHelper {
 
@@ -162,7 +157,9 @@ public final class CcaAsmHelper {
      * @param componentImpls       a map of {@link ComponentKey}s to their actual implementation classes for the container
      * @param implNameSuffix       a unique suffix for the generated class
      * @return the generated container class
+     * @deprecated cannot remove in 1.17 because internal compatibility
      */
+    @Deprecated(forRemoval = true)
     public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, Map<ComponentKey<?>, Class<? extends Component>> componentImpls, String implNameSuffix) throws IOException {
         Map<ComponentKey<?>, QualifiedComponentFactory<I>> merged = new LinkedHashMap<>();
         for (var entry : componentFactories.entrySet()) {
@@ -185,7 +182,7 @@ public final class CcaAsmHelper {
     public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, QualifiedComponentFactory<I>> componentFactories, String implNameSuffix) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
 
-        Map<ComponentKey<?>, QualifiedComponentFactory<I>> sorted = sort(componentFactories);
+        Map<ComponentKey<?>, QualifiedComponentFactory<I>> sorted = QualifiedComponentFactory.sort(componentFactories);
         checkValidJavaIdentifier(implNameSuffix);
         String containerImplName = STATIC_COMPONENT_CONTAINER + '_' + implNameSuffix;
         String componentFactoryName = Type.getInternalName(componentFactoryType);
@@ -265,7 +262,9 @@ public final class CcaAsmHelper {
             // initialize the component by calling the factory
             init.visitMethodInsn(Opcodes.INVOKEINTERFACE, componentFactoryName, sam.getName(), samDescriptor, true);
             // stack: component
-            init.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Objects", "requireNonNull", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
+            init.visitLdcInsn("Component factory " + entry.getValue().factory().getClass() + " for " + identifier + " produced a null component");
+            // stack: component, errorMsg
+            init.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Objects", "requireNonNull", "(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;", false);
             // stack: object
             init.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(impl));
             // stack: component
@@ -328,65 +327,6 @@ public final class CcaAsmHelper {
             }
         }
         return ret;
-    }
-
-    /**
-     * Sorts factories according to their dependencies using Depth-First Search Topological Sorting
-     *
-     * @param factories the list of factories being sorted
-     * @return a sorted list of factories
-     */
-    private static <I> Map<ComponentKey<?>, QualifiedComponentFactory<I>> sort(Map<ComponentKey<?>, QualifiedComponentFactory<I>> factories) {
-        checkDependenciesSatisfied(factories);
-        // reset
-        factories.values().forEach(f -> f.sortingState = QualifiedComponentFactory.SortingState.UNSORTED);
-        // If there is no explicit dependency, we want everything to stay in the same order
-        // We are *prepending* visited nodes to the output list, so we need to visit in reverse order
-        List<Map.Entry<ComponentKey<?>, QualifiedComponentFactory<I>>> in = Lists.reverse(new ArrayList<>(factories.entrySet()));
-        Deque<Map.Entry<ComponentKey<?>, QualifiedComponentFactory<I>>> out = new ArrayDeque<>();
-        while (!in.isEmpty()) { // can't use an iterator because sweet CME's
-            visitComponentNode(in, in.get(0), out);
-        }
-        return out.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (c1, c2) -> c1, LinkedHashMap::new));
-    }
-
-    private static <I> void checkDependenciesSatisfied(Map<ComponentKey<?>, QualifiedComponentFactory<I>> factories) {
-        RuntimeException ex = null;
-        for (var checked : factories.entrySet()) {
-            for (ComponentKey<?> dependency : checked.getValue().dependencies()) {
-                if (!factories.containsKey(dependency)) {
-                    RuntimeException ex1 = new StaticComponentLoadingException("Unsatisfied dependency for " + checked.getKey() + ": " + dependency);
-                    if (ex == null) {
-                        ex = ex1;
-                    } else {
-                        ex.addSuppressed(ex1);
-                    }
-                }
-            }
-        }
-        if (ex != null) throw ex;
-    }
-
-    private static <I> void visitComponentNode(List<Map.Entry<ComponentKey<?>, QualifiedComponentFactory<I>>> factories, Map.Entry<ComponentKey<?>, QualifiedComponentFactory<I>> node, Deque<Map.Entry<ComponentKey<?>, QualifiedComponentFactory<I>>> out) {
-        switch (node.getValue().sortingState) {
-            case SORTED -> {}
-            case SORTING -> throw new StaticComponentLoadingException("Circular dependency detected: " + node.getKey());
-            case UNSORTED -> {
-                node.getValue().sortingState = QualifiedComponentFactory.SortingState.SORTING;
-                // OPTI: indexing dependencies beforehand would let us run in linear time
-                try {
-                    // Beware, CME's ahoy
-                    for (var dependant : factories.stream().filter(entry -> entry.getValue().dependencies().contains(node.getKey())).toList()) {
-                        visitComponentNode(factories, dependant, out);
-                    }
-                } catch (StaticComponentLoadingException e) {
-                    throw new StaticComponentLoadingException(e.getMessage() + " <- " + node.getKey());
-                }
-                factories.remove(node);
-                node.getValue().sortingState = QualifiedComponentFactory.SortingState.SORTED;
-                out.addFirst(node);
-            }
-        }
     }
 
     private static void generateTickImpl(String containerImplName, MethodVisitor tick, String componentFieldName, Class<? extends Component> impl, String componentFieldDescriptor, String target) {

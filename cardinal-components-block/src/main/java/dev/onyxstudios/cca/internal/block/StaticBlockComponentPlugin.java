@@ -32,7 +32,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
-import dev.onyxstudios.cca.internal.base.asm.QualifiedComponentFactory;
+import dev.onyxstudios.cca.internal.base.QualifiedComponentFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -48,7 +48,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -111,13 +110,14 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
             }
         }
 
-        ComponentContainer.Factory.Builder<BlockEntity> builder = ComponentContainer.Factory.builder(BlockEntity.class);
+        ComponentContainer.Factory.Builder<BlockEntity> builder = ComponentContainer.Factory.builder(BlockEntity.class)
+            .factoryNameSuffix(getSuffix(entityClass));
 
-        for (Map.Entry<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<? extends BlockEntity, ?>>> entry : compiled.entrySet()) {
+        for (var entry : compiled.entrySet()) {
             addToBuilder(builder, entry);
         }
 
-        return builder.build(getSuffix(entityClass));
+        return builder.build();
     }
 
     private <C extends Component> void addToBuilder(ComponentContainer.Factory.Builder<BlockEntity> builder, Map.Entry<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<? extends BlockEntity, ?>>> entry) {
@@ -140,8 +140,8 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
             throw new StaticComponentLoadingException("Duplicate factory declarations for %s on %s: %s and %s".formatted(type.getId(), target, factory, previousFactory));
         }
 
-        ComponentFactory<E, Component> checked = entity -> Objects.requireNonNull(((ComponentFactory<E, ?>) factory.factory()).createComponent(entity), "Component factory %s for %s returned null on %s".formatted(factory, type.getId(), entity.getClass().getSimpleName()));
-        specializedMap.put(type, new QualifiedComponentFactory<>(checked, factory.impl(), factory.dependencies()));
+        @SuppressWarnings("unchecked") var factory1 = (QualifiedComponentFactory<ComponentFactory<? extends BlockEntity, ?>>) (QualifiedComponentFactory<?>) factory;
+        specializedMap.put(type, factory1);
     }
 
     @Override

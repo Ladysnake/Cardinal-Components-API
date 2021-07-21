@@ -38,7 +38,6 @@ import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 public final class StaticScoreboardComponentPlugin extends LazyDispatcher implements ScoreboardComponentFactoryRegistry {
@@ -48,31 +47,29 @@ public final class StaticScoreboardComponentPlugin extends LazyDispatcher implem
     public static final Supplier<TeamComponentContainerFactory> teamComponentsContainerFactory
         = Suppliers.memoize(INSTANCE::buildTeamContainerFactory);
 
-    private final GenericContainerBuilder.SimpleImpl<ScoreboardComponentFactoryV2<?>, ScoreboardComponentContainerFactory> scoreboardFactories = new GenericContainerBuilder.SimpleImpl<>();
-    private final GenericContainerBuilder.SimpleImpl<TeamComponentFactoryV2<?>, TeamComponentContainerFactory> teamFactories = new GenericContainerBuilder.SimpleImpl<>();
+    private final GenericContainerBuilder.SimpleImpl<ScoreboardComponentFactoryV2<?>, ScoreboardComponentContainerFactory> scoreboardFactories = new GenericContainerBuilder.SimpleImpl<>(
+        ScoreboardComponentFactoryV2.class,
+        ScoreboardComponentContainerFactory.class,
+        List.of(Scoreboard.class, MinecraftServer.class),
+        (scoreboard, server) -> ComponentContainer.EMPTY
+    );
+    private final GenericContainerBuilder.SimpleImpl<TeamComponentFactoryV2<?>, TeamComponentContainerFactory> teamFactories = new GenericContainerBuilder.SimpleImpl<>(
+        TeamComponentFactoryV2.class,
+        TeamComponentContainerFactory.class,
+        List.of(Team.class, Scoreboard.class, MinecraftServer.class),
+        (team, scoreboard, server) -> ComponentContainer.EMPTY
+    );
 
     private ScoreboardComponentContainerFactory buildScoreboardContainerFactory() {
         this.ensureInitialized();
 
-        return scoreboardFactories.build(
-            "ScoreboardImpl",
-            (sc, s) -> ComponentContainer.EMPTY,
-            ScoreboardComponentFactoryV2.class,
-            ScoreboardComponentContainerFactory.class,
-            List.of(Scoreboard.class, MinecraftServer.class)
-        );
+        return scoreboardFactories.factoryNameSuffix("ScoreboardImpl").build();
     }
 
     private TeamComponentContainerFactory buildTeamContainerFactory() {
         this.ensureInitialized();
 
-        return teamFactories.build(
-            "TeamImpl",
-            (t, sc, s) -> ComponentContainer.EMPTY,
-            TeamComponentFactoryV2.class,
-            TeamComponentContainerFactory.class,
-            List.of(Team.class, Scoreboard.class, MinecraftServer.class)
-        );
+        return teamFactories.factoryNameSuffix("TeamImpl").build();
     }
 
     private StaticScoreboardComponentPlugin() {
@@ -95,7 +92,7 @@ public final class StaticScoreboardComponentPlugin extends LazyDispatcher implem
     @Override
     public <C extends Component> void registerScoreboardComponent(ComponentKey<? super C> type, Class<C> impl, ScoreboardComponentFactoryV2<? extends C> factory) {
         this.checkLoading(ScoreboardComponentFactoryRegistry.class, "registerForScoreboards");
-        this.scoreboardFactories.addComponent(type, impl, (scoreboard, server) -> Objects.requireNonNull(((ScoreboardComponentFactoryV2<?>) factory).createForScoreboard(scoreboard, server), "Component factory %s for %s returned null on %s".formatted(factory, type.getId(), scoreboard.getClass().getSimpleName())));
+        this.scoreboardFactories.addComponent(type, impl, factory);
     }
 
     @Override
@@ -106,6 +103,6 @@ public final class StaticScoreboardComponentPlugin extends LazyDispatcher implem
     @Override
     public <C extends Component> void registerTeamComponent(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactoryV2<? extends C> factory) {
         this.checkLoading(ScoreboardComponentFactoryRegistry.class, "register");
-        this.teamFactories.addComponent(type, impl, (team, scoreboard, server) -> Objects.requireNonNull(((TeamComponentFactoryV2<?>) factory).createForTeam(team, scoreboard, server), "Component factory %s for %s returned null on %s".formatted(factory, type.getId(), scoreboard.getClass().getSimpleName())));
+        this.teamFactories.addComponent(type, impl, factory);
     }
 }
