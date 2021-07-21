@@ -28,7 +28,6 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import net.minecraft.entity.Entity;
 
 import java.util.HashMap;
@@ -69,8 +68,7 @@ public final class CardinalEntityInternals {
 
         ComponentContainer.Factory<Entity> factory;
         if (StaticEntityComponentPlugin.INSTANCE.requiresStaticFactory(entityClass)) {
-            @SuppressWarnings("unchecked") var factoryClass = (Class<? extends ComponentContainer.Factory<Entity>>) StaticEntityComponentPlugin.INSTANCE.spinDedicatedFactory(entityClass);
-            factory = ComponentsInternals.createFactory(factoryClass);
+            factory = StaticEntityComponentPlugin.INSTANCE.buildDedicatedFactory(entityClass);
         } else {
             @SuppressWarnings("unchecked") var superclass = (Class<? extends Entity>) entityClass.getSuperclass();
             assert Entity.class.isAssignableFrom(superclass) : "requiresStaticFactory returned false on Entity?";

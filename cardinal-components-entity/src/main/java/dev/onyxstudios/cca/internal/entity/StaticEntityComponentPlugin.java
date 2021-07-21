@@ -31,14 +31,12 @@ import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
-import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
-import dev.onyxstudios.cca.internal.base.asm.QualifiedComponentFactory;
+import dev.onyxstudios.cca.internal.base.QualifiedComponentFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,7 +44,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -63,7 +60,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     }
 
     private final List<PredicatedComponentFactory<?>> dynamicFactories = new ArrayList<>();
-    private final Map<Class<? extends Entity>, Map<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<?, ?>>>> componentFactories = new HashMap<>();
+    private final Map<Class<? extends Entity>, Map<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<? extends Entity, ?>>>> componentFactories = new HashMap<>();
 
     public boolean requiresStaticFactory(Class<? extends Entity> entityClass) {
         this.ensureInitialized();
@@ -75,7 +72,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         return entityClass == Entity.class || this.componentFactories.containsKey(entityClass);
     }
 
-    public Class<? extends ComponentContainer.Factory<?>> spinDedicatedFactory(Class<? extends Entity> entityClass) {
+    public ComponentContainer.Factory<Entity> buildDedicatedFactory(Class<? extends Entity> entityClass) {
         this.ensureInitialized();
 
         var compiled = new LinkedHashMap<>(this.componentFactories.getOrDefault(entityClass, Collections.emptyMap()));
@@ -86,14 +83,21 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
             this.componentFactories.getOrDefault(type, Collections.emptyMap()).forEach(compiled::putIfAbsent);
         }
 
-        String implSuffix = getSuffix(entityClass);
+        ComponentContainer.Factory.Builder<Entity> builder = ComponentContainer.Factory.builder(Entity.class)
+            .factoryNameSuffix(getSuffix(entityClass));
 
-        try {
-            Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(ComponentFactory.class, compiled, implSuffix);
-            return StaticComponentPluginBase.spinContainerFactory(implSuffix, ComponentContainer.Factory.class, containerCls, entityClass);
-        } catch (IOException e) {
-            throw new StaticComponentLoadingException("Failed to generate a dedicated component container for " + entityClass, e);
+        for (var entry : compiled.entrySet()) {
+            addToBuilder(builder, entry);
         }
+
+        return builder.build();
+    }
+
+    private <C extends Component> void addToBuilder(ComponentContainer.Factory.Builder<Entity> builder, Map.Entry<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<? extends Entity, ?>>> entry) {
+        @SuppressWarnings("unchecked") var key = (ComponentKey<C>) entry.getKey();
+        @SuppressWarnings("unchecked") var factory = (ComponentFactory<Entity, C>) entry.getValue().factory();
+        @SuppressWarnings("unchecked") var impl = (Class<C>) entry.getValue().impl();
+        builder.component(key, impl, factory);
     }
 
     @Override
@@ -139,8 +143,8 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
             throw new StaticComponentLoadingException("Duplicate factory declarations for " + key.getId() + " on " + target + ": " + factory + " and " + previousFactory);
         }
 
-        ComponentFactory<E, Component> checked = entity -> Objects.requireNonNull(((ComponentFactory<E, ?>) factory.factory()).createComponent(entity), "Component factory " + factory + " for " + key.getId() + " returned null on " + target.getSimpleName());
-        specializedMap.put(key, new QualifiedComponentFactory<>(checked, factory.impl(), factory.dependencies()));
+        @SuppressWarnings("unchecked") var factory1 = (QualifiedComponentFactory<ComponentFactory<? extends Entity, ?>>) (QualifiedComponentFactory<?>) factory;
+        specializedMap.put(key, factory1);
     }
 
     private final class PredicatedComponentFactory<C extends Component> {

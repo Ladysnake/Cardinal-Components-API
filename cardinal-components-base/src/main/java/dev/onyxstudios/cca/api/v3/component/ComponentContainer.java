@@ -26,6 +26,7 @@ import com.demonwav.mcdev.annotations.CheckEnv;
 import com.demonwav.mcdev.annotations.Env;
 import dev.onyxstudios.cca.api.v3.util.NbtSerializable;
 import dev.onyxstudios.cca.internal.base.GenericContainerBuilder;
+import dev.onyxstudios.cca.internal.base.QualifiedComponentFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.ApiStatus;
@@ -156,10 +157,8 @@ public interface ComponentContainer extends NbtSerializable {
          * @see Factory#builder(Class)
          */
         final class Builder<T> extends GenericContainerBuilder<ComponentFactory<T, ?>, Factory<T>> {
-            private final Class<T> argClass;
-
             Builder(Class<T> argClass) {
-                this.argClass = argClass;
+                super(ComponentFactory.class, Factory.class, List.of(argClass), t -> EMPTY);
             }
 
             @Contract(mutates = "this")
@@ -169,21 +168,39 @@ public interface ComponentContainer extends NbtSerializable {
 
             @Contract(mutates = "this")
             public <C extends Component> Builder<T> component(ComponentKey<? super C> key, Class<C> implClass, ComponentFactory<T, ? extends C> factory) {
-                this.addComponent(key, implClass, t -> {
-                    C component = factory.createComponent(t);
-                    //noinspection ConstantConditions
-                    if (component == null) throw new NullPointerException("Component factory " + factory + " for " + key + " returned null on " + t.getClass().getSimpleName());
-                    return component;
-                });
+                this.addComponent(key, new QualifiedComponentFactory<>(factory, implClass, Set.of()));
+                return this;
+            }
+
+            /**
+             * Sets a suffix for the generated factory class' {@link Class#getName() name}.
+             *
+             * <p>The suffix can only be set at most once per builder. Not setting a specific suffix will
+             * result in a an arbitrary unique suffix being chosen.
+             *
+             * <p>Reusing the same suffix for two or more factory builders will cause an error at class
+             * definition time.
+             *
+             * @param factoryNameSuffix the unique class suffix for the generated factory object
+             * @return {@code this} for chaining
+             */
+            @Override
+            public Builder<T> factoryNameSuffix(String factoryNameSuffix) {
+                super.factoryNameSuffix(factoryNameSuffix);
                 return this;
             }
 
             public Factory<T> build() {
-                return this.build(null);
+                return super.build();
             }
 
+            /**
+             * @deprecated use {@link #factoryNameSuffix(String)}
+             */
+            @Deprecated(forRemoval = true)
             public Factory<T> build(@Nullable String factoryNameSuffix) {
-                return build(factoryNameSuffix, t -> EMPTY, ComponentFactory.class, Factory.class, List.of(this.argClass));
+                if (factoryNameSuffix != null) this.factoryNameSuffix(factoryNameSuffix);
+                return this.build();
             }
         }
     }
