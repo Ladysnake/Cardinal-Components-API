@@ -37,6 +37,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class QualifiedComponentFactory<I> {
+    private static final boolean DEV = Boolean.getBoolean("fabric.development");
+
     private final I factory;
     private final Class<? extends Component> impl;
     private final Set<ComponentKey<?>> dependencies;
@@ -46,6 +48,13 @@ public final class QualifiedComponentFactory<I> {
         this.factory = factory;
         this.impl = impl;
         this.dependencies = dependencies;
+    }
+
+    public static <I> void checkDependencies(Map<ComponentKey<?>, QualifiedComponentFactory<I>> factories) {
+        if (DEV) {
+            // The result of the sort call is ignored, we are only doing this to catch errors early
+            QualifiedComponentFactory.sort(factories);
+        }
     }
 
     /**
