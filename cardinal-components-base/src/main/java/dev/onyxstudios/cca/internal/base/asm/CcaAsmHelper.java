@@ -183,6 +183,7 @@ public final class CcaAsmHelper {
     public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, QualifiedComponentFactory<I>> componentFactories, String implNameSuffix) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
 
+        QualifiedComponentFactory.checkDependenciesSatisfied(componentFactories);
         Map<ComponentKey<?>, QualifiedComponentFactory<I>> sorted = QualifiedComponentFactory.sort(componentFactories);
         checkValidJavaIdentifier(implNameSuffix);
         String containerImplName = STATIC_COMPONENT_CONTAINER + '_' + implNameSuffix;
