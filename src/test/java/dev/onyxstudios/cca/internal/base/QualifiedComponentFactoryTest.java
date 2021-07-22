@@ -22,11 +22,98 @@
  */
 package dev.onyxstudios.cca.internal.base;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
+import dev.onyxstudios.cca.internal.base.asm.CcaBootstrapTest;
+import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
+import net.minecraft.util.Identifier;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.*;
+
 public class QualifiedComponentFactoryTest {
+    public static final Identifier TEST_ID_1 = new Identifier("testmod:test");
+    public static final Identifier TEST_ID_2 = new Identifier("testmod:test_2");
+    public static final Identifier TEST_ID_3 = new Identifier("testmod:test_3");
+
+    @BeforeClass
+    public static void beforeAll() {
+        System.setProperty("cca.debug.asm", "true");
+        CcaBootstrapTest.addStaticComponentInitializers(
+            TEST_ID_1,
+            TEST_ID_2,
+            TEST_ID_3
+        );
+    }
 
     @Test
-    public void sort() {
+    public void sortKeepsOrderByDefault() {
+        Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
+        var key1 = ComponentRegistry.getOrCreate(TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key2 = ComponentRegistry.getOrCreate(TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key3 = ComponentRegistry.getOrCreate(TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
+        map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
+        map.put(key2, new QualifiedComponentFactory<>(new Object(), key2.getComponentClass(), Set.of()));
+        map.put(key3, new QualifiedComponentFactory<>(new Object(), key3.getComponentClass(), Set.of()));
+        Map<ComponentKey<?>, QualifiedComponentFactory<Object>> sorted = QualifiedComponentFactory.sort(map);
+        assertNotSame(map, sorted);
+        assertEquals(List.copyOf(map.keySet()), List.copyOf(sorted.keySet()));
+        map = new LinkedHashMap<>();
+        map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
+        map.put(key3, new QualifiedComponentFactory<>(new Object(), key3.getComponentClass(), Set.of()));
+        map.put(key2, new QualifiedComponentFactory<>(new Object(), key2.getComponentClass(), Set.of()));
+        sorted = QualifiedComponentFactory.sort(map);
+        assertNotSame(map, sorted);
+        assertEquals(List.copyOf(map.keySet()), List.copyOf(sorted.keySet()));
+    }
+
+    @Test
+    public void sortThrowsOnUnsatisfiedDependency() {
+        Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
+        var key1 = ComponentRegistry.getOrCreate(TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key2 = ComponentRegistry.getOrCreate(TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
+        map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
+        assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
+        map.put(key2, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
+        QualifiedComponentFactory.sort(map);
+    }
+
+    @Test
+    public void sortThrowsOnCircularDependency() {
+        Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
+        var key1 = ComponentRegistry.getOrCreate(TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key2 = ComponentRegistry.getOrCreate(TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key3 = ComponentRegistry.getOrCreate(TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
+        map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key1)));
+        assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
+        map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
+        map.put(key2, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key1)));
+        assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
+        map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
+        map.put(key2, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key3)));
+        map.put(key3, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key1)));
+        assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
+        map.put(key3, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
+        QualifiedComponentFactory.sort(map);
+    }
+
+    @Test
+    public void sortRespectsDependencyOrdering() {
+        Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
+        var key1 = ComponentRegistry.getOrCreate(TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key2 = ComponentRegistry.getOrCreate(TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key3 = ComponentRegistry.getOrCreate(TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
+        map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
+        map.put(key2, new QualifiedComponentFactory<>(new Object(), key2.getComponentClass(), Set.of()));
+        assertEquals(List.of(key2, key1), List.copyOf(QualifiedComponentFactory.sort(map).keySet()));
+        map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2, key3)));
+        map.put(key3, new QualifiedComponentFactory<>(new Object(), key3.getComponentClass(), Set.of(key2)));
+        assertEquals(List.of(key2, key3, key1), List.copyOf(QualifiedComponentFactory.sort(map).keySet()));
     }
 }
