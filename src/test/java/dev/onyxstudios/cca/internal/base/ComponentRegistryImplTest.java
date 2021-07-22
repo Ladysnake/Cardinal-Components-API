@@ -72,7 +72,7 @@ public class ComponentRegistryImplTest {
 
     interface TestNotComponentItf {}
 
-    static class TestComponentNotItf implements Component {
+    public static class TestComponentNotItf implements Component {
         @Override
         public void readFromNbt(NbtCompound tag) { }
 
