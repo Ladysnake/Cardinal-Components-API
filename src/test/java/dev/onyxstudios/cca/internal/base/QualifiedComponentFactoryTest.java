@@ -24,9 +24,8 @@ package dev.onyxstudios.cca.internal.base;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
-import dev.onyxstudios.cca.internal.base.asm.CcaBootstrapTest;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
-import net.minecraft.util.Identifier;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -38,25 +37,21 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 public class QualifiedComponentFactoryTest {
-    public static final Identifier TEST_ID_1 = new Identifier("testmod:test");
-    public static final Identifier TEST_ID_2 = new Identifier("testmod:test_2");
-    public static final Identifier TEST_ID_3 = new Identifier("testmod:test_3");
-
     @BeforeClass
     public static void beforeAll() {
-        CcaBootstrapTest.addStaticComponentInitializers(
-            TEST_ID_1,
-            TEST_ID_2,
-            TEST_ID_3
-        );
+        CcaTesting.init();
+    }
+
+    @After public void tearDown() {
+        ComponentRegistryImpl.INSTANCE.clear();
     }
 
     @Test
     public void sortKeepsOrderByDefault() {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
-        var key1 = ComponentRegistry.getOrCreate(TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
-        var key2 = ComponentRegistry.getOrCreate(TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
-        var key3 = ComponentRegistry.getOrCreate(TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key2 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key3 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key2.getComponentClass(), Set.of()));
         map.put(key3, new QualifiedComponentFactory<>(new Object(), key3.getComponentClass(), Set.of()));
@@ -75,8 +70,8 @@ public class QualifiedComponentFactoryTest {
     @Test
     public void sortThrowsOnUnsatisfiedDependency() {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
-        var key1 = ComponentRegistry.getOrCreate(TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
-        var key2 = ComponentRegistry.getOrCreate(TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key2 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
         assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.checkDependenciesSatisfied(map));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
@@ -86,9 +81,9 @@ public class QualifiedComponentFactoryTest {
     @Test
     public void sortThrowsOnCircularDependency() {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
-        var key1 = ComponentRegistry.getOrCreate(TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
-        var key2 = ComponentRegistry.getOrCreate(TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
-        var key3 = ComponentRegistry.getOrCreate(TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key2 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key3 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key1)));
         assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
@@ -105,9 +100,9 @@ public class QualifiedComponentFactoryTest {
     @Test
     public void sortRespectsDependencyOrdering() {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
-        var key1 = ComponentRegistry.getOrCreate(TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
-        var key2 = ComponentRegistry.getOrCreate(TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
-        var key3 = ComponentRegistry.getOrCreate(TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key2 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
+        var key3 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key2.getComponentClass(), Set.of()));
         assertEquals(List.of(key2, key1), List.copyOf(QualifiedComponentFactory.sort(map).keySet()));

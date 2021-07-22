@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.internal.base;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.internal.base.asm.CcaBootstrapTest;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import org.junit.After;
@@ -36,28 +35,22 @@ import static org.junit.Assert.assertThrows;
 
 public class ComponentRegistryImplTest {
 
-    public static final Identifier TEST_ID_1 = new Identifier("testmod:test");
-    public static final Identifier TEST_ID_2 = new Identifier("testmod:test_2");
-
     @BeforeClass
     public static void beforeAll() {
-        CcaBootstrapTest.addStaticComponentInitializers(
-            TEST_ID_1,
-            TEST_ID_2
-        );
+        CcaTesting.init();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Test public void checksRegisteredClasses() {
         ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
-        assertThrows("Component class must extend Component", IllegalArgumentException.class, () -> registry.getOrCreate(TEST_ID_1, (Class) TestNotComponentItf.class));
-        registry.getOrCreate(TEST_ID_1, TestComponentNotItf.class);
-        registry.getOrCreate(TEST_ID_2, TestComponentItf.class);
+        assertThrows("Component class must extend Component", IllegalArgumentException.class, () -> registry.getOrCreate(CcaTesting.TEST_ID_1, (Class) TestNotComponentItf.class));
+        registry.getOrCreate(CcaTesting.TEST_ID_1, TestComponentNotItf.class);
+        registry.getOrCreate(CcaTesting.TEST_ID_2, TestComponentItf.class);
     }
 
     @Test public void doesNotDuplicateComponentTypes() {
         ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
-        Identifier id = TEST_ID_1;
+        Identifier id = CcaTesting.TEST_ID_1;
         ComponentKey<?> type = registry.getOrCreate(id, TestComponentItf.class);
         assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf2.class));
         assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf3.class));
