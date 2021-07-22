@@ -33,6 +33,7 @@ import dev.onyxstudios.cca.internal.base.QualifiedComponentFactory;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.launch.common.FabricLauncherBase;
 import net.minecraft.util.Identifier;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -67,7 +68,7 @@ public final class CcaAsmHelper {
     public static final String COMPONENT_CONTAINER = Type.getInternalName(ComponentContainer.class);
     public static final String COMPONENT_TYPE = Type.getInternalName(ComponentKey.class);
     public static final String DYNAMIC_COMPONENT_CONTAINER_IMPL = Type.getInternalName(AbstractComponentContainer.class);
-    public static final String IDENTIFIER = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960").replace('.', '/');
+    public static final String IDENTIFIER = (FabricLauncherBase.getLauncher() == null ? Identifier.class.getName() : FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960")).replace('.', '/');
     public static final String EVENT = Type.getInternalName(Event.class);
     // generated references
     public static final String STATIC_COMPONENT_CONTAINER = "dev/onyxstudios/cca/_generated_/GeneratedComponentContainer";

@@ -24,37 +24,49 @@ package dev.onyxstudios.cca.internal.base;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.internal.base.asm.CcaBootstrapTest;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-class ComponentRegistryImplTest {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
+public class ComponentRegistryImplTest {
+
+    public static final Identifier TEST_ID_1 = new Identifier("testmod:test");
+    public static final Identifier TEST_ID_2 = new Identifier("testmod:test_2");
+
+    @BeforeClass
+    public static void beforeAll() {
+        System.setProperty("cca.debug.asm", "true");
+        CcaBootstrapTest.addStaticComponentInitializers(
+            TEST_ID_1,
+            TEST_ID_2
+        );
+    }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @Test
-    void checksRegisteredClasses() {
+    @Test public void checksRegisteredClasses() {
         ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
-        Identifier id = new Identifier("testmod:test");
-        Assertions.assertThrows(IllegalArgumentException.class, () -> registry.getOrCreate(id, (Class) TestNotComponentItf.class), "Component class must extend Component");
-        Assertions.assertDoesNotThrow(() -> registry.getOrCreate(id, TestComponentNotItf.class));
-        Assertions.assertDoesNotThrow(() -> registry.getOrCreate(id, TestComponentItf.class));
+        assertThrows("Component class must extend Component", IllegalArgumentException.class, () -> registry.getOrCreate(TEST_ID_1, (Class) TestNotComponentItf.class));
+        registry.getOrCreate(TEST_ID_1, TestComponentNotItf.class);
+        registry.getOrCreate(TEST_ID_2, TestComponentItf.class);
     }
 
-    @Test
-    void doesNotDuplicateComponentTypes() {
+    @Test public void doesNotDuplicateComponentTypes() {
         ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
-        Identifier id = new Identifier("testmod:test");
+        Identifier id = TEST_ID_1;
         ComponentKey<?> type = registry.getOrCreate(id, TestComponentItf.class);
-        Assertions.assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf2.class));
-        Assertions.assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf3.class));
-        Assertions.assertEquals(type, registry.getOrCreate(id, TestComponentItf.class));
-        Assertions.assertEquals(1, registry.stream().count());
+        assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf2.class));
+        assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf3.class));
+        assertEquals(type, registry.getOrCreate(id, TestComponentItf.class));
+        assertEquals(1, registry.stream().count());
     }
 
-    @AfterEach
-    void tearDown() {
+    @After public void tearDown() {
         ComponentRegistryImpl.INSTANCE.clear();
     }
 
