@@ -44,7 +44,6 @@ public class QualifiedComponentFactoryTest {
 
     @BeforeClass
     public static void beforeAll() {
-        System.setProperty("cca.debug.asm", "true");
         CcaBootstrapTest.addStaticComponentInitializers(
             TEST_ID_1,
             TEST_ID_2,
@@ -79,9 +78,9 @@ public class QualifiedComponentFactoryTest {
         var key1 = ComponentRegistry.getOrCreate(TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
         var key2 = ComponentRegistry.getOrCreate(TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
-        assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
+        assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.checkDependenciesSatisfied(map));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
-        QualifiedComponentFactory.sort(map);
+        QualifiedComponentFactory.checkDependenciesSatisfied(map);
     }
 
     @Test
