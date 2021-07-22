@@ -26,6 +26,7 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.block.entity.BlockEntity;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Predicate;
 
@@ -66,6 +67,19 @@ public interface BlockComponentFactoryRegistry {
          * @param test a predicate testing whether the class can have the component attached to its instances
          */
         Registration<C, BE> filter(Predicate<Class<? extends BE>> test);
+
+        /**
+         * Require that the component factory being registered gets added after the component factory for the given dependency.
+         *
+         * <p>Component ordering controls order of serialization, synchronization, and ticking, if applicable.
+         *
+         * <p>An error will be thrown if a circular dependency appears,
+         * or if the dependency cannot be satisfied.
+         *
+         * @param dependency the {@link ComponentKey} describing the component on which to depend
+         */
+        @ApiStatus.Experimental
+        Registration<C, BE> after(ComponentKey<?> dependency);
 
         /**
          * Specify the implementation class that will be produced by the factory.

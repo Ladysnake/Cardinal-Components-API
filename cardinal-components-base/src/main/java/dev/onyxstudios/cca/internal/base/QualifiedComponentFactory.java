@@ -50,7 +50,7 @@ public final class QualifiedComponentFactory<I> {
         this.dependencies = dependencies;
     }
 
-    public static <I> void checkDependencies(Map<ComponentKey<?>, QualifiedComponentFactory<I>> factories) {
+    public static <I> void checkNoDependencyCycles(Map<ComponentKey<?>, QualifiedComponentFactory<I>> factories) {
         if (DEV) {
             // The result of the sort call is ignored, we are only doing this to catch errors early
             QualifiedComponentFactory.sort(factories);
@@ -64,7 +64,6 @@ public final class QualifiedComponentFactory<I> {
      * @return a sorted list of factories
      */
     public static <I> Map<ComponentKey<?>, QualifiedComponentFactory<I>> sort(Map<ComponentKey<?>, QualifiedComponentFactory<I>> factories) {
-        checkDependenciesSatisfied(factories);
         // reset
         factories.values().forEach(f -> f.sortingState = SortingState.UNSORTED);
         // If there is no explicit dependency, we want everything to stay in the same order
@@ -77,7 +76,7 @@ public final class QualifiedComponentFactory<I> {
         return out.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (c1, c2) -> c1, LinkedHashMap::new));
     }
 
-    private static <I> void checkDependenciesSatisfied(Map<ComponentKey<?>, QualifiedComponentFactory<I>> factories) {
+    public static <I> void checkDependenciesSatisfied(Map<ComponentKey<?>, QualifiedComponentFactory<I>> factories) {
         RuntimeException ex = null;
         for (var checked : factories.entrySet()) {
             for (ComponentKey<?> dependency : checked.getValue().dependencies()) {

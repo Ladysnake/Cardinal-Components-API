@@ -197,6 +197,12 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         }
 
         @Override
+        public Registration<C, E> after(ComponentKey<?> dependency) {
+            this.dependencies.add(dependency);
+            return this;
+        }
+
+        @Override
         public <I extends C> Registration<I, E> impl(Class<I> impl) {
             @SuppressWarnings("unchecked") RegistrationImpl<I, E> ret = (RegistrationImpl<I, E>) this;
             ret.componentClass = impl;
