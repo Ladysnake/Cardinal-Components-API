@@ -25,12 +25,11 @@ package dev.onyxstudios.cca.api.v3.util;
 import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * @since 2.4.0
  */
-@ApiStatus.Experimental
+@Deprecated(forRemoval = true)
 public interface GenericComponentFactoryRegistry {
     <F> void register(ComponentKey<?> type, Identifier providerId, TypeToken<F> factoryType, F factory);
 }
