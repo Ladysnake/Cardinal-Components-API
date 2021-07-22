@@ -107,7 +107,9 @@ public interface EntityComponentFactoryRegistry {
         Registration<C, E> filter(Predicate<Class<? extends E>> test);
 
         /**
-         * Require that the component factory being registered gets called after the component factory for the given dependency.
+         * Require that the component factory being registered gets added after the component factory for the given dependency.
+         *
+         * <p>Component ordering controls order of serialization, synchronization, and ticking, if applicable.
          *
          * <p>An error will be thrown if a circular dependency appears,
          * or if the dependency cannot be satisfied.
