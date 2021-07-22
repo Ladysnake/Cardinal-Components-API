@@ -210,16 +210,16 @@ public final class CcaAsmHelper {
 
         String factoryFieldDescriptor = Type.getDescriptor(componentFactoryType);
 
-        classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "componentKeys", "Ljava/util/Set;", null, null);
+        classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "componentKeys", "Ljava/util/Set;", "Ljava/util/Set<Ldev/onyxstudios/cca/api/v3/component/ComponentKey<*>;>;", null);
 
-        MethodVisitor keys = classNode.visitMethod(Opcodes.ACC_PUBLIC, "keys", "()Ljava/util/Set;", null, null);
+        MethodVisitor keys = classNode.visitMethod(Opcodes.ACC_PUBLIC, "keys", "()Ljava/util/Set;", "()Ljava/util/Set<Ldev/onyxstudios/cca/api/v3/component/ComponentKey<*>;>;", null);
         keys.visitFieldInsn(Opcodes.GETSTATIC, containerImplName, "componentKeys", "Ljava/util/Set;");
         keys.visitInsn(Opcodes.ARETURN);
         keys.visitEnd();
 
         MethodVisitor hasComponents = classNode.visitMethod(Opcodes.ACC_PUBLIC, "hasComponents", "()Z", null, null);
         hasComponents.visitCode();
-        hasComponents.visitLdcInsn(!sorted.isEmpty());
+        hasComponents.visitInsn(sorted.isEmpty() ? Opcodes.ICONST_0 : Opcodes.ICONST_1);
         hasComponents.visitInsn(Opcodes.IRETURN);
         hasComponents.visitEnd();
 
