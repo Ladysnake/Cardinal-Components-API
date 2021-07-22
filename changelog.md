@@ -1,4 +1,13 @@
 ------------------------------------------------------
+Version 3.1.1
+------------------------------------------------------
+Fixes
+- Fixed explicit component ordering being ignored during registration
+
+Changes
+- Deprecated the `cardinal-components-util` module for future removal
+
+------------------------------------------------------
 Version 3.1.0
 ------------------------------------------------------
 Additions

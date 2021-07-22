@@ -30,6 +30,7 @@ import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -40,7 +41,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-public abstract class GenericContainerBuilder<I, R> {
+public class GenericContainerBuilder<I, R> {
     private static final AtomicInteger nextId = new AtomicInteger();
 
     private boolean built;
@@ -51,7 +52,7 @@ public abstract class GenericContainerBuilder<I, R> {
     private final Class<? super I> componentFactoryClass;
     private final Class<? super R> containerFactoryType;
 
-    protected GenericContainerBuilder(Class<? super I> componentFactoryClass, Class<? super R> containerFactoryType, List<Class<?>> argClasses, R emptyFactory) {
+    public GenericContainerBuilder(Class<? super I> componentFactoryClass, Class<? super R> containerFactoryType, List<Class<?>> argClasses, R emptyFactory) {
         this.argClasses = argClasses;
         this.emptyFactory = emptyFactory;
         this.componentFactoryClass = componentFactoryClass;
@@ -73,11 +74,17 @@ public abstract class GenericContainerBuilder<I, R> {
         return this;
     }
 
+    @Contract(mutates = "this")
+    public <C extends Component> GenericContainerBuilder<I, R> component(ComponentKey<? super C> key, Class<C> implClass, I factory, Set<ComponentKey<?>> dependencies) {
+        this.addComponent(key, new QualifiedComponentFactory<>(factory, implClass, dependencies));
+        return this;
+    }
+
     protected <C extends Component> void addComponent(ComponentKey<? super C> key, QualifiedComponentFactory<I> value) {
         this.factories.put(key, value);
     }
 
-    protected R build() {
+    public R build() {
         if (this.built) {
             throw new IllegalStateException("Cannot build more than one container factory with the same builder");
         }
@@ -99,32 +106,6 @@ public abstract class GenericContainerBuilder<I, R> {
             return ComponentsInternals.createFactory(factoryClass);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
-        }
-    }
-
-    public static final class SimpleImpl<I, R> extends GenericContainerBuilder<I, R> {
-        public SimpleImpl(Class<? super I> componentFactoryClass, Class<? super R> containerFactoryType, List<Class<?>> argClasses, R emptyFactory) {
-            super(componentFactoryClass, containerFactoryType, argClasses, emptyFactory);
-        }
-
-        public <C extends Component> void addComponent(ComponentKey<? super C> key, Class<C> implClass, I factory) {
-            this.addComponent(key, new QualifiedComponentFactory<>(factory, implClass, Set.of()));
-        }
-
-        @Override
-        public <C extends Component> void addComponent(ComponentKey<? super C> key, QualifiedComponentFactory<I> value) {
-            super.addComponent(key, value);
-        }
-
-        @Override
-        public GenericContainerBuilder.SimpleImpl<I, R> factoryNameSuffix(String factoryNameSuffix) {
-            super.factoryNameSuffix(factoryNameSuffix);
-            return this;
-        }
-
-        @Override
-        public R build() {
-            return super.build();
         }
     }
 }

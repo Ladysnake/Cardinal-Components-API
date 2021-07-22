@@ -124,7 +124,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         @SuppressWarnings("unchecked") var key = (ComponentKey<C>) entry.getKey();
         @SuppressWarnings("unchecked") var factory = (ComponentFactory<BlockEntity, C>) entry.getValue().factory();
         @SuppressWarnings("unchecked") var impl = (Class<C>) entry.getValue().impl();
-        builder.component(key, impl, factory);
+        builder.component(key, impl, factory, entry.getValue().dependencies());
     }
 
     public <C extends Component, E extends BlockEntity> void registerFor(Class<E> target, ComponentKey<C> type, ComponentFactory<E, C> factory) {
