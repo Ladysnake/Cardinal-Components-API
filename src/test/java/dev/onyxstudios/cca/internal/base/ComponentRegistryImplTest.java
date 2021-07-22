@@ -41,7 +41,6 @@ public class ComponentRegistryImplTest {
 
     @BeforeClass
     public static void beforeAll() {
-        System.setProperty("cca.debug.asm", "true");
         CcaBootstrapTest.addStaticComponentInitializers(
             TEST_ID_1,
             TEST_ID_2
