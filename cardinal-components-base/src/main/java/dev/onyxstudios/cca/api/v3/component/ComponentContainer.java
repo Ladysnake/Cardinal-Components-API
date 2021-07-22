@@ -26,7 +26,6 @@ import com.demonwav.mcdev.annotations.CheckEnv;
 import com.demonwav.mcdev.annotations.Env;
 import dev.onyxstudios.cca.api.v3.util.NbtSerializable;
 import dev.onyxstudios.cca.internal.base.GenericContainerBuilder;
-import dev.onyxstudios.cca.internal.base.QualifiedComponentFactory;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.ApiStatus;
@@ -168,7 +167,13 @@ public interface ComponentContainer extends NbtSerializable {
 
             @Contract(mutates = "this")
             public <C extends Component> Builder<T> component(ComponentKey<? super C> key, Class<C> implClass, ComponentFactory<T, ? extends C> factory) {
-                this.addComponent(key, new QualifiedComponentFactory<>(factory, implClass, Set.of()));
+                return this.component(key, implClass, factory, Set.of());
+            }
+
+            @ApiStatus.Experimental
+            @Contract(mutates = "this")
+            public <C extends Component> Builder<T> component(ComponentKey<? super C> key, Class<C> implClass, ComponentFactory<T, ? extends C> factory, Set<ComponentKey<?>> dependencies) {
+                super.component(key, implClass, factory, dependencies);
                 return this;
             }
 

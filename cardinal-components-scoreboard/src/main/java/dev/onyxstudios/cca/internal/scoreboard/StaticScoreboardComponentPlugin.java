@@ -38,6 +38,7 @@ import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public final class StaticScoreboardComponentPlugin extends LazyDispatcher implements ScoreboardComponentFactoryRegistry {
@@ -47,13 +48,13 @@ public final class StaticScoreboardComponentPlugin extends LazyDispatcher implem
     public static final Supplier<TeamComponentContainerFactory> teamComponentsContainerFactory
         = Suppliers.memoize(INSTANCE::buildTeamContainerFactory);
 
-    private final GenericContainerBuilder.SimpleImpl<ScoreboardComponentFactoryV2<?>, ScoreboardComponentContainerFactory> scoreboardFactories = new GenericContainerBuilder.SimpleImpl<>(
+    private final GenericContainerBuilder<ScoreboardComponentFactoryV2<?>, ScoreboardComponentContainerFactory> scoreboardFactories = new GenericContainerBuilder<>(
         ScoreboardComponentFactoryV2.class,
         ScoreboardComponentContainerFactory.class,
         List.of(Scoreboard.class, MinecraftServer.class),
         (scoreboard, server) -> ComponentContainer.EMPTY
     );
-    private final GenericContainerBuilder.SimpleImpl<TeamComponentFactoryV2<?>, TeamComponentContainerFactory> teamFactories = new GenericContainerBuilder.SimpleImpl<>(
+    private final GenericContainerBuilder<TeamComponentFactoryV2<?>, TeamComponentContainerFactory> teamFactories = new GenericContainerBuilder<>(
         TeamComponentFactoryV2.class,
         TeamComponentContainerFactory.class,
         List.of(Team.class, Scoreboard.class, MinecraftServer.class),
@@ -92,7 +93,7 @@ public final class StaticScoreboardComponentPlugin extends LazyDispatcher implem
     @Override
     public <C extends Component> void registerScoreboardComponent(ComponentKey<? super C> type, Class<C> impl, ScoreboardComponentFactoryV2<? extends C> factory) {
         this.checkLoading(ScoreboardComponentFactoryRegistry.class, "registerForScoreboards");
-        this.scoreboardFactories.addComponent(type, impl, factory);
+        this.scoreboardFactories.component(type, impl, factory, Set.of());
     }
 
     @Override
@@ -103,6 +104,6 @@ public final class StaticScoreboardComponentPlugin extends LazyDispatcher implem
     @Override
     public <C extends Component> void registerTeamComponent(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactoryV2<? extends C> factory) {
         this.checkLoading(ScoreboardComponentFactoryRegistry.class, "register");
-        this.teamFactories.addComponent(type, impl, factory);
+        this.teamFactories.component(type, impl, factory, Set.of());
     }
 }

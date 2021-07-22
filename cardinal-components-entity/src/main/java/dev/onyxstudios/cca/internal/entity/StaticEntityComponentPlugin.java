@@ -97,7 +97,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         @SuppressWarnings("unchecked") var key = (ComponentKey<C>) entry.getKey();
         @SuppressWarnings("unchecked") var factory = (ComponentFactory<Entity, C>) entry.getValue().factory();
         @SuppressWarnings("unchecked") var impl = (Class<C>) entry.getValue().impl();
-        builder.component(key, impl, factory);
+        builder.component(key, impl, factory, entry.getValue().dependencies());
     }
 
     @Override
