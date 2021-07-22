@@ -1,4 +1,12 @@
 ------------------------------------------------------
+Version 3.1.0
+------------------------------------------------------
+Additions
+- Added an experimental way to order entity and BE components through `Registration#after(ComponentKey)`
+    - This allows mods to ensure components are deserialized/synchronized/ticked in the right order if needed
+    - Components that are not ordered through this mechanism will keep their registration ordering
+
+------------------------------------------------------
 Version 3.0.1
 ------------------------------------------------------
 Fixes
