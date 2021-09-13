@@ -6,8 +6,15 @@
     "description": "dynamically exposing components",
     "version": "${version}",
     "custom": {
-        "modmenu:api": true,
-        "modmenu:parent": "cardinal-components"
+      "modmenu": {
+        "badges": [ "library" ],
+        "parent": {
+          "id": "cardinal-components",
+          "name": "Cardinal Components API",
+          "description": "Attaching more data to various game objects",
+          "badges": [ "library" ]
+        }
+      }
     },
     "depends": {
         "fabric-api-base": "*",
