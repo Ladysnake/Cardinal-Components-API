@@ -25,9 +25,7 @@ package dev.onyxstudios.cca.api.v3.component;
 import com.demonwav.mcdev.annotations.CheckEnv;
 import com.demonwav.mcdev.annotations.Env;
 import dev.onyxstudios.cca.api.v3.util.NbtSerializable;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import dev.onyxstudios.cca.internal.base.asm.CcaAsmHelper;
-import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
+import dev.onyxstudios.cca.internal.base.GenericContainerBuilder;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.ApiStatus;
@@ -35,13 +33,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 /**
  * An opaque container for components.
@@ -162,72 +155,57 @@ public interface ComponentContainer extends NbtSerializable {
          * @param <T> the type of the resulting factory's single argument
          * @see Factory#builder(Class)
          */
-        final class Builder<T> {
-            private static final AtomicInteger nextId = new AtomicInteger();
-
-            private boolean built;
-            private final Class<T> argClass;
-            private final Map<ComponentKey<?>, ComponentFactory<T, ?>> factories;
-            private final Map<ComponentKey<?>, Class<? extends Component>> componentImpls;
-
+        final class Builder<T> extends GenericContainerBuilder<ComponentFactory<T, ?>, Factory<T>> {
             Builder(Class<T> argClass) {
-                this.argClass = argClass;
-                this.factories = new LinkedHashMap<>();
-                this.componentImpls = new LinkedHashMap<>();
-            }
-
-            @ApiStatus.Experimental
-            public void checkDuplicate(ComponentKey<?> key, Function<ComponentFactory<T, ?>, String> msgFactory) {
-                if (this.factories.containsKey(key)) {
-                    throw new StaticComponentLoadingException(msgFactory.apply(this.factories.get(key)));
-                }
+                super(ComponentFactory.class, Factory.class, List.of(argClass), t -> EMPTY);
             }
 
             @Contract(mutates = "this")
             public <C extends Component> Builder<T> component(ComponentKey<C> key, ComponentFactory<T, ? extends C> factory) {
-                this.component(key, key.getComponentClass(), factory);
-                return this;
+                return this.component(key, key.getComponentClass(), factory);
             }
 
             @Contract(mutates = "this")
             public <C extends Component> Builder<T> component(ComponentKey<? super C> key, Class<C> implClass, ComponentFactory<T, ? extends C> factory) {
-                this.factories.put(key, t -> {
-                    C component = factory.createComponent(t);
-                    //noinspection ConstantConditions
-                    if (component == null) throw new NullPointerException("Component factory " + factory + " for " + key + " returned null on " + t.getClass().getSimpleName());
-                    return component;
-                });
-                this.componentImpls.put(key, implClass);
+                return this.component(key, implClass, factory, Set.of());
+            }
+
+            @ApiStatus.Experimental
+            @Contract(mutates = "this")
+            public <C extends Component> Builder<T> component(ComponentKey<? super C> key, Class<C> implClass, ComponentFactory<T, ? extends C> factory, Set<ComponentKey<?>> dependencies) {
+                super.component(key, implClass, factory, dependencies);
+                return this;
+            }
+
+            /**
+             * Sets a suffix for the generated factory class' {@link Class#getName() name}.
+             *
+             * <p>The suffix can only be set at most once per builder. Not setting a specific suffix will
+             * result in a an arbitrary unique suffix being chosen.
+             *
+             * <p>Reusing the same suffix for two or more factory builders will cause an error at class
+             * definition time.
+             *
+             * @param factoryNameSuffix the unique class suffix for the generated factory object
+             * @return {@code this} for chaining
+             */
+            @Override
+            public Builder<T> factoryNameSuffix(String factoryNameSuffix) {
+                super.factoryNameSuffix(factoryNameSuffix);
                 return this;
             }
 
             public Factory<T> build() {
-                return this.build(null);
+                return super.build();
             }
 
+            /**
+             * @deprecated use {@link #factoryNameSuffix(String)}
+             */
+            @Deprecated(forRemoval = true)
             public Factory<T> build(@Nullable String factoryNameSuffix) {
-                if (this.built) {
-                    throw new IllegalStateException("Cannot build more than one container factory with the same builder");
-                }
-
-                try {
-                    this.built = true;
-
-                    if (this.factories.isEmpty()) {
-                        return t -> EMPTY;
-                    }
-
-                    String implNameSuffix = factoryNameSuffix != null ? factoryNameSuffix : Integer.toString(nextId.getAndIncrement());
-                    Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(
-                        ComponentFactory.class, this.factories, this.componentImpls, implNameSuffix
-                    );
-                    Class<? extends Factory<T>> factoryClass = StaticComponentPluginBase.spinContainerFactory(
-                        implNameSuffix, Factory.class, containerClass, this.argClass
-                    );
-                    return ComponentsInternals.createFactory(factoryClass);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
+                if (factoryNameSuffix != null) this.factoryNameSuffix(factoryNameSuffix);
+                return this.build();
             }
         }
     }

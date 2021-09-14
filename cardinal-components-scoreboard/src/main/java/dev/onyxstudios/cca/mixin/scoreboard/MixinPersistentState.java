@@ -20,27 +20,22 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.mixin.entity.common;
+package dev.onyxstudios.cca.mixin.scoreboard;
 
-import dev.onyxstudios.cca.api.v3.entity.TrackingStartCallback;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.network.EntityTrackerEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.scoreboard.ScoreboardState;
+import net.minecraft.world.PersistentState;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(EntityTrackerEntry.class)
-public abstract class MixinEntityTrackerEntry {
-    @Shadow
-    @Final
-    private Entity entity;
-
-    @Inject(method = "startTracking", at = @At("RETURN"))
-    private void onStartedTracking(ServerPlayerEntity player, CallbackInfo ci) {
-        TrackingStartCallback.EVENT.invoker().onPlayerStartTracking(player, this.entity);
+@Mixin(PersistentState.class)
+public abstract class MixinPersistentState {
+    @Inject(method = "isDirty", at = @At("RETURN"), cancellable = true)
+    private void forceDirty(CallbackInfoReturnable<Boolean> cir) {
+        //noinspection ConstantConditions
+        if (!cir.getReturnValueZ() && (Object) this instanceof ScoreboardState) {
+            cir.setReturnValue(true);
+        }
     }
 }

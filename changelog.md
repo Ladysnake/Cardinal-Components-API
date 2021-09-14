@@ -1,4 +1,27 @@
 ------------------------------------------------------
+Version 3.1.1
+------------------------------------------------------
+Fixes
+- Fixed explicit component ordering being ignored during registration
+
+Changes
+- Deprecated the `cardinal-components-util` module for future removal
+
+------------------------------------------------------
+Version 3.1.0
+------------------------------------------------------
+Additions
+- Added an experimental way to order entity and BE components through `Registration#after(ComponentKey)`
+    - This allows mods to ensure components are deserialized/synchronized/ticked in the right order if needed
+    - Components that are not ordered through this mechanism will keep their registration ordering
+
+------------------------------------------------------
+Version 3.0.1
+------------------------------------------------------
+Fixes
+- Fixed scoreboard (and team) components not always being saved
+
+------------------------------------------------------
 Version 3.0.0
 ------------------------------------------------------
 **The breaking changes are here !**

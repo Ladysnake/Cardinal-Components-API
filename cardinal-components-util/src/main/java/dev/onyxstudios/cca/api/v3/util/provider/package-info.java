@@ -25,6 +25,7 @@
  */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
+@Deprecated(forRemoval = true)
 package dev.onyxstudios.cca.api.v3.util.provider;
 
 import dev.onyxstudios.cca.api.v3.util.MethodsReturnNonnullByDefault;

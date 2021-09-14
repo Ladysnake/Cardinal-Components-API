@@ -20,27 +20,21 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.mixin.entity.common;
+package dev.onyxstudios.cca.internal.base;
 
-import dev.onyxstudios.cca.api.v3.entity.TrackingStartCallback;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.network.EntityTrackerEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import dev.onyxstudios.cca.internal.base.asm.CcaBootstrapTest;
+import net.minecraft.util.Identifier;
 
-@Mixin(EntityTrackerEntry.class)
-public abstract class MixinEntityTrackerEntry {
-    @Shadow
-    @Final
-    private Entity entity;
+public class CcaTesting {
+    public static final Identifier TEST_ID_1 = new Identifier("testmod:test");
+    public static final Identifier TEST_ID_2 = new Identifier("testmod:test_2");
+    public static final Identifier TEST_ID_3 = new Identifier("testmod:test_3");
 
-    @Inject(method = "startTracking", at = @At("RETURN"))
-    private void onStartedTracking(ServerPlayerEntity player, CallbackInfo ci) {
-        TrackingStartCallback.EVENT.invoker().onPlayerStartTracking(player, this.entity);
+    public static void init() {
+        CcaBootstrapTest.addStaticComponentInitializers(
+            CcaTesting.TEST_ID_1,
+            CcaTesting.TEST_ID_2,
+            CcaTesting.TEST_ID_3
+        );
     }
 }

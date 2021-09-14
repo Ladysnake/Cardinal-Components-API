@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.api.v3.util;
 
 import dev.onyxstudios.cca.internal.base.ComponentRegistrationInitializer;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> generic (typically for third party providers)
@@ -33,7 +32,7 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @since 2.4.0
  */
-@ApiStatus.Experimental
+@Deprecated(forRemoval = true)
 public interface GenericComponentInitializer extends ComponentRegistrationInitializer {
     /**
      * Called to register component factories for statically declared component types.

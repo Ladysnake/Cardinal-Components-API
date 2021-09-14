@@ -29,11 +29,17 @@ import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.internal.base.AbstractComponentContainer;
+import dev.onyxstudios.cca.internal.base.QualifiedComponentFactory;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.launch.common.FabricLauncherBase;
 import net.minecraft.util.Identifier;
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 
@@ -45,9 +51,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 public final class CcaAsmHelper {
 
@@ -62,7 +68,7 @@ public final class CcaAsmHelper {
     public static final String COMPONENT_CONTAINER = Type.getInternalName(ComponentContainer.class);
     public static final String COMPONENT_TYPE = Type.getInternalName(ComponentKey.class);
     public static final String DYNAMIC_COMPONENT_CONTAINER_IMPL = Type.getInternalName(AbstractComponentContainer.class);
-    public static final String IDENTIFIER = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960").replace('.', '/');
+    public static final String IDENTIFIER = (FabricLauncherBase.getLauncher() == null ? Identifier.class.getName() : FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960")).replace('.', '/');
     public static final String EVENT = Type.getInternalName(Event.class);
     // generated references
     public static final String STATIC_COMPONENT_CONTAINER = "dev/onyxstudios/cca/_generated_/GeneratedComponentContainer";
@@ -148,12 +154,19 @@ public final class CcaAsmHelper {
      * <strong>This method must not be called before the static component container interface has been defined!</strong>
      *
      * @param componentFactoryType the interface implemented by the component factories used to initialize this container
-     * @param componentFactories   a map of {@link ComponentKey} ids to factories for components of that type
+     * @param componentFactories   a map of {@link ComponentKey}s to factories for components of that type
+     * @param componentImpls       a map of {@link ComponentKey}s to their actual implementation classes for the container
      * @param implNameSuffix       a unique suffix for the generated class
      * @return the generated container class
+     * @deprecated cannot remove in 1.17 because internal compatibility
      */
-    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, String implNameSuffix) throws IOException {
-        return spinComponentContainer(componentFactoryType, componentFactories, componentFactories.keySet().stream().collect(Collectors.toMap(Function.identity(), ComponentKey::getComponentClass)), implNameSuffix);
+    @Deprecated(forRemoval = true)
+    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, Map<ComponentKey<?>, Class<? extends Component>> componentImpls, String implNameSuffix) throws IOException {
+        Map<ComponentKey<?>, QualifiedComponentFactory<I>> merged = new LinkedHashMap<>();
+        for (var entry : componentFactories.entrySet()) {
+            merged.put(entry.getKey(), new QualifiedComponentFactory<>(entry.getValue(), componentImpls.get(entry.getKey()), Set.of()));
+        }
+        return spinComponentContainer(componentFactoryType, merged, implNameSuffix);
     }
 
     /**
@@ -163,14 +176,15 @@ public final class CcaAsmHelper {
      * <strong>This method must not be called before the static component container interface has been defined!</strong>
      *
      * @param componentFactoryType the interface implemented by the component factories used to initialize this container
-     * @param componentFactories   a map of {@link ComponentKey}s to factories for components of that type
-     * @param componentImpls       a map of {@link ComponentKey}s to their actual implementation classes for the container
+     * @param componentFactories   a map of {@link ComponentKey} ids to factories for components of that type
      * @param implNameSuffix       a unique suffix for the generated class
      * @return the generated container class
      */
-    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, Map<ComponentKey<?>, Class<? extends Component>> componentImpls, String implNameSuffix) throws IOException {
+    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, QualifiedComponentFactory<I>> componentFactories, String implNameSuffix) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
 
+        QualifiedComponentFactory.checkDependenciesSatisfied(componentFactories);
+        Map<ComponentKey<?>, QualifiedComponentFactory<I>> sorted = QualifiedComponentFactory.sort(componentFactories);
         checkValidJavaIdentifier(implNameSuffix);
         String containerImplName = STATIC_COMPONENT_CONTAINER + '_' + implNameSuffix;
         String componentFactoryName = Type.getInternalName(componentFactoryType);
@@ -196,16 +210,16 @@ public final class CcaAsmHelper {
 
         String factoryFieldDescriptor = Type.getDescriptor(componentFactoryType);
 
-        classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "componentKeys", "Ljava/util/Set;", null, null);
+        classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "componentKeys", "Ljava/util/Set;", "Ljava/util/Set<Ldev/onyxstudios/cca/api/v3/component/ComponentKey<*>;>;", null);
 
-        MethodVisitor keys = classNode.visitMethod(Opcodes.ACC_PUBLIC, "keys", "()Ljava/util/Set;", null, null);
+        MethodVisitor keys = classNode.visitMethod(Opcodes.ACC_PUBLIC, "keys", "()Ljava/util/Set;", "()Ljava/util/Set<Ldev/onyxstudios/cca/api/v3/component/ComponentKey<*>;>;", null);
         keys.visitFieldInsn(Opcodes.GETSTATIC, containerImplName, "componentKeys", "Ljava/util/Set;");
         keys.visitInsn(Opcodes.ARETURN);
         keys.visitEnd();
 
         MethodVisitor hasComponents = classNode.visitMethod(Opcodes.ACC_PUBLIC, "hasComponents", "()Z", null, null);
         hasComponents.visitCode();
-        hasComponents.visitLdcInsn(!componentFactories.isEmpty());
+        hasComponents.visitInsn(sorted.isEmpty() ? Opcodes.ICONST_0 : Opcodes.ICONST_1);
         hasComponents.visitInsn(Opcodes.IRETURN);
         hasComponents.visitEnd();
 
@@ -219,10 +233,10 @@ public final class CcaAsmHelper {
         MethodVisitor clientTick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickClientComponents", "()V", null, null);
         clientTick.visitCode();
 
-        for (ComponentKey<?> key : componentFactories.keySet()) {
-            Identifier identifier = key.getId();
+        for (var entry : sorted.entrySet()) {
+            Identifier identifier = entry.getKey().getId();
             String componentFieldName = getJavaIdentifierName(identifier);
-            Class<? extends Component> impl = componentImpls.get(key);
+            Class<? extends Component> impl = entry.getValue().impl();
             String componentFieldDescriptor = Type.getDescriptor(impl);
             String factoryFieldName = getFactoryFieldName(identifier);
             /* field declaration */
@@ -250,7 +264,9 @@ public final class CcaAsmHelper {
             // initialize the component by calling the factory
             init.visitMethodInsn(Opcodes.INVOKEINTERFACE, componentFactoryName, sam.getName(), samDescriptor, true);
             // stack: component
-            init.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Objects", "requireNonNull", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
+            init.visitLdcInsn("Component factory " + entry.getValue().factory().getClass() + " for " + identifier + " produced a null component");
+            // stack: component, errorMsg
+            init.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Objects", "requireNonNull", "(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;", false);
             // stack: object
             init.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(impl));
             // stack: component
@@ -298,16 +314,16 @@ public final class CcaAsmHelper {
             Field keySet = ret.getDeclaredField("componentKeys");
             keySet.setAccessible(true);
             // TODO use a custom class with baked in immutability + BitSet contains + array iterator
-            keySet.set(null, Collections.unmodifiableSet(new ReferenceArraySet<>(componentFactories.keySet())));
+            keySet.set(null, Collections.unmodifiableSet(new ReferenceArraySet<>(sorted.keySet())));
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new StaticComponentLoadingException("Failed to initialize the set of component keys for " + ret, e);
         }
 
-        for (Map.Entry<ComponentKey<?>, I> entry : componentFactories.entrySet()) {
+        for (var entry : sorted.entrySet()) {
             try {
                 Field factoryField = ret.getDeclaredField(getFactoryFieldName(entry.getKey().getId()));
                 factoryField.setAccessible(true);
-                factoryField.set(null, entry.getValue());
+                factoryField.set(null, entry.getValue().factory());
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new StaticComponentLoadingException("Failed to initialize factory field for component type " + entry.getKey(), e);
             }
@@ -338,4 +354,5 @@ public final class CcaAsmHelper {
             }
         }
     }
+
 }

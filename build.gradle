@@ -45,8 +45,10 @@ allprojects {
         modApi "net.fabricmc:fabric-loader:${rootProject.loader_version}"
         modApi fabricApi.module("fabric-api-base", rootProject.fabric_api_version)
         modImplementation fabricApi.module("fabric-networking-api-v1", rootProject.fabric_api_version)
-        testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.0-M1"
-        testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.0-M1"
+
+        testImplementation 'junit:junit:4.13'
+        testImplementation 'org.mockito:mockito-core:3.+'
+
         compileOnly "com.google.code.findbugs:jsr305:3.0.2"
         compileOnly "com.demonwav.mcdev:annotations:1.0"
         compileOnly "org.jetbrains:annotations:19.0.0"
@@ -58,6 +60,12 @@ allprojects {
         filesMatching("fabric.mod.json") {
             expand "version": project.version
         }
+    }
+
+    test {
+        useJUnit()
+
+        maxHeapSize = '1G'
     }
 
     license {
