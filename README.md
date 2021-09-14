@@ -107,7 +107,7 @@ class IncrementingIntComponent implements IntComponent, ServerTickingComponent {
 }
 ```
 
-*This feature is still experimental. Serverside ticking is implemented for all providers except item stacks.
+*Serverside ticking is implemented for all providers except item stacks.
  Clientside ticking is only implemented for entities, block entities, and worlds.*
 
 The next step is to choose an identifier for your component, and to declare it in your `fabric.mod.json`'s custom properties:
