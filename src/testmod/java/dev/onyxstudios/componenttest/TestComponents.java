@@ -43,6 +43,7 @@ import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
 import dev.onyxstudios.componenttest.vita.AmbientVita;
 import dev.onyxstudios.componenttest.vita.BaseVita;
+import dev.onyxstudios.componenttest.vita.ChunkVita;
 import dev.onyxstudios.componenttest.vita.ItemVita;
 import dev.onyxstudios.componenttest.vita.PlayerVita;
 import dev.onyxstudios.componenttest.vita.SyncedVita;
@@ -95,7 +96,7 @@ public final class TestComponents implements
 
     @Override
     public void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry) {
-        registry.register(VITA, SyncedVita::new);
+        registry.register(VITA, ChunkVita::new);
     }
 
     @Override
