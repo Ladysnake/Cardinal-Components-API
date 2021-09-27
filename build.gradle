@@ -39,7 +39,7 @@ allprojects {
         dev
     }
     // import utility functions
-    apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/utilities.gradle"
+    apply from: rootProject.file("utilities.gradle")
 
     tasks.withType(Javadoc) {
         options.addStringOption("Xdoclint:none", "-quiet")

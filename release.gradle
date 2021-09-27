@@ -1,6 +1,3 @@
-apply from: 'https://raw.githubusercontent.com/OnyxStudios/Gradle-Scripts/master/scripts/fabric/publish/changelog.gradle'
-def MASTER_REPO = 'https://github.com/OnyxStudios/Cardinal-Components-API.git'
-
 task checkGitStatus() {
     group = 'publishing'
     description = 'Checks that the git repository is in a state suitable for release'
@@ -9,18 +6,15 @@ task checkGitStatus() {
         if (!grgit.status().isClean()) {
             throw new RuntimeException("Git repository not ready for release (${grgit.status()})")
         }
-        def masterRemote = (grgit.remote.list().find { it.url == MASTER_REPO } ?: grgit.remote.add {
-            name = 'onyxstudios'
-            url = MASTER_REPO
-        }).name
-        def currentTrackedBranch = grgit.branch.current().trackingBranch.getName().replaceAll(/.*\//, '')
-        grgit.fetch(tagMode: 'all')
-        grgit.fetch(remote: masterRemote, tagMode: 'all')
-        grgit.pull(remote: masterRemote, branch: currentTrackedBranch, rebase: true)
+        def currentBranch = grgit.branch.current().getName()
+        if (currentBranch != 'master' && !currentBranch.matches(/\d+\.\d+(?>\.\d+)?/)) {
+            throw new RuntimeException("Need to be on master or a snapshot branch to release (currently on ${currentBranch})")
+        }
+        grgit.fetch()
         if (grgit.tag.list().any { it.name == project.version }) {
             throw new RuntimeException("A tag already exists for ${project.version}")
         }
-        def status = grgit.branch.status(name: grgit.branch.current().getName())
+        def status = grgit.branch.status(name: currentBranch)
         if (status.aheadCount != 0) {
             throw new RuntimeException('Some commits have not been pushed')
         }
@@ -32,38 +26,16 @@ task checkGitStatus() {
 
 githubRelease {
     token "${findProperty('github_releases_token')}"
+    // default owner: last component of maven group
+    // default repo: name of the project
     tagName = project.version
-    targetCommitish = { grgit.branch.current().trackingBranch.name.replaceAll(/.*\//, '') }
+    targetCommitish = { grgit.branch.current().name }
     body = { project.getChangelogText() }
 
     FilenameFilter filter = { dir, filename -> filename.contains(project.version) && !filename.contains('-dev.jar') }
     releaseAssets = { jar.destinationDirectory.asFile.get().listFiles filter }
 }
-
-task ladysnakeGithubRelease(type: project.tasks.githubRelease.getClass())
-
-def configureGithubRelease(task, String repoOwner) {
-    def ext = project.extensions.githubRelease
-    task.with {
-        setAuthorization ext.authorizationProvider
-        setOwner repoOwner
-        setRepo ext.repoProvider
-        setTagName ext.tagNameProvider
-        setTargetCommitish ext.targetCommitishProvider
-        setReleaseName ext.releaseNameProvider
-        setBody ext.bodyProvider
-        setDraft ext.draftProvider
-        setPrerelease ext.prereleaseProvider
-        setReleaseAssets ext.releaseAssets
-        setOverwrite ext.overwriteProvider
-        setAllowUploadToExisting ext.allowUploadToExistingProvider
-        setApiEndpoint ext.apiEndpointProvider
-        setDryRun ext.dryRun
-    }
-    task.dependsOn(checkGitStatus)
-}
-configureGithubRelease(project.tasks.githubRelease, 'OnyxStudios')
-configureGithubRelease(project.tasks.ladysnakeGithubRelease, 'Ladysnake')
+tasks.githubRelease.dependsOn(checkGitStatus)
 
 artifactory {
 	if (project.hasProperty("artifactory_user")) {
@@ -165,7 +137,7 @@ curseforge {
 
 tasks.curseforge.dependsOn(checkGitStatus)
 
-task release(dependsOn: [tasks.publish, tasks.githubRelease, tasks.ladysnakeGithubRelease, tasks.curseforge, tasks.artifactoryPublish]) {
+task release(dependsOn: [tasks.publish, tasks.githubRelease, tasks.curseforge, tasks.artifactoryPublish]) {
     group = 'publishing'
     description = 'Releases a new version to Maven, Github and Curseforge'
 }
