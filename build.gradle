@@ -150,6 +150,7 @@ dependencies {
     modImplementation fabricApi.module("fabric-item-groups-v0", rootProject.fabric_api_version)
     modImplementation fabricApi.module("fabric-events-interaction-v0", rootProject.fabric_api_version)
     modImplementation fabricApi.module("fabric-api-lookup-api-v1", rootProject.fabric_api_version)
+    modImplementation fabricApi.module("fabric-command-api-v1", fabric_api_version)
     modRuntime fabricApi.module("fabric-networking-v0", rootProject.rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-resource-loader-v0", rootProject.fabric_api_version)
     modRuntime fabricApi.module("fabric-mining-levels-v0", rootProject.fabric_api_version)
