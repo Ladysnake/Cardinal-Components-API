@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.componenttest;
 
-import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
@@ -37,8 +36,6 @@ import dev.onyxstudios.cca.api.v3.level.LevelComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.level.LevelComponentInitializer;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
-import dev.onyxstudios.cca.api.v3.util.GenericComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.util.GenericComponentInitializer;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
 import dev.onyxstudios.componenttest.vita.AmbientVita;
@@ -58,25 +55,17 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 
-import java.util.UUID;
-import java.util.function.BiFunction;
-
 public final class TestComponents implements
     EntityComponentInitializer,
     ChunkComponentInitializer,
     BlockComponentInitializer,
     LevelComponentInitializer,
     WorldComponentInitializer,
-    GenericComponentInitializer,
     ItemComponentInitializer,
     ScoreboardComponentInitializer {
 
     public static final Identifier CUSTOM_PROVIDER_1 = new Identifier("componenttest:custom/1");
     public static final Identifier CUSTOM_PROVIDER_2 = new Identifier("componenttest:custom/2");
-    public static final Identifier CUSTOM_PROVIDER_3 = new Identifier("componenttest:custom/3");
-
-    public static final TypeToken<BiFunction<UUID, PlayerEntity, BaseVita>> CUSTOM_FACTORY_TYPE = new TypeToken<>() {
-    };
 
     public static final ComponentKey<Vita> VITA = ComponentRegistryV3.INSTANCE.getOrCreate(CardinalComponentsTest.id("vita"), Vita.class);
     public static final ComponentKey<Vita> ALT_VITA = ComponentRegistryV3.INSTANCE.getOrCreate(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
@@ -114,14 +103,6 @@ public final class TestComponents implements
     @Override
     public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
         registry.register(VITA, AmbientVita.WorldVita.class, AmbientVita.WorldVita::new);
-    }
-
-    @Override
-    public void registerGenericComponentFactories(GenericComponentFactoryRegistry registry) {
-        BiFunction<UUID, PlayerEntity, BaseVita> createForThirdParty = (uuid, p) -> new BaseVita();
-        registry.register(VITA, CUSTOM_PROVIDER_1, CUSTOM_FACTORY_TYPE, createForThirdParty);
-        registry.register(VITA, CUSTOM_PROVIDER_2, CUSTOM_FACTORY_TYPE, createForThirdParty);
-        registry.register(VITA, CUSTOM_PROVIDER_3, CUSTOM_FACTORY_TYPE, createForThirdParty);
     }
 
     @Override
