@@ -26,9 +26,9 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.source.BiomeArray;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.WorldChunk;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -36,16 +36,12 @@ import javax.annotation.Nonnull;
 
 @Mixin(EmptyChunk.class)
 public abstract class MixinEmptyChunk extends WorldChunk implements ComponentProvider {
-    @Unique
-    private static final ComponentContainer EMPTY_COMPONENTS = ComponentContainer.EMPTY;
-
-    public MixinEmptyChunk(World world, ChunkPos pos, BiomeArray biomes) {
-        super(world, pos, biomes);
+    public MixinEmptyChunk(World world, ChunkPos pos) {
+        super(world, pos);
     }
 
-    @Nonnull
     @Override
-    public ComponentContainer getComponentContainer() {
-        return EMPTY_COMPONENTS;
+    public @NotNull ComponentContainer getComponentContainer() {
+        return ComponentContainer.EMPTY;
     }
 }

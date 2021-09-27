@@ -25,15 +25,13 @@ package dev.onyxstudios.cca.mixin.item.common;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.item.ItemTagInvalidationListener;
 import dev.onyxstudios.cca.internal.base.AbstractComponentContainer;
-import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
-import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -41,58 +39,24 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = ItemStack.class)
-public abstract class MixinItemStack implements InternalStackComponentProvider {
+public abstract class MixinItemStack implements ComponentProvider {
     @Unique
     private static final ComponentContainer EMPTY_COMPONENTS = ComponentContainer.EMPTY;
 
     @Unique
     private @Nullable ComponentContainer components;
-    @Unique
-    private @Nullable NbtCompound serializedComponents;
 
-    @Inject(method = "areTagsEqual", at = @At("RETURN"), cancellable = true)
-    private static void areTagsEqual(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> cir) {
-        // If the tags are equal, either both stacks are empty or neither is.
-        if(cir.getReturnValueZ() && CardinalItemInternals.areComponentsIncompatible(stack1, stack2)) {
-            cir.setReturnValue(false);
-        }
-    }
-
-    @Inject(method = "isEqual", at = @At("RETURN"), cancellable = true)
-    private void isEqual(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        // If the tags are equal, either both stacks are empty or neither is.
-        if(cir.getReturnValueZ() && CardinalItemInternals.areComponentsIncompatible((ItemStack) (Object) this, stack)) {
-            cir.setReturnValue(false);
-        }
-    }
-
-    @Inject(method = "copy", at = @At("RETURN"))
-    private void copy(CallbackInfoReturnable<ItemStack> cir) {
-        CardinalItemInternals.copyComponents(((ItemStack)(Object) this), cir.getReturnValue());
-    }
-
-    @Inject(method = "writeNbt", at = @At("RETURN"))
-    private void serialize(NbtCompound tag, CallbackInfoReturnable<NbtCompound> cir) {
-        if (this.components != null) {
-            this.components.toTag(cir.getReturnValue());
-        } else if (this.serializedComponents != null) {
-            CardinalItemInternals.markSharedTag(this.serializedComponents);
-            cir.getReturnValue().put(AbstractComponentContainer.NBT_KEY, this.serializedComponents.get(AbstractComponentContainer.NBT_KEY));
-        }
-    }
-
-    @Inject(method = "setTag", at = @At("RETURN"))
+    @Inject(method = "setNbt", at = @At("RETURN"))
     private void invalidateCaches(NbtCompound tag, CallbackInfo ci) {
         ComponentContainer components = this.components;
 
         if (components != null) {
             for (ComponentKey<?> key : components.keys()) {
                 Component c = key.getInternal(components);
-                if (c instanceof ItemTagInvalidationListener) {
-                    ((ItemTagInvalidationListener) c).onTagInvalidated();
+                if (c instanceof ItemTagInvalidationListener listener) {
+                    listener.onTagInvalidated();
                 }
             }
         }
@@ -106,13 +70,9 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/NbtCompound;)V", at = @At("RETURN"))
     private void initComponentsNBT(NbtCompound tag, CallbackInfo ci) {
-        // Keep data without deserializing
-        NbtElement componentData = tag.get(AbstractComponentContainer.NBT_KEY);
-        if (componentData != null) {
-            NbtCompound serializedComponents = new NbtCompound();
-            // the vanilla tag is not copied, so we don't copy our data either
-            serializedComponents.put(AbstractComponentContainer.NBT_KEY, componentData);
-            this.serializedComponents = serializedComponents;
+        // Backwards save compatibility (see ItemComponent#readFromNbt)
+        if (tag.contains(AbstractComponentContainer.NBT_KEY)) {
+            this.getComponentContainer().fromTag(tag);
         }
     }
 
@@ -121,33 +81,7 @@ public abstract class MixinItemStack implements InternalStackComponentProvider {
         if (this.empty) return EMPTY_COMPONENTS;
         if (this.components == null) {
             this.components = ((ItemCaller) this.getItem()).cardinal_createComponents((ItemStack) (Object) this);
-            if (this.serializedComponents != null) {
-                // If the tag is shared, we need to copy it before deserialization
-                // Components may keep direct references to the serialized data, especially in the case of inventories
-                this.components.fromTag(CardinalItemInternals.copyIfNeeded(this.serializedComponents));
-                this.serializedComponents = null;
-            }
         }
         return this.components;
-    }
-
-    @Override
-    public @Nullable ComponentContainer getActualComponentContainer() {
-        return this.components;
-    }
-
-    @Override
-    public @Nullable NbtCompound cca_getSerializedComponentData() {
-        return this.serializedComponents;
-    }
-
-    @Override
-    public void cca_setSerializedComponentData(@Nullable NbtCompound components) {
-        this.serializedComponents = components;
-    }
-
-    @Override
-    public boolean cca_hasNoComponentData() {
-        return this.components == null && this.serializedComponents == null;
     }
 }

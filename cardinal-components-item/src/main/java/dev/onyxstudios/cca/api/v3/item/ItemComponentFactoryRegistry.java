@@ -41,44 +41,6 @@ import java.util.function.Predicate;
  */
 public interface ItemComponentFactoryRegistry {
     /**
-     * Registers a {@link ComponentFactory} for stacks of a specific item.
-     *
-     * @param item    the item to target
-     * @param factory the factory to use to create components of the given type
-     * @throws NullPointerException  if any of the arguments is {@code null}
-     * @throws IllegalStateException if the {@code item} was not previously registered
-     * @deprecated stateful item components will be removed in MC 1.18, please store data in the tag.
-     * Migration to tag-based components is handled automatically for old saves.
-     */
-    @Deprecated(since = "3.0.0", forRemoval = true)
-    <C extends Component> void registerFor(Item item, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory);
-
-    /**
-     * Registers a {@link ComponentFactory} for stacks of a specific item.
-     *
-     * @param itemId  the id of an item to target
-     * @param factory the factory to use to create components of the given type
-     * @throws NullPointerException if any of the arguments is {@code null}
-     * @deprecated stateful item components will be removed in MC 1.18, please store data in the tag
-     * Migration to tag-based components is handled automatically for old saves.
-     */
-    @Deprecated(since = "3.0.0", forRemoval = true)
-    <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory);
-
-    /**
-     * Registers a {@link ComponentFactory} for stacks of specific items, based on a predicate.
-     *
-     * @param test    a predicate testing whether the Item can have the component attached to its stacks
-     * @param factory the factory to use to create components of the given type
-     * @throws NullPointerException if any of the arguments is {@code null}
-     * @deprecated stateful item components will be removed in MC 1.18, please store data in the tag
-     * Migration to tag-based components is handled automatically for old saves.
-     */
-    @Deprecated(since = "3.0.0", forRemoval = true)
-    <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory);
-
-
-    /**
      * Registers a {@link ComponentFactory} for stacks of specific items, based on a predicate.
      *
      * @param test    a predicate testing whether the Item can have the component attached to its stacks

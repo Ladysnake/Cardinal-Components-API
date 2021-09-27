@@ -41,7 +41,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 /**
- * Base implementation for an {@link ItemStack} component that stores data in the {@linkplain ItemStack#getTag() stack NBT}.
+ * Base implementation for an {@link ItemStack} component that stores data in the {@linkplain ItemStack#getNbt() stack NBT}.
  *
  * @see ItemComponentFactoryRegistry#register(Item, ComponentKey, ComponentFactory)
  * @see ItemComponentFactoryRegistry#register(Predicate, ComponentKey, ComponentFactory)
@@ -67,7 +67,7 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     /**
      * Returns the tag storing this component's data.
      *
-     * <p>The returned tag is a {@linkplain ItemStack#getSubTag(String)} subtag} attached to this component's stack
+     * <p>The returned tag is a {@linkplain ItemStack#getSubNbt(String)} subtag} attached to this component's stack
      * (the stack to which this component is attached).
      * The subtag is mapped to this component's {@linkplain #getRootTagKey() root key}.
      *
@@ -80,7 +80,7 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     /**
      * Returns the tag storing this component's data, creating it if it does not exist.
      *
-     * <p>The returned tag is a {@linkplain ItemStack#getOrCreateSubTag(String) subtag} attached to this component's stack
+     * <p>The returned tag is a {@linkplain ItemStack#getOrCreateSubNbt(String) subtag} attached to this component's stack
      * (the stack to which this component is attached).
      * The subtag is mapped to this component's {@linkplain #getRootTagKey() root key}.
      *
@@ -88,7 +88,7 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
      */
     protected NbtCompound getOrCreateRootTag() {
         if (this.rootTag != null) return this.rootTag;
-        return this.rootTag = this.stack.getOrCreateSubTag(this.getRootTagKey());
+        return this.rootTag = this.stack.getOrCreateSubNbt(this.getRootTagKey());
     }
 
     /**
@@ -278,7 +278,7 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
             rootTag.remove(key);
 
             if (rootTag.isEmpty()) {
-                this.stack.removeSubTag(this.getRootTagKey());
+                this.stack.removeSubNbt(this.getRootTagKey());
                 this.rootTag = null;
             }
         }
@@ -358,7 +358,7 @@ public abstract class ItemComponent implements Component, ItemTagInvalidationLis
     @ApiStatus.Experimental
     @Override
     public void onTagInvalidated() {
-        this.rootTag = this.stack.getSubTag(this.getRootTagKey());
+        this.rootTag = this.stack.getSubNbt(this.getRootTagKey());
     }
 
     @Deprecated

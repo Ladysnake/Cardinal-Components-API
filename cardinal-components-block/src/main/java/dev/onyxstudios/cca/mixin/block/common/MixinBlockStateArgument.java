@@ -20,30 +20,32 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.mixin.item.common;
+package dev.onyxstudios.cca.mixin.block.common;
 
-import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.command.argument.BlockStateArgument;
+import net.minecraft.nbt.NbtCompound;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Mixin(ItemEntity.class)
-public abstract class MixinItemEntity {
+@Mixin(BlockStateArgument.class)
+public class MixinBlockStateArgument {
     @Shadow
-    public abstract ItemStack getStack();
+    @Final
+    @Nullable
+    private NbtCompound data;
 
-    @Inject(
-        method = "canMerge(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z",
-        at = @At(value = "RETURN"),
-        cancellable = true
-    )
-    private static void stopDifferentComponentsMerging(ItemStack stack1, ItemStack stack2, CallbackInfoReturnable<Boolean> ci) {
-        if (ci.getReturnValueZ() && CardinalItemInternals.areComponentsIncompatible(stack1, stack2)) {
-            ci.setReturnValue(false);
+    @ModifyVariable(method = "setBlockState", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;readNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
+    private BlockEntity readComponentData(BlockEntity be) {
+        if (this.data != null) {
+            ComponentProvider.fromBlockEntity(be).getComponentContainer().fromTag(this.data);
         }
+        return be;
     }
 }

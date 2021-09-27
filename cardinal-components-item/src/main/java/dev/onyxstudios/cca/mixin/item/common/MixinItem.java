@@ -23,8 +23,8 @@
 package dev.onyxstudios.cca.mixin.item.common;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
 import dev.onyxstudios.cca.internal.item.ItemCaller;
+import dev.onyxstudios.cca.internal.item.StaticItemComponentPlugin;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,9 +37,9 @@ public abstract class MixinItem implements ItemCaller {
     @Override
     public ComponentContainer cardinal_createComponents(ItemStack stack) {
         //noinspection ConstantConditions
-        assert stack.getItem() == (ItemCaller) this;
+        assert stack.getItem() == (Object) this;
         if (this.cardinal_containerFactory == null) {
-            this.cardinal_containerFactory = CardinalItemInternals.createItemStackContainerFactory((Item) (Object) this);
+            this.cardinal_containerFactory = StaticItemComponentPlugin.createItemStackContainerFactory((Item) (Object) this);
         }
         return this.cardinal_containerFactory.createContainer(stack);
     }

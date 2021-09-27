@@ -20,34 +20,32 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.mixin.item.common;
+package dev.onyxstudios.cca.mixin.block.common;
 
-import dev.onyxstudios.cca.internal.item.CardinalItemInternals;
-import dev.onyxstudios.cca.internal.item.InternalStackComponentProvider;
-import net.minecraft.item.ItemStack;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import net.minecraft.block.Block;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-@Mixin(PacketByteBuf.class)
-public abstract class MixinPacketByteBuf {
+@Mixin(FallingBlockEntity.class)
+public abstract class MixinFallingBlockEntity extends Entity {
+    public MixinFallingBlockEntity(EntityType<?> type, World world) {
+        super(type, world);
+    }
 
-    /**
-     * @see MixinWritePacketByteBuf
-     * @see MixinWritePacketByteBufOF
-     */
-    @Inject(method = "readItemStack", at = @At(value = "RETURN", ordinal = 1))
-    private void readStack(CallbackInfoReturnable<ItemStack> cir) {
-        ItemStack stack = cir.getReturnValue();
-        NbtCompound syncedComponents = stack.getSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS);
-
-        if (syncedComponents != null) {
-            // assumes components have not been deserialized yet
-            InternalStackComponentProvider.get(stack).cca_setSerializedComponentData(syncedComponents);
-            stack.removeSubTag(CardinalItemInternals.CCA_SYNCED_COMPONENTS);
-        }
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;readNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILSOFT)
+    void readComponentData(CallbackInfo ci, Block $$0, BlockPos $$2, BlockEntity be, NbtCompound nbt) {
+        ComponentProvider.fromBlockEntity(be).getComponentContainer().fromTag(nbt);
     }
 }

@@ -68,17 +68,33 @@ public abstract class MixinBlockEntity implements ComponentProvider {
     @Unique
     private ComponentContainer components;
 
+    @Inject(method = "createFromNbt", at = @At("RETURN"))
+    private static void readComponentData(BlockPos pos, BlockState state, NbtCompound nbt, CallbackInfoReturnable<BlockEntity> cir) {
+        if (cir.getReturnValue() != null) {
+            ComponentProvider.fromBlockEntity(cir.getReturnValue()).getComponentContainer().fromTag(nbt);
+        }
+    }
+
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(BlockEntityType<?> type, BlockPos pos, BlockState state, CallbackInfo ci) {
         this.components = CardinalBlockInternals.createComponents((BlockEntity) (Object) this);
     }
 
-    @Inject(method = "writeNbt", at = @At("RETURN"))
-    private void writeNbt(NbtCompound inputTag, CallbackInfoReturnable<NbtCompound> cir) {
+    @Inject(method = "createNbt", at = @At("RETURN"))
+    private void writeNbt(CallbackInfoReturnable<NbtCompound> cir) {
         this.components.toTag(cir.getReturnValue());
     }
 
-    // FIXME modded and future BEs may not call super.fromTag()
+    /**
+     * Yay redundancy!
+     *
+     * <p>This method may be overridden without calling super(), so we need safety nets.
+     * On the other hand, we still need this inject because mods can also call {@link BlockEntity#readNbt(NbtCompound)} directly.
+     * We mostly do not care about what happens on the client though, since we have our own packets.
+     *
+     * @see #readComponentData(BlockPos, BlockState, NbtCompound, CallbackInfoReturnable)
+     * @see MixinBlockDataObject#readComponentData(NbtCompound, CallbackInfo)
+     */
     @Inject(method = "readNbt", at = @At(value = "RETURN"))
     private void readNbt(NbtCompound tag, CallbackInfo ci) {
         this.components.fromTag(tag);
