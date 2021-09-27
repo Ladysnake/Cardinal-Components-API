@@ -22,13 +22,11 @@
  */
 package dev.onyxstudios.componenttest;
 
-import com.google.common.reflect.TypeToken;
 import dev.onyxstudios.cca.api.v3.block.BlockComponents;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
-import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
-import dev.onyxstudios.cca.api.v3.util.ComponentContainerMetafactory;
+import dev.onyxstudios.cca.internal.base.GenericContainerBuilder;
 import dev.onyxstudios.componenttest.vita.BaseVita;
 import dev.onyxstudios.componenttest.vita.Vita;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
@@ -56,9 +54,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.BiFunction;
 
 public class CardinalComponentsTest {
 
@@ -106,32 +104,22 @@ public class CardinalComponentsTest {
             assert false : "Static components must be registered through mod metadata or plugin";
         } catch (IllegalStateException ignored) { }
 
-        LOGGER.info(ComponentContainerMetafactory.metafactory(
-            TestComponents.CUSTOM_PROVIDER_1,
-            TypeToken.of(TestContainerFactory.class),
-            new TypeToken<BiFunction<UUID, PlayerEntity, ? extends Component>>() {}
-        ).create(UUID.randomUUID(), null));
+        LOGGER.info(new GenericContainerBuilder<>(
+            TestComponentFactory.class,
+            TestContainerFactory.class,
+            List.of(UUID.class, PlayerEntity.class),
+            (u, p) -> ComponentContainer.EMPTY
+        ).build().create(UUID.randomUUID(), null));
 
         try {
-            LOGGER.info(ComponentContainerMetafactory.metafactory(
-                TestComponents.CUSTOM_PROVIDER_1,
-                TypeToken.of(TestContainerFactory.class),
-                new TypeToken<BiFunction<UUID, PlayerEntity, ? extends Component>>() {}
-            ).create(UUID.randomUUID(), null));
+            LOGGER.info(new GenericContainerBuilder<>(
+                TestComponentFactory.class,
+                TestContainerFactory.class,
+                List.of(UUID.class, PlayerEntity.class),
+                (u, p) -> ComponentContainer.EMPTY
+            ).build().create(UUID.randomUUID(), null));
             assert false : "Only one factory should be created for any given provider type";
         } catch (IllegalStateException ignored) { }
-
-        LOGGER.info(ComponentContainerMetafactory.metafactory(
-            TestComponents.CUSTOM_PROVIDER_2,
-            new TypeToken<BiFunction<UUID, PlayerEntity, ComponentContainer>>() {},
-            new TypeToken<BiFunction<UUID, PlayerEntity, ? extends CopyableComponent<?>>>() {}
-        ).apply(UUID.randomUUID(), null));
-
-        LOGGER.info(ComponentContainerMetafactory.metafactory(
-            new Identifier("componenttest:no_factory"),
-            TypeToken.of(TestContainerFactory.class),
-            new TypeToken<BiFunction<UUID, PlayerEntity, ? extends Component>>() {}
-        ).create(UUID.randomUUID(), null));
 
         UseItemCallback.EVENT.register((playerEntity, world, hand) -> {
             ItemStack stack = playerEntity.getStackInHand(hand);
@@ -145,6 +133,11 @@ public class CardinalComponentsTest {
         );
         BlockComponents.exposeApi(TestComponents.VITA, VITA_API_LOOKUP, (vita, side) -> side == Direction.UP ? vita : null, BlockEntityType.END_PORTAL);
         BlockComponents.exposeApi(VitaCompound.KEY, VITA_API_LOOKUP, VitaCompound::get, BlockEntityType.END_GATEWAY);
+    }
+
+    @FunctionalInterface
+    public interface TestComponentFactory<C extends Component> {
+        C create(UUID u, @Nullable PlayerEntity p);
     }
 
     public interface TestContainerFactory {
