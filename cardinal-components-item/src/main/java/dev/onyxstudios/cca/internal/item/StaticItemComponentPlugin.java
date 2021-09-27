@@ -51,8 +51,6 @@ import java.util.function.Predicate;
 
 public final class StaticItemComponentPlugin extends LazyDispatcher implements ItemComponentFactoryRegistry {
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
-    private static final boolean DEV = Boolean.getBoolean("fabric.development");
-    private static final boolean VERIFY_EQUALS = DEV && !Boolean.getBoolean("cca.debug.noverifyequals");
 
     private StaticItemComponentPlugin() {
         super("creating an ItemStack");
@@ -64,6 +62,14 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
 
     private static String getSuffix(Identifier itemId) {
         return "ItemStackImpl_" + CcaAsmHelper.getJavaIdentifierName(itemId);
+    }
+
+    /**
+     * Creates a container factory for an item id.
+     */
+    public static ComponentContainer.Factory<ItemStack> createItemStackContainerFactory(Item item) {
+        Identifier itemId = Registry.ITEM.getId(item);
+        return INSTANCE.getFactoryClass(item, itemId);
     }
 
     public ComponentContainer.Factory<ItemStack> getFactoryClass(Item item, Identifier itemId) {
@@ -89,13 +95,11 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         );
     }
 
-    @Override
     public <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
         this.checkLoading(ItemComponentFactoryRegistry.class, "register");
         this.register0(itemId, type, factory);
     }
 
-    @Override
     public <C extends Component> void registerFor(Item item, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
         if (!Iterables.contains(Registry.ITEM, item)) {
             throw new IllegalStateException(item + " must be registered to Registry.ITEM before using it for component registration");
@@ -124,8 +128,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
         this.registerFor(item, type, factory);
     }
 
-    @Override
-    public <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
+    private <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
         this.dynamicFactories.add(new PredicatedComponentFactory<>(test, type, factory));
     }
 
@@ -134,38 +137,7 @@ public final class StaticItemComponentPlugin extends LazyDispatcher implements I
 
         ComponentContainer.Factory.Builder<ItemStack> builder = this.componentFactories.computeIfAbsent(itemId, t -> ComponentContainer.Factory.builder(ItemStack.class));
         builder.checkDuplicate(type, previousFactory -> "Duplicate factory declarations for " + type.getId() + " on item '" + itemId + "': " + factory + " and " + previousFactory);
-
-        ComponentFactory<ItemStack, ? extends C> finalFactory;
-
-        if (VERIFY_EQUALS && ComponentV3.class.isAssignableFrom(type.getComponentClass())) {
-            finalFactory = new ComponentFactory<ItemStack, C>() {
-                private boolean checked;
-
-                @Nonnull
-                @Override
-                public C createComponent(ItemStack stack) {
-                    C component = factory.createComponent(stack);
-
-                    if (!this.checked) {
-                        try {
-                            if (component.getClass().getMethod("equals", Object.class).getDeclaringClass() == Object.class) {
-                                throw new IllegalStateException("Component implementation " + component.getClass().getTypeName() + " attached to " + stack + " should override Object#equals.\nMore information: https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Item");
-                            }
-                        } catch (NoSuchMethodException e) {
-                            throw new AssertionError("Object#equals not found ?!");
-                        }
-
-                        this.checked = true;
-                    }
-
-                    return component;
-                }
-            };
-        } else {
-            finalFactory = factory;
-        }
-
-        builder.component(type, finalFactory);
+        builder.component(type, factory);
     }
 
     private final class PredicatedComponentFactory<C extends Component> {

@@ -40,7 +40,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ChunkSerializer.class)
 public abstract class MixinChunkSerializer {
     @Inject(method = "deserialize", at = @At("RETURN"))
-    private static void deserialize(ServerWorld world, StructureManager structureManager, PointOfInterestStorage poiStorage, ChunkPos pos, NbtCompound tag, CallbackInfoReturnable<ProtoChunk> cir) {
+    private static void deserialize(ServerWorld world, PointOfInterestStorage pointOfInterestStorage, ChunkPos chunkPos, NbtCompound tag, CallbackInfoReturnable<ProtoChunk> cir) {
         ProtoChunk ret = cir.getReturnValue();
         Chunk chunk = ret instanceof ReadOnlyChunk ? ((ReadOnlyChunk) ret).getWrappedChunk() : ret;
         NbtCompound levelData = tag.getCompound("Level");

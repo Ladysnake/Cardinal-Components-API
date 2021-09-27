@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class MixinServerPlayerEntity {
-    @Inject(method = "sendBlockEntityUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;toUpdatePacket()Lnet/minecraft/network/packet/s2c/play/BlockEntityUpdateS2CPacket;"))
+    @Inject(method = "sendBlockEntityUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;toUpdatePacket()Lnet/minecraft/network/Packet;"))
     private void syncBlockEntity(BlockEntity blockEntity, CallbackInfo ci) {
         BlockEntitySyncCallback.EVENT.invoker().onBlockEntitySync((ServerPlayerEntity)(Object) this, blockEntity);
     }

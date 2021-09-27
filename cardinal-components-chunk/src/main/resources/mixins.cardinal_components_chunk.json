@@ -4,10 +4,10 @@
   "compatibilityLevel": "JAVA_8",
   "package": "dev.onyxstudios.cca.mixin.chunk",
   "mixins": [
+    "common.MixinChunk",
     "common.MixinChunkHolder",
     "common.MixinChunkSerializer",
     "common.MixinEmptyChunk",
-    "common.MixinProtoChunk",
     "common.MixinReadOnlyChunk",
     "common.MixinServerWorld",
     "common.MixinThreadedAnvilChunkStorage",

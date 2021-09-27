@@ -25,27 +25,32 @@ package dev.onyxstudios.cca.mixin.chunk.common;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
+import net.minecraft.block.Block;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.HeightLimitView;
+import net.minecraft.world.TickScheduler;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ProtoChunk;
+import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.UpgradeData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nonnull;
-
-@Mixin(ProtoChunk.class)
-public abstract class MixinProtoChunk implements Chunk, ComponentProvider {
+@Mixin(Chunk.class)
+public class MixinChunk implements ComponentProvider {
     @Unique
     private ComponentContainer components;
 
-    @Inject(method = "<init>(Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/world/chunk/UpgradeData;[Lnet/minecraft/world/chunk/ChunkSection;Lnet/minecraft/world/ChunkTickScheduler;Lnet/minecraft/world/ChunkTickScheduler;Lnet/minecraft/world/HeightLimitView;)V", at = @At("RETURN"))
-    private void initComponents(CallbackInfo ci) {
-        this.components = StaticChunkComponentPlugin.createContainer(this);
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void initComponents(ChunkPos $$0, UpgradeData $$1, HeightLimitView $$2, Registry<Biome> $$3, long $$4, ChunkSection[] $$5, TickScheduler<Block> $$6, TickScheduler<Fluid> $$7, CallbackInfo ci) {
+        this.components = StaticChunkComponentPlugin.createContainer((Chunk) (Object) this);
     }
 
-    @Nonnull
     @Override
     public ComponentContainer getComponentContainer() {
         return this.components;

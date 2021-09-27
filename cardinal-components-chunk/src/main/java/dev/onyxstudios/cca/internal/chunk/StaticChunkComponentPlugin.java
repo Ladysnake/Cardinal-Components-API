@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.chunk;
 
+import com.google.common.base.Suppliers;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.Component;
@@ -34,11 +35,12 @@ import net.minecraft.util.Lazy;
 import net.minecraft.world.chunk.Chunk;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<Chunk, ChunkComponentInitializer> implements ChunkComponentFactoryRegistry {
     public static final StaticChunkComponentPlugin INSTANCE = new StaticChunkComponentPlugin();
-    private static final Lazy<ComponentContainer.Factory<Chunk>> componentsContainerFactory
-        = new Lazy<>(INSTANCE::buildContainerFactory);
+    private static final Supplier<ComponentContainer.Factory<Chunk>> componentsContainerFactory
+        = Suppliers.memoize(INSTANCE::buildContainerFactory);
 
     public static ComponentContainer createContainer(Chunk chunk) {
         return componentsContainerFactory.get().createContainer(chunk);

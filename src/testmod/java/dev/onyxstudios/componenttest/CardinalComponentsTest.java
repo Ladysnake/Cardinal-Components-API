@@ -73,8 +73,7 @@ public class CardinalComponentsTest {
     public static final VitalityStickItem VITALITY_STICK = Registry.register(Registry.ITEM, VITA_STICK_ID,
             new VitalityStickItem(new Item.Settings().group(ITEM_GROUP).maxDamage(50)));
 
-    public static final VitalityCondenser VITALITY_CONDENSER = Registry.register(Registry.BLOCK, "componenttest:vita_condenser",
-            new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().lightLevel(5).ticksRandomly()));
+    public static final VitalityCondenser VITALITY_CONDENSER = new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().lightLevel(5).ticksRandomly());
 
     public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(Registry.ENTITY_TYPE, "componenttest:vita_zombie",
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, VitalityZombieEntity::new).dimensions(EntityType.ZOMBIE.getDimensions()).build());
@@ -87,6 +86,8 @@ public class CardinalComponentsTest {
 
     public static void init() {
         LOGGER.info("Hello, Components!");
+
+        Registry.register(Registry.BLOCK, "componenttest:vita_condenser", VITALITY_CONDENSER);
 
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
 

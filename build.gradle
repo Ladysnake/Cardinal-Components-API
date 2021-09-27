@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.time.Year
 
 plugins {
-    id "fabric-loom" version "0.8-SNAPSHOT" apply false
+    id "fabric-loom" version "0.10-SNAPSHOT" apply false
     id "org.cadixdev.licenser" version "0.6.0"
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "maven-publish"

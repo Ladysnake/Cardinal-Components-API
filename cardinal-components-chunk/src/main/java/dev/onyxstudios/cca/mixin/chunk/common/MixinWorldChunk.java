@@ -31,15 +31,24 @@ import dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.minecraft.block.Block;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.HeightLimitView;
+import net.minecraft.world.TickScheduler;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ProtoChunk;
+import net.minecraft.world.chunk.UpgradeData;
 import net.minecraft.world.chunk.WorldChunk;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -53,26 +62,13 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 @Mixin(WorldChunk.class)
-public abstract class MixinWorldChunk implements Chunk, ComponentProvider {
+public abstract class MixinWorldChunk extends Chunk implements ComponentProvider {
+    public MixinWorldChunk(ChunkPos $$0, UpgradeData $$1, HeightLimitView $$2, Registry<Biome> $$3, long $$4, @Nullable ChunkSection[] $$5, TickScheduler<Block> $$6, TickScheduler<Fluid> $$7) {
+        super($$0, $$1, $$2, $$3, $$4, $$5, $$6, $$7);
+    }
+
     @Shadow
     public abstract World getWorld();
-
-    @Shadow
-    public abstract ChunkPos getPos();
-
-    @Unique
-    private ComponentContainer components;
-
-    @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/util/math/ChunkPos;Lnet/minecraft/world/biome/source/BiomeArray;Lnet/minecraft/world/chunk/UpgradeData;Lnet/minecraft/world/TickScheduler;Lnet/minecraft/world/TickScheduler;J[Lnet/minecraft/world/chunk/ChunkSection;Ljava/util/function/Consumer;)V", at = @At("RETURN"))
-    private void initComponents(CallbackInfo ci) {
-        this.components = StaticChunkComponentPlugin.createContainer(this);
-    }
-
-    @Nonnull
-    @Override
-    public ComponentContainer getComponentContainer() {
-        return this.components;
-    }
 
     @Override
     public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
@@ -95,6 +91,6 @@ public abstract class MixinWorldChunk implements Chunk, ComponentProvider {
 
     @Inject(method = "<init>(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/chunk/ProtoChunk;Ljava/util/function/Consumer;)V", at = @At("RETURN"))
     private void copyFromProto(ServerWorld world, ProtoChunk proto, Consumer<WorldChunk> consumer, CallbackInfo ci) {
-        this.components.copyFrom(ComponentProvider.fromChunk(proto).getComponentContainer());
+        this.getComponentContainer().copyFrom(ComponentProvider.fromChunk(proto).getComponentContainer());
     }
 }
