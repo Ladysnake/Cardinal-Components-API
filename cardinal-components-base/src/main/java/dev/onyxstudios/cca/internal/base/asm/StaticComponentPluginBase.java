@@ -60,19 +60,6 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
      * the given implementation type, using an argument of the given {@code factoryArg} type.
      *
      * <p>The generated class has a single constructor, taking {@code eventCount} parameters of type {@link Event}.
-     *  @param implNameSuffix       a unique suffix for the generated class
-     * @param containerFactoryType the factory interface that is to be implemented by the returned class
-     * @param containerImpl        the type of containers that is to be instantiated by the generated factory
-     */
-    public static <I> Class<? extends I> spinContainerFactory(String implNameSuffix, Class<? super I> containerFactoryType, Class<? extends ComponentContainer> containerImpl, Class<?>... actualFactoryParams) throws IOException {
-        return spinContainerFactory(implNameSuffix, containerFactoryType, containerImpl, List.of(actualFactoryParams));
-    }
-
-    /**
-     * Defines an implementation of {@code I} which creates component containers of
-     * the given implementation type, using an argument of the given {@code factoryArg} type.
-     *
-     * <p>The generated class has a single constructor, taking {@code eventCount} parameters of type {@link Event}.
      *
      * @param implNameSuffix       a unique suffix for the generated class
      * @param containerFactoryType the factory interface that is to be implemented by the returned class

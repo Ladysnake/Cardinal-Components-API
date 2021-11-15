@@ -25,16 +25,14 @@ package dev.onyxstudios.cca.mixin.chunk.common;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.internal.chunk.StaticChunkComponentPlugin;
-import net.minecraft.block.Block;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.HeightLimitView;
-import net.minecraft.world.TickScheduler;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.UpgradeData;
+import net.minecraft.world.gen.chunk.Blender;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -47,7 +45,7 @@ public class MixinChunk implements ComponentProvider {
     private ComponentContainer components;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void initComponents(ChunkPos $$0, UpgradeData $$1, HeightLimitView $$2, Registry<Biome> $$3, long $$4, ChunkSection[] $$5, TickScheduler<Block> $$6, TickScheduler<Fluid> $$7, CallbackInfo ci) {
+    private void initComponents(ChunkPos pos, UpgradeData upgradeData, HeightLimitView heightLimitView, Registry<Biome> biome, long inhabitedTime, ChunkSection[] sectionArrayInitializer, Blender blendingData, CallbackInfo ci) {
         this.components = StaticChunkComponentPlugin.createContainer((Chunk) (Object) this);
     }
 

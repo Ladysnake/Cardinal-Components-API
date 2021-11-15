@@ -23,7 +23,7 @@
 package dev.onyxstudios.cca.mixin.block.common;
 
 import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncCallback;
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,8 +32,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class MixinServerPlayerEntity {
-    @Inject(method = "sendBlockEntityUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;toUpdatePacket()Lnet/minecraft/network/Packet;"))
-    private void syncBlockEntity(BlockEntity blockEntity, CallbackInfo ci) {
-        BlockEntitySyncCallback.EVENT.invoker().onBlockEntitySync((ServerPlayerEntity)(Object) this, blockEntity);
+    @Inject(method = "openCommandBlockScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/s2c/play/BlockEntityUpdateS2CPacket;create(Lnet/minecraft/block/entity/BlockEntity;Ljava/util/function/Function;)Lnet/minecraft/network/packet/s2c/play/BlockEntityUpdateS2CPacket;"))
+    private void syncBlockEntity(CommandBlockBlockEntity commandBlock, CallbackInfo ci) {
+        BlockEntitySyncCallback.EVENT.invoker().onBlockEntitySync((ServerPlayerEntity)(Object) this, commandBlock);
     }
 }
