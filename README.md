@@ -35,9 +35,13 @@ repositories {
 }
 
 dependencies {
+    // Adds a dependency on the base cardinal components module (required by every other module)
     // Replace modImplementation with modApi if you expose components in your own API
+    modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:<VERSION>"
+    // Adds a dependency on a specific module
     modImplementation "io.github.onyxstudios.Cardinal-Components-API:<MODULE>:<VERSION>"
     // Includes Cardinal Components API as a Jar-in-Jar dependency (optional)
+    include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:<VERSION>"
     include "io.github.onyxstudios.Cardinal-Components-API:<MODULE>:<VERSION>"
 }
 ```
@@ -59,7 +63,10 @@ modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-compon
 
 ## Basic Usage
 
-To get started, you only need a class implementing `Component`. It is recommended to have it split into an interface and an implementation, so that internals get properly encapsulated and so that the component itself can be used as an API by other mods.
+To get started, you only need a class implementing `Component`.
+It is recommended to have it split into an interface and an implementation,
+so that internals get properly encapsulated and so that the component itself can be used
+as an API by other mods.
 
 **Minimal code example:**
 ```java
@@ -76,7 +83,9 @@ class RandomIntComponent implements IntComponent {
 ```
 *Note: a component class can be reused for several component types*
 
-If you want your component to be **automatically synchronized with watching clients**, you can also add the [`AutoSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/AutoSyncedComponent.java) interface to your implementation:
+If you want your component to be **automatically synchronized with watching clients**,
+you can also add the [`AutoSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/AutoSyncedComponent.java)
+interface to your implementation:
 
 ```java
 class SyncedIntComponent implements IntComponent, AutoSyncedComponent {
@@ -125,7 +134,11 @@ The next step is to choose an identifier for your component, and to declare it i
 ```
 
 Components can be provided by objects of various classes, depending on which modules you installed.
-The most common providers are [entities](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Entity), [item stacks](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Item), [worlds](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-World) and [chunks](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Chunk), but more are available.
+The most common providers are [entities](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Entity),
+[item stacks](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Item),
+[worlds](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-World)
+and [chunks](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Chunk),
+but more are available.
 To interact with them, you need to **register a component key**, using `ComponentRegistryV3#getOrCreate`;
 the resulting `ComponentKey` instance has the query methods you need. You will also need to **attach your
 component** to some providers (here, to players and worlds):
@@ -153,10 +166,7 @@ Do not forget to declare your component initializer as an entrypoint in your `fa
 ```json
 {
     "entrypoints": {
-        "cardinal-components-entity": [
-            "a.b.c.MyComponents"
-        ],
-        "cardinal-components-world": [
+        "cardinal-components": [
             "a.b.c.MyComponents"
         ]
     },

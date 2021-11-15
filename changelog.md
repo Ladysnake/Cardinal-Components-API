@@ -1,8 +1,7 @@
 ------------------------------------------------------
 Version 4.0.0
 ------------------------------------------------------
-### Alpha 1
-Updated to 21w37a
+Updated to 1.18
 
 **Removed**
 
@@ -10,7 +9,7 @@ Updated to 21w37a
     - Item components must now save all their data in the stack NBT
     - Consider switching to API Lookup API where possible
 - Removed the `cardinal-components-util` module
-    - According to Github no one ever used it, but if you did and you see no currently available alternative, please open an issue
+    - According to Github no one ever used it, but if you did, and you see no currently available alternative, please open an issue
 
 ------------------------------------------------------
 Version 3.1.1

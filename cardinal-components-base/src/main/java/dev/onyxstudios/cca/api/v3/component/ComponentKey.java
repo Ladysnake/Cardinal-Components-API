@@ -67,20 +67,23 @@ public abstract class ComponentKey<C extends Component> {
      */
     @Contract(pure = true)
     public <V> @Nullable C getNullable(V provider) {
-        return this.getInternal((ComponentProvider) provider);
+        return this.getInternal(((ComponentProvider) provider).getComponentContainer());
     }
 
     /**
      * @param provider a component provider
      * @param <V>      the class of the component provider
      * @return the nonnull value of the held component of this type
+     * @throws NullPointerException if {@code provider} is null
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      * @see #maybeGet(Object)
      */
     public final <V> C get(V provider) {
-        C component = this.getInternal((ComponentProvider) provider);
+        C component = this.getInternal(((ComponentProvider) provider).getComponentContainer());
+
         assert component == null || this.getComponentClass().isInstance(component);
+
         if (component == null) {
             try {
                 throw new NoSuchElementException(provider + " provides no component of type " + this.getId());
@@ -101,8 +104,8 @@ public abstract class ComponentKey<C extends Component> {
      * @see #get(Object)
      */
     public final <V> Optional<C> maybeGet(@Nullable V provider) {
-        if (provider instanceof ComponentProvider) {
-            return Optional.ofNullable(this.getInternal((ComponentProvider) provider));
+        if (provider instanceof ComponentProvider p) {
+            return Optional.ofNullable(this.getInternal(p.getComponentContainer()));
         }
         return Optional.empty();
     }
@@ -185,6 +188,17 @@ public abstract class ComponentKey<C extends Component> {
         }
     }
 
+    @ApiStatus.Experimental
+    public void syncWith(ServerPlayerEntity player, ComponentProvider provider, ComponentPacketWriter writer, PlayerSyncPredicate predicate) {
+        if (predicate.shouldSyncWith(player)) {
+            Packet<?> packet = provider.toComponentPacket(this, writer, player);
+
+            if (packet != null) {
+                player.networkHandler.sendPacket(packet);
+            }
+        }
+    }
+
     @Override
     public final String toString() {
         return this.getClass().getSimpleName() + "[\"" + this.id + "\"]";
@@ -220,24 +234,8 @@ public abstract class ComponentKey<C extends Component> {
     @ApiStatus.Internal
     public abstract @Nullable C getInternal(ComponentContainer container);
 
-    private @Nullable C getInternal(ComponentProvider provider) {
-        return this.getInternal(provider.getComponentContainer());
-    }
-
     @ApiStatus.Internal
     public C getFromContainer(ComponentContainer container) {
         return Objects.requireNonNull(this.getInternal(container));
-    }
-
-
-    @ApiStatus.Internal
-    public void syncWith(ServerPlayerEntity player, ComponentProvider provider, ComponentPacketWriter writer, PlayerSyncPredicate predicate) {
-        if (predicate.shouldSyncWith(player)) {
-            Packet<?> packet = provider.toComponentPacket(this, writer, player);
-
-            if (packet != null) {
-                player.networkHandler.sendPacket(packet);
-            }
-        }
     }
 }
