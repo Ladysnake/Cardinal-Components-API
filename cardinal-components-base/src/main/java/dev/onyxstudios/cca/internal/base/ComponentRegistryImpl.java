@@ -89,7 +89,7 @@ public final class ComponentRegistryImpl implements ComponentRegistryV3 {
     }
 
     @VisibleForTesting
-    void clear() {
-        this.keys.clear();
+    void clear(Identifier id) {
+        this.keys.remove(id);
     }
 }

@@ -7,22 +7,30 @@
     "version": "${version}",
     "entrypoints": {
         "main": [
-            "dev.onyxstudios.componenttest.CardinalComponentsTest::init"
+          "dev.onyxstudios.componenttest.content.CardinalComponentsTest::init"
         ],
         "client": [
-            "dev.onyxstudios.componenttest.CCATestClient::clientInit"
+          "dev.onyxstudios.componenttest.content.CCATestClient::clientInit"
         ],
         "cardinal-components:static-init": [
-            "dev.onyxstudios.componenttest.TestStaticComponentInitializer"
+          "dev.onyxstudios.componenttest.content.TestStaticComponentInitializer"
         ],
         "cardinal-components": [
-            "dev.onyxstudios.componenttest.TestComponents"
+          "dev.onyxstudios.componenttest.content.TestComponents"
+        ],
+        "fabric-gametest": [
+          "dev.onyxstudios.componenttest.tests.CcaTestSuite",
+          "dev.onyxstudios.cca.internal.base.ComponentRegistryImplTest",
+          "dev.onyxstudios.cca.internal.base.QualifiedComponentFactoryTest"
         ]
     },
     "custom": {
         "cardinal-components": [
             "componenttest:vita",
-            "componenttest:vita_compound"
+            "componenttest:vita_compound",
+            "testmod:test",
+            "testmod:test_2",
+            "testmod:test_3"
         ]
     },
     "depends": {
