@@ -1,3 +1,3 @@
 dependencies {
-    api project(":cardinal-components-base")
+    api project(path: ":cardinal-components-base", configuration: "namedElements")
 }

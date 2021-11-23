@@ -4,7 +4,7 @@
 
 This test mod adds a new component type called Vita. Two entities can hold it: Vita Zombies and Players.
 Players do not naturally have vita, vita zombies are the only source. Hitting a vita holder with a
-vita stick will transfer some of it to the stick. Subsequently right clicking the stick will transfer
+vita stick will transfer some of it to the stick. Subsequently right-clicking the stick will transfer
 the collected vita to the player. Vita sticks also display the player's current (synchronized) vita in their tooltip.  
 
 When shift-right-clicking a non-empty vita stick, a sliver of vita will be released in the world, and a title
@@ -18,20 +18,22 @@ vita available in the chunk.
 ## Code map
 
 - `dev.onyxstudios.componenttest`: root package
-    - `vita`: component classes
-        - `Vita`: the interface defining the vita component
-        - `BaseVita`: base implementation
-        - `AmbientVita`: abstract synchronized extension of `BaseVita` with custom behaviour
-            - `LevelVita`: global implementation of `AmbientVita`
-            - `WorldVita`: world-aware implementation of `AmbientVita`
-        - `SyncedVita`: synchronized implementation of `BaseVita`
-        - `EntityVita`: entity-specific extension of `BaseVita` with custom behaviour
-        - `PlayerVita`: player-specific, synchronized extension of `EntityVita` with custom respawn behaviour
-    - `CardinalComponentsTest`: mod initialization
-    - `TestComponents`: component registration
-    - `VitalityCondenser`: a custom block re-implementing `BlockProvider`, interacting with chunk and ambient vita
-    - `VitalityStickItem`: a custom item that attaches a `BaseVita` instance to its item stacks
-    - `VitalityZombieEntity`: a custom entity that attaches an `EntityVita` instance to itself
+    - `content`: implementation of the content in the test mod
+        - `vita`: component classes
+            - `Vita`: the interface defining the vita component
+            - `BaseVita`: base implementation
+            - `AmbientVita`: abstract synchronized extension of `BaseVita` with custom behaviour
+                - `LevelVita`: global implementation of `AmbientVita`
+                - `WorldVita`: world-aware implementation of `AmbientVita`
+            - `SyncedVita`: synchronized implementation of `BaseVita`
+            - `EntityVita`: entity-specific extension of `BaseVita` with custom behaviour
+            - `PlayerVita`: player-specific, synchronized extension of `EntityVita` with custom respawn behaviour
+        - `CardinalComponentsTest`: mod initialization
+        - `TestComponents`: component registration
+        - `VitalityCondenser`: a custom block re-implementing `BlockProvider`, interacting with chunk and ambient vita
+        - `VitalityStickItem`: a custom item that attaches a `BaseVita` instance to its item stacks
+        - `VitalityZombieEntity`: a custom entity that attaches an `EntityVita` instance to itself
+    - `tests`: unit test suite using Minecraft's gametest API
 
 ## Notes
 

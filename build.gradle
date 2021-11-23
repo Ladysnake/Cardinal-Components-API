@@ -5,7 +5,7 @@ import java.time.Year
 
 plugins {
     id "fabric-loom" version "0.10-SNAPSHOT" apply false
-    id "org.cadixdev.licenser" version "0.6.0"
+    id "org.cadixdev.licenser" version "0.6.1"
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "com.jfrog.artifactory" version "4.21.0"
     id 'org.ajoberstar.grgit' version '3.1.1'
@@ -35,45 +35,58 @@ allprojects {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_16
     version = System.getenv("TRAVIS_TAG") ?: rootProject.mod_version
 
-    configurations {
-        dev
-    }
     // import utility functions
     apply from: rootProject.file("utilities.gradle")
 
-    tasks.withType(Javadoc) {
-        options.addStringOption("Xdoclint:none", "-quiet")
+    tasks.withType(JavaCompile) {
+        it.options.release = 16
     }
 
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        archiveClassifier = "sources"
-        from sourceSets.main.allSource
+    sourceSets {
+        testmod {
+            compileClasspath += main.compileClasspath
+            runtimeClasspath += main.runtimeClasspath
+        }
     }
 
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        from javadoc.destinationDir
-        archiveClassifier = "javadoc"
-    }
-    tasks.build.dependsOn javadocJar
-
-    repositories {
+    loom {
+        runs {
+            testmodClient {
+                client()
+                ideConfigGenerated project.rootProject == project
+                name = "Testmod Client"
+                source sourceSets.testmod
+            }
+            testmodServer {
+                server()
+                ideConfigGenerated project.rootProject == project
+                name = "Testmod Server"
+                source sourceSets.testmod
+            }
+        }
     }
 
     dependencies {
-        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        mappings "net.fabricmc:yarn:${rootProject.minecraft_version}+build.${rootProject.yarn_mappings}:v2"
-        modApi "net.fabricmc:fabric-loader:${rootProject.loader_version}"
-        modApi fabricApi.module("fabric-api-base", rootProject.fabric_api_version)
-        modImplementation fabricApi.module("fabric-networking-api-v1", rootProject.fabric_api_version)
+        minecraft "com.mojang:minecraft:${minecraft_version}"
+        mappings "net.fabricmc:yarn:${minecraft_version}+build.${yarn_mappings}:v2"
+        modApi "net.fabricmc:fabric-loader:${loader_version}"
+        modApi fabricApi.module("fabric-api-base", fabric_api_version)
+        modImplementation fabricApi.module("fabric-networking-api-v1", fabric_api_version)
 
-        testImplementation 'junit:junit:4.13'
-        testImplementation 'org.mockito:mockito-core:3.+'
+        testmodImplementation 'junit:junit:4.13'
+        testmodImplementation 'org.mockito:mockito-core:3.+'
 
         compileOnly "com.google.code.findbugs:jsr305:3.0.2"
         compileOnly "com.demonwav.mcdev:annotations:1.0"
         compileOnly "org.jetbrains:annotations:19.0.0"
+    }
+
+    loom {
+        shareRemapCaches = true
+    }
+
+    repositories {
+        mavenLocal()
     }
 
     processResources {
@@ -82,12 +95,6 @@ allprojects {
         filesMatching("fabric.mod.json") {
             expand "version": project.version
         }
-    }
-
-    test {
-        useJUnit()
-
-        maxHeapSize = '1G'
     }
 
     license {
@@ -107,12 +114,32 @@ allprojects {
         }
     }
 
-    // ensure that the encoding is set to UTF-8, no matter what the system default is
-    // this fixes some edge cases with special characters not displaying correctly
-    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-    tasks.withType(JavaCompile).configureEach {
-        it.options.encoding = "UTF-8"
-        it.options.release = 16
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        archiveClassifier = "sources"
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        from javadoc.destinationDir
+        archiveClassifier = "javadoc"
+    }
+    tasks.build.dependsOn javadocJar
+
+    tasks.withType(AbstractArchiveTask) {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = false
+    }
+
+    test {
+        useJUnit()
+
+        maxHeapSize = '1G'
     }
 
     java {
@@ -123,113 +150,86 @@ allprojects {
     }
 
     jar {
-        archiveClassifier = "dev"
         from(rootProject.file("LICENSE.md")) {
             rename { "LICENSE_${project.archivesBaseName.replace('-', '_')}"}
         }
     }
+}
 
-    afterEvaluate {
-        artifacts {
-            dev file: file("${project.buildDir}/libs/$archivesBaseName-${version}-dev.jar"), type: "jar", builtBy: jar
-        }
+javadoc {
+    options {
+        source = "16"
+        encoding = "UTF-8"
+        charSet = "UTF-8"
+        memberLevel = JavadocMemberLevel.PACKAGE
+        links(
+            "https://guava.dev/releases/21.0/api/docs/",
+            "https://asm.ow2.io/javadoc/",
+            "https://docs.oracle.com/javase/8/docs/api/",
+            "http://jenkins.liteloader.com/job/Mixin/javadoc/",
+            "https://logging.apache.org/log4j/2.x/log4j-api/apidocs/"
+            // Need to add minecraft jd publication etc once there is one available
+        )
+        // Disable the crazy super-strict doclint tool in Java 8
+        addStringOption("Xdoclint:none", "-quiet")
     }
 
-    apply from: "https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/publish/nerdhub_maven.gradle"
+    allprojects.each {
+        source(it.sourceSets.main.allJava.srcDirs)
+    }
+
+    classpath = sourceSets.main.compileClasspath
+    include("**/api/**")
+    failOnError false
+}
+
+loom {
+    runs {
+        gametest {
+            inherit testmodServer
+
+            name "Game Test"
+
+            // Enable the gametest runner
+            vmArg "-Dfabric-api.gametest"
+            vmArg "-Dfabric-api.gametest.report-file=${project.buildDir}/junit.xml"
+            runDir "build/gametest"
+        }
+        autoTestServer {
+            inherit testmodServer
+
+            name "Auto Test Server"
+
+            vmArg "-Dfabric.autoTest"
+        }
+    }
+}
+test.dependsOn runGametest
+
+subprojects {
+    version = rootProject.version
 
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                artifact(remapJar) {
-                    builtBy(remapJar)
-                }
-                artifact(sourcesJar) {
-                    builtBy(remapSourcesJar)
-                }
-                artifact(javadocJar)
+                from components.java
             }
         }
     }
-}
 
-subprojects {
-    version = rootProject.version
-}
+    javadoc.enabled = false
 
-sourceSets {
-    testmod {
-        compileClasspath += main.compileClasspath
-        runtimeClasspath += main.runtimeClasspath
-    }
-    test {
-        compileClasspath += main.compileClasspath
-        runtimeClasspath += main.runtimeClasspath
+    afterEvaluate {
+        // Disable the gen sources task on sub projects
+        genSourcesWithFernFlower.enabled = false
+        genSourcesWithCfr.enabled = false
+        unpickJar.enabled = false
+
+        // Work around a loom bug causing empty jars to be pushed to maven local.
+        publishMavenJavaPublicationToMavenLocal.dependsOn rootProject.tasks.getByName("remapAllJars")
+        publishMavenJavaPublicationToMavenLocal.dependsOn rootProject.tasks.getByName("remapAllSources")
     }
 }
-
-task licenseFormatAll
-subprojects { p -> licenseFormatAll.dependsOn("${p.path}:licenseFormat") }
-subprojects.each { remapJar.dependsOn("${it.path}:remapJar") }
-
-repositories {
-    maven {
-        name = "JitPack"
-        url = "https://jitpack.io"
-    }
-}
-
-dependencies {
-    // used by the test mod
-    modImplementation fabricApi.module("fabric-api-base", rootProject.fabric_api_version)
-    modImplementation fabricApi.module("fabric-object-builder-api-v1", rootProject.fabric_api_version)
-    modImplementation fabricApi.module("fabric-renderer-registries-v1", rootProject.fabric_api_version)
-    modImplementation fabricApi.module("fabric-lifecycle-events-v1", rootProject.fabric_api_version)
-    modImplementation fabricApi.module("fabric-item-api-v1", rootProject.fabric_api_version)
-    modImplementation fabricApi.module("fabric-item-groups-v0", rootProject.fabric_api_version)
-    modImplementation fabricApi.module("fabric-events-interaction-v0", rootProject.fabric_api_version)
-    modImplementation fabricApi.module("fabric-api-lookup-api-v1", rootProject.fabric_api_version)
-    modImplementation fabricApi.module("fabric-command-api-v1", fabric_api_version)
-    modRuntime fabricApi.module("fabric-networking-v0", rootProject.rootProject.fabric_api_version)
-    modRuntime fabricApi.module("fabric-resource-loader-v0", rootProject.fabric_api_version)
-    modRuntime fabricApi.module("fabric-mining-levels-v0", rootProject.fabric_api_version)
-    modRuntime fabricApi.module("fabric-tag-extensions-v0", rootProject.fabric_api_version)
-    modRuntime fabricApi.module("fabric-tool-attribute-api-v1", rootProject.fabric_api_version)
-    modRuntime fabricApi.module("fabric-events-interaction-v0", rootProject.fabric_api_version)
-
-    // Optibad
-//    modRuntime 'com.github.modmuss50:OptiFabric:1.1.0-beta2'
-//    modRuntime 'org.zeroturnaround:zt-zip:1.14' // required dep for optibad
-
-    testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
-
-    include fabricApi.module("fabric-api-base", fabric_api_version)
-    include fabricApi.module("fabric-networking-v0", fabric_api_version)
-
-    subprojects.each {
-        api project(path: ":${it.name}", configuration: "dev")
-        include project(":${it.name}")
-    }
-}
-
-task testmodJar(type: Jar, dependsOn: testmodClasses) {
-    archiveBaseName = 'CCATest'
-    archiveClassifier = 'dev'
-    from(sourceSets.testmod.output) {
-        include 'fabric.mod.json'
-        expand 'version': project.version
-    }
-    from(sourceSets.testmod.output) {
-        exclude 'fabric.mod.json'
-    }
-}
-
-task remapTestmodJar(type: RemapJarTask, dependsOn: project.testmodJar) {
-    archiveBaseName = 'CCATest'
-    input = testmodJar.archiveFile
-    addNestedDependencies = false
-}
-
-build.dependsOn(remapTestmodJar)
 
 publishing {
     publications {
@@ -247,6 +247,70 @@ publishing {
         }
     }
 }
-tasks.publish.dependsOn build //stupid fix for maven/loom not publishing the main artifact
+
+task licenseFormatAll
+subprojects { p -> licenseFormatAll.dependsOn("${p.path}:licenseFormat") }
+subprojects.each { remapJar.dependsOn("${it.path}:remapJar") }
+
+repositories {
+    maven {
+        name = "JitPack"
+        url = "https://jitpack.io"
+    }
+}
+
+dependencies {
+    // used by the test mod
+    modImplementation fabricApi.module("fabric-api-base", fabric_api_version)
+    modImplementation fabricApi.module("fabric-object-builder-api-v1", fabric_api_version)
+    modImplementation fabricApi.module("fabric-renderer-registries-v1", fabric_api_version)
+    modImplementation fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
+    modImplementation fabricApi.module("fabric-item-api-v1", fabric_api_version)
+    modImplementation fabricApi.module("fabric-item-groups-v0", fabric_api_version)
+    modImplementation fabricApi.module("fabric-events-interaction-v0", fabric_api_version)
+    modImplementation fabricApi.module("fabric-api-lookup-api-v1", fabric_api_version)
+    modImplementation fabricApi.module("fabric-command-api-v1", fabric_api_version)
+    modImplementation fabricApi.module("fabric-gametest-api-v1", fabric_api_version)
+    modRuntimeOnly fabricApi.module("fabric-networking-v0", fabric_api_version)
+    modRuntimeOnly fabricApi.module("fabric-resource-loader-v0", fabric_api_version)
+    modRuntimeOnly fabricApi.module("fabric-mining-levels-v0", fabric_api_version)
+    modRuntimeOnly fabricApi.module("fabric-tag-extensions-v0", fabric_api_version)
+    modRuntimeOnly fabricApi.module("fabric-tool-attribute-api-v1", fabric_api_version)
+    modRuntimeOnly fabricApi.module("fabric-events-interaction-v0", fabric_api_version)
+
+    testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
+
+    include fabricApi.module("fabric-api-base", fabric_api_version)
+    include fabricApi.module("fabric-networking-v0", fabric_api_version)
+
+    afterEvaluate {
+        subprojects.each {
+            api project(path: ":${it.name}", configuration: "namedElements")
+
+            testmodImplementation project("${it.name}:").sourceSets.testmod.output
+        }
+    }
+}
+
+task testmodJar(type: Jar, dependsOn: testmodClasses) {
+    archiveBaseName = 'CCATest'
+    archiveClassifier = 'dev'
+    from(sourceSets.testmod.output) {
+        include 'fabric.mod.json'
+        expand 'version': project.version
+    }
+    from(sourceSets.testmod.output) {
+        exclude 'fabric.mod.json'
+    }
+}
+
+task remapTestmodJar(type: RemapJarTask, dependsOn: project.testmodJar) {
+    archiveBaseName = 'CCATest'
+    archiveClassifier = 'testmod'
+    input = testmodJar.archiveFile
+    addNestedDependencies = false
+}
+
+build.dependsOn(remapTestmodJar)
 
 apply from: 'release.gradle'
