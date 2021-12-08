@@ -20,6 +20,7 @@
         ],
         "fabric-gametest": [
           "dev.onyxstudios.componenttest.tests.CcaTestSuite",
+          "dev.onyxstudios.componenttest.tests.entity.CcaEntityTestSuite",
           "dev.onyxstudios.cca.internal.base.ComponentRegistryImplTest",
           "dev.onyxstudios.cca.internal.base.QualifiedComponentFactoryTest"
         ]

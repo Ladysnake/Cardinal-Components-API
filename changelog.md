@@ -1,4 +1,11 @@
 ------------------------------------------------------
+Version 4.0.1
+------------------------------------------------------
+**Fixes**
+- Fixed cardinal-components-chunk crashing at launch
+- Fixed components not being saved when bucketing entities
+
+------------------------------------------------------
 Version 4.0.0
 ------------------------------------------------------
 Updated to 1.18

@@ -1,6 +1,5 @@
 import net.fabricmc.loom.task.RemapJarTask
 
-import java.nio.charset.StandardCharsets
 import java.time.Year
 
 plugins {
@@ -254,6 +253,15 @@ subprojects.each { remapJar.dependsOn("${it.path}:remapJar") }
 
 repositories {
     maven {
+        name = 'Ladysnake Mods'
+        url = 'https://ladysnake.jfrog.io/artifactory/mods'
+        content {
+            includeGroup 'io.github.ladysnake'
+            includeGroupByRegex 'dev\\.emi.*'
+            includeGroupByRegex 'io\\.github\\.onyxstudios.*'
+        }
+    }
+    maven {
         name = "JitPack"
         url = "https://jitpack.io"
     }
@@ -277,6 +285,8 @@ dependencies {
     modRuntimeOnly fabricApi.module("fabric-tag-extensions-v0", fabric_api_version)
     modRuntimeOnly fabricApi.module("fabric-tool-attribute-api-v1", fabric_api_version)
     modRuntimeOnly fabricApi.module("fabric-events-interaction-v0", fabric_api_version)
+    modCompileOnly "io.github.ladysnake:elmendorf:${elmendorf_version}"
+    modRuntimeOnly "io.github.ladysnake:elmendorf:${elmendorf_version}"
 
     testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
 
