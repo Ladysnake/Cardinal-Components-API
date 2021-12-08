@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "package": "dev.onyxstudios.cca.mixin.entity",
   "mixins": [
+    "common.BucketableMixin",
     "common.MixinEntity",
     "common.MixinEntityTrackerEntry",
     "common.MixinPlayerManager",

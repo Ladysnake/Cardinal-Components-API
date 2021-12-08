@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.mixin.chunk.common;
 
 import com.mojang.datafixers.DataFixer;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkSyncCallback;
-import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
@@ -36,11 +35,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.File;
+import java.nio.file.Path;
 
 @Mixin(ThreadedAnvilChunkStorage.class)
 public abstract class MixinThreadedAnvilChunkStorage extends VersionedChunkStorage {
-    public MixinThreadedAnvilChunkStorage(File file, DataFixer dataFixer, boolean bl) {
+    public MixinThreadedAnvilChunkStorage(Path file, DataFixer dataFixer, boolean bl) {
         super(file, dataFixer, bl);
     }
 
