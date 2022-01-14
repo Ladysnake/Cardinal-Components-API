@@ -20,27 +20,14 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.mixin.entity.common;
+package dev.onyxstudios.cca.internal.base.asm;
 
-import dev.onyxstudios.cca.api.v3.entity.TrackingStartCallback;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.network.EntityTrackerEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import net.minecraft.util.Identifier;
 
-@Mixin(EntityTrackerEntry.class)
-public abstract class MixinEntityTrackerEntry {
-    @Shadow
-    @Final
-    private Entity entity;
+import java.util.List;
 
-    @Inject(method = "startTracking", at = @At("RETURN"))
-    private void onStartedTracking(ServerPlayerEntity player, CallbackInfo ci) {
-        TrackingStartCallback.EVENT.invoker().onPlayerStartTracking(player, this.entity);
+public class CcaBootstrapTest {
+    public static void addStaticComponentInitializers(Identifier... id) {
+        CcaBootstrap.INSTANCE.additionalComponentIds.addAll(List.of(id));
     }
 }

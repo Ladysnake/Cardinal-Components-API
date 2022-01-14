@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.base.asm;
 
+import com.google.common.annotations.VisibleForTesting;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.StaticComponentInitializer;
@@ -41,7 +42,14 @@ import org.objectweb.asm.tree.ClassNode;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public final class CcaBootstrap extends LazyDispatcher {
 
@@ -52,6 +60,7 @@ public final class CcaBootstrap extends LazyDispatcher {
 
     private final List<EntrypointContainer<StaticComponentInitializer>> staticComponentInitializers = FabricLoader.getInstance().getEntrypointContainers(STATIC_INIT_ENTRYPOINT, StaticComponentInitializer.class);
 
+    @VisibleForTesting Collection<Identifier> additionalComponentIds = new ArrayList<>();
     private Map<Identifier, Class<? extends ComponentKey<?>>> generatedComponentTypes = new HashMap<>();
 
     public CcaBootstrap() {
@@ -96,6 +105,8 @@ public final class CcaBootstrap extends LazyDispatcher {
                     throw new StaticComponentLoadingException(String.format("Exception while querying %s (%s) for supported static component types", badMod.getName(), badMod.getId()), e);
                 }
             }
+
+            staticComponentTypes.addAll(this.additionalComponentIds);
 
             this.spinStaticContainerItf(staticComponentTypes);
             this.generatedComponentTypes = this.spinStaticComponentKeys(staticComponentTypes);

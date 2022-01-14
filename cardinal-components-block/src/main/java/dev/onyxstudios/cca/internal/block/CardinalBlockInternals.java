@@ -23,43 +23,41 @@
 package dev.onyxstudios.cca.internal.block;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import net.minecraft.block.entity.BlockEntity;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public final class CardinalBlockInternals {
     private static final Map<Class<? extends BlockEntity>, ComponentContainer.Factory<BlockEntity>> entityContainerFactories = new HashMap<>();
-    private static final Object factoryMutex = new Object();
 
     public static ComponentContainer createComponents(BlockEntity blockEntity) {
         Class<? extends BlockEntity> entityClass = blockEntity.getClass();
         ComponentContainer.Factory<BlockEntity> existing = entityContainerFactories.get(entityClass);
 
-        if (existing != null) {
-            return existing.createContainer(blockEntity);
+        return Objects.requireNonNullElseGet(
+            existing,
+            () -> getBeComponentFactory(entityClass)
+        ).createContainer(blockEntity);
+    }
+
+    private static synchronized ComponentContainer.Factory<BlockEntity> getBeComponentFactory(Class<? extends BlockEntity> entityClass) {
+        // need to check again despite synchronization, because
+        // 1- recursive calls
+        // 2- the factory may have been generated while waiting from createComponents
+        ComponentContainer.Factory<BlockEntity> existing = entityContainerFactories.get(entityClass);
+        if (existing != null) return existing;
+
+        ComponentContainer.Factory<BlockEntity> factory;
+        if (StaticBlockComponentPlugin.INSTANCE.requiresStaticFactory(entityClass)) {
+            factory = StaticBlockComponentPlugin.INSTANCE.buildDedicatedFactory(entityClass);
+        } else {
+            @SuppressWarnings("unchecked") var superclass = (Class<? extends BlockEntity>) entityClass.getSuperclass();
+            assert BlockEntity.class.isAssignableFrom(superclass) : "requiresStaticFactory returned false on BlockEntity?";
+            factory = /* recursive call */ getBeComponentFactory(superclass);
         }
-
-        synchronized (factoryMutex) {   // can be called from both client and server thread
-            // computeIfAbsent and not put, because the factory may have been generated while waiting
-            return entityContainerFactories.computeIfAbsent(entityClass, clazz -> {
-                Class<?> cl = clazz;
-                Class<? extends BlockEntity> parentWithStaticComponents = null;
-
-                while (BlockEntity.class.isAssignableFrom(cl)) {
-                    Class<? extends BlockEntity> c = cl.asSubclass(BlockEntity.class);
-
-                    if (parentWithStaticComponents == null && StaticBlockComponentPlugin.INSTANCE.requiresStaticFactory(c)) {   // try to find a specialized ASM factory
-                        parentWithStaticComponents = c;
-                    }
-                    cl = c.getSuperclass();
-                }
-                assert parentWithStaticComponents != null;
-                Class<? extends ComponentContainer.Factory<BlockEntity>> factoryClass = StaticBlockComponentPlugin.INSTANCE.spinDedicatedFactory(parentWithStaticComponents);
-
-                return ComponentsInternals.createFactory(factoryClass);
-            }).createContainer(blockEntity);
-        }
+        entityContainerFactories.put(entityClass, factory);
+        return factory;
     }
 }

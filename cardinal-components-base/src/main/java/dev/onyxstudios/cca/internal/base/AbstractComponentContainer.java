@@ -22,7 +22,11 @@
  */
 package dev.onyxstudios.cca.internal.base;
 
-import dev.onyxstudios.cca.api.v3.component.*;
+import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
+import dev.onyxstudios.cca.api.v3.component.CopyableComponent;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -96,7 +100,12 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
             }
 
             for (String missedKeyId : componentMap.getKeys()) {
-                ComponentsInternals.LOGGER.warn("Failed to deserialize component: unregistered key " + missedKeyId);
+                Identifier id = Identifier.tryParse(missedKeyId);
+                String cause;
+                if (id == null) cause = "invalid identifier";
+                else if (ComponentRegistry.get(id) == null) cause = "unregistered key";
+                else cause = "provider does not have ";
+                ComponentsInternals.LOGGER.warn("Failed to deserialize component: {} {}", cause, missedKeyId);
             }
         }
     }

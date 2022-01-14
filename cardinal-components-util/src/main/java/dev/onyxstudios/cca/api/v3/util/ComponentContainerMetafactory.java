@@ -28,9 +28,8 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.internal.util.ComponentContainerMetafactoryImpl;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.ApiStatus;
 
-@ApiStatus.Experimental
+@Deprecated(forRemoval = true)
 public final class ComponentContainerMetafactory {
     /**
      * Creates a {@link ComponentContainer} factory that supports only statically declared components.
