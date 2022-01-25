@@ -91,9 +91,8 @@ public abstract class MixinEntity implements ComponentProvider {
         Entity holder = (Entity) (Object) this;
         if (!this.world.isClient) {
             Iterator<ServerPlayerEntity> watchers = PlayerLookup.tracking(holder).iterator();
-            //noinspection ConstantConditions
-            if (holder instanceof ServerPlayerEntity && ((ServerPlayerEntity) holder).networkHandler != null) {
-                return Iterators.concat(Iterators.singletonIterator((ServerPlayerEntity)holder), watchers);
+            if (holder instanceof ServerPlayerEntity player && player.networkHandler != null) {
+                return Iterators.concat(Iterators.singletonIterator(player), watchers);
             }
             return watchers;
         }

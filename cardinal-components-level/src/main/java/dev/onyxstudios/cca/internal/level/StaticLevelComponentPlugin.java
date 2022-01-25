@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.internal.level;
 
+import com.google.common.base.Suppliers;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
@@ -30,15 +31,15 @@ import dev.onyxstudios.cca.api.v3.level.LevelComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.level.LevelComponentInitializer;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
-import net.minecraft.util.Lazy;
 import net.minecraft.world.WorldProperties;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<WorldProperties, LevelComponentInitializer> implements LevelComponentFactoryRegistry {
     public static final StaticLevelComponentPlugin INSTANCE = new StaticLevelComponentPlugin();
-    public static final Lazy<ComponentContainer.Factory<WorldProperties>> componentContainerFactory
-        = new Lazy<>(INSTANCE::buildContainerFactory);
+    public static final Supplier<ComponentContainer.Factory<WorldProperties>> componentContainerFactory
+        = Suppliers.memoize(INSTANCE::buildContainerFactory);
 
     public static ComponentContainer createContainer(WorldProperties properties) {
         return componentContainerFactory.get().createContainer(properties);

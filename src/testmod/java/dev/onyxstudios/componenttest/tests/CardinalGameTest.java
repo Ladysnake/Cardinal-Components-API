@@ -44,13 +44,15 @@ public interface CardinalGameTest extends FabricGameTest {
             this.tearDown();
         } catch (Throwable e) {
             String message;
+            Throwable cause;
             if (e instanceof InvocationTargetException) {
                 message = e.getMessage() + ": " + e.getCause().getMessage();
-                e = e.getCause();
+                cause = e.getCause();
             } else {
                 message = e.getMessage();
+                cause = e;
             }
-            CardinalComponentsTest.LOGGER.error("Failed test", e);
+            CardinalComponentsTest.LOGGER.error("Failed test", cause);
             throw new GameTestException(message);
         }
     }
