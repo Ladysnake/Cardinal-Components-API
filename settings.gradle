@@ -7,7 +7,7 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = 'Cardinal-Components-API'
+rootProject.name = 'cardinal-components-api'
 
 include 'cardinal-components-base'
 include 'cardinal-components-block'

@@ -3,7 +3,7 @@ import net.fabricmc.loom.task.RemapJarTask
 import java.time.Year
 
 plugins {
-    id "fabric-loom" version "0.10-SNAPSHOT" apply false
+    id "fabric-loom" version "0.11-SNAPSHOT" apply false
     id "org.cadixdev.licenser" version "0.6.1"
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "com.jfrog.artifactory" version "4.21.0"
@@ -13,33 +13,22 @@ plugins {
     id "java-library"
 }
 
-group = "io.github.onyxstudios"
-archivesBaseName = "Cardinal-Components-API"
-
-subprojects {
+allprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+    apply plugin: 'com.jfrog.artifactory'
     apply plugin: 'fabric-loom'
     apply plugin: 'org.cadixdev.licenser'
-    apply plugin: 'com.matthewprenger.cursegradle'
-    apply plugin: 'com.jfrog.artifactory'
-    apply plugin: 'maven-publish'
-    apply plugin: 'java-library'
 
-    archivesBaseName = project.name
-    group = "${rootProject.group}.${rootProject.archivesBaseName}"
+    tasks.withType(JavaCompile) {
+        it.options.release = 17
+    }
 
-}
-
-allprojects {
-    apply plugin: "fabric-loom"
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_16
-    version = System.getenv("TRAVIS_TAG") ?: rootProject.mod_version
+    group = "io.github.onyxstudios.cardinal-components-api"
+    version = project.mod_version
 
     // import utility functions
     apply from: rootProject.file("utilities.gradle")
-
-    tasks.withType(JavaCompile) {
-        it.options.release = 16
-    }
 
     sourceSets {
         testmod {
@@ -65,6 +54,22 @@ allprojects {
         }
     }
 
+    repositories {
+        maven {
+            name = 'Ladysnake Mods'
+            url = 'https://ladysnake.jfrog.io/artifactory/mods'
+            content {
+                includeGroup 'io.github.ladysnake'
+                includeGroupByRegex 'dev\\.emi.*'
+                includeGroupByRegex 'io\\.github\\.onyxstudios.*'
+            }
+        }
+        maven {
+            name = "JitPack"
+            url = "https://jitpack.io"
+        }
+    }
+
     dependencies {
         minecraft "com.mojang:minecraft:${minecraft_version}"
         mappings "net.fabricmc:yarn:${minecraft_version}+build.${yarn_mappings}:v2"
@@ -74,6 +79,9 @@ allprojects {
 
         testmodImplementation 'junit:junit:4.13'
         testmodImplementation 'org.mockito:mockito-core:3.+'
+
+        testmodImplementation sourceSets.main.output
+        modCompileOnly modLocalRuntime("io.github.ladysnake:elmendorf:${elmendorf_version}")
 
         compileOnly "com.google.code.findbugs:jsr305:3.0.2"
         compileOnly "com.demonwav.mcdev:annotations:1.0"
@@ -109,22 +117,16 @@ allprojects {
         //export variables
         ext {
             year = Year.now()
-            projectDisplayName = rootProject.archivesBaseName
+            projectDisplayName = project.display_name
         }
     }
 
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        archiveClassifier = "sources"
-        from sourceSets.main.allSource
+    java {
+        // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+        // if it is present.
+        // If you remove this line, sources will not be generated.
+        withSourcesJar()
     }
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        from javadoc.destinationDir
-        archiveClassifier = "javadoc"
-    }
-    tasks.build.dependsOn javadocJar
 
     tasks.withType(AbstractArchiveTask) {
         preserveFileTimestamps = false
@@ -133,19 +135,6 @@ allprojects {
 
     tasks.withType(GenerateModuleMetadata) {
         enabled = false
-    }
-
-    test {
-        useJUnit()
-
-        maxHeapSize = '1G'
-    }
-
-    java {
-        // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-        // if it is present.
-        // If you remove this line, sources will not be generated.
-        withSourcesJar()
     }
 
     jar {
@@ -181,6 +170,15 @@ javadoc {
     include("**/api/**")
     failOnError false
 }
+
+task javadocJar(type: Jar) {
+    dependsOn javadoc
+    from javadoc.destinationDir
+    //Set as `fatjavadoc` to prevent an ide form trying to use this javadoc, over using the modules javadoc
+    archiveClassifier = "fatjavadoc"
+}
+
+assemble.dependsOn javadocJar
 
 loom {
     runs {
@@ -223,16 +221,29 @@ subprojects {
         genSourcesWithFernFlower.enabled = false
         genSourcesWithCfr.enabled = false
         unpickJar.enabled = false
-
-        // Work around a loom bug causing empty jars to be pushed to maven local.
-        publishMavenJavaPublicationToMavenLocal.dependsOn rootProject.tasks.getByName("remapAllJars")
-        publishMavenJavaPublicationToMavenLocal.dependsOn rootProject.tasks.getByName("remapAllSources")
     }
 }
+
+task remapMavenJar(type: net.fabricmc.loom.task.RemapJarTask, dependsOn: jar) {
+    input = jar.archiveFile
+    archiveFileName = "${archivesBaseName}-${project.version}-maven.jar"
+    addNestedDependencies = false
+}
+assemble.dependsOn remapMavenJar
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifact(remapMavenJar) {
+                builtBy remapMavenJar
+            }
+
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+
+            artifact javadocJar
+
             pom.withXml {
                 def depsNode = asNode().appendNode("dependencies")
                 subprojects.each {
@@ -247,25 +258,12 @@ publishing {
     }
 }
 
+// Required until the deprecation is removed. CCA's main jar that is published to maven does not contain sub modules.
+loom.disableDeprecatedPomGeneration(publishing.publications.mavenJava)
+
 task licenseFormatAll
 subprojects { p -> licenseFormatAll.dependsOn("${p.path}:licenseFormat") }
 subprojects.each { remapJar.dependsOn("${it.path}:remapJar") }
-
-repositories {
-    maven {
-        name = 'Ladysnake Mods'
-        url = 'https://ladysnake.jfrog.io/artifactory/mods'
-        content {
-            includeGroup 'io.github.ladysnake'
-            includeGroupByRegex 'dev\\.emi.*'
-            includeGroupByRegex 'io\\.github\\.onyxstudios.*'
-        }
-    }
-    maven {
-        name = "JitPack"
-        url = "https://jitpack.io"
-    }
-}
 
 dependencies {
     // used by the test mod
@@ -296,7 +294,7 @@ dependencies {
     afterEvaluate {
         subprojects.each {
             api project(path: ":${it.name}", configuration: "namedElements")
-
+            include project("${it.name}:")
             testmodImplementation project("${it.name}:").sourceSets.testmod.output
         }
     }
@@ -321,6 +319,6 @@ task remapTestmodJar(type: RemapJarTask, dependsOn: project.testmodJar) {
     addNestedDependencies = false
 }
 
-build.dependsOn(remapTestmodJar)
+assemble.dependsOn(remapTestmodJar)
 
 apply from: 'release.gradle'

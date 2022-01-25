@@ -93,6 +93,7 @@ public abstract class ComponentKey<C extends Component> {
                 throw e1;
             }
         }
+
         return component;
     }
 

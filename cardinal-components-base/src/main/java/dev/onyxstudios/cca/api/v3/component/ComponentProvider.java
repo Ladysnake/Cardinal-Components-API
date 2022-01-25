@@ -39,10 +39,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldProperties;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.level.LevelProperties;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * used to access an object's components.
@@ -53,6 +55,8 @@ public interface ComponentProvider {
      * Convenience method to retrieve ComponentProvider from a given {@link BlockEntity}
      * Requires the <tt>cardinal-components-block</tt> module.
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
+    @Deprecated(forRemoval = true, since = "4.1.0")
     static ComponentProvider fromBlockEntity(BlockEntity blockEntity) {
         return (ComponentProvider) blockEntity;
     }
@@ -61,6 +65,8 @@ public interface ComponentProvider {
      * Convenience method to retrieve a ComponentProvider from given {@link Chunk}.
      * Requires the <tt>cardinal-components-chunk</tt> module.
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
+    @Deprecated(forRemoval = true, since = "4.1.0")
     static ComponentProvider fromChunk(Chunk chunk) {
         return (ComponentProvider) chunk;
     }
@@ -69,6 +75,8 @@ public interface ComponentProvider {
      * Convenience method to retrieve a ComponentProvider from a given {@link Entity}.
      * Requires the <tt>cardinal-components-entity</tt> module.
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
+    @Deprecated(forRemoval = true, since = "4.1.0")
     static ComponentProvider fromEntity(Entity entity) {
         return (ComponentProvider) entity;
     }
@@ -77,6 +85,8 @@ public interface ComponentProvider {
      * Convenience method to retrieve ComponentProvider from a given {@link ItemStack}
      * Requires the <tt>cardinal-components-item</tt> module.
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
+    @Deprecated(forRemoval = true, since = "4.1.0")
     @SuppressWarnings("ConstantConditions")
     static ComponentProvider fromItemStack(ItemStack stack) {
         return (ComponentProvider) (Object) stack;
@@ -86,6 +96,8 @@ public interface ComponentProvider {
      * Convenience method to retrieve a ComponentProvider from given {@link LevelProperties}.
      * Requires the <tt>cardinal-components-level</tt> module.
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
+    @Deprecated(forRemoval = true, since = "4.1.0")
     static ComponentProvider fromLevel(WorldProperties level) {
         return (ComponentProvider) level;
     }
@@ -94,6 +106,8 @@ public interface ComponentProvider {
      * Convenience method to retrieve a ComponentProvider from given {@link Scoreboard}.
      * Requires the <tt>cardinal-components-scoreboard</tt> module.
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
+    @Deprecated(forRemoval = true, since = "4.1.0")
     static ComponentProvider fromScoreboard(Scoreboard scoreboard) {
         return (ComponentProvider) scoreboard;
     }
@@ -102,6 +116,8 @@ public interface ComponentProvider {
      * Convenience method to retrieve a ComponentProvider from given {@link Team}.
      * Requires the <tt>cardinal-components-scoreboard</tt> module.
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
+    @Deprecated(forRemoval = true, since = "4.1.0")
     static ComponentProvider fromTeam(AbstractTeam team) {
         return (ComponentProvider) team;
     }
@@ -110,6 +126,8 @@ public interface ComponentProvider {
      * Convenience method to retrieve a ComponentProvider from a given {@link World}.
      * Requires the <tt>cardinal-components-world</tt> module.
      */
+    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
+    @Deprecated(forRemoval = true, since = "4.1.0")
     static ComponentProvider fromWorld(World world) {
         return (ComponentProvider) world;
     }
@@ -118,6 +136,19 @@ public interface ComponentProvider {
      * @return a runtime-generated component container storing statically declared components.
      */
     ComponentContainer getComponentContainer();
+
+    /**
+     * @param key the key object for the type of component to retrieve
+     * @return the nonnull value of the held component of this type
+     * @param <C> the type of component to retrieve
+     * @throws NullPointerException if {@code key} is null
+     * @throws NoSuchElementException if this provider does not provide the desired type of component
+     * @since 4.1.0
+     */
+    @ApiStatus.Experimental
+    default <C extends Component> C getComponent(ComponentKey<C> key) {
+        return key.get(this);
+    }
 
     /**
      * Retrieves an iterator describing the list of players who may receive
@@ -131,7 +162,7 @@ public interface ComponentProvider {
      * @return a list of player candidates for receiving component sync packets
      */
     default Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
-        // TODO 4.0.0 replace with Iterable
+        // TODO 5.0.0 replace with Iterable
         return Collections.emptyIterator();
     }
 
