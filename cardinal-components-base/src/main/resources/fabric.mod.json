@@ -14,11 +14,6 @@
         "description": "Attaching more data to various game objects",
         "badges": [ "library" ]
       }
-    },
-    "loom:injected_interfaces": {
-      "net/minecraft/class_1297": [
-        "dev/onyxstudios/cca/api/v3/component/ComponentProvider"
-      ]
     }
   },
   "depends": {

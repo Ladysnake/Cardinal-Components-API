@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.cca.mixin.level.common;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.SaveProperties;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,6 +38,6 @@ public abstract class MixinMinecraftServer {
 
     @Inject(at = @At("TAIL"), method = "tick")
     private void onEndTick(BooleanSupplier shouldKeepTicking, CallbackInfo info) {
-        ComponentProvider.fromLevel(this.getSaveProperties().getMainWorldProperties()).getComponentContainer().tickServerComponents();
+        this.getSaveProperties().getMainWorldProperties().getComponentContainer().tickServerComponents();
     }
 }

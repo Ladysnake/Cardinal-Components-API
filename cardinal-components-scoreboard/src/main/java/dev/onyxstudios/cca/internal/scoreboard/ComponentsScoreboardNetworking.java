@@ -23,7 +23,6 @@
 package dev.onyxstudios.cca.internal.scoreboard;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardSyncCallback;
 import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
@@ -57,24 +56,21 @@ public final class ComponentsScoreboardNetworking {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             ScoreboardSyncCallback.EVENT.register((player, tracked) -> {
-                for (ComponentKey<?> key : ((ComponentProvider) tracked).getComponentContainer().keys()) {
-                    key.syncWith(player, ComponentProvider.fromScoreboard(tracked));
+                for (ComponentKey<?> key : tracked.getComponentContainer().keys()) {
+                    key.syncWith(player, tracked);
                 }
 
                 for (Team team : tracked.getTeams()) {
-                    ComponentProvider provider = ComponentProvider.fromTeam(team);
-
-                    for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
-                        key.syncWith(player, provider);
+                    for (ComponentKey<?> key : team.getComponentContainer().keys()) {
+                        key.syncWith(player, team);
                     }
                 }
             });
             TeamAddCallback.EVENT.register((tracked) -> {
-                for (ComponentKey<?> key : ComponentProvider.fromTeam(tracked).getComponentContainer().keys()) {
+                for (ComponentKey<?> key : tracked.getComponentContainer().keys()) {
                     key.sync(tracked);
                 }
             });
         }
     }
-
 }

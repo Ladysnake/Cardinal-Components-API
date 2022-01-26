@@ -22,13 +22,38 @@
  */
 package dev.onyxstudios.componenttest.tests;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import io.github.ladysnake.elmendorf.GameTestUtil;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
+import net.minecraft.util.math.BlockPos;
+
+import java.util.Objects;
 
 public final class CcaTestSuite implements FabricGameTest {
     @GameTest(structureName = EMPTY_STRUCTURE)
-    public void complete(TestContext context) {
+    public void interfacesGetInjected(TestContext context) {
+        // CCA Block
+        context.setBlockState(1, 0, 2, Blocks.CHEST);
+        checkContainer(Objects.requireNonNull(context.getBlockEntity(new BlockPos(1, 0, 2))));
+        // CCA Chunk
+        checkContainer(context.getWorld().getChunk(context.getAbsolutePos(BlockPos.ORIGIN)));
+        // CCA Entity
+        checkContainer(context.<AxolotlEntity>spawnMob(EntityType.AXOLOTL, 1, 0, 1));
+        // CCA Level
+        checkContainer(context.getWorld().getLevelProperties());
+        // CCA Scoreboard
+        checkContainer(context.getWorld().getScoreboard());
+        checkContainer(context.getWorld().getScoreboard().addTeam("testX"));
         context.complete();
+    }
+
+    private void checkContainer(ComponentProvider provider) {
+        //noinspection ConstantConditions
+        GameTestUtil.assertTrue(provider + " should correctly implement ComponentProvider", provider.getComponentContainer() != null);
     }
 }

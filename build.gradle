@@ -200,6 +200,12 @@ loom {
             vmArg "-Dfabric.autoTest"
         }
     }
+
+    interfaceInjection {
+        subprojects.each {
+            interfaceInjectionSourceSets.add(project(":${it.name}").sourceSets.main)
+        }
+    }
 }
 test.dependsOn runGametest
 

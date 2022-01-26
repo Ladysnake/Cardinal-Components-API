@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.cca.mixin.scoreboard;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
@@ -41,10 +40,10 @@ public abstract class MixinMinecraftServer {
     @Inject(at = @At("TAIL"), method = "tick")
     private void onEndTick(BooleanSupplier shouldKeepTicking, CallbackInfo info) {
         ServerScoreboard scoreboard = this.getScoreboard();
-        ComponentProvider.fromScoreboard(scoreboard).getComponentContainer().tickServerComponents();
+        scoreboard.getComponentContainer().tickServerComponents();
 
         for (Team team : scoreboard.getTeams()) {
-            ComponentProvider.fromTeam(team).getComponentContainer().tickServerComponents();
+            team.getComponentContainer().tickServerComponents();
         }
     }
 }

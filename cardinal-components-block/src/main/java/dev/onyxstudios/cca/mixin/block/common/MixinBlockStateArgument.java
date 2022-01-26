@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.cca.mixin.block.common;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.command.argument.BlockStateArgument;
 import net.minecraft.nbt.NbtCompound;
@@ -31,7 +30,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(BlockStateArgument.class)
@@ -44,7 +42,7 @@ public class MixinBlockStateArgument {
     @ModifyVariable(method = "setBlockState", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;readNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
     private BlockEntity readComponentData(BlockEntity be) {
         if (this.data != null) {
-            ComponentProvider.fromBlockEntity(be).getComponentContainer().fromTag(this.data);
+            be.getComponentContainer().fromTag(this.data);
         }
         return be;
     }

@@ -71,12 +71,14 @@ public abstract class MixinBlockEntity implements ComponentProvider {
     @Inject(method = "createFromNbt", at = @At("RETURN"))
     private static void readComponentData(BlockPos pos, BlockState state, NbtCompound nbt, CallbackInfoReturnable<BlockEntity> cir) {
         if (cir.getReturnValue() != null) {
-            ComponentProvider.fromBlockEntity(cir.getReturnValue()).getComponentContainer().fromTag(nbt);
+            cir.getReturnValue().getComponentContainer().fromTag(nbt);
         }
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(BlockEntityType<?> type, BlockPos pos, BlockState state, CallbackInfo ci) {
+        // Promise, this is a BlockEntity
+        //noinspection ConstantConditions
         this.components = CardinalBlockInternals.createComponents((BlockEntity) (Object) this);
     }
 

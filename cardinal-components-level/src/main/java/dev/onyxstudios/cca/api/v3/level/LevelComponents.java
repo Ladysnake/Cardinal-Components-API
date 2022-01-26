@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.api.v3.level;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
@@ -47,9 +46,9 @@ public final class LevelComponents {
      * @throws NoSuchElementException if the provider does not provide this type of component
      */
     public static void sync(ComponentKey<?> key, MinecraftServer server) {
-        ComponentProvider provider = ComponentProvider.fromLevel(server.getSaveProperties().getMainWorldProperties());
+        WorldProperties props = server.getSaveProperties().getMainWorldProperties();
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            key.syncWith(player, provider);
+            key.syncWith(player, props);
         }
     }
 
@@ -63,11 +62,11 @@ public final class LevelComponents {
      * @throws NoSuchElementException if the provider does not provide this type of component
      */
     public static void sync(ComponentKey<?> key, MinecraftServer server, ComponentPacketWriter packetWriter) {
-        ComponentProvider provider = ComponentProvider.fromLevel(server.getSaveProperties().getMainWorldProperties());
-        Component c = key.get(provider);
-        if (c instanceof AutoSyncedComponent) {
+        WorldProperties props = server.getSaveProperties().getMainWorldProperties();
+        Component c = key.get(props);
+        if (c instanceof AutoSyncedComponent sc) {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                key.syncWith(player, provider, packetWriter, ((AutoSyncedComponent) c));
+                key.syncWith(player, props, packetWriter, sc);
             }
         }
     }
@@ -83,9 +82,9 @@ public final class LevelComponents {
      * @throws NoSuchElementException if the provider does not provide this type of component
      */
     public static void sync(ComponentKey<?> key, MinecraftServer server, ComponentPacketWriter packetWriter, PlayerSyncPredicate predicate) {
-        ComponentProvider provider = ComponentProvider.fromLevel(server.getSaveProperties().getMainWorldProperties());
+        WorldProperties props = server.getSaveProperties().getMainWorldProperties();
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            key.syncWith(player, provider, packetWriter, predicate);
+            key.syncWith(player, props, packetWriter, predicate);
         }
     }
 }

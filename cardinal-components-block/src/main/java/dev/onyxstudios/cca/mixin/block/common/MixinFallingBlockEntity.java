@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.cca.mixin.block.common;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
@@ -34,7 +33,6 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -46,6 +44,6 @@ public abstract class MixinFallingBlockEntity extends Entity {
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;readNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILSOFT)
     void readComponentData(CallbackInfo ci, Block $$0, BlockPos $$2, BlockEntity be, NbtCompound nbt) {
-        ComponentProvider.fromBlockEntity(be).getComponentContainer().fromTag(nbt);
+        be.getComponentContainer().fromTag(nbt);
     }
 }

@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.cca.mixin.block.common;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.command.BlockDataObject;
 import net.minecraft.nbt.NbtCompound;
@@ -41,6 +40,6 @@ public abstract class MixinBlockDataObject {
 
     @Inject(method = "setNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;markDirty()V"))
     void readComponentData(NbtCompound nbt, CallbackInfo ci) {
-        ComponentProvider.fromBlockEntity(this.blockEntity).getComponentContainer().fromTag(nbt);
+        this.blockEntity.getComponentContainer().fromTag(nbt);
     }
 }

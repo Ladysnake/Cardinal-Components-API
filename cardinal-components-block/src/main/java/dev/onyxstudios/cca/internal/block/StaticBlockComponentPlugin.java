@@ -28,7 +28,6 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentFactory;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.internal.base.LazyDispatcher;
@@ -70,15 +69,15 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getComponentTicker(World world, T be, @Nullable BlockEntityTicker<T> base) {
         if (world.isClient && this.clientTicking.contains(be.getClass())) {
-            if (base == null) return (w, pos, state, blockEntity) -> ComponentProvider.fromBlockEntity(blockEntity).getComponentContainer().tickClientComponents();
+            if (base == null) return (w, pos, state, blockEntity) -> blockEntity.getComponentContainer().tickClientComponents();
             return (w, pos, state, blockEntity) -> {
-                ComponentProvider.fromBlockEntity(blockEntity).getComponentContainer().tickClientComponents();
+                blockEntity.getComponentContainer().tickClientComponents();
                 base.tick(w, pos, state, blockEntity);
             };
         } else if (!world.isClient && this.serverTicking.contains(be.getClass())) {
-            if (base == null) return (w, pos, state, blockEntity) -> ComponentProvider.fromBlockEntity(blockEntity).getComponentContainer().tickServerComponents();
+            if (base == null) return (w, pos, state, blockEntity) -> blockEntity.getComponentContainer().tickServerComponents();
             return (w, pos, state, blockEntity) -> {
-                ComponentProvider.fromBlockEntity(blockEntity).getComponentContainer().tickServerComponents();
+                blockEntity.getComponentContainer().tickServerComponents();
                 base.tick(w, pos, state, blockEntity);
             };
         }

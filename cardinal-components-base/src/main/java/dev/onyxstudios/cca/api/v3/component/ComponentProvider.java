@@ -54,6 +54,7 @@ public interface ComponentProvider {
     /**
      * Convenience method to retrieve ComponentProvider from a given {@link BlockEntity}
      * Requires the <tt>cardinal-components-block</tt> module.
+     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
      */
     @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
     @Deprecated(forRemoval = true, since = "4.1.0")
@@ -64,6 +65,7 @@ public interface ComponentProvider {
     /**
      * Convenience method to retrieve a ComponentProvider from given {@link Chunk}.
      * Requires the <tt>cardinal-components-chunk</tt> module.
+     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
      */
     @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
     @Deprecated(forRemoval = true, since = "4.1.0")
@@ -74,6 +76,7 @@ public interface ComponentProvider {
     /**
      * Convenience method to retrieve a ComponentProvider from a given {@link Entity}.
      * Requires the <tt>cardinal-components-entity</tt> module.
+     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
      */
     @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
     @Deprecated(forRemoval = true, since = "4.1.0")
@@ -84,6 +87,7 @@ public interface ComponentProvider {
     /**
      * Convenience method to retrieve ComponentProvider from a given {@link ItemStack}
      * Requires the <tt>cardinal-components-item</tt> module.
+     * @deprecated this module is getting removed; use Fabric's API-Lookup-API instead
      */
     @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
     @Deprecated(forRemoval = true, since = "4.1.0")
@@ -95,6 +99,7 @@ public interface ComponentProvider {
     /**
      * Convenience method to retrieve a ComponentProvider from given {@link LevelProperties}.
      * Requires the <tt>cardinal-components-level</tt> module.
+     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
      */
     @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
     @Deprecated(forRemoval = true, since = "4.1.0")
@@ -105,6 +110,7 @@ public interface ComponentProvider {
     /**
      * Convenience method to retrieve a ComponentProvider from given {@link Scoreboard}.
      * Requires the <tt>cardinal-components-scoreboard</tt> module.
+     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
      */
     @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
     @Deprecated(forRemoval = true, since = "4.1.0")
@@ -115,6 +121,7 @@ public interface ComponentProvider {
     /**
      * Convenience method to retrieve a ComponentProvider from given {@link Team}.
      * Requires the <tt>cardinal-components-scoreboard</tt> module.
+     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
      */
     @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
     @Deprecated(forRemoval = true, since = "4.1.0")
@@ -125,6 +132,7 @@ public interface ComponentProvider {
     /**
      * Convenience method to retrieve a ComponentProvider from a given {@link World}.
      * Requires the <tt>cardinal-components-world</tt> module.
+     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
      */
     @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
     @Deprecated(forRemoval = true, since = "4.1.0")

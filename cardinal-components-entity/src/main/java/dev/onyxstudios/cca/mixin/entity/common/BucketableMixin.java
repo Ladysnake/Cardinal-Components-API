@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.cca.mixin.entity.common;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.entity.Bucketable;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.ItemStack;
@@ -38,12 +37,12 @@ public interface BucketableMixin {
     private static void writeComponentsToStack(MobEntity entity, ItemStack stack, CallbackInfo ci) {
         NbtCompound nbt = stack.getNbt();
         if (nbt != null) {
-            ComponentProvider.fromEntity(entity).getComponentContainer().toTag(nbt);
+            entity.getComponentContainer().toTag(nbt);
         }
     }
 
     @Inject(method = "copyDataFromNbt(Lnet/minecraft/entity/mob/MobEntity;Lnet/minecraft/nbt/NbtCompound;)V", at = @At("RETURN"))
     private static void readComponentsFromStack(MobEntity entity, NbtCompound nbt, CallbackInfo ci) {
-        ComponentProvider.fromEntity(entity).getComponentContainer().fromTag(nbt);
+        entity.getComponentContainer().fromTag(nbt);
     }
 }
