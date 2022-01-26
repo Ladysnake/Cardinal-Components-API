@@ -20,9 +20,9 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.tests.entity;
+package dev.onyxstudios.cca.test.entity;
 
-import dev.onyxstudios.componenttest.content.vita.Vita;
+import dev.onyxstudios.cca.test.base.Vita;
 import io.github.ladysnake.elmendorf.GameTestUtil;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.entity.Bucketable;
@@ -38,9 +38,9 @@ import net.minecraft.util.math.BlockPos;
 public class CcaEntityTestSuite implements FabricGameTest {
     @GameTest(structureName = EMPTY_STRUCTURE)
     public void bucketableWorks(TestContext ctx) {
-        var player = GameTestUtil.spawnPlayer(ctx, 1, 1, 1);
+        var player = GameTestUtil.spawnPlayer(ctx, 1, 0, 1);
         player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
-        BlockPos pos = new BlockPos(2, 2, 2);
+        BlockPos pos = new BlockPos(2, 0, 2);
         var axolotl = ctx.spawnMob(EntityType.AXOLOTL, pos);
         Vita.get(axolotl).setVitality(3);
         Bucketable.tryBucket(player, Hand.MAIN_HAND, axolotl);

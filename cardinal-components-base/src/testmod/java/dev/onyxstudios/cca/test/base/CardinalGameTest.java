@@ -20,17 +20,20 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.tests;
+package dev.onyxstudios.cca.test.base;
 
-import dev.onyxstudios.componenttest.content.CardinalComponentsTest;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.test.GameTestException;
 import net.minecraft.test.TestContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public interface CardinalGameTest extends FabricGameTest {
+    Logger LOGGER = LogManager.getLogger();
+
     @Override
     default void invokeTestMethod(TestContext context, Method method) {
         try {
@@ -52,7 +55,7 @@ public interface CardinalGameTest extends FabricGameTest {
                 message = e.getMessage();
                 cause = e;
             }
-            CardinalComponentsTest.LOGGER.error("Failed test", cause);
+            LOGGER.error("Failed test", cause);
             throw new GameTestException(message);
         }
     }

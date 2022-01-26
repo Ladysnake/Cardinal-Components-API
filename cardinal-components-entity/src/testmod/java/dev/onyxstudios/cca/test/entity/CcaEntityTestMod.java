@@ -20,29 +20,16 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.content.vita;
+package dev.onyxstudios.cca.test.entity;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
+import dev.onyxstudios.cca.test.base.Vita;
+import net.minecraft.entity.player.PlayerEntity;
 
-public class EntityVita extends BaseVita {
-    protected LivingEntity owner;
-
-    public EntityVita(LivingEntity owner, int baseVitality) {
-        this.owner = owner;
-        this.vitality = baseVitality;
-    }
-
+public class CcaEntityTestMod implements EntityComponentInitializer {
     @Override
-    public void setVitality(int value) {
-        super.setVitality(value);
-        if (!this.owner.world.isClient) {
-            if (this.getVitality() == 0) {
-                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
-            } else if (this.getVitality() > 10) {
-                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1000));
-            }
-        }
+    public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
+        registry.beginRegistration(PlayerEntity.class, Vita.KEY).impl(PlayerVita.class).end(PlayerVita::new);
     }
 }

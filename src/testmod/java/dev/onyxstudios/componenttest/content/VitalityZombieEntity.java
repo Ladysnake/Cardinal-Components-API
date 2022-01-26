@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.componenttest.content;
 
-import dev.onyxstudios.componenttest.content.vita.EntityVita;
+import dev.onyxstudios.cca.test.entity.EntityVita;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.particle.ParticleTypes;

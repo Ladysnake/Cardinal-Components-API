@@ -20,33 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.content.vita;
+package dev.onyxstudios.cca.test.base;
 
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.test.base.Vita;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.server.network.ServerPlayerEntity;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
+import dev.onyxstudios.cca.api.v3.component.ComponentV3;
+import net.minecraft.util.Identifier;
 
-public class TeamVita extends SyncedVita implements AutoSyncedComponent {
-    private final Team team;
+public interface Vita extends ComponentV3 {
+    ComponentKey<Vita> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("cca-base-test", "vita"), Vita.class);
 
-    public TeamVita(Team team) {
-        super(team);
-        this.team = team;
+    static <T> Vita get(T provider) {
+        return KEY.get(provider);
     }
 
-    @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player) {
-        return player.getScoreboardTeam() == this.team;
-    }
-
-    @Override
-    public int getVitality() {
-        return super.getVitality() + this.team.getPlayerList().size();
-    }
-
-    @Override
-    public void transferTo(Vita dest, int amount) {
-        super.transferTo(dest, Math.min(this.vitality, amount));
+    int getVitality();
+    void setVitality(int value);
+    default void transferTo(Vita dest, int amount) {
+        int sourceVitality = this.getVitality();
+        int actualAmount = Math.min(sourceVitality, amount);
+        this.setVitality(sourceVitality - actualAmount);
+        dest.setVitality(dest.getVitality() + actualAmount);
     }
 }

@@ -24,7 +24,8 @@ package dev.onyxstudios.cca.internal.base;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.componenttest.tests.CardinalGameTest;
+import dev.onyxstudios.cca.test.base.CardinalGameTest;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.test.GameTest;
 import net.minecraft.util.Identifier;
@@ -33,7 +34,7 @@ import org.junit.Assert;
 public class ComponentRegistryImplTest implements CardinalGameTest {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(structureName = FabricGameTest.EMPTY_STRUCTURE)
     public void checksRegisteredClasses() {
         ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
         Assert.assertThrows("Component class must extend Component", IllegalArgumentException.class, () -> registry.getOrCreate(CcaTesting.TEST_ID_1, (Class) TestNotComponentItf.class));
@@ -41,7 +42,7 @@ public class ComponentRegistryImplTest implements CardinalGameTest {
         registry.getOrCreate(CcaTesting.TEST_ID_2, TestComponentItf.class);
     }
 
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(structureName = FabricGameTest.EMPTY_STRUCTURE)
     public void doesNotDuplicateComponentTypes() {
         ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
         Identifier id = CcaTesting.TEST_ID_1;

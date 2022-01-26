@@ -23,7 +23,8 @@
 package dev.onyxstudios.componenttest.content.vita;
 
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.componenttest.content.TestComponents;
+import dev.onyxstudios.cca.test.base.BaseVita;
+import dev.onyxstudios.cca.test.base.Vita;
 import net.minecraft.world.chunk.Chunk;
 
 public class ChunkVita extends BaseVita implements AutoSyncedComponent {
@@ -36,7 +37,7 @@ public class ChunkVita extends BaseVita implements AutoSyncedComponent {
     @Override
     public void setVitality(int value) {
         super.setVitality(value);
-        TestComponents.VITA.sync(this.owner);
+        Vita.KEY.sync(this.owner);
         this.owner.setShouldSave(true);
     }
 }

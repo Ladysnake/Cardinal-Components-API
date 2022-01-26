@@ -23,7 +23,7 @@
 package dev.onyxstudios.componenttest.content;
 
 import dev.onyxstudios.componenttest.content.vita.AmbientVita;
-import dev.onyxstudios.componenttest.content.vita.Vita;
+import dev.onyxstudios.cca.test.base.Vita;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -95,14 +95,14 @@ public class VitalityStickItem extends Item {
     @Override
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity holder) {
         // The entity may not have the component, but the stack always does.
-        TestComponents.VITA.maybeGet(target)
+        Vita.KEY.maybeGet(target)
                 .ifPresent(v -> v.transferTo(Vita.get(stack), 1));
 
         AbstractTeam team = holder.getScoreboardTeam();
         if (team != null) {
-            Optional<Vita> vita = TestComponents.VITA.maybeGet(target.getScoreboardTeam());
+            Optional<Vita> vita = Vita.KEY.maybeGet(target.getScoreboardTeam());
             if (vita.isEmpty()) {
-                vita = TestComponents.VITA.maybeGet(target);
+                vita = Vita.KEY.maybeGet(target);
             }
             vita.ifPresent(v -> v.transferTo(Vita.get(team), 1));
         }
@@ -115,10 +115,10 @@ public class VitalityStickItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> lines, TooltipContext ctx) {
         super.appendTooltip(stack, world, lines, ctx);
-        lines.add(new TranslatableText("componenttest:tooltip.vitality", TestComponents.VITA.get(stack).getVitality()));
+        lines.add(new TranslatableText("componenttest:tooltip.vitality", Vita.KEY.get(stack).getVitality()));
         PlayerEntity holder = MinecraftClient.getInstance().player;
         if (holder != null) {
-            lines.add(new TranslatableText("componenttest:tooltip.self_vitality", TestComponents.VITA.get(holder).getVitality()));
+            lines.add(new TranslatableText("componenttest:tooltip.self_vitality", Vita.KEY.get(holder).getVitality()));
         }
     }
 

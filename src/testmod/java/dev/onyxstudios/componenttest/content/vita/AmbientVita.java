@@ -25,8 +25,9 @@ package dev.onyxstudios.componenttest.content.vita;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.api.v3.level.LevelComponents;
+import dev.onyxstudios.cca.test.base.BaseVita;
+import dev.onyxstudios.cca.test.base.Vita;
 import dev.onyxstudios.componenttest.content.CardinalComponentsTest;
-import dev.onyxstudios.componenttest.content.TestComponents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.network.PacketByteBuf;
@@ -80,7 +81,7 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
 
         @Override
         public void syncWithAll(MinecraftServer server) {
-            TestComponents.VITA.sync(this.world);
+            Vita.KEY.sync(this.world);
         }
 
         @Override
@@ -94,7 +95,7 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
     public static class LevelVita extends AmbientVita {
         @Override
         public void syncWithAll(MinecraftServer server) {
-            LevelComponents.sync(TestComponents.VITA, server);
+            LevelComponents.sync(Vita.KEY, server);
         }
     }
 }

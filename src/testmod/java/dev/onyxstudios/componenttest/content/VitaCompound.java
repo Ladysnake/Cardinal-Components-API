@@ -26,7 +26,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.componenttest.content.vita.SyncedVita;
-import dev.onyxstudios.componenttest.content.vita.Vita;
+import dev.onyxstudios.cca.test.base.Vita;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;

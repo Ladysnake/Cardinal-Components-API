@@ -1,3 +1,4 @@
 dependencies {
     api project(path: ":cardinal-components-base", configuration: "namedElements")
+    testmodImplementation project(":cardinal-components-base").sourceSets.testmod.output
 }

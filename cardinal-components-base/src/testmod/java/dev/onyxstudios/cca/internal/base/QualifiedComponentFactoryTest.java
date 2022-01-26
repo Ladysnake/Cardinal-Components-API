@@ -25,7 +25,8 @@ package dev.onyxstudios.cca.internal.base;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentLoadingException;
-import dev.onyxstudios.componenttest.tests.CardinalGameTest;
+import dev.onyxstudios.cca.test.base.CardinalGameTest;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.test.GameTest;
 import net.minecraft.util.Identifier;
 import org.junit.Assert;
@@ -43,7 +44,7 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         }
     }
 
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(structureName = FabricGameTest.EMPTY_STRUCTURE)
     public void sortKeepsOrderByDefault() {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
@@ -64,7 +65,7 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         Assert.assertEquals(List.copyOf(map.keySet()), List.copyOf(sorted.keySet()));
     }
 
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(structureName = FabricGameTest.EMPTY_STRUCTURE)
     public void sortThrowsOnUnsatisfiedDependency() {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
@@ -75,7 +76,7 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         QualifiedComponentFactory.checkDependenciesSatisfied(map);
     }
 
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(structureName = FabricGameTest.EMPTY_STRUCTURE)
     public void sortThrowsOnCircularDependency() {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
@@ -94,7 +95,7 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         QualifiedComponentFactory.sort(map);
     }
 
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(structureName = FabricGameTest.EMPTY_STRUCTURE)
     public void sortRespectsDependencyOrdering() {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);

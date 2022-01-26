@@ -1,0 +1,20 @@
+{
+    "schemaVersion": 1,
+    "environment": "*",
+    "id": "cca-entity-test",
+    "name": "Cardinal Components API Test Mod",
+    "description": "Test mod for Cardinal Components API",
+    "version": "${version}",
+    "entrypoints": {
+        "fabric-gametest": [
+          "dev.onyxstudios.cca.test.entity.CcaEntityTestSuite"
+        ]
+    },
+    "depends": {
+        "fabric-api-base": "*"
+    },
+    "authors": [
+        "Pyrofab"
+    ],
+    "license": "MIT"
+}

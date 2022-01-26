@@ -20,14 +20,15 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.content.vita;
+package dev.onyxstudios.cca.test.entity;
 
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
 import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
-import dev.onyxstudios.componenttest.content.CardinalComponentsTest;
-import dev.onyxstudios.componenttest.content.TestComponents;
+import dev.onyxstudios.cca.test.base.BaseVita;
+import dev.onyxstudios.cca.test.base.CardinalGameTest;
+import dev.onyxstudios.cca.test.base.Vita;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
@@ -50,14 +51,14 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
         if (value != this.vitality) {
             int increase = value - this.vitality;
             super.setVitality(value);
-            TestComponents.VITA.sync(this.owner, (buf, recipient) -> this.writeSyncPacket(buf, recipient, increase), PlayerSyncPredicate.all());
+            Vita.KEY.sync(this.owner, (buf, recipient) -> this.writeSyncPacket(buf, recipient, increase), PlayerSyncPredicate.all());
         }
     }
 
     @Override
     public void serverTick() {
         if (this.owner.age % 1200 == 0) {
-            CardinalComponentsTest.LOGGER.info("{} is still alive", this.owner);
+            CardinalGameTest.LOGGER.info("{} is still alive", this.owner);
         }
     }
 

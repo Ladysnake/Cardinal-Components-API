@@ -24,7 +24,7 @@ package dev.onyxstudios.componenttest.content;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import dev.onyxstudios.componenttest.content.vita.Vita;
+import dev.onyxstudios.cca.test.base.Vita;
 import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;

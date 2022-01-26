@@ -27,8 +27,8 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.internal.base.GenericContainerBuilder;
-import dev.onyxstudios.componenttest.content.vita.BaseVita;
-import dev.onyxstudios.componenttest.content.vita.Vita;
+import dev.onyxstudios.cca.test.base.BaseVita;
+import dev.onyxstudios.cca.test.base.Vita;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -92,7 +92,7 @@ public class CardinalComponentsTest {
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
 
         ComponentContainer.Factory.Builder<Integer> factoryBuilder = ComponentContainer.Factory.builder(Integer.class)
-            .component(TestComponents.VITA, BaseVita::new);
+            .component(Vita.KEY, BaseVita::new);
         ComponentContainer.Factory<Integer> containerFactory = factoryBuilder.build();
         LOGGER.info(containerFactory.createContainer(3));
         LOGGER.info(containerFactory.createContainer(5));
@@ -130,10 +130,10 @@ public class CardinalComponentsTest {
         });
 
         VITA_API_LOOKUP.registerForBlocks(
-            (world, pos, state, blockEntity, context) -> TestComponents.VITA.get(Objects.requireNonNull(world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.FULL, false))),
+            (world, pos, state, blockEntity, context) -> Vita.KEY.get(Objects.requireNonNull(world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.FULL, false))),
             VITALITY_CONDENSER
         );
-        BlockComponents.exposeApi(TestComponents.VITA, VITA_API_LOOKUP, (vita, side) -> side == Direction.UP ? vita : null, BlockEntityType.END_PORTAL);
+        BlockComponents.exposeApi(Vita.KEY, VITA_API_LOOKUP, (vita, side) -> side == Direction.UP ? vita : null, BlockEntityType.END_PORTAL);
         BlockComponents.exposeApi(VitaCompound.KEY, VITA_API_LOOKUP, VitaCompound::get, BlockEntityType.END_GATEWAY);
     }
 

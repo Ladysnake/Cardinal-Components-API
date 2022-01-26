@@ -23,6 +23,7 @@
 package dev.onyxstudios.componenttest.content.vita;
 
 import dev.onyxstudios.cca.api.v3.item.ItemComponent;
+import dev.onyxstudios.cca.test.base.Vita;
 import net.minecraft.item.ItemStack;
 
 public class ItemVita extends ItemComponent implements Vita {

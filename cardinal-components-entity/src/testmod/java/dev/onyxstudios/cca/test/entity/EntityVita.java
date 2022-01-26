@@ -20,23 +20,30 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.content.vita;
+package dev.onyxstudios.cca.test.entity;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
-import dev.onyxstudios.componenttest.content.TestComponents;
+import dev.onyxstudios.cca.test.base.BaseVita;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 
-public interface Vita extends ComponentV3 {
+public class EntityVita extends BaseVita {
+    protected LivingEntity owner;
 
-    static <T> Vita get(T provider) {
-        return TestComponents.VITA.get(provider);
+    public EntityVita(LivingEntity owner, int baseVitality) {
+        this.owner = owner;
+        this.vitality = baseVitality;
     }
 
-    int getVitality();
-    void setVitality(int value);
-    default void transferTo(Vita dest, int amount) {
-        int sourceVitality = this.getVitality();
-        int actualAmount = Math.min(sourceVitality, amount);
-        this.setVitality(sourceVitality - actualAmount);
-        dest.setVitality(dest.getVitality() + actualAmount);
+    @Override
+    public void setVitality(int value) {
+        super.setVitality(value);
+        if (!this.owner.world.isClient) {
+            if (this.getVitality() == 0) {
+                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
+            } else if (this.getVitality() > 10) {
+                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1000));
+            }
+        }
     }
 }
