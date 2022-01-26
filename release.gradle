@@ -27,7 +27,7 @@ task checkGitStatus() {
 githubRelease {
     token "${findProperty('github_releases_token')}"
     // default repo: name of the project
-    owner = "${project.owner}"
+    owner = project.owners
     tagName = project.version
     targetCommitish = { grgit.branch.current().name }
     body = { project.getChangelogText() }
@@ -35,7 +35,7 @@ githubRelease {
     FilenameFilter filter = { dir, filename -> filename.contains(project.version) && !filename.contains('-dev.jar') }
     releaseAssets = { jar.destinationDirectory.asFile.get().listFiles filter }
 }
-tasks.githubRelease.dependsOn(checkGitStatus)
+//tasks.githubRelease.dependsOn(checkGitStatus)
 
 artifactory {
 	if (project.hasProperty("artifactory_user")) {
