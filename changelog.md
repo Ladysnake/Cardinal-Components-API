@@ -1,4 +1,15 @@
 ------------------------------------------------------
+Version 4.1.0
+------------------------------------------------------
+Now available on modrinth!
+
+**Changes**
+- **Changed the maven group from `io.github.onyxstudios.Cardinal-Components-API` to `dev.onyxstudios.cardinal-components-api`**
+
+**Fixes**
+- Fixed curseforge upload
+
+------------------------------------------------------
 Version 4.0.1
 ------------------------------------------------------
 **Fixes**
