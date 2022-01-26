@@ -25,6 +25,9 @@ The information below is a condensed form of the latter.
 *\*Non exhaustive, refer to the wiki and javadoc for the full list.*
 
 ## Adding the API to your buildscript:
+
+**Upgrade information: versions 4.1.0 onwards of Cardinal Components API use the `dev.onyxstudios.cardinal-components-api` (lowercase) maven group instead of `io.github.onyxstudios.Cardinal-Components-API`**
+
 Latest versions of Cardinal Components API are available on Artifactory:
 ```gradle
 repositories {
@@ -37,28 +40,30 @@ repositories {
 dependencies {
     // Adds a dependency on the base cardinal components module (required by every other module)
     // Replace modImplementation with modApi if you expose components in your own API
-    modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:<VERSION>"
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:<VERSION>"
     // Adds a dependency on a specific module
-    modImplementation "io.github.onyxstudios.Cardinal-Components-API:<MODULE>:<VERSION>"
+    modImplementation "dev.onyxstudios.cardinal-components-api:<MODULE>:<VERSION>"
     // Includes Cardinal Components API as a Jar-in-Jar dependency (optional)
-    include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:<VERSION>"
-    include "io.github.onyxstudios.Cardinal-Components-API:<MODULE>:<VERSION>"
+    include "dev.onyxstudios.cardinal-components-api:cardinal-components-base:<VERSION>"
+    include "dev.onyxstudios.cardinal-components-api:<MODULE>:<VERSION>"
 }
 ```
 
 You can find the current version of the API in the [**releases**](https://github.com/OnyxStudios/Cardinal-Components-API/releases) tab of the repository on Github.
 
 Cardinal Components API is split into several modules. To depend on the all-encompassing master jar, use the dependency string
-`io.github.onyxstudios:Cardinal-Components-API:<VERSION>`. That artifact bundles every module, but you often do not need all of them for a project.
+`dev.onyxstudios.cardinal-components-api:cardinal-components-api:<VERSION>`.
+That artifact brings every module to your dev env, but you often do not need all of them for a project.
+Also note that the maven version of the fat jar is actually empty, so you will have to require users to install it from curseforge or modrinth if you do not bundle all required modules.
 
 **[[List of individual module names and descriptions]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki#modules)**
 
 Example:
 ```gradle
 // Adds an API dependency on the base cardinal components module (required by every other module)
-modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:<VERSION>"
+modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-base:<VERSION>"
 // Adds an implementation dependency on the entity module
-modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:<VERSION>"
+modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:<VERSION>"
 ```
 
 ## Basic Usage

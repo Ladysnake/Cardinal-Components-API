@@ -24,7 +24,7 @@ allprojects {
         it.options.release = 17
     }
 
-    group = "io.github.onyxstudios.cardinal-components-api"
+    group = "dev.onyxstudios.cardinal-components-api"
     version = project.mod_version
 
     // import utility functions
@@ -61,7 +61,7 @@ allprojects {
             content {
                 includeGroup 'io.github.ladysnake'
                 includeGroupByRegex 'dev\\.emi.*'
-                includeGroupByRegex 'io\\.github\\.onyxstudios.*'
+                includeGroupByRegex 'dev\\.onyxstudios.*'
             }
         }
         maven {
