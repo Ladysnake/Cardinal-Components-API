@@ -47,4 +47,10 @@ public class CcaEntityTestSuite implements FabricGameTest {
         ((EntityBucketItem) Items.AXOLOTL_BUCKET).onEmptied(player, ctx.getWorld(), player.getStackInHand(Hand.MAIN_HAND), ctx.getAbsolutePos(pos));
         ctx.expectEntityWithDataEnd(pos, EntityType.AXOLOTL, a -> Vita.get(a).getVitality(), 3);
     }
+
+    @GameTest(structureName = EMPTY_STRUCTURE)
+    public void moddedEntitiesWork(TestContext ctx) {
+        ctx.spawnEntity(CcaEntityTestMod.TEST_ENTITY, 0, 0, 0);
+        ctx.complete();
+    }
 }

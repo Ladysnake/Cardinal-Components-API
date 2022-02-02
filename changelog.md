@@ -1,4 +1,10 @@
 ------------------------------------------------------
+Version 4.1.1
+------------------------------------------------------
+**Fixes**
+Fixed modded ComponentProvider subclasses (as in, custom entities) on newer loom versions
+
+------------------------------------------------------
 Version 4.1.0
 ------------------------------------------------------
 Now available on modrinth!

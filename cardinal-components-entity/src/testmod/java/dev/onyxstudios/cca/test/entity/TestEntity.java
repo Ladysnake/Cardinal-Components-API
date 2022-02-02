@@ -22,27 +22,34 @@
  */
 package dev.onyxstudios.cca.test.entity;
 
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
-import dev.onyxstudios.cca.test.base.Vita;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.Packet;
+import net.minecraft.world.World;
 
-public class CcaEntityTestMod implements ModInitializer, EntityComponentInitializer {
-
-    public static final EntityType<TestEntity> TEST_ENTITY = FabricEntityTypeBuilder.create().entityFactory(TestEntity::new).build();
-
-    @Override
-    public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.beginRegistration(PlayerEntity.class, Vita.KEY).impl(PlayerVita.class).end(PlayerVita::new);
+public class TestEntity extends Entity {
+    public TestEntity(EntityType<?> type, World world) {
+        super(type, world);
     }
 
     @Override
-    public void onInitialize() {
-        Registry.register(Registry.ENTITY_TYPE, new Identifier("cca-entity-test", "test"), TEST_ENTITY);
+    protected void initDataTracker() {
+
+    }
+
+    @Override
+    protected void readCustomDataFromNbt(NbtCompound nbt) {
+
+    }
+
+    @Override
+    protected void writeCustomDataToNbt(NbtCompound nbt) {
+
+    }
+
+    @Override
+    public Packet<?> createSpawnPacket() {
+        return null;
     }
 }

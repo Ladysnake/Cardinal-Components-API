@@ -143,7 +143,9 @@ public interface ComponentProvider {
     /**
      * @return a runtime-generated component container storing statically declared components.
      */
-    ComponentContainer getComponentContainer();
+    default ComponentContainer getComponentContainer() {
+        throw new UnsupportedOperationException("Please implement me");
+    }
 
     /**
      * @param key the key object for the type of component to retrieve
