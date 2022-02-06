@@ -32,19 +32,14 @@ import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
-import dev.onyxstudios.cca.api.v3.level.LevelComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.level.LevelComponentInitializer;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
-import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
-import dev.onyxstudios.componenttest.content.vita.AmbientVita;
 import dev.onyxstudios.cca.test.base.BaseVita;
+import dev.onyxstudios.cca.test.base.Vita;
 import dev.onyxstudios.componenttest.content.vita.ChunkVita;
 import dev.onyxstudios.componenttest.content.vita.ItemVita;
 import dev.onyxstudios.componenttest.content.vita.SyncedVita;
 import dev.onyxstudios.componenttest.content.vita.TeamVita;
-import dev.onyxstudios.cca.test.base.Vita;
 import net.minecraft.block.entity.EndGatewayBlockEntity;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.LivingEntity;
@@ -57,8 +52,6 @@ public final class TestComponents implements
     EntityComponentInitializer,
     ChunkComponentInitializer,
     BlockComponentInitializer,
-    LevelComponentInitializer,
-    WorldComponentInitializer,
     ItemComponentInitializer,
     ScoreboardComponentInitializer {
 
@@ -89,16 +82,6 @@ public final class TestComponents implements
         registry.registerFor(EndGatewayBlockEntity.class, VitaCompound.KEY, VitaCompound::new);
         registry.beginRegistration(EndPortalBlockEntity.class, ALT_VITA).after(Vita.KEY).impl(SyncedVita.class).end(SyncedVita::new);
         registry.registerFor(EndPortalBlockEntity.class, Vita.KEY, SyncedVita::new);
-    }
-
-    @Override
-    public void registerLevelComponentFactories(LevelComponentFactoryRegistry registry) {
-        registry.register(Vita.KEY, properties -> new AmbientVita.LevelVita());
-    }
-
-    @Override
-    public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
-        registry.register(Vita.KEY, AmbientVita.WorldVita.class, AmbientVita.WorldVita::new);
     }
 
     @Override

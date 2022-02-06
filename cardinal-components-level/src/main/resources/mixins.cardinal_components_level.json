@@ -9,7 +9,8 @@
   "mixins": [
     "common.MixinLevelProperties",
     "common.MixinMinecraftServer",
-    "common.MixinUnmodifiableLevelProperties"
+    "common.MixinUnmodifiableLevelProperties",
+    "common.MixinWorldProperties"
   ],
   "injectors": {
     "defaultRequire": 1

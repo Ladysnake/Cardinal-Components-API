@@ -1,20 +1,16 @@
 {
     "schemaVersion": 1,
     "environment": "*",
-    "id": "cca-base-test",
+    "id": "cca-level-test",
     "name": "Cardinal Components API Test Mod",
     "description": "Test mod for Cardinal Components API",
     "version": "${version}",
     "entrypoints": {
-        "fabric-gametest": [
-          "dev.onyxstudios.cca.internal.base.ComponentRegistryImplTest",
-          "dev.onyxstudios.cca.internal.base.QualifiedComponentFactoryTest"
-        ]
-    },
-    "custom": {
         "cardinal-components": [
-            "cca-base-test:vita",
-            "cca-base-test:ticking"
+          "dev.onyxstudios.cca.test.level.CcaLevelTestMod"
+        ],
+        "fabric-gametest": [
+          "dev.onyxstudios.cca.test.level.CcaLevelTestSuite"
         ]
     },
     "depends": {

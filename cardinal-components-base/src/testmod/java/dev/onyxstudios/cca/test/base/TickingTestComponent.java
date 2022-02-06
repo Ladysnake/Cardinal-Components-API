@@ -23,24 +23,45 @@
 package dev.onyxstudios.cca.test.base;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
+import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 
-public interface
-Vita extends ComponentV3 {
-    ComponentKey<Vita> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("cca-base-test", "vita"), Vita.class);
+public class TickingTestComponent implements ServerTickingComponent, ClientTickingComponent {
+    public static final ComponentKey<TickingTestComponent> KEY = ComponentRegistry.getOrCreate(new Identifier("cca-base-test", "ticking"), TickingTestComponent.class);
 
-    static <T> Vita get(T provider) {
-        return KEY.get(provider);
+    private int clientTicks;
+    private int serverTicks;
+
+    @Override
+    public void readFromNbt(NbtCompound tag) {
+        this.clientTicks = tag.getInt("clientTicks");
+        this.serverTicks = tag.getInt("serverTicks");
     }
 
-    int getVitality();
-    void setVitality(int value);
-    default void transferTo(Vita dest, int amount) {
-        int sourceVitality = this.getVitality();
-        int actualAmount = Math.min(sourceVitality, amount);
-        this.setVitality(sourceVitality - actualAmount);
-        dest.setVitality(dest.getVitality() + actualAmount);
+    @Override
+    public void writeToNbt(NbtCompound tag) {
+        tag.putInt("clientTicks", this.clientTicks);
+        tag.putInt("serverTicks", this.serverTicks);
+    }
+
+    @Override
+    public void clientTick() {
+        this.clientTicks++;
+    }
+
+    @Override
+    public void serverTick() {
+        this.serverTicks++;
+    }
+
+    public int clientTicks() {
+        return clientTicks;
+    }
+
+    public int serverTicks() {
+        return serverTicks;
     }
 }

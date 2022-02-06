@@ -20,27 +20,17 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.test.base;
+package dev.onyxstudios.cca.test.level;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
-import net.minecraft.util.Identifier;
+import dev.onyxstudios.cca.api.v3.level.LevelComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.level.LevelComponentInitializer;
+import dev.onyxstudios.cca.test.base.TickingTestComponent;
+import dev.onyxstudios.cca.test.base.Vita;
 
-public interface
-Vita extends ComponentV3 {
-    ComponentKey<Vita> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("cca-base-test", "vita"), Vita.class);
-
-    static <T> Vita get(T provider) {
-        return KEY.get(provider);
-    }
-
-    int getVitality();
-    void setVitality(int value);
-    default void transferTo(Vita dest, int amount) {
-        int sourceVitality = this.getVitality();
-        int actualAmount = Math.min(sourceVitality, amount);
-        this.setVitality(sourceVitality - actualAmount);
-        dest.setVitality(dest.getVitality() + actualAmount);
+public class CcaLevelTestMod implements LevelComponentInitializer {
+    @Override
+    public void registerLevelComponentFactories(LevelComponentFactoryRegistry registry) {
+        registry.register(TickingTestComponent.KEY, props -> new TickingTestComponent());
+        registry.register(Vita.KEY, props -> new LevelVita());
     }
 }

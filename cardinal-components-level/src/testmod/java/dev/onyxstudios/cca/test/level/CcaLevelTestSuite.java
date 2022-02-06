@@ -20,27 +20,22 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.test.base;
+package dev.onyxstudios.cca.test.level;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
-import dev.onyxstudios.cca.api.v3.component.ComponentV3;
-import net.minecraft.util.Identifier;
+import dev.onyxstudios.cca.test.base.TickingTestComponent;
+import io.github.ladysnake.elmendorf.GameTestUtil;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.minecraft.test.GameTest;
+import net.minecraft.test.TestContext;
 
-public interface
-Vita extends ComponentV3 {
-    ComponentKey<Vita> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("cca-base-test", "vita"), Vita.class);
-
-    static <T> Vita get(T provider) {
-        return KEY.get(provider);
-    }
-
-    int getVitality();
-    void setVitality(int value);
-    default void transferTo(Vita dest, int amount) {
-        int sourceVitality = this.getVitality();
-        int actualAmount = Math.min(sourceVitality, amount);
-        this.setVitality(sourceVitality - actualAmount);
-        dest.setVitality(dest.getVitality() + actualAmount);
+public class CcaLevelTestSuite implements FabricGameTest {
+    @GameTest(structureName = EMPTY_STRUCTURE)
+    public void levelComponentsTick(TestContext ctx) {
+        int baseTicks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
+        ctx.waitAndRun(5, () -> {
+            int ticks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
+            GameTestUtil.assertTrue("Component should tick 5 times", ticks - baseTicks == 5);
+            ctx.complete();
+        });
     }
 }

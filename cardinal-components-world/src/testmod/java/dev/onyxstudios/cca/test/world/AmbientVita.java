@@ -20,13 +20,13 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.content.vita;
+package dev.onyxstudios.cca.test.world;
 
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
 import dev.onyxstudios.cca.test.base.BaseVita;
+import dev.onyxstudios.cca.test.base.CardinalGameTest;
 import dev.onyxstudios.cca.test.base.Vita;
-import dev.onyxstudios.componenttest.content.CardinalComponentsTest;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.network.PacketByteBuf;
@@ -86,7 +86,7 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
         @Override
         public void clientTick() {
             if (this.world.getTime() % 2400 == 0) {
-                CardinalComponentsTest.LOGGER.info("The world still runs, and is now worth {}", this.vitality);
+                CardinalGameTest.LOGGER.info("The world still runs, and is now worth {}", this.vitality);
             }
         }
     }
