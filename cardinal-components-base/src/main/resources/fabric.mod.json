@@ -5,6 +5,7 @@
   "name": "Cardinal Components API (base)",
   "description": "dynamically exposing components",
   "version": "${version}",
+  "icon": "assets/cardinal-components-base/icon.png",
   "custom": {
     "modmenu": {
       "badges": [ "library" ],

@@ -5,6 +5,7 @@
   "name": "Cardinal Components API (chunks)",
   "description": "dynamically exposing components",
   "version": "${version}",
+  "icon": "assets/cardinal-components-chunk/icon.png",
   "entrypoints": {
     "main": [
       "dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking::init"

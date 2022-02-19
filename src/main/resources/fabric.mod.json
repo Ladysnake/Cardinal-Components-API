@@ -5,6 +5,7 @@
     "name": "Cardinal Components API",
     "description": "Attaching more data to various game objects",
     "version": "${version}",
+    "icon": "assets/cardinal-components/icon.png",
     "custom": {
       "modmenu": {
         "badges": ["library"]

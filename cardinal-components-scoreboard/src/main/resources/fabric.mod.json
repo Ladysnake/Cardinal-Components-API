@@ -5,6 +5,7 @@
   "name": "Cardinal Components API (scoreboard)",
   "description": "dynamically exposing components",
   "version": "${version}",
+  "icon": "assets/cardinal-components-scoreboard/icon.png",
   "entrypoints": {
     "main": [
       "dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking::init"

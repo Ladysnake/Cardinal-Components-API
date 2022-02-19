@@ -5,6 +5,7 @@
   "name": "Cardinal Components API (entities)",
   "description": "dynamically exposing components",
   "version": "${version}",
+  "icon": "assets/cardinal-components-entity/icon.png",
   "entrypoints": {
     "main": [
       "dev.onyxstudios.cca.internal.entity.CardinalComponentsEntity::init"

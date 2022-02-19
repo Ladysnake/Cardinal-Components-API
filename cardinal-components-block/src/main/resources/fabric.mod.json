@@ -5,6 +5,7 @@
   "name": "Cardinal Components API (blocks)",
   "description": "dynamically exposing components",
   "version": "${version}",
+  "icon": "assets/cardinal-components-block/icon.png",
   "entrypoints": {
     "main": [
       "dev.onyxstudios.cca.internal.CardinalComponentsBlock::init"
