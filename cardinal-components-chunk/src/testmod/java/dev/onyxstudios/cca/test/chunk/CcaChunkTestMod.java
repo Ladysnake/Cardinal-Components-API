@@ -20,24 +20,23 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.content.vita;
+package dev.onyxstudios.cca.test.chunk;
 
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.test.base.BaseVita;
+import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
+import dev.onyxstudios.cca.test.base.TickingTestComponent;
 import dev.onyxstudios.cca.test.base.Vita;
-import net.minecraft.world.chunk.Chunk;
+import net.fabricmc.api.ModInitializer;
 
-public class ChunkVita extends BaseVita implements AutoSyncedComponent {
-    private final Chunk owner;
-
-    public ChunkVita(Chunk owner) {
-        this.owner = owner;
+public class CcaChunkTestMod implements ModInitializer, ChunkComponentInitializer {
+    @Override
+    public void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry) {
+        registry.register(TickingTestComponent.KEY, chunk -> new TickingTestComponent());
+        registry.register(Vita.KEY, ChunkVita::new);
     }
 
     @Override
-    public void setVitality(int value) {
-        super.setVitality(value);
-        Vita.KEY.sync(this.owner);
-        this.owner.setShouldSave(true);
+    public void onInitialize() {
+
     }
 }

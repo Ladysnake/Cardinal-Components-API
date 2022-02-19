@@ -1,0 +1,26 @@
+{
+    "schemaVersion": 1,
+    "environment": "*",
+    "id": "cca-chunk-test",
+    "name": "Cardinal Components API Test Mod",
+    "description": "Test mod for Cardinal Components API",
+    "version": "${version}",
+    "entrypoints": {
+        "main": [
+          "dev.onyxstudios.cca.test.chunk.CcaChunkTestMod"
+        ],
+        "cardinal-components": [
+          "dev.onyxstudios.cca.test.chunk.CcaChunkTestMod"
+        ],
+        "fabric-gametest": [
+          "dev.onyxstudios.cca.test.chunk.CcaChunkTestSuite"
+        ]
+    },
+    "depends": {
+        "fabric-api-base": "*"
+    },
+    "authors": [
+        "Pyrofab"
+    ],
+    "license": "MIT"
+}

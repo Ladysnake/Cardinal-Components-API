@@ -216,6 +216,20 @@ subprojects {
 
     publishing {
         publications {
+            relocation(MavenPublication) {
+                pom {
+                    // Old artifact coordinates
+                    groupId = "io.github.onyxstudios.Cardinal-Components-API"
+
+                    distributionManagement {
+                        relocation {
+                            // New artifact coordinates
+                            groupId = "dev.onyxstudios.cardinal-components-api"
+                            message = "groupId has been changed"
+                        }
+                    }
+                }
+            }
             mavenJava(MavenPublication) {
                 from components.java
             }

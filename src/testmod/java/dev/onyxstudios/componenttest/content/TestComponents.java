@@ -24,8 +24,6 @@ package dev.onyxstudios.componenttest.content;
 
 import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
-import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
@@ -36,7 +34,6 @@ import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
 import dev.onyxstudios.cca.test.base.BaseVita;
 import dev.onyxstudios.cca.test.base.Vita;
-import dev.onyxstudios.componenttest.content.vita.ChunkVita;
 import dev.onyxstudios.componenttest.content.vita.ItemVita;
 import dev.onyxstudios.componenttest.content.vita.SyncedVita;
 import dev.onyxstudios.componenttest.content.vita.TeamVita;
@@ -50,7 +47,6 @@ import net.minecraft.util.Identifier;
 
 public final class TestComponents implements
     EntityComponentInitializer,
-    ChunkComponentInitializer,
     BlockComponentInitializer,
     ItemComponentInitializer,
     ScoreboardComponentInitializer {
@@ -70,11 +66,6 @@ public final class TestComponents implements
         registry.registerFor(LivingEntity.class, Vita.KEY, TestComponents::createForEntity);
         registry.registerFor(VitalityZombieEntity.class, Vita.KEY, VitalityZombieEntity::createVitaComponent);
         registry.beginRegistration(LivingEntity.class, ALT_VITA).filter(CowEntity.class::isAssignableFrom).end(TestComponents::createForEntity);
-    }
-
-    @Override
-    public void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry) {
-        registry.register(Vita.KEY, ChunkVita::new);
     }
 
     @Override
