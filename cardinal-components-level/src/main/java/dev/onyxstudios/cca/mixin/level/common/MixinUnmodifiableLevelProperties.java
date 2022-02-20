@@ -40,6 +40,6 @@ public abstract class MixinUnmodifiableLevelProperties implements ComponentProvi
     @Nonnull
     @Override
     public ComponentContainer getComponentContainer() {
-        return ((ComponentProvider) this.worldProperties).getComponentContainer();
+        return this.worldProperties.getComponentContainer();
     }
 }

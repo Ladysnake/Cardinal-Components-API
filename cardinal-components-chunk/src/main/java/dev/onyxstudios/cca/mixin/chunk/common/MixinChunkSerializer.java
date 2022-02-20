@@ -22,10 +22,8 @@
  */
 package dev.onyxstudios.cca.mixin.chunk.common;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.structure.StructureManager;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.ChunkSerializer;
 import net.minecraft.world.chunk.Chunk;
@@ -43,12 +41,12 @@ public abstract class MixinChunkSerializer {
     private static void deserialize(ServerWorld world, PointOfInterestStorage pointOfInterestStorage, ChunkPos chunkPos, NbtCompound tag, CallbackInfoReturnable<ProtoChunk> cir) {
         ProtoChunk ret = cir.getReturnValue();
         Chunk chunk = ret instanceof ReadOnlyChunk ? ((ReadOnlyChunk) ret).getWrappedChunk() : ret;
-        ((ComponentProvider)chunk).getComponentContainer().fromTag(tag);
+        chunk.getComponentContainer().fromTag(tag);
     }
 
     @Inject(method = "serialize", at = @At("RETURN"))
     private static void serialize(ServerWorld world, Chunk chunk, CallbackInfoReturnable<NbtCompound> cir) {
         NbtCompound ret = cir.getReturnValue();
-        ((ComponentProvider)chunk).getComponentContainer().toTag(ret);
+        chunk.getComponentContainer().toTag(ret);
     }
 }

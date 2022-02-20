@@ -23,13 +23,13 @@
 package dev.onyxstudios.cca.test.entity;
 
 import dev.onyxstudios.cca.test.base.Vita;
-import io.github.ladysnake.elmendorf.GameTestUtil;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.entity.Bucketable;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.EntityBucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 import net.minecraft.util.Hand;
@@ -38,14 +38,14 @@ import net.minecraft.util.math.BlockPos;
 public class CcaEntityTestSuite implements FabricGameTest {
     @GameTest(structureName = EMPTY_STRUCTURE)
     public void bucketableWorks(TestContext ctx) {
-        var player = GameTestUtil.spawnPlayer(ctx, 1, 0, 1);
+        ServerPlayerEntity player = ctx.spawnServerPlayer(1, 0, 1);
         player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
         BlockPos pos = new BlockPos(2, 0, 2);
         var axolotl = ctx.spawnMob(EntityType.AXOLOTL, pos);
         Vita.get(axolotl).setVitality(3);
         Bucketable.tryBucket(player, Hand.MAIN_HAND, axolotl);
         ((EntityBucketItem) Items.AXOLOTL_BUCKET).onEmptied(player, ctx.getWorld(), player.getStackInHand(Hand.MAIN_HAND), ctx.getAbsolutePos(pos));
-        ctx.expectEntityWithDataEnd(pos, EntityType.AXOLOTL, a -> Vita.get(a).getVitality(), 3);
+        ctx.expectEntityWithDataEnd(pos, EntityType.AXOLOTL, a -> a.getComponent(Vita.KEY).getVitality(), 3);
     }
 
     @GameTest(structureName = EMPTY_STRUCTURE)

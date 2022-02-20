@@ -34,10 +34,8 @@ public final class ComponentsChunkNetworking {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             ChunkSyncCallback.EVENT.register((player, tracked) -> {
-                ComponentProvider provider = (ComponentProvider) tracked;
-
-                for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
-                    key.syncWith(player, provider);
+                for (ComponentKey<?> key : tracked.getComponentContainer().keys()) {
+                    key.syncWith(player, (ComponentProvider) tracked);
                 }
             });
         }
