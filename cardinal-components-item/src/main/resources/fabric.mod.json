@@ -4,6 +4,7 @@
   "id": "cardinal-components-item",
   "name": "Cardinal Components API (items)",
   "description": "dynamically exposing components",
+  "icon": "assets/cardinal-components-item/icon.png",
   "version": "${version}",
   "custom": {
     "modmenu": {
