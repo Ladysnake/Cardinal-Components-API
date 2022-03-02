@@ -1,4 +1,5 @@
 dependencies {
     annotationProcessor api(project(path: ":cardinal-components-base", configuration: "namedElements"))
     testmodImplementation project(":cardinal-components-base").sourceSets.testmod.output
+    modCompileOnly modLocalRuntime(fabricApi.module("fabric-object-builder-api-v1", fabric_api_version))
 }

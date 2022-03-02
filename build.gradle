@@ -84,6 +84,7 @@ allprojects {
         testmodImplementation 'org.mockito:mockito-core:3.+'
 
         testmodImplementation sourceSets.main.output
+        modCompileOnly fabricApi.module("fabric-gametest-api-v1", fabric_api_version)
         modCompileOnly modLocalRuntime("io.github.ladysnake:elmendorf:${elmendorf_version}")
 
         compileOnly "com.google.code.findbugs:jsr305:3.0.2"
@@ -300,12 +301,10 @@ dependencies {
     modImplementation fabricApi.module("fabric-api-lookup-api-v1", fabric_api_version)
     modImplementation fabricApi.module("fabric-command-api-v1", fabric_api_version)
     modImplementation fabricApi.module("fabric-gametest-api-v1", fabric_api_version)
-    modRuntimeOnly fabricApi.module("fabric-networking-v0", fabric_api_version)
-    modRuntimeOnly fabricApi.module("fabric-resource-loader-v0", fabric_api_version)
-    modRuntimeOnly fabricApi.module("fabric-mining-levels-v0", fabric_api_version)
-    modRuntimeOnly fabricApi.module("fabric-tag-extensions-v0", fabric_api_version)
-    modRuntimeOnly fabricApi.module("fabric-tool-attribute-api-v1", fabric_api_version)
-    modRuntimeOnly fabricApi.module("fabric-events-interaction-v0", fabric_api_version)
+    modLocalRuntime fabricApi.module("fabric-registry-sync-v0", fabric_api_version)
+    modLocalRuntime fabricApi.module("fabric-networking-v0", fabric_api_version)
+    modLocalRuntime fabricApi.module("fabric-resource-loader-v0", fabric_api_version)
+    modLocalRuntime fabricApi.module("fabric-events-interaction-v0", fabric_api_version)
 
     testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
 

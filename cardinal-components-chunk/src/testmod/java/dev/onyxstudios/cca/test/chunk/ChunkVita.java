@@ -38,6 +38,6 @@ public class ChunkVita extends BaseVita implements AutoSyncedComponent {
     public void setVitality(int value) {
         super.setVitality(value);
         Vita.KEY.sync(this.owner);
-        this.owner.setShouldSave(true);
+        this.owner.setNeedsSaving(true);
     }
 }
