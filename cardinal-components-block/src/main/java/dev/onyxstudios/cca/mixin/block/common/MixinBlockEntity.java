@@ -50,8 +50,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.List;
 
 @Mixin(BlockEntity.class)
 public abstract class MixinBlockEntity implements ComponentProvider {
@@ -71,7 +70,7 @@ public abstract class MixinBlockEntity implements ComponentProvider {
     @Inject(method = "createFromNbt", at = @At("RETURN"))
     private static void readComponentData(BlockPos pos, BlockState state, NbtCompound nbt, CallbackInfoReturnable<BlockEntity> cir) {
         if (cir.getReturnValue() != null) {
-            cir.getReturnValue().getComponentContainer().fromTag(nbt);
+            cir.getReturnValue().asComponentProvider().getComponentContainer().fromTag(nbt);
         }
     }
 
@@ -109,13 +108,13 @@ public abstract class MixinBlockEntity implements ComponentProvider {
     }
 
     @Override
-    public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
+    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
         World world = this.getWorld();
 
         if (world != null && !world.isClient) {
-            return PlayerLookup.tracking((BlockEntity) (Object) this).iterator();
+            return PlayerLookup.tracking((BlockEntity) (Object) this);
         }
-        return Collections.emptyIterator();
+        return List.of();
     }
 
     @Nullable

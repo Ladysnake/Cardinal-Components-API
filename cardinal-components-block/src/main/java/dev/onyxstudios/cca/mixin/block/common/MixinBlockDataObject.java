@@ -40,6 +40,6 @@ public abstract class MixinBlockDataObject {
 
     @Inject(method = "setNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;markDirty()V"))
     void readComponentData(NbtCompound nbt, CallbackInfo ci) {
-        this.blockEntity.getComponentContainer().fromTag(nbt);
+        this.blockEntity.asComponentProvider().getComponentContainer().fromTag(nbt);
     }
 }

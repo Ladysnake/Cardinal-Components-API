@@ -22,7 +22,7 @@
  */
 package dev.onyxstudios.componenttest.tests;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentAccess;
 import io.github.ladysnake.elmendorf.GameTestUtil;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.block.Blocks;
@@ -52,8 +52,8 @@ public final class CcaTestSuite implements FabricGameTest {
         context.complete();
     }
 
-    private void checkContainer(ComponentProvider provider) {
+    private void checkContainer(ComponentAccess provider) {
         //noinspection ConstantConditions
-        GameTestUtil.assertTrue(provider + " should correctly implement ComponentProvider", provider.getComponentContainer() != null);
+        GameTestUtil.assertTrue(provider + " should correctly implement ComponentProvider", provider.asComponentProvider().getComponentContainer() != null);
     }
 }

@@ -26,10 +26,10 @@
     },
     "loom:injected_interfaces": {
       "net/minecraft/class_269": [
-        "dev/onyxstudios/cca/api/v3/component/ComponentProvider"
+        "dev/onyxstudios/cca/api/v3/component/ComponentAccess"
       ],
       "net/minecraft/class_268": [
-        "dev/onyxstudios/cca/api/v3/component/ComponentProvider"
+        "dev/onyxstudios/cca/api/v3/component/ComponentAccess"
       ]
     }
   },

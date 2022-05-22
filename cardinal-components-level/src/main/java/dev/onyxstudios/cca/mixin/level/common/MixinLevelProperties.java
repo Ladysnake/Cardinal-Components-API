@@ -56,7 +56,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
@@ -87,7 +86,7 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Com
     }
 
     @Override
-    public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
+    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
         throw new UnsupportedOperationException("Please call LevelComponents#sync(MinecraftServer) instead of ComponentKey#sync");
     }
 

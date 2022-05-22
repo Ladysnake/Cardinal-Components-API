@@ -4,7 +4,7 @@ import net.fabricmc.loom.task.RemapJarTask
 import java.time.Year
 
 plugins {
-    id "fabric-loom" version "0.11-SNAPSHOT" apply false
+    id "fabric-loom" version "0.12-SNAPSHOT" apply false
     id 'io.github.juuxel.loom-quiltflower' version "1.6.0"
     id "org.cadixdev.licenser" version "0.6.1"
     id "com.matthewprenger.cursegradle" version "1.4.0"
@@ -292,7 +292,7 @@ dependencies {
     // used by the test mod
     modImplementation fabricApi.module("fabric-api-base", fabric_api_version)
     modImplementation fabricApi.module("fabric-object-builder-api-v1", fabric_api_version)
-    modImplementation fabricApi.module("fabric-renderer-registries-v1", fabric_api_version)
+    modImplementation fabricApi.module("fabric-rendering-v1", fabric_api_version)
     modImplementation fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)
     modImplementation fabricApi.module("fabric-item-api-v1", fabric_api_version)
     modImplementation fabricApi.module("fabric-item-groups-v0", fabric_api_version)
@@ -300,17 +300,15 @@ dependencies {
     modImplementation fabricApi.module("fabric-api-lookup-api-v1", fabric_api_version)
     modImplementation fabricApi.module("fabric-command-api-v1", fabric_api_version)
     modImplementation fabricApi.module("fabric-gametest-api-v1", fabric_api_version)
-    modRuntimeOnly fabricApi.module("fabric-networking-v0", fabric_api_version)
+    modRuntimeOnly fabricApi.module("fabric-networking-api-v1", fabric_api_version)
     modRuntimeOnly fabricApi.module("fabric-resource-loader-v0", fabric_api_version)
-    modRuntimeOnly fabricApi.module("fabric-mining-levels-v0", fabric_api_version)
-    modRuntimeOnly fabricApi.module("fabric-tag-extensions-v0", fabric_api_version)
-    modRuntimeOnly fabricApi.module("fabric-tool-attribute-api-v1", fabric_api_version)
     modRuntimeOnly fabricApi.module("fabric-events-interaction-v0", fabric_api_version)
+    modRuntimeOnly fabricApi.module("fabric-registry-sync-v0", fabric_api_version)
 
     testCompileOnly "com.google.code.findbugs:jsr305:3.0.2"
 
     include fabricApi.module("fabric-api-base", fabric_api_version)
-    include fabricApi.module("fabric-networking-v0", fabric_api_version)
+    include fabricApi.module("fabric-networking-api-v1", fabric_api_version)
 
     afterEvaluate {
         subprojects.each {

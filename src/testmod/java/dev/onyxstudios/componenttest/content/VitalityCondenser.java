@@ -27,16 +27,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.AbstractRandom;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
-import java.util.Random;
 
 public class VitalityCondenser extends Block {
     public VitalityCondenser(Settings settings) {
@@ -46,7 +46,7 @@ public class VitalityCondenser extends Block {
     @SuppressWarnings("deprecation")
     @ApiStatus.OverrideOnly
     @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, AbstractRandom rand) {
         Vita.get(world).transferTo(Vita.get(world.getChunk(pos)), 1);
     }
 
@@ -56,7 +56,7 @@ public class VitalityCondenser extends Block {
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hitInfo) {
         // only on client side, to confirm that sync works
         if (world.isClient) {
-            player.sendMessage(new TranslatableText("componenttest:action.chunk_vitality",
+            player.sendMessage(Text.translatable("componenttest:action.chunk_vitality",
                 Objects.requireNonNull(CardinalComponentsTest.VITA_API_LOOKUP.find(world, pos, state, null, hitInfo.getSide())).getVitality()), true);
         }
         return ActionResult.SUCCESS;

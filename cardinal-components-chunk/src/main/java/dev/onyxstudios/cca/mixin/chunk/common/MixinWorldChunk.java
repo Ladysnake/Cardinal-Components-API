@@ -38,11 +38,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.ProtoChunk;
-import net.minecraft.world.chunk.UpgradeData;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.*;
 import net.minecraft.world.gen.chunk.BlendingData;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -51,8 +47,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.List;
 
 @Mixin(WorldChunk.class)
 public abstract class MixinWorldChunk extends Chunk implements ComponentProvider {
@@ -64,11 +59,11 @@ public abstract class MixinWorldChunk extends Chunk implements ComponentProvider
     public abstract World getWorld();
 
     @Override
-    public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
+    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
         if (!this.getWorld().isClient()) {
-            return PlayerLookup.tracking((ServerWorld) this.getWorld(), this.getPos()).iterator();
+            return PlayerLookup.tracking((ServerWorld) this.getWorld(), this.getPos());
         }
-        return Collections.emptyIterator();
+        return List.of();
     }
 
     @Override
@@ -84,6 +79,6 @@ public abstract class MixinWorldChunk extends Chunk implements ComponentProvider
 
     @Inject(method = "<init>(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/chunk/ProtoChunk;Lnet/minecraft/world/chunk/WorldChunk$EntityLoader;)V", at = @At("RETURN"))
     private void copyFromProto(ServerWorld world, ProtoChunk proto, WorldChunk.EntityLoader entityLoader, CallbackInfo ci) {
-        this.getComponentContainer().copyFrom(proto.getComponentContainer());
+        this.getComponentContainer().copyFrom(proto.asComponentProvider().getComponentContainer());
     }
 }

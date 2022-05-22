@@ -26,7 +26,7 @@
     },
     "loom:injected_interfaces": {
       "net/minecraft/class_5217": [
-        "dev/onyxstudios/cca/api/v3/component/ComponentProvider"
+        "dev/onyxstudios/cca/api/v3/component/ComponentAccess"
       ]
     }
   },

@@ -40,10 +40,10 @@ public abstract class MixinMinecraftServer {
     @Inject(at = @At("TAIL"), method = "tick")
     private void onEndTick(BooleanSupplier shouldKeepTicking, CallbackInfo info) {
         ServerScoreboard scoreboard = this.getScoreboard();
-        scoreboard.getComponentContainer().tickServerComponents();
+        scoreboard.asComponentProvider().getComponentContainer().tickServerComponents();
 
         for (Team team : scoreboard.getTeams()) {
-            team.getComponentContainer().tickServerComponents();
+            team.asComponentProvider().getComponentContainer().tickServerComponents();
         }
     }
 }

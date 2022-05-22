@@ -45,7 +45,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Iterator;
 
 @Mixin(Team.class)
 public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
@@ -74,8 +73,8 @@ public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
     }
 
     @Override
-    public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
-        return ((ComponentProvider) this.scoreboard).getRecipientsForComponentSync();
+    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
+        return this.scoreboard.asComponentProvider().getRecipientsForComponentSync();
     }
 
     @Nullable

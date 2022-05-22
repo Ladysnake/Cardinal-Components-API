@@ -34,11 +34,10 @@ public final class ComponentsChunkNetworking {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             ChunkSyncCallback.EVENT.register((player, tracked) -> {
-                for (ComponentKey<?> key : tracked.getComponentContainer().keys()) {
+                for (ComponentKey<?> key : tracked.asComponentProvider().getComponentContainer().keys()) {
                     key.syncWith(player, (ComponentProvider) tracked);
                 }
             });
         }
     }
-
 }

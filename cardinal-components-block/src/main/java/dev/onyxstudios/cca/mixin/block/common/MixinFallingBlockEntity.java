@@ -44,6 +44,6 @@ public abstract class MixinFallingBlockEntity extends Entity {
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;readNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILSOFT)
     void readComponentData(CallbackInfo ci, Block $$0, BlockPos $$2, BlockEntity be, NbtCompound nbt) {
-        be.getComponentContainer().fromTag(nbt);
+        be.asComponentProvider().getComponentContainer().fromTag(nbt);
     }
 }

@@ -37,12 +37,12 @@ public interface BucketableMixin {
     private static void writeComponentsToStack(MobEntity entity, ItemStack stack, CallbackInfo ci) {
         NbtCompound nbt = stack.getNbt();
         if (nbt != null) {
-            entity.getComponentContainer().toTag(nbt);
+            entity.asComponentProvider().getComponentContainer().toTag(nbt);
         }
     }
 
     @Inject(method = "copyDataFromNbt(Lnet/minecraft/entity/mob/MobEntity;Lnet/minecraft/nbt/NbtCompound;)V", at = @At("RETURN"))
     private static void readComponentsFromStack(MobEntity entity, NbtCompound nbt, CallbackInfo ci) {
-        entity.getComponentContainer().fromTag(nbt);
+        entity.asComponentProvider().getComponentContainer().fromTag(nbt);
     }
 }

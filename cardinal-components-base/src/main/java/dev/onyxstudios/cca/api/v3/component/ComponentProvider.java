@@ -25,140 +25,22 @@ package dev.onyxstudios.cca.api.v3.component;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
-import net.minecraft.scoreboard.AbstractTeam;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldProperties;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.level.LevelProperties;
-import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.List;
 
 /**
- * used to access an object's components.
+ * @see ComponentAccess
+ * @see ComponentContainer
  */
-public interface ComponentProvider {
-
-    /**
-     * Convenience method to retrieve ComponentProvider from a given {@link BlockEntity}
-     * Requires the <tt>cardinal-components-block</tt> module.
-     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
-     */
-    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
-    @Deprecated(forRemoval = true, since = "4.1.0")
-    static ComponentProvider fromBlockEntity(BlockEntity blockEntity) {
-        return (ComponentProvider) blockEntity;
-    }
-
-    /**
-     * Convenience method to retrieve a ComponentProvider from given {@link Chunk}.
-     * Requires the <tt>cardinal-components-chunk</tt> module.
-     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
-     */
-    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
-    @Deprecated(forRemoval = true, since = "4.1.0")
-    static ComponentProvider fromChunk(Chunk chunk) {
-        return (ComponentProvider) chunk;
-    }
-
-    /**
-     * Convenience method to retrieve a ComponentProvider from a given {@link Entity}.
-     * Requires the <tt>cardinal-components-entity</tt> module.
-     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
-     */
-    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
-    @Deprecated(forRemoval = true, since = "4.1.0")
-    static ComponentProvider fromEntity(Entity entity) {
-        return (ComponentProvider) entity;
-    }
-
-    /**
-     * Convenience method to retrieve ComponentProvider from a given {@link ItemStack}
-     * Requires the <tt>cardinal-components-item</tt> module.
-     * @deprecated this module is getting removed; use Fabric's API-Lookup-API instead
-     */
-    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
-    @Deprecated(forRemoval = true, since = "4.1.0")
-    @SuppressWarnings("ConstantConditions")
-    static ComponentProvider fromItemStack(ItemStack stack) {
-        return (ComponentProvider) (Object) stack;
-    }
-
-    /**
-     * Convenience method to retrieve a ComponentProvider from given {@link LevelProperties}.
-     * Requires the <tt>cardinal-components-level</tt> module.
-     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
-     */
-    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
-    @Deprecated(forRemoval = true, since = "4.1.0")
-    static ComponentProvider fromLevel(WorldProperties level) {
-        return (ComponentProvider) level;
-    }
-
-    /**
-     * Convenience method to retrieve a ComponentProvider from given {@link Scoreboard}.
-     * Requires the <tt>cardinal-components-scoreboard</tt> module.
-     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
-     */
-    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
-    @Deprecated(forRemoval = true, since = "4.1.0")
-    static ComponentProvider fromScoreboard(Scoreboard scoreboard) {
-        return (ComponentProvider) scoreboard;
-    }
-
-    /**
-     * Convenience method to retrieve a ComponentProvider from given {@link Team}.
-     * Requires the <tt>cardinal-components-scoreboard</tt> module.
-     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
-     */
-    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
-    @Deprecated(forRemoval = true, since = "4.1.0")
-    static ComponentProvider fromTeam(AbstractTeam team) {
-        return (ComponentProvider) team;
-    }
-
-    /**
-     * Convenience method to retrieve a ComponentProvider from a given {@link World}.
-     * Requires the <tt>cardinal-components-world</tt> module.
-     * @deprecated this interface is now injected by loom; update to 0.11 if you don't see it
-     */
-    @ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
-    @Deprecated(forRemoval = true, since = "4.1.0")
-    static ComponentProvider fromWorld(World world) {
-        return (ComponentProvider) world;
-    }
+public interface ComponentProvider extends ComponentAccess {
 
     /**
      * @return a runtime-generated component container storing statically declared components.
      */
-    default ComponentContainer getComponentContainer() {
-        throw new UnsupportedOperationException("Please implement me");
-    }
-
-    /**
-     * @param key the key object for the type of component to retrieve
-     * @return the nonnull value of the held component of this type
-     * @param <C> the type of component to retrieve
-     * @throws NullPointerException if {@code key} is null
-     * @throws NoSuchElementException if this provider does not provide the desired type of component
-     * @since 4.1.0
-     */
-    @ApiStatus.Experimental
-    default <C extends Component> C getComponent(ComponentKey<C> key) {
-        return key.get(this);
-    }
+    ComponentContainer getComponentContainer();
 
     /**
      * Retrieves an iterator describing the list of players who may receive
@@ -171,9 +53,8 @@ public interface ComponentProvider {
      *
      * @return a list of player candidates for receiving component sync packets
      */
-    default Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
-        // TODO 5.0.0 replace with Iterable
-        return Collections.emptyIterator();
+    default Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
+        return List.of();
     }
 
     /**
@@ -187,16 +68,6 @@ public interface ComponentProvider {
      */
     @Nullable
     default <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
-        // TODO 4.0.0 inline
-        return toComponentPacket(PacketByteBufs.create(), key, writer, recipient);
-    }
-
-    /**
-     * @deprecated override/call {@link #toComponentPacket(ComponentKey, ComponentPacketWriter, ServerPlayerEntity)} instead
-     */
-    @SuppressWarnings("unused") @Deprecated(since = "3.0.0", forRemoval = true)
-    @Nullable
-    default <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(PacketByteBuf buf, ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
         return null;
     }
 }

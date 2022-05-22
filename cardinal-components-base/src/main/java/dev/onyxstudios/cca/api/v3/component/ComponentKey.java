@@ -33,7 +33,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,28 +57,32 @@ public abstract class ComponentKey<C extends Component> {
     }
 
     /**
+     * Attempts to retrieve a component instance from the given {@code provider}.
+     *
      * @param provider a component provider
      * @return the attached component associated with this key, or
      * {@code null} if the provider does not support this type of component
-     * @throws ClassCastException if the {@code provider} is
+     * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      * @see #get(Object)
      * @see #maybeGet(Object)
      */
     @Contract(pure = true)
-    public <V> @Nullable C getNullable(V provider) {
+    public @Nullable C getNullable(Object provider) {
         return this.getInternal(((ComponentProvider) provider).getComponentContainer());
     }
 
     /**
+     * Retrieves a component instance from the given {@code provider}.
+     *
      * @param provider a component provider
-     * @param <V>      the class of the component provider
      * @return the nonnull value of the held component of this type
      * @throws NullPointerException if {@code provider} is null
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      * @see #maybeGet(Object)
+     * @see ComponentAccess#getComponent(ComponentKey)
      */
-    public final <V> C get(V provider) {
+    public final C get(Object provider) {
         C component = this.getInternal(((ComponentProvider) provider).getComponentContainer());
 
         assert component == null || this.getComponentClass().isInstance(component);
@@ -99,12 +102,11 @@ public abstract class ComponentKey<C extends Component> {
 
     /**
      * @param provider a component provider
-     * @param <V>      the class of the component provider
      * @return an {@code Optional} describing a component of this type, or an empty
      * {@code Optional} if {@code provider} does not have such a component.
      * @see #get(Object)
      */
-    public final <V> Optional<C> maybeGet(@Nullable V provider) {
+    public final Optional<C> maybeGet(@Nullable Object provider) {
         if (provider instanceof ComponentProvider p) {
             return Optional.ofNullable(this.getInternal(p.getComponentContainer()));
         }
@@ -112,7 +114,7 @@ public abstract class ComponentKey<C extends Component> {
     }
 
     @Contract(pure = true)
-    public <V> boolean isProvidedBy(V provider) {
+    public boolean isProvidedBy(Object provider) {
         return this.getNullable(provider) != null;
     }
 
@@ -123,11 +125,11 @@ public abstract class ComponentKey<C extends Component> {
      * the associated component does not implement an adequate synchronization interface.
      *
      * @param provider a component provider
-     * @param <V>      the class of the component provider
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
+     * @see ComponentAccess#syncComponent(ComponentKey)
      */
-    public <V> void sync(V provider) {
+    public void sync(Object provider) {
         if (this.get(provider) instanceof AutoSyncedComponent synced) {
             this.sync(provider, synced, synced);
         }
@@ -139,13 +141,13 @@ public abstract class ComponentKey<C extends Component> {
      * <p>This method has no visible effect if the given provider does not support synchronization, or
      * the associated component does not implement an adequate synchronization interface.
      *
-     * @param <V>          the class of the component provider
      * @param provider     a component provider
      * @param packetWriter a writer for the sync packet
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
+     * @see ComponentAccess#syncComponent(ComponentKey, ComponentPacketWriter)
      */
-    public <V> void sync(V provider, ComponentPacketWriter packetWriter) {
+    public void sync(Object provider, ComponentPacketWriter packetWriter) {
         if (this.get(provider) instanceof AutoSyncedComponent synced) {
             this.sync(provider, packetWriter, synced);
         }
@@ -157,17 +159,16 @@ public abstract class ComponentKey<C extends Component> {
      * <p>This method has no visible effect if the given provider does not support synchronization, or
      * the associated component does not implement an adequate synchronization interface.
      *
-     * @param <V>          the class of the component provider
      * @param provider     a component provider
      * @param packetWriter a writer for the sync packet
      * @param predicate    a predicate for which players should receive the packet
      * @throws NoSuchElementException if the provider does not provide this type of component
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
+     * @see ComponentAccess#syncComponent(ComponentKey, ComponentPacketWriter, PlayerSyncPredicate)
      */
-    public <V> void sync(V provider, ComponentPacketWriter packetWriter, PlayerSyncPredicate predicate) {
-        ComponentProvider prov = (ComponentProvider) provider;
-        for (Iterator<ServerPlayerEntity> it = prov.getRecipientsForComponentSync(); it.hasNext();) {
-            this.syncWith(it.next(), prov, packetWriter, predicate);
+    public void sync(Object provider, ComponentPacketWriter packetWriter, PlayerSyncPredicate predicate) {
+        for (ServerPlayerEntity player : ((ComponentProvider) provider).getRecipientsForComponentSync()) {
+            this.syncWith(player, (ComponentProvider) provider, packetWriter, predicate);
         }
     }
 

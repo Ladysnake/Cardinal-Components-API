@@ -45,7 +45,7 @@ public final class VitaCommand {
                         .executes(context -> {
                             Chunk chunk = context.getSource().getWorld().getChunk(BlockPosArgumentType.getBlockPos(context, "pos"));
                             Vita.get(chunk).setVitality(IntegerArgumentType.getInteger(context, "amount"));
-                            chunk.setShouldSave(true);
+                            chunk.setNeedsSaving(true);
                             context.getSource().sendFeedback(Text.of("success!"), false);
                             return 1;
                         })

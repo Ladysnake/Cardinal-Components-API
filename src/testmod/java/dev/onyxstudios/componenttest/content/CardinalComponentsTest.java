@@ -31,7 +31,6 @@ import dev.onyxstudios.cca.test.base.BaseVita;
 import dev.onyxstudios.cca.test.base.Vita;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -47,7 +46,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -72,7 +70,7 @@ public class CardinalComponentsTest {
     public static final VitalityStickItem VITALITY_STICK = Registry.register(Registry.ITEM, VITA_STICK_ID,
             new VitalityStickItem(new Item.Settings().group(ITEM_GROUP).maxDamage(50)));
 
-    public static final VitalityCondenser VITALITY_CONDENSER = new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().luminance(5).ticksRandomly());
+    public static final VitalityCondenser VITALITY_CONDENSER = new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().luminance(s -> 5).ticksRandomly());
 
     public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(Registry.ENTITY_TYPE, "componenttest:vita_zombie",
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, VitalityZombieEntity::new).dimensions(EntityType.ZOMBIE.getDimensions()).build());
@@ -122,12 +120,6 @@ public class CardinalComponentsTest {
             ).build().create(UUID.randomUUID(), null));
             assert false : "Only one factory should be created for any given provider type";
         } catch (IllegalStateException ignored) { }
-
-        UseItemCallback.EVENT.register((playerEntity, world, hand) -> {
-            ItemStack stack = playerEntity.getStackInHand(hand);
-            LOGGER.info("{} vitality: {}", stack, TestComponents.ALT_VITA.get(stack).getVitality()); // init components
-            return TypedActionResult.pass(stack);
-        });
 
         VITA_API_LOOKUP.registerForBlocks(
             (world, pos, state, blockEntity, context) -> Vita.KEY.get(Objects.requireNonNull(world.getChunk(pos.getX() >> 4, pos.getZ() >> 4, ChunkStatus.FULL, false))),

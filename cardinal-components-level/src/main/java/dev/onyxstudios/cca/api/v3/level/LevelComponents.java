@@ -48,7 +48,7 @@ public final class LevelComponents {
     public static void sync(ComponentKey<?> key, MinecraftServer server) {
         WorldProperties props = server.getSaveProperties().getMainWorldProperties();
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            key.syncWith(player, props);
+            key.syncWith(player, props.asComponentProvider());
         }
     }
 
@@ -66,7 +66,7 @@ public final class LevelComponents {
         Component c = key.get(props);
         if (c instanceof AutoSyncedComponent sc) {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                key.syncWith(player, props, packetWriter, sc);
+                key.syncWith(player, props.asComponentProvider(), packetWriter, sc);
             }
         }
     }
@@ -84,7 +84,7 @@ public final class LevelComponents {
     public static void sync(ComponentKey<?> key, MinecraftServer server, ComponentPacketWriter packetWriter, PlayerSyncPredicate predicate) {
         WorldProperties props = server.getSaveProperties().getMainWorldProperties();
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            key.syncWith(player, props, packetWriter, predicate);
+            key.syncWith(player, props.asComponentProvider(), packetWriter, predicate);
         }
     }
 }
