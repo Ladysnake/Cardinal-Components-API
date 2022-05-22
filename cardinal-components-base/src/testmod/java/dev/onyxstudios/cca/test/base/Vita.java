@@ -31,7 +31,7 @@ public interface
 Vita extends ComponentV3 {
     ComponentKey<Vita> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("cca-base-test", "vita"), Vita.class);
 
-    static <T> Vita get(T provider) {
+    static Vita get(Object provider) {
         return KEY.get(provider);
     }
 

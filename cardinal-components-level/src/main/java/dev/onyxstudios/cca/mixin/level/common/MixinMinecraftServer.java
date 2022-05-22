@@ -38,6 +38,6 @@ public abstract class MixinMinecraftServer {
 
     @Inject(at = @At("TAIL"), method = "tick")
     private void onEndTick(BooleanSupplier shouldKeepTicking, CallbackInfo info) {
-        this.getSaveProperties().getMainWorldProperties().getComponentContainer().tickServerComponents();
+        this.getSaveProperties().getMainWorldProperties().asComponentProvider().getComponentContainer().tickServerComponents();
     }
 }

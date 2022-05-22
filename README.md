@@ -214,7 +214,7 @@ Now, all that is left is to actually use that component. You can access individu
 ```java
 public static void useMagik(Entity provider) { // anything will work, as long as a module allows it!
     // Retrieve a provided component
-    int magik = MAGIK.get(provider).getValue();
+    int magik = provider.getComponent(MAGIK).getValue();
     // Or, if the object is not guaranteed to provide that component:
     int magik = MAGIK.maybeGet(provider).map(IntComponent::getValue).orElse(0);
     // ...

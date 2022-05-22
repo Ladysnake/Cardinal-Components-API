@@ -41,7 +41,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
@@ -70,8 +69,8 @@ public abstract class MixinServerWorld extends MixinWorld {
     }
 
     @Override
-    public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
-        return this.getPlayers().iterator();
+    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
+        return this.getPlayers();
     }
 
     @Nullable

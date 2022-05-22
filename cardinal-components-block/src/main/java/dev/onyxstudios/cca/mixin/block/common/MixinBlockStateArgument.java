@@ -42,7 +42,7 @@ public class MixinBlockStateArgument {
     @ModifyVariable(method = "setBlockState", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;readNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
     private BlockEntity readComponentData(BlockEntity be) {
         if (this.data != null) {
-            be.getComponentContainer().fromTag(this.data);
+            be.asComponentProvider().getComponentContainer().fromTag(this.data);
         }
         return be;
     }

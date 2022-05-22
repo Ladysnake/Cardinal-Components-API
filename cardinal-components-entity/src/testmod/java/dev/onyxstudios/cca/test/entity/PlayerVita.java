@@ -34,6 +34,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A Vita component attached to players, and automatically synchronized with their owner
@@ -51,7 +52,7 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
         if (value != this.vitality) {
             int increase = value - this.vitality;
             super.setVitality(value);
-            Vita.KEY.sync(this.owner, (buf, recipient) -> this.writeSyncPacket(buf, recipient, increase), PlayerSyncPredicate.all());
+            this.owner.syncComponent(Vita.KEY, (buf, recipient) -> this.writeSyncPacket(buf, recipient, increase), PlayerSyncPredicate.all());
         }
     }
 
@@ -100,7 +101,7 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
     }
 
     @Override
-    public void copyForRespawn(BaseVita original, boolean lossless, boolean keepInventory, boolean switchingCharacter) {
+    public void copyForRespawn(@NotNull BaseVita original, boolean lossless, boolean keepInventory, boolean switchingCharacter) {
         PlayerComponent.super.copyForRespawn(original, lossless, keepInventory, switchingCharacter);
         if (!lossless && !keepInventory) {
             this.vitality -= 5;

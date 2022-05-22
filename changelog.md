@@ -1,4 +1,14 @@
 ------------------------------------------------------
+Version 5.0.0
+------------------------------------------------------
+Updated to MC 1.19
+
+**Additions**
+- Component providers now expose the `ComponentAccess` interface through Loom's interface injection
+  - `ComponentAccess` adds `getComponent` as an alternative to `ComponentKey#get`, and `syncComponent` as an alternative to `ComponentKey#sync`
+  - It is now recommended to use e.g. `entity.getComponent(KEY)` instead of `KEY.get(entity)`, as this enforces type checking
+
+------------------------------------------------------
 Version 4.2.0
 ------------------------------------------------------
 **Additions**

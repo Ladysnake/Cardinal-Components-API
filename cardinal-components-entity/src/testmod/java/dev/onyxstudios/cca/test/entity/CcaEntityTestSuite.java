@@ -42,7 +42,7 @@ public class CcaEntityTestSuite implements FabricGameTest {
         player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
         BlockPos pos = new BlockPos(2, 0, 2);
         var axolotl = ctx.spawnMob(EntityType.AXOLOTL, pos);
-        Vita.get(axolotl).setVitality(3);
+        axolotl.getComponent(Vita.KEY).setVitality(3);
         Bucketable.tryBucket(player, Hand.MAIN_HAND, axolotl);
         ((EntityBucketItem) Items.AXOLOTL_BUCKET).onEmptied(player, ctx.getWorld(), player.getStackInHand(Hand.MAIN_HAND), ctx.getAbsolutePos(pos));
         ctx.expectEntityWithDataEnd(pos, EntityType.AXOLOTL, a -> a.getComponent(Vita.KEY).getVitality(), 3);

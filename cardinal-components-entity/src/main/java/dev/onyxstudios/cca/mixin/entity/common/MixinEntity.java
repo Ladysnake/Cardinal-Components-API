@@ -22,7 +22,6 @@
  */
 package dev.onyxstudios.cca.mixin.entity.common;
 
-import com.google.common.collect.Iterators;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
@@ -49,8 +48,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity implements ComponentProvider {
@@ -87,16 +87,16 @@ public abstract class MixinEntity implements ComponentProvider {
     }
 
     @Override
-    public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
+    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
         Entity holder = (Entity) (Object) this;
         if (!this.world.isClient) {
-            Iterator<ServerPlayerEntity> watchers = PlayerLookup.tracking(holder).iterator();
+            Deque<ServerPlayerEntity> watchers = new ArrayDeque<>(PlayerLookup.tracking(holder));
             if (holder instanceof ServerPlayerEntity player && player.networkHandler != null) {
-                return Iterators.concat(Iterators.singletonIterator(player), watchers);
+                watchers.addFirst(player);
             }
             return watchers;
         }
-        return Collections.emptyIterator();
+        return List.of();
     }
 
     @Nullable

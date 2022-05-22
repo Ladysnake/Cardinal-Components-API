@@ -22,8 +22,8 @@
  */
 package dev.onyxstudios.componenttest.content;
 
-import dev.onyxstudios.componenttest.content.vita.AmbientVita;
 import dev.onyxstudios.cca.test.base.Vita;
+import dev.onyxstudios.cca.test.world.AmbientVita;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -38,7 +38,6 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -85,7 +84,7 @@ public class VitalityStickItem extends Item {
                 context.getSide()
             );
             if (vita != null) {
-                context.getPlayer().sendMessage(new TranslatableText("componenttest:action.block_vitality",
+                context.getPlayer().sendMessage(Text.translatable("componenttest:action.block_vitality",
                     vita.getVitality()), true);
             }
         }
@@ -115,10 +114,10 @@ public class VitalityStickItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> lines, TooltipContext ctx) {
         super.appendTooltip(stack, world, lines, ctx);
-        lines.add(new TranslatableText("componenttest:tooltip.vitality", Vita.KEY.get(stack).getVitality()));
+        lines.add(Text.translatable("componenttest:tooltip.vitality", Vita.KEY.get(stack).getVitality()));
         PlayerEntity holder = MinecraftClient.getInstance().player;
         if (holder != null) {
-            lines.add(new TranslatableText("componenttest:tooltip.self_vitality", Vita.KEY.get(holder).getVitality()));
+            lines.add(Text.translatable("componenttest:tooltip.self_vitality", holder.getComponent(Vita.KEY).getVitality()));
         }
     }
 

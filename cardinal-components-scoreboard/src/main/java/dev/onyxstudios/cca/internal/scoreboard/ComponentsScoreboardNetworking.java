@@ -56,19 +56,19 @@ public final class ComponentsScoreboardNetworking {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             ScoreboardSyncCallback.EVENT.register((player, tracked) -> {
-                for (ComponentKey<?> key : tracked.getComponentContainer().keys()) {
-                    key.syncWith(player, tracked);
+                for (ComponentKey<?> key : tracked.asComponentProvider().getComponentContainer().keys()) {
+                    key.syncWith(player, tracked.asComponentProvider());
                 }
 
                 for (Team team : tracked.getTeams()) {
-                    for (ComponentKey<?> key : team.getComponentContainer().keys()) {
-                        key.syncWith(player, team);
+                    for (ComponentKey<?> key : team.asComponentProvider().getComponentContainer().keys()) {
+                        key.syncWith(player, team.asComponentProvider());
                     }
                 }
             });
             TeamAddCallback.EVENT.register((tracked) -> {
-                for (ComponentKey<?> key : tracked.getComponentContainer().keys()) {
-                    key.sync(tracked);
+                for (ComponentKey<?> key : tracked.asComponentProvider().getComponentContainer().keys()) {
+                    tracked.syncComponent(key);
                 }
             });
         }

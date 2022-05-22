@@ -33,6 +33,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinServerWorld {
     @Inject(method = "tickChunk", at = @At("RETURN"))
     private void tick(WorldChunk chunk, int randomTickSpeed, CallbackInfo ci) {
-        chunk.getComponentContainer().tickServerComponents();
+        chunk.asComponentProvider().getComponentContainer().tickServerComponents();
     }
 }

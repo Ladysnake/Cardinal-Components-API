@@ -41,13 +41,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 public final class StaticBlockComponentPlugin extends LazyDispatcher implements BlockComponentFactoryRegistry {
@@ -69,15 +63,15 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getComponentTicker(World world, T be, @Nullable BlockEntityTicker<T> base) {
         if (world.isClient && this.clientTicking.contains(be.getClass())) {
-            if (base == null) return (w, pos, state, blockEntity) -> blockEntity.getComponentContainer().tickClientComponents();
+            if (base == null) return (w, pos, state, blockEntity) -> blockEntity.asComponentProvider().getComponentContainer().tickClientComponents();
             return (w, pos, state, blockEntity) -> {
-                blockEntity.getComponentContainer().tickClientComponents();
+                blockEntity.asComponentProvider().getComponentContainer().tickClientComponents();
                 base.tick(w, pos, state, blockEntity);
             };
         } else if (!world.isClient && this.serverTicking.contains(be.getClass())) {
-            if (base == null) return (w, pos, state, blockEntity) -> blockEntity.getComponentContainer().tickServerComponents();
+            if (base == null) return (w, pos, state, blockEntity) -> blockEntity.asComponentProvider().getComponentContainer().tickServerComponents();
             return (w, pos, state, blockEntity) -> {
-                blockEntity.getComponentContainer().tickServerComponents();
+                blockEntity.asComponentProvider().getComponentContainer().tickServerComponents();
                 base.tick(w, pos, state, blockEntity);
             };
         }

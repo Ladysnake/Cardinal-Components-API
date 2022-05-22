@@ -46,8 +46,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.List;
 import java.util.function.Supplier;
 
 @Mixin(ServerScoreboard.class)
@@ -60,13 +59,13 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
     private MinecraftServer server;
 
     @Override
-    public Iterator<ServerPlayerEntity> getRecipientsForComponentSync() {
+    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
         MinecraftServer server = this.server;
 
         if (server.getPlayerManager() != null) {
-            return server.getPlayerManager().getPlayerList().iterator();
+            return server.getPlayerManager().getPlayerList();
         }
-        return Collections.emptyIterator();
+        return List.of();
     }
 
     @Nullable

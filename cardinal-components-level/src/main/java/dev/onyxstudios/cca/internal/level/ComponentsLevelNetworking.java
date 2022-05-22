@@ -49,8 +49,8 @@ public final class ComponentsLevelNetworking {
                 WorldSyncCallback.EVENT.register((player, world) -> {
                     WorldProperties props = world.getLevelProperties();
 
-                    for (ComponentKey<?> key : props.getComponentContainer().keys()) {
-                        key.syncWith(player, props);
+                    for (ComponentKey<?> key : props.asComponentProvider().getComponentContainer().keys()) {
+                        key.syncWith(player, props.asComponentProvider());
                     }
                 });
             }

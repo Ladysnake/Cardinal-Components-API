@@ -39,6 +39,6 @@ public abstract class MixinReadOnlyChunk implements ComponentProvider {
     @Nonnull
     @Override
     public ComponentContainer getComponentContainer() {
-        return this.wrapped.getComponentContainer();
+        return this.wrapped.asComponentProvider().getComponentContainer();
     }
 }

@@ -32,9 +32,7 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.world.World;
 
 import java.util.Objects;
@@ -49,10 +47,10 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
         this.setVitality(vita);
         World world = Objects.requireNonNull(MinecraftClient.getInstance().player).world;
         // Very bad shortcut to get a dimension's name
-        Text worldName = new LiteralText(
+        Text worldName = Text.literal(
             Objects.requireNonNull(world.getRegistryKey() == World.OVERWORLD ? "Overworld" : "Alien World")
         );
-        Text worldVita = new TranslatableText(
+        Text worldVita = Text.translatable(
                 "componenttest:title.world_vitality",
                 Vita.get(world).getVitality(),
                 Vita.get(world.getLevelProperties()).getVitality()
@@ -80,7 +78,7 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
 
         @Override
         public void syncWithAll(MinecraftServer server) {
-            Vita.KEY.sync(this.world);
+            this.world.syncComponent(KEY);
         }
 
         @Override

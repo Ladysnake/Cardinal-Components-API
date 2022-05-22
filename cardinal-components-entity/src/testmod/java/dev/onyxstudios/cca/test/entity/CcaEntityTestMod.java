@@ -26,15 +26,15 @@ import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.test.base.Vita;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class CcaEntityTestMod implements ModInitializer, EntityComponentInitializer {
 
-    public static final EntityType<TestEntity> TEST_ENTITY = FabricEntityTypeBuilder.create().entityFactory(TestEntity::new).build();
+    public static final EntityType<TestEntity> TEST_ENTITY = EntityType.Builder.create(TestEntity::new, SpawnGroup.MISC).build("cca-entity-test");
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {

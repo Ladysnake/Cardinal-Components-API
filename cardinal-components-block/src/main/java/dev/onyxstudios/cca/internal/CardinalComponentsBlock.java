@@ -58,7 +58,7 @@ public class CardinalComponentsBlock {
             });
             BlockEntitySyncAroundCallback.EVENT.register(tracked -> {
                 for (ComponentKey<?> key : ((ComponentProvider) tracked).getComponentContainer().keys()) {
-                    key.sync(tracked);
+                    tracked.syncComponent(key);
                 }
             });
         }

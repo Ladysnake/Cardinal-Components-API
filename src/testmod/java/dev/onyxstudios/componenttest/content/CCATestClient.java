@@ -25,13 +25,13 @@ package dev.onyxstudios.componenttest.content;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.render.entity.ZombieEntityRenderer;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 
 public final class CCATestClient {
     public static void clientInit() {
         EntityRendererRegistry.register(CardinalComponentsTest.VITALITY_ZOMBIE, ZombieEntityRenderer::new);
         ItemTooltipCallback.EVENT.register((stack, tooltipContext, lines) ->
-            TestComponents.ALT_VITA.maybeGet(stack).ifPresent(vita -> lines.add(new TranslatableText("componenttest:tooltip.vitality.native", vita.getVitality())))
+            TestComponents.ALT_VITA.maybeGet(stack).ifPresent(vita -> lines.add(Text.translatable("componenttest:tooltip.vitality.native", vita.getVitality())))
         );
     }
 }
