@@ -299,7 +299,7 @@ dependencies {
     modImplementation fabricApi.module("fabric-item-groups-v0", fabric_api_version)
     modImplementation fabricApi.module("fabric-events-interaction-v0", fabric_api_version)
     modImplementation fabricApi.module("fabric-api-lookup-api-v1", fabric_api_version)
-    modImplementation fabricApi.module("fabric-command-api-v1", fabric_api_version)
+    modImplementation fabricApi.module("fabric-command-api-v2", fabric_api_version)
     modImplementation fabricApi.module("fabric-gametest-api-v1", fabric_api_version)
     modRuntimeOnly fabricApi.module("fabric-networking-api-v1", fabric_api_version)
     modRuntimeOnly fabricApi.module("fabric-resource-loader-v0", fabric_api_version)

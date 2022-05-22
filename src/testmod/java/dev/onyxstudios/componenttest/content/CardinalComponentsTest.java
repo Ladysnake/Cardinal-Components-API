@@ -31,7 +31,7 @@ import dev.onyxstudios.cca.test.base.BaseVita;
 import dev.onyxstudios.cca.test.base.Vita;
 import dev.onyxstudios.cca.test.block.VitaCompound;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -86,7 +86,7 @@ public class CardinalComponentsTest {
         LOGGER.info("Hello, Components!");
 
         Registry.register(Registry.BLOCK, "componenttest:vita_condenser", VITALITY_CONDENSER);
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> VitaCommand.register(dispatcher));
+        CommandRegistrationCallback.EVENT.register((dispatcher, reg, dedicated) -> VitaCommand.register(dispatcher));
 
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
 

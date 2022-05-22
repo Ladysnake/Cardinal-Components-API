@@ -23,6 +23,7 @@
 package dev.onyxstudios.cca.test.entity;
 
 import dev.onyxstudios.cca.test.base.Vita;
+import io.github.ladysnake.elmendorf.ElmendorfTestContext;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.entity.Bucketable;
 import net.minecraft.entity.EntityType;
@@ -38,7 +39,7 @@ import net.minecraft.util.math.BlockPos;
 public class CcaEntityTestSuite implements FabricGameTest {
     @GameTest(templateName = EMPTY_STRUCTURE)
     public void bucketableWorks(TestContext ctx) {
-        ServerPlayerEntity player = ctx.spawnServerPlayer(1, 0, 1);
+        ServerPlayerEntity player = ((ElmendorfTestContext) ctx).spawnServerPlayer(1, 0, 1);
         player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
         BlockPos pos = new BlockPos(2, 0, 2);
         var axolotl = ctx.spawnMob(EntityType.AXOLOTL, pos);
