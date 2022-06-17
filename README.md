@@ -1,5 +1,5 @@
 # ![Cardinal Components API](banner.svg)
-A components API for Fabric that is easy, modular, and extremely fast.
+A components API for Quilt and Fabric that is easy, modular, and extremely fast.
 
 *Cardinal Components API is a library for Minecraft mods to create data
 components that can be attached to various providers. Those components
@@ -124,7 +124,22 @@ class IncrementingIntComponent implements IntComponent, ServerTickingComponent {
 *Serverside ticking is implemented for all providers except item stacks.
  Clientside ticking is only implemented for entities, block entities, and worlds.*
 
-The next step is to choose an identifier for your component, and to declare it in your `fabric.mod.json`'s custom properties:
+The next step is to choose an identifier for your component, and to declare it as a custom property in your mod's metadata:
+
+**quilt.mod.json** (if you use [Quilt](https://quiltmc.org))
+```json
+{
+    "schema_version": 1,
+    "quilt_loader": {
+        "id": "mymod"
+    },
+    "cardinal-components": [
+        "mymod:magik"
+    ]
+}
+```
+
+**fabric.mod.json** (if you use [Fabric](https://fabricmc.net))
 ```json
 {
     "schemaVersion": 1,
@@ -167,7 +182,21 @@ public final class MyComponents implements EntityComponentInitializer, WorldComp
 }
 ```
 
-Do not forget to declare your component initializer as an entrypoint in your `fabric.mod.json`:
+Do not forget to declare your component initializer as an entrypoint in your mod's metadata:
+
+**quilt.mod.json** (if you use Quilt)
+
+```json
+{
+    "quilt_loader": {
+        "entrypoints": {
+            "cardinal-components": "a.b.c.MyComponents"
+        },
+    }
+}
+```
+
+**fabric.mod.json** (if you use Fabric)
 ```json
 {
     "entrypoints": {
