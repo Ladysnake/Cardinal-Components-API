@@ -47,7 +47,7 @@ public final class CcaEntityClientNw {
                     PacketByteBuf copy = new PacketByteBuf(buffer.copy());
                     client.execute(() -> {
                         try {
-                            componentType.maybeGet(Objects.requireNonNull(client.player).world.getEntityById(entityId))
+                            componentType.maybeGet(Objects.requireNonNull(client.world).getEntityById(entityId))
                                 .filter(c -> c instanceof AutoSyncedComponent)
                                 .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(copy));
                         } finally {
