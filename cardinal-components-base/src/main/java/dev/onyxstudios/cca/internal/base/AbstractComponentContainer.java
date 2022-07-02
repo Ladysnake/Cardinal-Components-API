@@ -99,14 +99,7 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
                 }
             }
 
-            for (String missedKeyId : componentMap.getKeys()) {
-                Identifier id = Identifier.tryParse(missedKeyId);
-                String cause;
-                if (id == null) cause = "invalid identifier";
-                else if (ComponentRegistry.get(id) == null) cause = "unregistered key";
-                else cause = "provider does not have ";
-                ComponentsInternals.LOGGER.warn("Failed to deserialize component: {} {}", cause, missedKeyId);
-            }
+            ComponentsInternals.logDeserializationWarnings(componentMap.getKeys());
         }
     }
 

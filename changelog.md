@@ -1,4 +1,14 @@
 ------------------------------------------------------
+Version 4.2.0
+------------------------------------------------------
+**Additions**
+- Players can now set the `log-deserialization-warnings` option to toggle warnings when a component fails to be resolved
+  (typically due to mods being removed)
+
+**Mod Compatibility**
+- Fixed incompatibility with Immersive Portals
+
+------------------------------------------------------
 Version 4.1.4
 ------------------------------------------------------
 Updated to 1.18.2

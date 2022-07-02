@@ -6,6 +6,11 @@
   "description": "dynamically exposing components",
   "version": "${version}",
   "icon": "assets/cardinal-components-base/icon.png",
+  "entrypoints": {
+    "main": [
+      "dev.onyxstudios.cca.internal.base.ComponentsInternals::init"
+    ]
+  },
   "custom": {
     "modmenu": {
       "badges": [ "library" ],
