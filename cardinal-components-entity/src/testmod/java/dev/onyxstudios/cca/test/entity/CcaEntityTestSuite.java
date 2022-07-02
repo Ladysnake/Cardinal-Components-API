@@ -36,7 +36,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 
 public class CcaEntityTestSuite implements FabricGameTest {
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(templateName = EMPTY_STRUCTURE)
     public void bucketableWorks(TestContext ctx) {
         ServerPlayerEntity player = ctx.spawnServerPlayer(1, 0, 1);
         player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
@@ -48,7 +48,7 @@ public class CcaEntityTestSuite implements FabricGameTest {
         ctx.expectEntityWithDataEnd(pos, EntityType.AXOLOTL, a -> a.getComponent(Vita.KEY).getVitality(), 3);
     }
 
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(templateName = EMPTY_STRUCTURE)
     public void moddedEntitiesWork(TestContext ctx) {
         ctx.spawnEntity(CcaEntityTestMod.TEST_ENTITY, 0, 0, 0);
         ctx.complete();

@@ -29,7 +29,7 @@ import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 
 public class CcaLevelTestSuite implements FabricGameTest {
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(templateName = EMPTY_STRUCTURE)
     public void levelComponentsTick(TestContext ctx) {
         int baseTicks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
         ctx.waitAndRun(5, () -> {

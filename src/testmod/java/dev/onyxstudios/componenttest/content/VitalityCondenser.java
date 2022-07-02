@@ -32,7 +32,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.AbstractRandom;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -46,7 +46,7 @@ public class VitalityCondenser extends Block {
     @SuppressWarnings("deprecation")
     @ApiStatus.OverrideOnly
     @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, AbstractRandom rand) {
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
         Vita.get(world).transferTo(Vita.get(world.getChunk(pos)), 1);
     }
 

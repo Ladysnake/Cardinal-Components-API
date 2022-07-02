@@ -34,7 +34,7 @@ import org.junit.Assert;
 public class ComponentRegistryImplTest implements CardinalGameTest {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @GameTest(structureName = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
     public void checksRegisteredClasses() {
         ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
         Assert.assertThrows("Component class must extend Component", IllegalArgumentException.class, () -> registry.getOrCreate(CcaTesting.TEST_ID_1, (Class) TestNotComponentItf.class));
@@ -42,7 +42,7 @@ public class ComponentRegistryImplTest implements CardinalGameTest {
         registry.getOrCreate(CcaTesting.TEST_ID_2, TestComponentItf.class);
     }
 
-    @GameTest(structureName = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
     public void doesNotDuplicateComponentTypes() {
         ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
         Identifier id = CcaTesting.TEST_ID_1;

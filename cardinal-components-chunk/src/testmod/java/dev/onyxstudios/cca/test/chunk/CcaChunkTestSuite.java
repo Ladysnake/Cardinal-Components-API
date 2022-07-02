@@ -36,7 +36,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
 
 public class CcaChunkTestSuite implements FabricGameTest {
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(templateName = EMPTY_STRUCTURE)
     public void chunksSerialize(TestContext ctx) {
         ChunkPos pos = new ChunkPos(ctx.getAbsolutePos(new BlockPos(1, 0, 1)));
         Chunk c = new WorldChunk(ctx.getWorld(), pos);
@@ -47,7 +47,7 @@ public class CcaChunkTestSuite implements FabricGameTest {
         ctx.complete();
     }
 
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(templateName = EMPTY_STRUCTURE)
     public void chunksTick(TestContext ctx) {
         int baseTicks = ctx.getWorld().getChunk(ctx.getAbsolutePos(BlockPos.ORIGIN)).getComponent(TickingTestComponent.KEY).serverTicks();
         ctx.waitAndRun(5, () -> {

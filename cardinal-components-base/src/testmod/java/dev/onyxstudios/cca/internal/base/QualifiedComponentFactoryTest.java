@@ -44,7 +44,7 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         }
     }
 
-    @GameTest(structureName = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
     public void sortKeepsOrderByDefault() {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
@@ -65,7 +65,7 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         Assert.assertEquals(List.copyOf(map.keySet()), List.copyOf(sorted.keySet()));
     }
 
-    @GameTest(structureName = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
     public void sortThrowsOnUnsatisfiedDependency() {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
@@ -76,7 +76,7 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         QualifiedComponentFactory.checkDependenciesSatisfied(map);
     }
 
-    @GameTest(structureName = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
     public void sortThrowsOnCircularDependency() {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
@@ -95,7 +95,7 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         QualifiedComponentFactory.sort(map);
     }
 
-    @GameTest(structureName = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
     public void sortRespectsDependencyOrdering() {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);

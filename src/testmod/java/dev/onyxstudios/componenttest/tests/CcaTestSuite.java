@@ -35,7 +35,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.Objects;
 
 public final class CcaTestSuite implements FabricGameTest {
-    @GameTest(structureName = EMPTY_STRUCTURE)
+    @GameTest(templateName = EMPTY_STRUCTURE)
     public void interfacesGetInjected(TestContext context) {
         // CCA Block
         context.setBlockState(1, 0, 2, Blocks.CHEST);
