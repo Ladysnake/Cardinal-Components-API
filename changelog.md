@@ -1,4 +1,11 @@
 ------------------------------------------------------
+Version 5.0.1
+------------------------------------------------------
+**Fixes**
+- Fixed components ticking only on subclasses of the block entities they were declared for
+  (e.g. if a ticking component got attached to ChestBlockEntity, it would only tick on TrappedChestBlockEntity)
+
+------------------------------------------------------
 Version 5.0.0
 ------------------------------------------------------
 Updated to MC 1.19

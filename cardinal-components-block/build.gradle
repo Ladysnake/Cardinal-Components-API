@@ -3,4 +3,5 @@ dependencies {
     // (which we add to various classes through interface injection)
     annotationProcessor api(project(path: ":cardinal-components-base", configuration: "namedElements"))
     modApi fabricApi.module("fabric-api-lookup-api-v1", rootProject.fabric_api_version)
+    testmodImplementation project(":cardinal-components-base").sourceSets.testmod.output
 }

@@ -25,7 +25,6 @@
     "custom": {
         "cardinal-components": [
             "componenttest:vita",
-            "componenttest:vita_compound",
             "testmod:test",
             "testmod:test_2",
             "testmod:test_3"

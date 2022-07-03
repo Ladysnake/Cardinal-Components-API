@@ -20,22 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.content.vita;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package dev.onyxstudios.cca.test.block;
 
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.test.base.BaseVita;
-import dev.onyxstudios.cca.test.base.Vita;
+import dev.onyxstudios.cca.api.v3.util.MethodsReturnNonnullByDefault;
 
-public class SyncedVita extends BaseVita implements AutoSyncedComponent {
-    private final Object owner;
-
-    public SyncedVita(Object owner) {
-        this.owner = owner;
-    }
-
-    @Override
-    public void setVitality(int value) {
-        super.setVitality(value);
-        Vita.KEY.sync(this.owner);
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;

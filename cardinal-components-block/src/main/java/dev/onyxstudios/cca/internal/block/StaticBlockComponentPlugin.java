@@ -41,7 +41,13 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public final class StaticBlockComponentPlugin extends LazyDispatcher implements BlockComponentFactoryRegistry {
@@ -98,8 +104,6 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
             type = type.getSuperclass().asSubclass(BlockEntity.class);
             for (var e : this.beComponentFactories.getOrDefault(type, Collections.emptyMap()).entrySet()) {
                 compiled.putIfAbsent(e.getKey(), e.getValue());
-                if (ClientTickingComponent.class.isAssignableFrom(e.getValue().impl())) this.clientTicking.add(entityClass);
-                if (ServerTickingComponent.class.isAssignableFrom(e.getValue().impl())) this.serverTicking.add(entityClass);
             }
         }
 
@@ -108,6 +112,8 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
 
         for (var entry : compiled.entrySet()) {
             addToBuilder(builder, entry);
+            if (ClientTickingComponent.class.isAssignableFrom(entry.getValue().impl())) this.clientTicking.add(entityClass);
+            if (ServerTickingComponent.class.isAssignableFrom(entry.getValue().impl())) this.serverTicking.add(entityClass);
         }
 
         return builder.build();

@@ -1,0 +1,31 @@
+{
+    "schemaVersion": 1,
+    "environment": "*",
+    "id": "cca-block-test",
+    "name": "Cardinal Components API Test Mod",
+    "description": "Test mod for Cardinal Components API",
+    "version": "${version}",
+    "entrypoints": {
+        "main": [
+          "dev.onyxstudios.cca.test.block.CcaBlockTestMod"
+        ],
+        "cardinal-components": [
+          "dev.onyxstudios.cca.test.block.CcaBlockTestMod"
+        ],
+        "fabric-gametest": [
+          "dev.onyxstudios.cca.test.block.CcaBlockTestSuite"
+        ]
+    },
+    "depends": {
+        "fabric-api-base": "*"
+    },
+    "authors": [
+        "Pyrofab"
+    ],
+    "license": "MIT",
+    "custom": {
+        "cardinal-components": [
+          "cca-block-test:vita_compound"
+        ]
+    }
+}

@@ -29,6 +29,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.internal.base.GenericContainerBuilder;
 import dev.onyxstudios.cca.test.base.BaseVita;
 import dev.onyxstudios.cca.test.base.Vita;
+import dev.onyxstudios.cca.test.block.VitaCompound;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;

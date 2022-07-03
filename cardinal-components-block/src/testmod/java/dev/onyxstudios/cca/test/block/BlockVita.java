@@ -20,34 +20,32 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.content.vita;
+package dev.onyxstudios.cca.test.block;
 
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.test.base.SyncedVita;
-import dev.onyxstudios.cca.test.base.Vita;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.server.network.ServerPlayerEntity;
+import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
+import dev.onyxstudios.cca.test.base.BaseVita;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.world.World;
 
-public class TeamVita extends SyncedVita implements AutoSyncedComponent {
-    private final Team team;
+public class BlockVita extends BaseVita implements AutoSyncedComponent, ServerTickingComponent {
+    private final BlockEntity owner;
 
-    public TeamVita(Team team) {
-        super(team);
-        this.team = team;
+    public BlockVita(BlockEntity owner) {
+        this.owner = owner;
     }
 
     @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player) {
-        return player.getScoreboardTeam() == this.team;
+    public void setVitality(int value) {
+        super.setVitality(value);
+        this.owner.syncComponent(KEY);
     }
 
     @Override
-    public int getVitality() {
-        return super.getVitality() + this.team.getPlayerList().size();
-    }
-
-    @Override
-    public void transferTo(Vita dest, int amount) {
-        super.transferTo(dest, Math.min(this.vitality, amount));
+    public void serverTick() {
+        World world = this.owner.getWorld();
+        if (world != null && world.getTime() % 3 == 0) {
+            this.setVitality(this.getVitality() + 1);
+        }
     }
 }

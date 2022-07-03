@@ -33,11 +33,10 @@ import dev.onyxstudios.cca.api.v3.item.ItemComponentInitializer;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
 import dev.onyxstudios.cca.test.base.BaseVita;
+import dev.onyxstudios.cca.test.base.SyncedVita;
 import dev.onyxstudios.cca.test.base.Vita;
 import dev.onyxstudios.componenttest.content.vita.ItemVita;
-import dev.onyxstudios.componenttest.content.vita.SyncedVita;
 import dev.onyxstudios.componenttest.content.vita.TeamVita;
-import net.minecraft.block.entity.EndGatewayBlockEntity;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
@@ -70,7 +69,6 @@ public final class TestComponents implements
 
     @Override
     public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
-        registry.registerFor(EndGatewayBlockEntity.class, VitaCompound.KEY, VitaCompound::new);
         registry.beginRegistration(EndPortalBlockEntity.class, ALT_VITA).after(Vita.KEY).impl(SyncedVita.class).end(SyncedVita::new);
         registry.registerFor(EndPortalBlockEntity.class, Vita.KEY, SyncedVita::new);
     }

@@ -20,18 +20,19 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.content;
+package dev.onyxstudios.cca.test.block;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.componenttest.content.vita.SyncedVita;
+import dev.onyxstudios.cca.test.base.SyncedVita;
 import dev.onyxstudios.cca.test.base.Vita;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Direction;
 
@@ -39,7 +40,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class VitaCompound implements AutoSyncedComponent {
-    public static final ComponentKey<VitaCompound> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(CardinalComponentsTest.id("vita_compound"), VitaCompound.class);
+    public static final ComponentKey<VitaCompound> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier(CcaBlockTestMod.MOD_ID, "vita_compound"), VitaCompound.class);
 
     private final Map<Direction, SyncedVita> storage = new EnumMap<>(Direction.class);
 

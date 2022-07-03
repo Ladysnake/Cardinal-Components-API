@@ -20,34 +20,20 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.content.vita;
+package dev.onyxstudios.cca.test.base;
 
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.test.base.SyncedVita;
-import dev.onyxstudios.cca.test.base.Vita;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.server.network.ServerPlayerEntity;
 
-public class TeamVita extends SyncedVita implements AutoSyncedComponent {
-    private final Team team;
+public class SyncedVita extends BaseVita implements AutoSyncedComponent {
+    private final Object owner;
 
-    public TeamVita(Team team) {
-        super(team);
-        this.team = team;
+    public SyncedVita(Object owner) {
+        this.owner = owner;
     }
 
     @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player) {
-        return player.getScoreboardTeam() == this.team;
-    }
-
-    @Override
-    public int getVitality() {
-        return super.getVitality() + this.team.getPlayerList().size();
-    }
-
-    @Override
-    public void transferTo(Vita dest, int amount) {
-        super.transferTo(dest, Math.min(this.vitality, amount));
+    public void setVitality(int value) {
+        super.setVitality(value);
+        Vita.KEY.sync(this.owner);
     }
 }

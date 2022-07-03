@@ -20,34 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.componenttest.content.vita;
+package dev.onyxstudios.cca.test.block;
 
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.test.base.SyncedVita;
-import dev.onyxstudios.cca.test.base.Vita;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.server.network.ServerPlayerEntity;
+import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
+import dev.onyxstudios.cca.test.base.TickingTestComponent;
+import net.fabricmc.api.ModInitializer;
+import net.minecraft.block.entity.EndGatewayBlockEntity;
+import net.minecraft.block.entity.EndPortalBlockEntity;
 
-public class TeamVita extends SyncedVita implements AutoSyncedComponent {
-    private final Team team;
+public class CcaBlockTestMod implements ModInitializer, BlockComponentInitializer {
+    public static final String MOD_ID = "cca-block-test";
 
-    public TeamVita(Team team) {
-        super(team);
-        this.team = team;
+    @Override
+    public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
+        registry.registerFor(EndGatewayBlockEntity.class, VitaCompound.KEY, VitaCompound::new);
+        registry.registerFor(EndPortalBlockEntity.class, TickingTestComponent.KEY, be -> new TickingTestComponent());
     }
 
     @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player) {
-        return player.getScoreboardTeam() == this.team;
-    }
+    public void onInitialize() {
 
-    @Override
-    public int getVitality() {
-        return super.getVitality() + this.team.getPlayerList().size();
-    }
-
-    @Override
-    public void transferTo(Vita dest, int amount) {
-        super.transferTo(dest, Math.min(this.vitality, amount));
     }
 }
