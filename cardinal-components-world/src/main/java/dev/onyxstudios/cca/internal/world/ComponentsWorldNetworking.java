@@ -32,7 +32,7 @@ public final class ComponentsWorldNetworking {
     public static final Identifier PACKET_ID = new Identifier("cardinal-components", "world_sync");
 
     public static void init() {
-        if (FabricLoader.getInstance().isModLoaded("fabric-networking-v0")) {
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             WorldSyncCallback.EVENT.register((player, world) -> {
                 ComponentProvider provider = (ComponentProvider) world;
                 for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
