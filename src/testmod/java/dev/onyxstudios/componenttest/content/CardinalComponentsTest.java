@@ -30,8 +30,8 @@ import dev.onyxstudios.cca.internal.base.GenericContainerBuilder;
 import dev.onyxstudios.cca.test.base.BaseVita;
 import dev.onyxstudios.cca.test.base.Vita;
 import dev.onyxstudios.cca.test.block.VitaCompound;
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -46,6 +46,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
@@ -60,16 +61,25 @@ import java.util.UUID;
 
 public class CardinalComponentsTest {
 
-    public static final ItemGroup ITEM_GROUP = FabricItemGroupBuilder.build(
-        id("ccagroup"),
-        () -> new ItemStack(Blocks.COBBLESTONE));   // confirm that lazy item components work
+    @SuppressWarnings("unused")
+    public static final ItemGroup ITEM_GROUP = new FabricItemGroup(id("ccagroup")) {
+        @Override
+        public ItemStack createIcon() {
+            return new ItemStack(Blocks.COBBLESTONE);
+        }
+
+        @Override
+        protected void addItems(FeatureSet enabledFeatures, Entries entries, boolean hasPermissions) {
+            entries.add(VITALITY_STICK);
+        }
+    };
 
     public static final Logger LOGGER = LogManager.getLogger("Component Test");
 
     public static final Identifier VITA_STICK_ID = id("vita_stick");
     // inline self component callback registration
     public static final VitalityStickItem VITALITY_STICK = Registry.register(Registry.ITEM, VITA_STICK_ID,
-            new VitalityStickItem(new Item.Settings().group(ITEM_GROUP).maxDamage(50)));
+            new VitalityStickItem(new Item.Settings().maxDamage(50)));
 
     public static final VitalityCondenser VITALITY_CONDENSER = new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().luminance(s -> 5).ticksRandomly());
 

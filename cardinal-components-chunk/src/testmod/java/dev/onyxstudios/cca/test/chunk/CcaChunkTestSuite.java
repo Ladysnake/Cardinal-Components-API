@@ -24,6 +24,7 @@ package dev.onyxstudios.cca.test.chunk;
 
 import dev.onyxstudios.cca.test.base.TickingTestComponent;
 import dev.onyxstudios.cca.test.base.Vita;
+import io.github.ladysnake.elmendorf.ElmendorfTestContext;
 import io.github.ladysnake.elmendorf.GameTestUtil;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.nbt.NbtCompound;
@@ -49,6 +50,7 @@ public class CcaChunkTestSuite implements FabricGameTest {
 
     @GameTest(templateName = EMPTY_STRUCTURE)
     public void chunksTick(TestContext ctx) {
+        ((ElmendorfTestContext) ctx).spawnServerPlayer(0, 0, 0);    // Ensure chunk gets ticked
         int baseTicks = ctx.getWorld().getChunk(ctx.getAbsolutePos(BlockPos.ORIGIN)).getComponent(TickingTestComponent.KEY).serverTicks();
         ctx.waitAndRun(5, () -> {
             int ticks = ctx.getWorld().getChunk(ctx.getAbsolutePos(BlockPos.ORIGIN)).getComponent(TickingTestComponent.KEY).serverTicks();
