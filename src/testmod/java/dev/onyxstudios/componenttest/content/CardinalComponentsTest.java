@@ -36,7 +36,6 @@ import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityType;
@@ -46,10 +45,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.resource.featuretoggle.FeatureSet;
+import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.chunk.ChunkStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,29 +61,20 @@ import java.util.UUID;
 
 public class CardinalComponentsTest {
 
-    @SuppressWarnings("unused")
-    public static final ItemGroup ITEM_GROUP = new FabricItemGroup(id("ccagroup")) {
-        @Override
-        public ItemStack createIcon() {
-            return new ItemStack(Blocks.COBBLESTONE);
-        }
-
-        @Override
-        protected void addItems(FeatureSet enabledFeatures, Entries entries, boolean hasPermissions) {
-            entries.add(VITALITY_STICK);
-        }
-    };
+    public static final ItemGroup ITEM_GROUP = FabricItemGroup.builder(id("ccagroup"))
+        .icon(() -> new ItemStack(Items.COBBLESTONE))
+        .build();
 
     public static final Logger LOGGER = LogManager.getLogger("Component Test");
 
     public static final Identifier VITA_STICK_ID = id("vita_stick");
     // inline self component callback registration
-    public static final VitalityStickItem VITALITY_STICK = Registry.register(Registry.ITEM, VITA_STICK_ID,
+    public static final VitalityStickItem VITALITY_STICK = Registry.register(Registries.ITEM, VITA_STICK_ID,
             new VitalityStickItem(new Item.Settings().maxDamage(50)));
 
     public static final VitalityCondenser VITALITY_CONDENSER = new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().luminance(s -> 5).ticksRandomly());
 
-    public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(Registry.ENTITY_TYPE, "componenttest:vita_zombie",
+    public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(Registries.ENTITY_TYPE, "componenttest:vita_zombie",
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, VitalityZombieEntity::new).dimensions(EntityType.ZOMBIE.getDimensions()).build());
 
     public static final BlockApiLookup<Vita, Direction> VITA_API_LOOKUP = BlockApiLookup.get(CardinalComponentsTest.id("sided_vita"), Vita.class, Direction.class);
@@ -95,7 +86,7 @@ public class CardinalComponentsTest {
     public static void init() {
         LOGGER.info("Hello, Components!");
 
-        Registry.register(Registry.BLOCK, "componenttest:vita_condenser", VITALITY_CONDENSER);
+        Registry.register(Registries.BLOCK, "componenttest:vita_condenser", VITALITY_CONDENSER);
         CommandRegistrationCallback.EVENT.register((dispatcher, reg, dedicated) -> VitaCommand.register(dispatcher));
 
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
