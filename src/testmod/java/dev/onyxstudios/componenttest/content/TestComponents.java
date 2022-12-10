@@ -37,6 +37,7 @@ import dev.onyxstudios.cca.test.base.SyncedVita;
 import dev.onyxstudios.cca.test.base.Vita;
 import dev.onyxstudios.componenttest.content.vita.ItemVita;
 import dev.onyxstudios.componenttest.content.vita.TeamVita;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
@@ -83,6 +84,7 @@ public final class TestComponents implements
             return ret;
         });
         registry.register(CardinalComponentsTest.VITALITY_STICK, Vita.KEY, ItemVita::new);
+        ItemGroupEvents.modifyEntriesEvent(CardinalComponentsTest.ITEM_GROUP).register(entries -> entries.add(CardinalComponentsTest.VITALITY_STICK));
     }
 
     @Override

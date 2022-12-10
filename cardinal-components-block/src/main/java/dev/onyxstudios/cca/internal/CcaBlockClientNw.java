@@ -29,9 +29,9 @@ import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 
 public class CcaBlockClientNw {
     public static void initClient() {
@@ -41,7 +41,7 @@ public class CcaBlockClientNw {
                     Identifier blockEntityTypeId = buffer.readIdentifier();
                     BlockPos position = buffer.readBlockPos();
                     Identifier componentTypeId = buffer.readIdentifier();
-                    BlockEntityType<?> blockEntityType = Registry.BLOCK_ENTITY_TYPE.get(blockEntityTypeId);
+                    BlockEntityType<?> blockEntityType = Registries.BLOCK_ENTITY_TYPE.get(blockEntityTypeId);
                     ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
 
                     if (componentType == null || blockEntityType == null) {

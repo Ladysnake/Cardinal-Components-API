@@ -29,8 +29,9 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class CcaEntityTestMod implements ModInitializer, EntityComponentInitializer {
 
@@ -43,6 +44,6 @@ public class CcaEntityTestMod implements ModInitializer, EntityComponentInitiali
 
     @Override
     public void onInitialize() {
-        Registry.register(Registry.ENTITY_TYPE, new Identifier("cca-entity-test", "test"), TEST_ENTITY);
+        Registry.register(Registries.ENTITY_TYPE, new Identifier("cca-entity-test", "test"), TEST_ENTITY);
     }
 }
