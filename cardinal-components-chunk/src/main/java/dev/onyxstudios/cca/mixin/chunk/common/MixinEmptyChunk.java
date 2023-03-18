@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2022 OnyxStudios
+ * Copyright (C) 2019-2023 OnyxStudios
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,6 @@ import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
-
-import javax.annotation.Nonnull;
 
 @Mixin(EmptyChunk.class)
 public abstract class MixinEmptyChunk extends WorldChunk implements ComponentProvider {
