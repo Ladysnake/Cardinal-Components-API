@@ -24,7 +24,6 @@ package dev.onyxstudios.cca.mixin.block.common;
 
 import dev.onyxstudios.cca.api.v3.block.BlockEntitySyncCallback;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;

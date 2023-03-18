@@ -63,7 +63,7 @@ public interface ComponentProvider extends ComponentAccess {
      * @param key the key describing the component being synchronized
      * @param writer a {@link ComponentPacketWriter} writing the component's data to the packet
      * @param recipient the player receiving the packet
-     * @return a {@link net.minecraft.network.Packet} that has all the information required to perform the component sync
+     * @return a {@link net.minecraft.network.packet.Packet} that has all the information required to perform the component sync
      * @since 3.0.0
      */
     @Nullable

@@ -32,7 +32,6 @@ import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -56,9 +55,6 @@ import java.util.List;
 public abstract class MixinEntity implements ComponentProvider {
     @Unique
     private ComponentContainer components;
-
-    @Shadow
-    public abstract EntityType<?> getType();
 
     @Shadow
     public World world;

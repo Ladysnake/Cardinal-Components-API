@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(ChunkHolder.class)
 public abstract class MixinChunkHolder {
-    @ModifyVariable(method = "sendBlockEntityUpdatePacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;toUpdatePacket()Lnet/minecraft/network/Packet;"))
+    @ModifyVariable(method = "sendBlockEntityUpdatePacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;toUpdatePacket()Lnet/minecraft/network/packet/Packet;"))
     private BlockEntity sendBlockEntityUpdate(BlockEntity be) {
         BlockEntitySyncAroundCallback.EVENT.invoker().onBlockEntitySync(be);
         return be;
