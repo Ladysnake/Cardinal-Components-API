@@ -8,7 +8,6 @@
     "common.MixinChunkHolder",
     "common.MixinChunkSerializer",
     "common.MixinEmptyChunk",
-    "common.MixinReadOnlyChunk",
     "common.MixinServerWorld",
     "common.MixinThreadedAnvilChunkStorage",
     "common.MixinWorldChunk"

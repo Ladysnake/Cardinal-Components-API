@@ -45,7 +45,7 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
     public void applySyncPacket(PacketByteBuf buf) {
         int vita = buf.readInt();
         this.setVitality(vita);
-        World world = Objects.requireNonNull(MinecraftClient.getInstance().player).world;
+        World world = Objects.requireNonNull(MinecraftClient.getInstance().player).getWorld();
         // Very bad shortcut to get a dimension's name
         Text worldName = Text.literal(
             Objects.requireNonNull(world.getRegistryKey() == World.OVERWORLD ? "Overworld" : "Alien World")

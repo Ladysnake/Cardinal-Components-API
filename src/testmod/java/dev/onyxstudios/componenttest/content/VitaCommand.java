@@ -38,7 +38,7 @@ public final class VitaCommand {
                 .then(CommandManager.argument("amount", IntegerArgumentType.integer())
                     .executes(context -> {
                         Vita.get(context.getSource().getWorld()).setVitality(IntegerArgumentType.getInteger(context, "amount"));
-                        context.getSource().sendFeedback(Text.of("success!"), false);
+                        context.getSource().sendFeedback(() -> Text.of("success!"), false);
                         return 1;
                     })
                     .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
@@ -46,7 +46,7 @@ public final class VitaCommand {
                             Chunk chunk = context.getSource().getWorld().getChunk(BlockPosArgumentType.getBlockPos(context, "pos"));
                             Vita.get(chunk).setVitality(IntegerArgumentType.getInteger(context, "amount"));
                             chunk.setNeedsSaving(true);
-                            context.getSource().sendFeedback(Text.of("success!"), false);
+                            context.getSource().sendFeedback(() -> Text.of("success!"), false);
                             return 1;
                         })
                     )
@@ -55,12 +55,12 @@ public final class VitaCommand {
             .then(CommandManager.literal("get")
                 .executes(context -> {
                     // Dedicated servers cannot handle translations
-                    context.getSource().sendFeedback(Text.of("World vitality: " + Vita.get(context.getSource().getWorld()).getVitality()), false);
+                    context.getSource().sendFeedback(() -> Text.of("World vitality: " + Vita.get(context.getSource().getWorld()).getVitality()), false);
                     return 1;
                 })
                 .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
                     .executes(context -> {
-                        context.getSource().sendFeedback(Text.of("Chunk vitality: " + Vita.get(context.getSource().getWorld().getChunk(BlockPosArgumentType.getBlockPos(context, "pos"))).getVitality()), false);
+                        context.getSource().sendFeedback(() -> Text.of("Chunk vitality: " + Vita.get(context.getSource().getWorld().getChunk(BlockPosArgumentType.getBlockPos(context, "pos"))).getVitality()), false);
                         return 1;
                     }))
             )

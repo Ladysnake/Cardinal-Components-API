@@ -36,7 +36,7 @@ import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.block.Material;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -48,6 +48,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -61,7 +64,9 @@ import java.util.UUID;
 
 public class CardinalComponentsTest {
 
-    public static final ItemGroup ITEM_GROUP = FabricItemGroup.builder(id("ccagroup"))
+    public static final RegistryKey<ItemGroup> ITEM_GROUP_KEY = RegistryKey.of(RegistryKeys.ITEM_GROUP, id("ccagroup"));
+
+    public static final ItemGroup ITEM_GROUP = FabricItemGroup.builder()
         .icon(() -> new ItemStack(Items.COBBLESTONE))
         .build();
 
@@ -72,7 +77,7 @@ public class CardinalComponentsTest {
     public static final VitalityStickItem VITALITY_STICK = Registry.register(Registries.ITEM, VITA_STICK_ID,
             new VitalityStickItem(new Item.Settings().maxDamage(50)));
 
-    public static final VitalityCondenser VITALITY_CONDENSER = new VitalityCondenser(FabricBlockSettings.of(Material.STONE).dropsNothing().luminance(s -> 5).ticksRandomly());
+    public static final VitalityCondenser VITALITY_CONDENSER = new VitalityCondenser(FabricBlockSettings.copyOf(Blocks.STONE).dropsNothing().luminance(s -> 5).ticksRandomly());
 
     public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(Registries.ENTITY_TYPE, "componenttest:vita_zombie",
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, VitalityZombieEntity::new).dimensions(EntityType.ZOMBIE.getDimensions()).build());
@@ -85,6 +90,8 @@ public class CardinalComponentsTest {
 
     public static void init() {
         LOGGER.info("Hello, Components!");
+
+        Registry.register(Registries.ITEM_GROUP, ITEM_GROUP_KEY, ITEM_GROUP);
 
         Registry.register(Registries.BLOCK, "componenttest:vita_condenser", VITALITY_CONDENSER);
         CommandRegistrationCallback.EVENT.register((dispatcher, reg, dedicated) -> VitaCommand.register(dispatcher));

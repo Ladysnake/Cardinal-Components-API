@@ -84,7 +84,7 @@ public final class TestComponents implements
             return ret;
         });
         registry.register(CardinalComponentsTest.VITALITY_STICK, Vita.KEY, ItemVita::new);
-        ItemGroupEvents.modifyEntriesEvent(CardinalComponentsTest.ITEM_GROUP).register(entries -> entries.add(CardinalComponentsTest.VITALITY_STICK));
+        ItemGroupEvents.modifyEntriesEvent(CardinalComponentsTest.ITEM_GROUP_KEY).register(entries -> entries.add(CardinalComponentsTest.VITALITY_STICK));
     }
 
     @Override

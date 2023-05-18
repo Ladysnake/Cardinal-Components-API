@@ -38,7 +38,7 @@ public class EntityVita extends BaseVita {
     @Override
     public void setVitality(int value) {
         super.setVitality(value);
-        if (!this.owner.world.isClient) {
+        if (!this.owner.getWorld().isClient) {
             if (this.getVitality() == 0) {
                 this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
             } else if (this.getVitality() > 10) {
