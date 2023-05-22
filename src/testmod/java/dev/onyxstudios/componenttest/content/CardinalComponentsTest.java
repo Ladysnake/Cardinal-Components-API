@@ -67,6 +67,7 @@ public class CardinalComponentsTest {
     public static final RegistryKey<ItemGroup> ITEM_GROUP_KEY = RegistryKey.of(RegistryKeys.ITEM_GROUP, id("ccagroup"));
 
     public static final ItemGroup ITEM_GROUP = FabricItemGroup.builder()
+        .displayName(Text.translatable("componenttest:item_group"))
         .icon(() -> new ItemStack(Items.COBBLESTONE))
         .build();
 
