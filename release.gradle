@@ -137,21 +137,17 @@ curseforge {
 
 tasks.curseforge.dependsOn(checkGitStatus)
 
-task modrinth (type: ModrinthUpload, dependsOn: checkGitStatus){
-    if (project.hasProperty('modrinth_key')) {
-        token = project.findProperty('modrinth_key')
+modrinth {
+    if (project.hasProperty("modrinth_api_key")) {
+        token = project.findProperty("modrinth_api_key")
+    } else {
+        println("Modrinth API Key not configured; please define the 'modrinth_key' user property before release")
     }
     projectId = findProperty("modrinth_id")
-    versionNumber = project.version
     uploadFile = remapJar
-    subprojects {
-        addFile(remapJar)
-    }
     changelog = project.getChangelogText()
-    "${project.modrinth_versions ?: project.curseforge_versions}".split('; ').each {
-        addGameVersion it
-    }
-    addLoader('fabric')
+    gameVersions = [*"${project.modrinth_versions ?: project.curseforge_versions}".split('; ')]
+    loaders = ['fabric', 'quilt']
 }
 
 task release(dependsOn: [tasks.publish, tasks.githubRelease, tasks.artifactoryPublish, tasks.curseforge, tasks.modrinth]) {
