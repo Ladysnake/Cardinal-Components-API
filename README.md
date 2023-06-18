@@ -1,3 +1,8 @@
+## **The CCA Maven is moving!**
+
+**As Jfrog is ending their free service for OSS projects, we have to move the maven repository before the 1st of July 2023.
+We will be updating this page as soon as the new maven is operational - you will then have to update your buildscripts with the new URL.**
+
 # ![Cardinal Components API](banner.svg)
 A components API for Quilt and Fabric that is easy, modular, and extremely fast.
 
