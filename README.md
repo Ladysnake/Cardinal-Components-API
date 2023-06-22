@@ -1,7 +1,7 @@
 ## **The CCA Maven is moving!**
 
 **As Jfrog is ending their free service for OSS projects, we have to move the maven repository before the 1st of July 2023.
-We will be updating this page as soon as the new maven is operational - you will then have to update your buildscripts with the new URL.**
+See below for the new maven instructions - you will have to update your buildscripts with the new URL before the cutoff date to avoid dependency resolution failures.**
 
 # ![Cardinal Components API](banner.svg)
 A components API for Quilt and Fabric that is easy, modular, and extremely fast.
@@ -38,7 +38,7 @@ Latest versions of Cardinal Components API are available on Artifactory:
 repositories {
     maven {
         name = 'Ladysnake Mods'
-        url = 'https://ladysnake.jfrog.io/artifactory/mods'
+        url = 'https://maven.ladysnake.org/releases'
     }
 }
 
