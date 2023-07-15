@@ -10,7 +10,8 @@
     "common.MixinEmptyChunk",
     "common.MixinServerWorld",
     "common.MixinThreadedAnvilChunkStorage",
-    "common.MixinWorldChunk"
+    "common.MixinWorldChunk",
+    "common.MixinWrapperProtoChunk"
   ],
   "injectors": {
     "defaultRequire": 1
