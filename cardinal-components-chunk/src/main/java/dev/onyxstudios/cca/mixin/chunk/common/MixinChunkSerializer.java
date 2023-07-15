@@ -28,6 +28,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.ChunkSerializer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
+import net.minecraft.world.chunk.WrapperProtoChunk;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -39,7 +40,8 @@ public abstract class MixinChunkSerializer {
     @Inject(method = "deserialize", at = @At("RETURN"))
     private static void deserialize(ServerWorld world, PointOfInterestStorage pointOfInterestStorage, ChunkPos chunkPos, NbtCompound tag, CallbackInfoReturnable<ProtoChunk> cir) {
         ProtoChunk ret = cir.getReturnValue();
-        ret.asComponentProvider().getComponentContainer().fromTag(tag);
+        Chunk chunk = ret instanceof WrapperProtoChunk ? ((WrapperProtoChunk)ret).getWrappedChunk():ret;
+        chunk.asComponentProvider().getComponentContainer().fromTag(tag);
     }
 
     @Inject(method = "serialize", at = @At("RETURN"))
