@@ -5,32 +5,23 @@ import java.time.Year
 plugins {
     id "fabric-loom" version "0.12-SNAPSHOT" apply false
     id 'io.github.juuxel.loom-quiltflower' version "1.6.0"
+    id 'io.github.ladysnake.chenille' version "0.11.3"
     id "org.cadixdev.licenser" version "0.6.1"
-    id "com.matthewprenger.cursegradle" version "1.4.0"
-    id 'com.modrinth.minotaur' version '2.4.3'
-    id "com.jfrog.artifactory" version "4.21.0"
-    id 'org.ajoberstar.grgit' version '3.1.1'
-    id 'com.github.breadmoirai.github-release' version '2.2.12'
-    id "maven-publish"
-    id "java-library"
 }
 
 allprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
-    apply plugin: 'com.jfrog.artifactory'
+    apply plugin: 'io.github.ladysnake.chenille'
     apply plugin: 'fabric-loom'
     apply plugin: 'org.cadixdev.licenser'
 
-    tasks.withType(JavaCompile) {
-        it.options.release = 17
+    chenille {
+        javaVersion = 17
     }
 
     group = "dev.onyxstudios.cardinal-components-api"
     version = project.mod_version
-
-    // import utility functions
-    apply from: rootProject.file("utilities.gradle")
 
     sourceSets {
         testmod {
@@ -237,6 +228,12 @@ subprojects {
         }
     }
 
+    chenille {
+        configurePublishing {
+            withLadysnakeMaven()
+        }
+    }
+
     javadoc.enabled = false
 
     afterEvaluate {
@@ -278,6 +275,15 @@ publishing {
                 }
             }
         }
+    }
+}
+
+chenille {
+    configurePublishing {
+        withLadysnakeMaven()
+        withCurseforgeRelease()
+        withGithubRelease()
+        withModrinthRelease()
     }
 }
 
@@ -336,5 +342,3 @@ task remapTestmodJar(type: RemapJarTask, dependsOn: project.testmodJar) {
 }
 
 assemble.dependsOn(remapTestmodJar)
-
-apply from: 'release.gradle'
