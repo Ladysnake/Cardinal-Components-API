@@ -40,7 +40,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Chunk.class)
-public class MixinChunk implements ComponentProvider {
+public abstract class MixinChunk implements ComponentProvider {
     @Unique
     private ComponentContainer components;
 

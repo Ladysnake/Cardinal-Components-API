@@ -40,7 +40,7 @@ public abstract class MixinChunkSerializer {
     @Inject(method = "deserialize", at = @At("RETURN"))
     private static void deserialize(ServerWorld world, PointOfInterestStorage pointOfInterestStorage, ChunkPos chunkPos, NbtCompound tag, CallbackInfoReturnable<ProtoChunk> cir) {
         ProtoChunk ret = cir.getReturnValue();
-        Chunk chunk = ret instanceof WrapperProtoChunk ? ((WrapperProtoChunk)ret).getWrappedChunk():ret;
+        Chunk chunk = ret instanceof WrapperProtoChunk ? ((WrapperProtoChunk) ret).getWrappedChunk() : ret;
         chunk.asComponentProvider().getComponentContainer().fromTag(tag);
     }
 

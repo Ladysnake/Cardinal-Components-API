@@ -1,4 +1,9 @@
 ------------------------------------------------------
+Version 5.2.2
+------------------------------------------------------
+Fixed chunk components being lost during deserialization (thanks to Stuff-Stuffs !)
+
+------------------------------------------------------
 Version 5.2.1
 ------------------------------------------------------
 Fixed compatibility with full 1.20 release

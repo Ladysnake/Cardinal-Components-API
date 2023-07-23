@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(WrapperProtoChunk.class)
-public class MixinWrapperProtoChunk implements ComponentProvider {
+public abstract class MixinWrapperProtoChunk implements ComponentProvider {
     @Shadow
     @Final
     private WorldChunk wrapped;
