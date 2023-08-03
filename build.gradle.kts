@@ -28,7 +28,7 @@ allprojects {
     }
 
     group = "dev.onyxstudios.cardinal-components-api"
-    version = providers.gradleProperty("mod_version")
+    version = providers.gradleProperty("mod_version").get()
 
     repositories {
         maven {
