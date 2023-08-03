@@ -179,7 +179,7 @@ subprojects {
 }
 
 val remapMavenJar by tasks.registering(RemapJarTask::class) {
-    inputFile.set(tasks.jar.flatMap { archiveFile })
+    inputFile.set(tasks.jar.flatMap { it.archiveFile })
     archiveFileName.set("${project.properties["archivesBaseName"]}-${project.version}-maven.jar")
     addNestedDependencies = false
     dependsOn(tasks.jar)
