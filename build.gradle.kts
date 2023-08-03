@@ -1,3 +1,4 @@
+import com.github.breadmoirai.githubreleaseplugin.GithubReleaseExtension
 import net.fabricmc.loom.task.RemapJarTask
 
 import java.net.URI
@@ -225,6 +226,10 @@ chenille {
         withGithubRelease()
         withModrinthRelease()
     }
+}
+
+extensions.configure(GithubReleaseExtension::class.java) {
+    owner = providers.gradleProperty("owners")
 }
 
 subprojects.forEach { tasks.remapJar.configure { dependsOn("${it.path}:remapJar") } }
