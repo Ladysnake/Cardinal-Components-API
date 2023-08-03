@@ -27,7 +27,6 @@ import io.github.ladysnake.elmendorf.GameTestUtil;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.passive.AxolotlEntity;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 import net.minecraft.util.math.BlockPos;
@@ -43,7 +42,7 @@ public final class CcaTestSuite implements FabricGameTest {
         // CCA Chunk
         checkContainer(context.getWorld().getChunk(context.getAbsolutePos(BlockPos.ORIGIN)));
         // CCA Entity
-        checkContainer(context.<AxolotlEntity>spawnMob(EntityType.AXOLOTL, 1, 0, 1));
+        checkContainer(context.spawnMob(EntityType.AXOLOTL, 1, 0, 1));
         // CCA Level
         checkContainer(context.getWorld().getLevelProperties());
         // CCA Scoreboard
@@ -52,8 +51,8 @@ public final class CcaTestSuite implements FabricGameTest {
         context.complete();
     }
 
-    private void checkContainer(ComponentAccess provider) {
+    private void checkContainer(Object provider) {
         //noinspection ConstantConditions
-        GameTestUtil.assertTrue(provider + " should correctly implement ComponentProvider", provider.asComponentProvider().getComponentContainer() != null);
+        GameTestUtil.assertTrue(provider + " should correctly implement ComponentProvider", ((ComponentAccess) provider).asComponentProvider().getComponentContainer() != null);
     }
 }

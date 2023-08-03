@@ -1,9 +1,10 @@
 import net.fabricmc.loom.task.RemapJarTask
+import org.cadixdev.gradle.licenser.header.HeaderStyle
 
 import java.time.Year
 
 plugins {
-    id "fabric-loom" version "0.12-SNAPSHOT" apply false
+    id "fabric-loom" version "1.3-SNAPSHOT" apply false
     id 'io.github.juuxel.loom-quiltflower' version "1.6.0"
     id 'io.github.ladysnake.chenille' version "0.11.3"
     id "org.cadixdev.licenser" version "0.6.1"
@@ -13,39 +14,18 @@ allprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'io.github.ladysnake.chenille'
-    apply plugin: 'fabric-loom'
     apply plugin: 'org.cadixdev.licenser'
+    apply plugin: 'fabric-loom'
 
     chenille {
         javaVersion = 17
+        configureTestmod {
+            withBaseTestRuns()
+        }
     }
 
     group = "dev.onyxstudios.cardinal-components-api"
     version = project.mod_version
-
-    sourceSets {
-        testmod {
-            compileClasspath += main.compileClasspath
-            runtimeClasspath += main.runtimeClasspath
-        }
-    }
-
-    loom {
-        runs {
-            testmodClient {
-                client()
-                ideConfigGenerated project.rootProject == project
-                name = "Testmod Client"
-                source sourceSets.testmod
-            }
-            testmodServer {
-                server()
-                ideConfigGenerated project.rootProject == project
-                name = "Testmod Server"
-                source sourceSets.testmod
-            }
-        }
-    }
 
     repositories {
         maven {
@@ -75,15 +55,11 @@ allprojects {
 
         testmodImplementation sourceSets.main.output
         modCompileOnly fabricApi.module("fabric-gametest-api-v1", fabric_api_version)
-        modCompileOnly modLocalRuntime("io.github.ladysnake:elmendorf:${elmendorf_version}")
+        modLocalImplementation("io.github.ladysnake:elmendorf:${elmendorf_version}")
 
         compileOnly "com.google.code.findbugs:jsr305:3.0.2"
         compileOnly "com.demonwav.mcdev:annotations:1.0"
         compileOnly "org.jetbrains:annotations:19.0.0"
-    }
-
-    loom {
-        shareRemapCaches = true
     }
 
     repositories {
@@ -103,7 +79,7 @@ allprojects {
         include "**/*.java"
 
         style {
-            java = "BLOCK_COMMENT"
+            java = HeaderStyle.BLOCK_COMMENT
         }
         newLine = false // Disables the empty line between the header and package name
         //ignoreFailures = true //Ignore failures and only print a warning on license violations
@@ -122,12 +98,12 @@ allprojects {
         withSourcesJar()
     }
 
-    tasks.withType(AbstractArchiveTask) {
+    tasks.withType(AbstractArchiveTask).configureEach {
         preserveFileTimestamps = false
         reproducibleFileOrder = true
     }
 
-    tasks.withType(GenerateModuleMetadata) {
+    tasks.withType(GenerateModuleMetadata).configureEach {
         enabled = false
     }
 
@@ -165,42 +141,15 @@ javadoc {
     failOnError false
 }
 
-task javadocJar(type: Jar) {
+def javadocJar = tasks.register("javadocJar", Jar) {
     dependsOn javadoc
     from javadoc.destinationDir
     //Set as `fatjavadoc` to prevent an ide form trying to use this javadoc, over using the modules javadoc
-    archiveClassifier = "fatjavadoc"
+    archiveClassifier.set("fatjavadoc")
 }
 
 assemble.dependsOn javadocJar
 
-loom {
-    runs {
-        gametest {
-            inherit testmodServer
-
-            name "Game Test"
-
-            // Enable the gametest runner
-            vmArg "-Dfabric-api.gametest"
-            vmArg "-Dfabric-api.gametest.report-file=${project.buildDir}/junit.xml"
-            runDir "build/gametest"
-        }
-        autoTestServer {
-            inherit testmodServer
-
-            name "Auto Test Server"
-
-            vmArg "-Dfabric.autoTest"
-        }
-    }
-
-    interfaceInjection {
-        subprojects.each {
-            interfaceInjectionSourceSets.add(project(":${it.name}").sourceSets.main)
-        }
-    }
-}
 test.dependsOn runGametest
 
 subprojects {
@@ -223,7 +172,7 @@ subprojects {
                 }
             }
             mavenJava(MavenPublication) {
-                from components.java
+                from(components.java)
             }
         }
     }
@@ -235,19 +184,13 @@ subprojects {
     }
 
     javadoc.enabled = false
-
-    afterEvaluate {
-        // Disable the gen sources task on sub projects
-        genSourcesWithFernFlower.enabled = false
-        genSourcesWithCfr.enabled = false
-        unpickJar.enabled = false
-    }
 }
 
-task remapMavenJar(type: net.fabricmc.loom.task.RemapJarTask, dependsOn: jar) {
+def remapMavenJar = tasks.register("remapMavenJar", RemapJarTask) {
     input = jar.archiveFile
     archiveFileName = "${archivesBaseName}-${project.version}-maven.jar"
     addNestedDependencies = false
+    dependsOn(jar)
 }
 assemble.dependsOn remapMavenJar
 
@@ -262,7 +205,7 @@ publishing {
                 builtBy remapSourcesJar
             }
 
-            artifact javadocJar
+            artifact(tasks.javadocJar)
 
             pom.withXml {
                 def depsNode = asNode().appendNode("dependencies")
@@ -290,8 +233,6 @@ chenille {
 // Required until the deprecation is removed. CCA's main jar that is published to maven does not contain sub modules.
 loom.disableDeprecatedPomGeneration(publishing.publications.mavenJava)
 
-task licenseFormatAll
-subprojects { p -> licenseFormatAll.dependsOn("${p.path}:licenseFormat") }
 subprojects.each { remapJar.dependsOn("${it.path}:remapJar") }
 
 dependencies {
@@ -315,16 +256,16 @@ dependencies {
 
     afterEvaluate {
         subprojects.each {
-            api project(path: ":${it.name}", configuration: "namedElements")
-            include project("${it.name}:")
-            testmodImplementation project("${it.name}:").sourceSets.testmod.output
+            api(project(path: ":${it.name}", configuration: "namedElements"))
+            include(project("${it.name}:"))
+            testmodImplementation(project("${it.name}:").sourceSets.testmod.output)
         }
     }
 }
 
-task testmodJar(type: Jar, dependsOn: testmodClasses) {
-    archiveBaseName = 'CCATest'
-    archiveClassifier = 'dev'
+def testmodJar = tasks.register("testmodJar", Jar) {
+    archiveBaseName.set('CCATest')
+    archiveClassifier.set('dev')
     from(sourceSets.testmod.output) {
         include 'fabric.mod.json'
         expand 'version': project.version
@@ -332,13 +273,15 @@ task testmodJar(type: Jar, dependsOn: testmodClasses) {
     from(sourceSets.testmod.output) {
         exclude 'fabric.mod.json'
     }
+    dependsOn(testmodClasses)
 }
 
-task remapTestmodJar(type: RemapJarTask, dependsOn: project.testmodJar) {
-    archiveBaseName = 'CCATest'
-    archiveClassifier = 'testmod'
-    input = testmodJar.archiveFile
+def remapTestmodJar = tasks.register("remapTestmodJar", RemapJarTask) {
+    archiveBaseName.set('CCATest')
+    archiveClassifier.set('testmod')
+    input = testmodJar
     addNestedDependencies = false
+    dependsOn(testmodJar)
 }
 
 assemble.dependsOn(remapTestmodJar)

@@ -117,7 +117,7 @@ public class VitalityStickItem extends Item {
         lines.add(Text.translatable("componenttest:tooltip.vitality", Vita.KEY.get(stack).getVitality()));
         PlayerEntity holder = MinecraftClient.getInstance().player;
         if (holder != null) {
-            lines.add(Text.translatable("componenttest:tooltip.self_vitality", holder.getComponent(Vita.KEY).getVitality()));
+            lines.add(Text.translatable("componenttest:tooltip.self_vitality", Vita.KEY.get(holder).getVitality()));
         }
     }
 
