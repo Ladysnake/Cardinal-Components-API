@@ -20,13 +20,18 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.test.entity;
+package dev.onyxstudios.cca.test.base;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
+import dev.onyxstudios.cca.api.v3.component.TransientComponent;
 import dev.onyxstudios.cca.api.v3.component.load.ServerLoadAwareComponent;
 import dev.onyxstudios.cca.api.v3.component.load.ServerUnloadAwareComponent;
-import dev.onyxstudios.cca.test.base.BaseVita;
+import net.minecraft.util.Identifier;
 
-public class LoadAwareVita extends BaseVita implements ServerLoadAwareComponent, ServerUnloadAwareComponent {
+public class LoadAwareTestComponent implements TransientComponent, ServerLoadAwareComponent, ServerUnloadAwareComponent {
+    public static final ComponentKey<LoadAwareTestComponent> KEY = ComponentRegistry.getOrCreate(new Identifier("cca-base-test", "loading"), LoadAwareTestComponent.class);
+
     private int loadCounter = 0;
 
     public int getLoadCounter() {
@@ -34,12 +39,12 @@ public class LoadAwareVita extends BaseVita implements ServerLoadAwareComponent,
     }
 
     @Override
-    public void onLoadServerside() {
+    public void loadServerside() {
         this.loadCounter++;
     }
 
     @Override
-    public void onUnloadServerside() {
+    public void unloadServerside() {
         this.loadCounter--;
     }
 }

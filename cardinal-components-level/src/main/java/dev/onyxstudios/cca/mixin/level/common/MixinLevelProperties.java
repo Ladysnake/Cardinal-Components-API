@@ -30,7 +30,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
-import dev.onyxstudios.cca.internal.level.ComponentsLevelNetworking;
+import dev.onyxstudios.cca.internal.level.CardinalComponentsLevel;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.entity.boss.dragon.EnderDragonFight;
@@ -54,7 +54,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -98,7 +97,7 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Com
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
-        return new CustomPayloadS2CPacket(ComponentsLevelNetworking.PACKET_ID, buf);
+        return new CustomPayloadS2CPacket(CardinalComponentsLevel.PACKET_ID, buf);
     }
 
 }

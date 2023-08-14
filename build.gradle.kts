@@ -53,6 +53,7 @@ allprojects {
         modApi("net.fabricmc:fabric-loader:${props["loader_version"]}")
         modApi(fabricApi.module("fabric-api-base", fabricApiVersion))
         modImplementation(fabricApi.module("fabric-networking-api-v1", fabricApiVersion))
+        modImplementation(fabricApi.module("fabric-lifecycle-events-v1", fabricApiVersion))
 
         "testmodImplementation"("junit:junit:4.13")
         "testmodImplementation"("org.mockito:mockito-core:3.+")
@@ -63,7 +64,7 @@ allprojects {
 
         compileOnly("com.google.code.findbugs:jsr305:3.0.2")
         compileOnly("com.demonwav.mcdev:annotations:1.0")
-        compileOnly("org.jetbrains:annotations:19.0.0")
+        compileOnly("org.jetbrains:annotations:24.0.1")
     }
 
     repositories {

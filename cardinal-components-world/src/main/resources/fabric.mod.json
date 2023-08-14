@@ -8,10 +8,10 @@
   "icon": "assets/cardinal-components-world/icon.png",
   "entrypoints": {
     "main": [
-      "dev.onyxstudios.cca.internal.world.ComponentsWorldNetworking::init"
+      "dev.onyxstudios.cca.internal.world.CardinalComponentsWorld::init"
     ],
     "client": [
-      "dev.onyxstudios.cca.internal.world.CcaWorldClientNw::initClient"
+      "dev.onyxstudios.cca.internal.world.CcaWorldClient::initClient"
     ]
   },
   "custom": {

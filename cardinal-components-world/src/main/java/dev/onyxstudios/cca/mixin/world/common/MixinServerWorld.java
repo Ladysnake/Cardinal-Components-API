@@ -25,8 +25,8 @@ package dev.onyxstudios.cca.mixin.world.common;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
+import dev.onyxstudios.cca.internal.world.CardinalComponentsWorld;
 import dev.onyxstudios.cca.internal.world.ComponentPersistentState;
-import dev.onyxstudios.cca.internal.world.ComponentsWorldNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -79,6 +79,6 @@ public abstract class MixinServerWorld extends MixinWorld {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
-        return new CustomPayloadS2CPacket(ComponentsWorldNetworking.PACKET_ID, buf);
+        return new CustomPayloadS2CPacket(CardinalComponentsWorld.PACKET_ID, buf);
     }
 }

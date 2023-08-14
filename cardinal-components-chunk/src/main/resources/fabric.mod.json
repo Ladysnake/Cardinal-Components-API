@@ -8,10 +8,10 @@
   "icon": "assets/cardinal-components-chunk/icon.png",
   "entrypoints": {
     "main": [
-      "dev.onyxstudios.cca.internal.chunk.ComponentsChunkNetworking::init"
+      "dev.onyxstudios.cca.internal.chunk.CardinalComponentsChunk::init"
     ],
     "client": [
-      "dev.onyxstudios.cca.internal.chunk.CcaChunkClientNw::initClient"
+      "dev.onyxstudios.cca.internal.chunk.CcaChunkClient::initClient"
     ]
   },
   "custom": {

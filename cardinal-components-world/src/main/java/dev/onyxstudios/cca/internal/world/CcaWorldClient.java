@@ -20,46 +20,44 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.internal.chunk;
+package dev.onyxstudios.cca.internal.world;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 
-import java.util.Objects;
-
-public class CcaChunkClientNw {
+public final class CcaWorldClient {
     public static void initClient() {
-        if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
-            ClientPlayNetworking.registerGlobalReceiver(ComponentsChunkNetworking.PACKET_ID, (client, handler, buffer, res) -> {
-                try {
-                    int chunkX = buffer.readInt();
-                    int chunkZ = buffer.readInt();
-                    Identifier componentTypeId = buffer.readIdentifier();
-                    ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
-                    if (componentType == null) {
-                        return;
-                    }
-                    buffer.retain();
-                    client.execute(() -> {
-                        try {
-                            // Note: on the client, unloaded chunks return EmptyChunk
-                            componentType.maybeGet(Objects.requireNonNull(client.world).getChunk(chunkX, chunkZ))
-                                .filter(c -> c instanceof AutoSyncedComponent)
-                                .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(buffer));
-                        } finally {
-                            buffer.release();
-                        }
-                    });
-                } catch (Exception e) {
-                    ComponentsInternals.LOGGER.error("Error while reading chunk components from network", e);
-                    throw e;
+        ClientPlayNetworking.registerGlobalReceiver(CardinalComponentsWorld.PACKET_ID, (client, handler, buf, res) -> {
+            try {
+                Identifier componentTypeId = buf.readIdentifier();
+                ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
+
+                if (componentType == null) {
+                    return;
                 }
-            });
-        }
+
+                buf.retain();
+
+                client.execute(() -> {
+                    try {
+                        assert client.world != null;
+                        Component c = componentType.get(client.world);
+                        if (c instanceof AutoSyncedComponent) {
+                            ((AutoSyncedComponent) c).applySyncPacket(buf);
+                        }
+                    } finally {
+                        buf.release();
+                    }
+                });
+            } catch (Exception e) {
+                ComponentsInternals.LOGGER.error("Error while reading world components from network", e);
+                throw e;
+            }
+        });
     }
 }

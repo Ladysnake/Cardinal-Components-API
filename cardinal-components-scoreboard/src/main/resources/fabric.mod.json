@@ -8,10 +8,10 @@
   "icon": "assets/cardinal-components-scoreboard/icon.png",
   "entrypoints": {
     "main": [
-      "dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking::init"
+      "dev.onyxstudios.cca.internal.scoreboard.CardinalComponentsScoreboard::init"
     ],
     "client": [
-      "dev.onyxstudios.cca.internal.scoreboard.CcaScoreboardClientNw::initClient"
+      "dev.onyxstudios.cca.internal.scoreboard.CcaScoreboardClient::initClient"
     ]
   },
   "custom": {

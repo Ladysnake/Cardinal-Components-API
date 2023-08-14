@@ -20,59 +20,56 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.internal.scoreboard;
+package dev.onyxstudios.cca.internal;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
-public final class CcaScoreboardClientNw {
+public class CcaBlockClient {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
-            registerScoreboardSync(ComponentsScoreboardNetworking.TEAM_PACKET_ID, buf -> {
-                String teamName = buf.readString();
-                return (componentType, scoreboard) -> componentType.maybeGet(scoreboard.getTeam(teamName));
-            });
-            registerScoreboardSync(ComponentsScoreboardNetworking.SCOREBOARD_PACKET_ID,
-                buf -> ComponentKey::maybeGet
-            );
-        }
-    }
+            ClientPlayNetworking.registerGlobalReceiver(CardinalComponentsBlock.PACKET_ID, (client, handler, buffer, res) -> {
+                try {
+                    Identifier blockEntityTypeId = buffer.readIdentifier();
+                    BlockPos position = buffer.readBlockPos();
+                    Identifier componentTypeId = buffer.readIdentifier();
+                    BlockEntityType<?> blockEntityType = Registries.BLOCK_ENTITY_TYPE.get(blockEntityTypeId);
+                    ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
 
-    private static void registerScoreboardSync(Identifier packetId, Function<PacketByteBuf, BiFunction<ComponentKey<?>, Scoreboard, Optional<? extends Component>>> reader) {
-        ClientPlayNetworking.registerGlobalReceiver(packetId, (client, handler, buffer, res) -> {
-            try {
-                BiFunction<ComponentKey<?>, Scoreboard, Optional<? extends Component>> getter = reader.apply(buffer);
-                Identifier componentTypeId = buffer.readIdentifier();
-                ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
+                    if (componentType == null || blockEntityType == null) {
+                        return;
+                    }
 
-                if (componentType != null) {
                     buffer.retain();
+
                     client.execute(() -> {
                         try {
-                            getter.apply(componentType, handler.getWorld().getScoreboard())
+                            componentType.maybeGet(blockEntityType.get(client.world, position))
                                 .filter(c -> c instanceof AutoSyncedComponent)
                                 .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(buffer));
                         } finally {
                             buffer.release();
                         }
                     });
+                } catch (Exception e) {
+                    ComponentsInternals.LOGGER.error("Error while reading block entity components from network", e);
+                    throw e;
                 }
-            } catch (Exception e) {
-                ComponentsInternals.LOGGER.error("Error while reading scoreboard components from network", e);
-                throw e;
-            }
-        });
+            });
+        }
+        if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {
+            ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register((be, world) -> ((ComponentProvider) be).getComponentContainer().onServerLoad());
+            ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((be, world) -> ((ComponentProvider) be).getComponentContainer().onServerUnload());
+        }
     }
 }

@@ -20,39 +20,37 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.internal;
+package dev.onyxstudios.cca.internal.chunk;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 
-public class CcaBlockClientNw {
+import java.util.Objects;
+
+public class CcaChunkClient {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
-            ClientPlayNetworking.registerGlobalReceiver(CardinalComponentsBlock.PACKET_ID, (client, handler, buffer, res) -> {
+            ClientPlayNetworking.registerGlobalReceiver(CardinalComponentsChunk.PACKET_ID, (client, handler, buffer, res) -> {
                 try {
-                    Identifier blockEntityTypeId = buffer.readIdentifier();
-                    BlockPos position = buffer.readBlockPos();
+                    int chunkX = buffer.readInt();
+                    int chunkZ = buffer.readInt();
                     Identifier componentTypeId = buffer.readIdentifier();
-                    BlockEntityType<?> blockEntityType = Registries.BLOCK_ENTITY_TYPE.get(blockEntityTypeId);
                     ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
-
-                    if (componentType == null || blockEntityType == null) {
+                    if (componentType == null) {
                         return;
                     }
-
                     buffer.retain();
-
                     client.execute(() -> {
                         try {
-                            componentType.maybeGet(blockEntityType.get(client.world, position))
+                            // Note: on the client, unloaded chunks return EmptyChunk
+                            componentType.maybeGet(Objects.requireNonNull(client.world).getChunk(chunkX, chunkZ))
                                 .filter(c -> c instanceof AutoSyncedComponent)
                                 .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(buffer));
                         } finally {
@@ -60,10 +58,14 @@ public class CcaBlockClientNw {
                         }
                     });
                 } catch (Exception e) {
-                    ComponentsInternals.LOGGER.error("Error while reading block entity components from network", e);
+                    ComponentsInternals.LOGGER.error("Error while reading chunk components from network", e);
                     throw e;
                 }
             });
+        }
+        if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {
+            ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> ((ComponentProvider) chunk).getComponentContainer().onServerLoad());
+            ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> ((ComponentProvider) chunk).getComponentContainer().onServerUnload());
         }
     }
 }

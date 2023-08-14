@@ -32,10 +32,10 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-public final class CcaLevelClientNw {
+public final class CcaLevelClient {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
-            ClientPlayNetworking.registerGlobalReceiver(ComponentsLevelNetworking.PACKET_ID, (client, handler, buffer, res) -> {
+            ClientPlayNetworking.registerGlobalReceiver(CardinalComponentsLevel.PACKET_ID, (client, handler, buffer, res) -> {
                 try {
                     Identifier componentTypeId = buffer.readIdentifier();
                     ComponentKey<?> componentKey = ComponentRegistry.get(componentTypeId);

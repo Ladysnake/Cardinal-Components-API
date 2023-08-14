@@ -47,5 +47,5 @@ public interface ServerLoadAwareComponent extends Component {
      * and it <em>should</em> be called as many times as the corresponding unloading event if applicable.
      */
     @CalledByAsm
-    void onLoadServerside();
+    void loadServerside();
 }

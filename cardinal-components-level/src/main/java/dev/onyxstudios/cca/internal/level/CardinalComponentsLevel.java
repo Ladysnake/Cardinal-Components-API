@@ -20,24 +20,41 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.internal.chunk;
+package dev.onyxstudios.cca.internal.level;
 
-import dev.onyxstudios.cca.api.v3.chunk.ChunkSyncCallback;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.world.WorldSyncCallback;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.WorldProperties;
 
-public final class ComponentsChunkNetworking {
-    public static final Identifier PACKET_ID = new Identifier("cardinal-components", "chunk_sync");
+public final class CardinalComponentsLevel {
+    /**
+     * {@link CustomPayloadS2CPacket} channel for default level component synchronization.
+     *
+     * <p> Packets emitted on this channel must begin with the
+     * {@link ComponentKey#getId() component's type} (as an Identifier).
+     *
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
+     * called on the game thread.
+     */
+    public static final Identifier PACKET_ID = new Identifier("cardinal-components", "level_sync");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
-            ChunkSyncCallback.EVENT.register((player, tracked) -> {
-                for (ComponentKey<?> key : tracked.asComponentProvider().getComponentContainer().keys()) {
-                    key.syncWith(player, (ComponentProvider) tracked);
-                }
-            });
+            if (FabricLoader.getInstance().isModLoaded("cardinal-components-world")) {
+                WorldSyncCallback.EVENT.register((player, world) -> {
+                    WorldProperties props = world.getLevelProperties();
+
+                    for (ComponentKey<?> key : props.asComponentProvider().getComponentContainer().keys()) {
+                        key.syncWith(player, props.asComponentProvider());
+                    }
+                });
+            }
         }
     }
+
 }

@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.test.entity;
 
+import dev.onyxstudios.cca.test.base.LoadAwareTestComponent;
 import dev.onyxstudios.cca.test.base.Vita;
 import io.github.ladysnake.elmendorf.GameTestUtil;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
@@ -59,18 +60,18 @@ public class CcaEntityTestSuite implements FabricGameTest {
         shulker.refreshPositionAndAngles(vec3d.x, vec3d.y, vec3d.z, shulker.getYaw(), shulker.getPitch());
         GameTestUtil.assertTrue(
             "Load counter should not be incremented until the entity joins the world",
-            ((LoadAwareVita) Vita.get(shulker)).getLoadCounter() == 0
+            LoadAwareTestComponent.KEY.get(shulker).getLoadCounter() == 0
         );
         ctx.getWorld().spawnEntity(shulker);
         GameTestUtil.assertTrue(
             "Load counter should be incremented once when the entity joins the world",
-            ((LoadAwareVita) Vita.get(shulker)).getLoadCounter() == 1
+            LoadAwareTestComponent.KEY.get(shulker).getLoadCounter() == 1
         );
         shulker.remove(Entity.RemovalReason.DISCARDED);
         ctx.waitAndRun(1, () -> {
             GameTestUtil.assertTrue(
                 "Load counter should be decremented when the entity leaves the world",
-                ((LoadAwareVita) Vita.get(shulker)).getLoadCounter() == 0
+                LoadAwareTestComponent.KEY.get(shulker).getLoadCounter() == 0
             );
             ctx.complete();
         });

@@ -8,10 +8,10 @@
   "icon": "assets/cardinal-components-level/icon.png",
   "entrypoints": {
     "main": [
-      "dev.onyxstudios.cca.internal.level.ComponentsLevelNetworking::init"
+      "dev.onyxstudios.cca.internal.level.CardinalComponentsLevel::init"
     ],
     "client": [
-      "dev.onyxstudios.cca.internal.level.CcaLevelClientNw::initClient"
+      "dev.onyxstudios.cca.internal.level.CcaLevelClient::initClient"
     ]
   },
   "custom": {

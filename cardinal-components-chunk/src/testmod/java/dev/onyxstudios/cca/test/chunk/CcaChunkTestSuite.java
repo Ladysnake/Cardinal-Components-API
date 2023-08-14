@@ -22,9 +22,9 @@
  */
 package dev.onyxstudios.cca.test.chunk;
 
+import dev.onyxstudios.cca.test.base.LoadAwareTestComponent;
 import dev.onyxstudios.cca.test.base.TickingTestComponent;
 import dev.onyxstudios.cca.test.base.Vita;
-import io.github.ladysnake.elmendorf.ElmendorfTestContext;
 import io.github.ladysnake.elmendorf.GameTestUtil;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.nbt.NbtCompound;
@@ -50,12 +50,22 @@ public class CcaChunkTestSuite implements FabricGameTest {
 
     @GameTest(templateName = EMPTY_STRUCTURE)
     public void chunksTick(TestContext ctx) {
-        ((ElmendorfTestContext) ctx).spawnServerPlayer(0, 0, 0);    // Ensure chunk gets ticked
+        ctx.spawnServerPlayer(0, 0, 0);    // Ensure chunk gets ticked
         int baseTicks = ctx.getWorld().getChunk(ctx.getAbsolutePos(BlockPos.ORIGIN)).getComponent(TickingTestComponent.KEY).serverTicks();
         ctx.waitAndRun(5, () -> {
             int ticks = ctx.getWorld().getChunk(ctx.getAbsolutePos(BlockPos.ORIGIN)).getComponent(TickingTestComponent.KEY).serverTicks();
             GameTestUtil.assertTrue("Component should tick 5 times", ticks - baseTicks == 5);
             ctx.complete();
         });
+    }
+
+    @GameTest(templateName = EMPTY_STRUCTURE)
+    public void chunksLoadUnload(TestContext ctx) {
+        ctx.spawnServerPlayer(0, 0, 0);    // Ensure chunk gets ticked
+        GameTestUtil.assertTrue(
+            "Load counter should be incremented once when the chunk is added to the world",
+            ctx.getWorld().getChunk(ctx.getAbsolutePos(BlockPos.ORIGIN)).getComponent(LoadAwareTestComponent.KEY).getLoadCounter() == 1
+        );
+        ctx.complete();
     }
 }

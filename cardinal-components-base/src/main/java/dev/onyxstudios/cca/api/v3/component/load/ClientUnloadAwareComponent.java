@@ -49,5 +49,5 @@ public interface ClientUnloadAwareComponent extends Component {
      */
     @CheckEnv(Env.CLIENT)
     @CalledByAsm
-    void onUnloadClientside();
+    void unloadClientside();
 }

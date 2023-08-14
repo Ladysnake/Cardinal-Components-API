@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.test.block;
 
+import dev.onyxstudios.cca.test.base.LoadAwareTestComponent;
 import dev.onyxstudios.cca.test.base.TickingTestComponent;
 import dev.onyxstudios.cca.test.base.Vita;
 import io.github.ladysnake.elmendorf.GameTestUtil;
@@ -29,6 +30,7 @@ import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
@@ -64,6 +66,29 @@ public class CcaBlockTestSuite implements FabricGameTest {
         ctx.waitAndRun(5, () -> {
             int ticks = Objects.requireNonNull(ctx.getBlockEntity(BlockPos.ORIGIN)).getComponent(TickingTestComponent.KEY).serverTicks();
             GameTestUtil.assertTrue("Component should tick 5 times", ticks == 5);
+            ctx.complete();
+        });
+    }
+
+    @GameTest(templateName = EMPTY_STRUCTURE)
+    public void beComponentsLoadUnload(TestContext ctx) {
+        BlockEntity firstCommandBlock = new CommandBlockBlockEntity(ctx.getAbsolutePos(BlockPos.ORIGIN), Blocks.CHAIN_COMMAND_BLOCK.getDefaultState());
+        GameTestUtil.assertTrue(
+            "Load counter should not be incremented until the block entity joins the world",
+            LoadAwareTestComponent.KEY.get(firstCommandBlock).getLoadCounter() == 0
+        );
+        ctx.setBlockState(BlockPos.ORIGIN, Blocks.CHAIN_COMMAND_BLOCK);
+        BlockEntity commandBlock = Objects.requireNonNull(ctx.getBlockEntity(BlockPos.ORIGIN));
+        GameTestUtil.assertTrue(
+            "Load counter should be incremented once when the block entity joins the world",
+            LoadAwareTestComponent.KEY.get(commandBlock).getLoadCounter() == 1
+        );
+        ctx.setBlockState(BlockPos.ORIGIN, Blocks.AIR);
+        ctx.waitAndRun(1, () -> {
+            GameTestUtil.assertTrue(
+                "Load counter should be decremented when the block entity leaves the world",
+                LoadAwareTestComponent.KEY.get(commandBlock).getLoadCounter() == 0
+            );
             ctx.complete();
         });
     }

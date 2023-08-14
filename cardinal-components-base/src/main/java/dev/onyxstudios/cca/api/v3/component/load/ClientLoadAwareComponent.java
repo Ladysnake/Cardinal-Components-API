@@ -50,5 +50,5 @@ public interface ClientLoadAwareComponent extends Component {
      */
     @CheckEnv(Env.CLIENT)
     @CalledByAsm
-    void onLoadClientside();
+    void loadClientside();
 }

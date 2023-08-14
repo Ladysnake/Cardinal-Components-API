@@ -24,6 +24,7 @@ package dev.onyxstudios.cca.test.chunk;
 
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
+import dev.onyxstudios.cca.test.base.LoadAwareTestComponent;
 import dev.onyxstudios.cca.test.base.TickingTestComponent;
 import dev.onyxstudios.cca.test.base.Vita;
 import net.fabricmc.api.ModInitializer;
@@ -33,6 +34,7 @@ public class CcaChunkTestMod implements ModInitializer, ChunkComponentInitialize
     public void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry) {
         registry.register(TickingTestComponent.KEY, chunk -> new TickingTestComponent());
         registry.register(Vita.KEY, ChunkVita::new);
+        registry.register(LoadAwareTestComponent.KEY, chunk -> new LoadAwareTestComponent());
     }
 
     @Override

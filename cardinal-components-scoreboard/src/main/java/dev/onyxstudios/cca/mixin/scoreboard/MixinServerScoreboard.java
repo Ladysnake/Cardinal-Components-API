@@ -26,7 +26,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
-import dev.onyxstudios.cca.internal.scoreboard.ComponentsScoreboardNetworking;
+import dev.onyxstudios.cca.internal.scoreboard.CardinalComponentsScoreboard;
 import dev.onyxstudios.cca.internal.scoreboard.ScoreboardComponentContainerFactory;
 import dev.onyxstudios.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -74,7 +74,7 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
-        return new CustomPayloadS2CPacket(ComponentsScoreboardNetworking.SCOREBOARD_PACKET_ID, buf);
+        return new CustomPayloadS2CPacket(CardinalComponentsScoreboard.SCOREBOARD_PACKET_ID, buf);
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))

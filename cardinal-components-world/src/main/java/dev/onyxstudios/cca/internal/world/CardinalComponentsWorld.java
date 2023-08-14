@@ -25,10 +25,11 @@ package dev.onyxstudios.cca.internal.world;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.world.WorldSyncCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 
-public final class ComponentsWorldNetworking {
+public final class CardinalComponentsWorld {
     public static final Identifier PACKET_ID = new Identifier("cardinal-components", "world_sync");
 
     public static void init() {
@@ -40,6 +41,9 @@ public final class ComponentsWorldNetworking {
                 }
             });
         }
+        if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {
+            ServerWorldEvents.LOAD.register((server, world) -> ((ComponentProvider) world).getComponentContainer().onServerLoad());
+            ServerWorldEvents.UNLOAD.register((server, world) -> ((ComponentProvider) world).getComponentContainer().onServerUnload());
+        }
     }
-
 }

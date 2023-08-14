@@ -23,16 +23,18 @@
 package dev.onyxstudios.cca.internal.scoreboard;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardSyncCallback;
 import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Identifier;
 
-public final class ComponentsScoreboardNetworking {
+public final class CardinalComponentsScoreboard {
     /**
      * {@link CustomPayloadS2CPacket} channel for default scoreboard component synchronization.
      *
@@ -71,6 +73,10 @@ public final class ComponentsScoreboardNetworking {
                     tracked.syncComponent(key);
                 }
             });
+        }
+        if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {
+            ServerLifecycleEvents.SERVER_STARTED.register((server) -> ((ComponentProvider) server.getScoreboard()).getComponentContainer().onServerLoad());
+            ServerLifecycleEvents.SERVER_STOPPED.register((server) -> ((ComponentProvider) server.getScoreboard()).getComponentContainer().onServerUnload());
         }
     }
 }

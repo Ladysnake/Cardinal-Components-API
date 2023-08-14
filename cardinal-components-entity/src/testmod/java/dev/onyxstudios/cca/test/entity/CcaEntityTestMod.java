@@ -24,6 +24,7 @@ package dev.onyxstudios.cca.test.entity;
 
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
+import dev.onyxstudios.cca.test.base.LoadAwareTestComponent;
 import dev.onyxstudios.cca.test.base.Vita;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.EntityType;
@@ -41,7 +42,7 @@ public class CcaEntityTestMod implements ModInitializer, EntityComponentInitiali
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.beginRegistration(PlayerEntity.class, Vita.KEY).impl(PlayerVita.class).end(PlayerVita::new);
-        registry.beginRegistration(ShulkerEntity.class, Vita.KEY).impl(LoadAwareVita.class).end(e -> new LoadAwareVita());
+        registry.beginRegistration(ShulkerEntity.class, LoadAwareTestComponent.KEY).impl(LoadAwareTestComponent.class).end(e -> new LoadAwareTestComponent());
     }
 
     @Override

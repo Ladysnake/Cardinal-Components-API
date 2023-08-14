@@ -11,7 +11,7 @@
       "dev.onyxstudios.cca.internal.CardinalComponentsBlock::init"
     ],
     "client": [
-      "dev.onyxstudios.cca.internal.CcaBlockClientNw::initClient"
+      "dev.onyxstudios.cca.internal.CcaBlockClient::initClient"
     ]
   },
   "custom": {
