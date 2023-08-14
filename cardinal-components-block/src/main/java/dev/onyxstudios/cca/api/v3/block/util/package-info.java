@@ -22,8 +22,11 @@
  */
 /**
  * Side-aware variants of component classes.
- * Classes in this package can be used notably in {@code BlockComponentProvider} implementations.
+ * Classes in this package have been used notably in {@code BlockComponentProvider} implementations.
+ * @deprecated this package is a remainder of a previous API
+ * TODO remove in the update to MC 1.21
  */
+@Deprecated(since = "5.3", forRemoval = true)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 package dev.onyxstudios.cca.api.v3.block.util;
