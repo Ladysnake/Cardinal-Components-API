@@ -23,6 +23,7 @@
 package dev.onyxstudios.componenttest.content;
 
 import dev.onyxstudios.cca.test.base.Vita;
+import dev.onyxstudios.cca.test.block.CcaBlockTestMod;
 import dev.onyxstudios.cca.test.world.AmbientVita;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -78,7 +79,7 @@ public class VitalityStickItem extends Item {
     public ActionResult useOnBlock(ItemUsageContext context) {
         // only on client side, to confirm that sync works
         if (context.getWorld().isClient && context.getPlayer() != null) {
-            Vita vita = CardinalComponentsTest.VITA_API_LOOKUP.find(
+            Vita vita = CcaBlockTestMod.VITA_API_LOOKUP.find(
                 context.getWorld(),
                 context.getBlockPos(),
                 context.getSide()

@@ -1,0 +1,23 @@
+{
+    "schemaVersion": 1,
+    "environment": "*",
+    "id": "cca-scoreboard-test",
+    "name": "Cardinal Components API Test Mod",
+    "description": "Test mod for Cardinal Components API",
+    "version": "${version}",
+    "entrypoints": {
+        "cardinal-components": [
+          "dev.onyxstudios.cca.test.scoreboard.CcaScoreboardTestMod"
+        ],
+        "fabric-gametest": [
+          "dev.onyxstudios.cca.test.scoreboard.CcaScoreboardTestSuite"
+        ]
+    },
+    "depends": {
+        "fabric-api-base": "*"
+    },
+    "authors": [
+        "Pyrofab"
+    ],
+    "license": "MIT"
+}

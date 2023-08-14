@@ -35,15 +35,18 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 public class CcaBlockTestSuite implements FabricGameTest {
     @GameTest(templateName = EMPTY_STRUCTURE)
     public void beSerialize(TestContext ctx) {
+        BlockPos pos = ctx.getAbsolutePos(BlockPos.ORIGIN);
         BlockEntity be = Objects.requireNonNull(
             BlockEntityType.END_GATEWAY.instantiate(
-                ctx.getAbsolutePos(BlockPos.ORIGIN),
+                pos,
                 Blocks.END_GATEWAY.getDefaultState()
             )
         );
@@ -51,13 +54,39 @@ public class CcaBlockTestSuite implements FabricGameTest {
         NbtCompound nbt = be.createNbt();
         BlockEntity be1 = Objects.requireNonNull(
             BlockEntityType.END_GATEWAY.instantiate(
-                ctx.getAbsolutePos(BlockPos.ORIGIN), Blocks.END_GATEWAY.getDefaultState()
+                pos, Blocks.END_GATEWAY.getDefaultState()
             )
         );
         GameTestUtil.assertTrue("New BlockEntity should have values zeroed", be1.getComponent(Vita.KEY).getVitality() == 0);
         be1.readNbt(nbt);
         GameTestUtil.assertTrue("BlockEntity component data should survive deserialization", be1.getComponent(Vita.KEY).getVitality() == 42);
         ctx.complete();
+    }
+
+    @GameTest(templateName = EMPTY_STRUCTURE)
+    public void canQueryThroughLookup(TestContext ctx) {
+        BlockPos pos = ctx.getAbsolutePos(BlockPos.ORIGIN);
+        BlockEntity be = Objects.requireNonNull(
+            BlockEntityType.END_GATEWAY.instantiate(
+                pos,
+                Blocks.END_GATEWAY.getDefaultState()
+            )
+        );
+        getVita(ctx, pos, be).setVitality(42);
+        NbtCompound nbt = be.createNbt();
+        BlockEntity be1 = Objects.requireNonNull(
+            BlockEntityType.END_GATEWAY.instantiate(
+                pos, Blocks.END_GATEWAY.getDefaultState()
+            )
+        );
+        GameTestUtil.assertTrue("New BlockEntity should have values zeroed", getVita(ctx, pos, be1).getVitality() == 0);
+        be1.readNbt(nbt);
+        GameTestUtil.assertTrue("BlockEntity component data should survive deserialization", getVita(ctx, pos, be1).getVitality() == 42);
+        ctx.complete();
+    }
+
+    @NotNull private static Vita getVita(TestContext ctx, BlockPos pos, BlockEntity be) {
+        return Objects.requireNonNull(CcaBlockTestMod.VITA_API_LOOKUP.find(ctx.getWorld(), pos, null, be, Direction.DOWN));
     }
 
     @GameTest(templateName = EMPTY_STRUCTURE)

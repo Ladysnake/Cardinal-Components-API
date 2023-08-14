@@ -24,9 +24,6 @@ allprojects {
         license = "MIT"
         displayName = providers.gradleProperty("display_name").get()
         owners = providers.gradleProperty("owners").get()
-        configureTestmod {
-            withBaseTestRuns()
-        }
     }
 
     group = "dev.onyxstudios.cardinal-components-api"
@@ -57,10 +54,6 @@ allprojects {
         modImplementation(fabricApi.module("fabric-networking-api-v1", fabricApiVersion))
         modImplementation(fabricApi.module("fabric-lifecycle-events-v1", fabricApiVersion))
 
-        "testmodImplementation"("junit:junit:4.13")
-        "testmodImplementation"("org.mockito:mockito-core:3.+")
-
-        "testmodImplementation"(sourceSets.main.map { it.output })
         modCompileOnly(fabricApi.module("fabric-gametest-api-v1", fabricApiVersion))
         modLocalImplementation("io.github.ladysnake:elmendorf:${props["elmendorf_version"]}")
 
@@ -149,6 +142,15 @@ tasks.test.configure {
 subprojects {
     version = rootProject.version
 
+    sourceSets.create("testmod") {
+        compileClasspath += sourceSets.main.get().compileClasspath
+        runtimeClasspath += sourceSets.main.get().runtimeClasspath
+    }
+
+    dependencies {
+        "testmodImplementation"(sourceSets.main.map { it.output })
+    }
+
     extensions.configure(PublishingExtension::class.java) {
         publications {
             create("relocation", MavenPublication::class.java) {
@@ -223,6 +225,9 @@ extensions.configure(PublishingExtension::class.java) {
 }
 
 chenille {
+    configureTestmod {
+        withBaseTestRuns()
+    }
     configurePublishing {
         withLadysnakeMaven()
         withCurseforgeRelease()

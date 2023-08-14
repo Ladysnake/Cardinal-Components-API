@@ -24,15 +24,22 @@ package dev.onyxstudios.cca.test.block;
 
 import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
+import dev.onyxstudios.cca.api.v3.block.BlockComponents;
 import dev.onyxstudios.cca.test.base.LoadAwareTestComponent;
 import dev.onyxstudios.cca.test.base.TickingTestComponent;
+import dev.onyxstudios.cca.test.base.Vita;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.EndGatewayBlockEntity;
 import net.minecraft.block.entity.EndPortalBlockEntity;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
 
 public class CcaBlockTestMod implements ModInitializer, BlockComponentInitializer {
     public static final String MOD_ID = "cca-block-test";
+    public static final BlockApiLookup<Vita, Direction> VITA_API_LOOKUP = BlockApiLookup.get(new Identifier(MOD_ID, "sided_vita"), Vita.class, Direction.class);
 
     @Override
     public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
@@ -43,6 +50,7 @@ public class CcaBlockTestMod implements ModInitializer, BlockComponentInitialize
 
     @Override
     public void onInitialize() {
-
+        BlockComponents.exposeApi(Vita.KEY, VITA_API_LOOKUP, (vita, side) -> side == Direction.UP ? vita : null, BlockEntityType.END_PORTAL);
+        BlockComponents.exposeApi(VitaCompound.KEY, VITA_API_LOOKUP, VitaCompound::get, BlockEntityType.END_GATEWAY);
     }
 }

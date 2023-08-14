@@ -15,7 +15,10 @@
         "cardinal-components": [
             "cca-base-test:vita",
             "cca-base-test:ticking",
-            "cca-base-test:loading"
+            "cca-base-test:loading",
+            "testmod:test",
+            "testmod:test_2",
+            "testmod:test_3"
         ]
     },
     "depends": {
