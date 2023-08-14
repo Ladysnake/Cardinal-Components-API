@@ -1,4 +1,14 @@
 ------------------------------------------------------
+Version 5.3.0
+------------------------------------------------------
+**Additions**
+- Added the load- and unload-aware components feature
+  - This can be used to implement advanced initialization and cleanup
+
+**Changes**
+- Deprecated the `utils` package in `cardinal-components-block` as it is now virtually unusable
+
+------------------------------------------------------
 Version 5.2.2
 ------------------------------------------------------
 Fixed chunk components being lost during deserialization (thanks to Stuff-Stuffs !)

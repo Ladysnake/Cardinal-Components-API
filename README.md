@@ -1,9 +1,15 @@
 ## **The CCA Maven is moving!**
 
-**As Jfrog is ending their free service for OSS projects, we have to move the maven repository before the 1st of July 2023.
-See below for the new maven instructions - you will have to update your buildscripts with the new URL before the cutoff date to avoid dependency resolution failures.**
+**As Jfrog has ended their free service for OSS projects, we had to move the maven repository before the 1st of July 2023.
+See below for the new maven instructions - you will have to update your buildscripts with the new URL to fix dependency resolution failures.**
 
-# ![Cardinal Components API](banner.svg)
+<h1>
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="banner-white.svg">
+        <img src="banner.svg" alt="Cardinal Components API">
+    </picture> 
+</h1>
+
 A components API for Quilt and Fabric that is easy, modular, and extremely fast.
 
 *Cardinal Components API is a library for Minecraft mods to create data
@@ -14,20 +20,32 @@ objects and behaviours, thereby helping both mod creation and compatibility.*
 
 **TL;DR: It allows you to attach data to things**
 
+### An example
 
-Detailed information is available in this repository's [**wiki**](https://github.com/OnyxStudios/Cardinal-Components-API/wiki).
-The information below is a condensed form of the latter.
+Let's say you want to make to add mana to your mod. You would most likely want to have a number stored on the player,
+which gets saved alongside it. You may want to display a mana bar on the client, which will require synchronization.
+You may want your mana to refill slowly over time, which will require ticking.
+And then you may want to have something like mana batteries in the world,
+which would require re-implementing all that on a custom block or entity.
+
+**Cardinal Components API takes care of it all.**
+
+Detailed information is available in [this repository's **wiki**](https://github.com/OnyxStudios/Cardinal-Components-API/wiki).
+The information below is a condensed form of the latter.  
+If you have questions or need help with this library, you can also join the [Ladysnake Discord](https://discord.ladysnake.org).
 
 ## Features\*
+
 - 🔗 Attach your components to a variety of vanilla classes
 - 🧩 Implement once, plug anywhere - your data will be saved automatically
 - 📤 Synchronize data with a single helper interface
 - 👥 Choose how your components are copied when a player respawns
 - ⏲️ Tick your components alongside their target
+- 🕯️ Implement advanced initialization or cleanup behaviors
 - 🛠️ Fine-tune everything so that it fits your needs
 - ☄️ And enjoy the blazing speed of ASM-generated extensions
 
-*\*Non exhaustive, refer to the wiki and javadoc for the full list.*
+*\*Non-exhaustive, refer to the wiki and javadoc for the full list.*
 
 ## Adding the API to your buildscript:
 
@@ -94,7 +112,7 @@ class RandomIntComponent implements IntComponent {
 *Note: a component class can be reused for several component types*
 
 If you want your component to be **automatically synchronized with watching clients**,
-you can also add the [`AutoSyncedComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/AutoSyncedComponent.java)
+you can also add the [`AutoSyncedComponent`](./cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/sync/AutoSyncedComponent.java)
 interface to your implementation:
 
 ```java
@@ -114,9 +132,12 @@ class SyncedIntComponent implements IntComponent, AutoSyncedComponent {
 
 **[[More information on component synchronization]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components)**
 
-If you want your component to **tick alongside its provider**, you can add the [`ServerTickingComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/ServerTickingComponent.java) or [`ClientTickingComponent`](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/ClientTickingComponent.java)
+If you want your component to **tick alongside its provider**, you can add the
+[`ServerTickingComponent`](./cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/tick/ServerTickingComponent.java)
+or [`ClientTickingComponent`](./cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/tick/ClientTickingComponent.java)
 (or both) to your *component interface* (here, `IntComponent`). If you'd rather add the ticking interface to a single
-component subclass, you can use one of the specific methods provided in the individual modules.
+component subclass, **you have to use one of the specific methods provided in the individual modules**
+(here something of the form `registry.beginRegistration(IntComponent.KEY).impl(IncrementingIntComponent.class).end(IncrementingIntComponent::new)`).
 
 ```java
 class IncrementingIntComponent implements IntComponent, ServerTickingComponent {
@@ -128,6 +149,24 @@ class IncrementingIntComponent implements IntComponent, ServerTickingComponent {
 
 *Serverside ticking is implemented for all providers except item stacks.
  Clientside ticking is only implemented for entities, block entities, and worlds.*
+
+If you want your component to **be notified of its provider being loaded and unloaded**, typically for advanced setup or cleanup,
+you can add the [`ServerLoadAwareComponent`](./cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/load/ServerLoadAwareComponent.java)
+or [`ClientLoadAwareComponent`](./cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/load/ClientLoadAwareComponent.java)
+(or both) and their "Unload" variants to your *component interface* (here, `IntComponent`). Just like with ticking,
+if you'd rather add the (un)load-aware interface to a single component subclass,
+**you have to use one of the specific methods provided in the individual modules**.
+
+```java
+class IncrementingIntComponent implements IntComponent, ServerLoadAwareComponent {
+    private int value;
+    @Override public void loadServerside() { this.value++; }
+    // implement everything else
+}
+```
+
+*Serverside load and unload is implemented for entities, block entities, chunks, worlds, and scoreboards.
+Clientside load and unload is only implemented for entities, block entities, and chunks.*
 
 The next step is to choose an identifier for your component, and to declare it as a custom property in your mod's metadata:
 
@@ -228,4 +267,4 @@ public static void useMagik(Entity provider) { // anything will work, as long as
 
 ## Test Mod
 A test mod for the API is available in this repository, under `src/testmod`. It makes uses of most features from the API.
-Its code is outlined in a secondary [readme](https://github.com/OnyxStudios/Cardinal-Components-API/blob/master/src/testmod/readme.md).
+Its code is outlined in a secondary [readme](./src/testmod/readme.md).
