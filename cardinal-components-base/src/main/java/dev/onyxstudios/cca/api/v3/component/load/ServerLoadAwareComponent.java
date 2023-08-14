@@ -20,7 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.tick;
+package dev.onyxstudios.cca.api.v3.component.load;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
@@ -28,18 +28,24 @@ import dev.onyxstudios.cca.internal.base.asm.CalledByAsm;
 import net.minecraft.util.Identifier;
 
 /**
- * A component that gets ticked alongside the provider it is attached to.
+ * A component that gets notified whenever the provider it is attached to gets loaded.
  *
  * <p>This interface must be visible at factory registration time - which means the class implementing it
  * must either be the parameter to {@link ComponentRegistryV3#getOrCreate(Identifier, Class)} or declared explicitly
  * using a dedicated method on the factory registry.
  *
- * <p>Not every provider supports client ticking. Check individual module documentation for more information.
+ * <p>Not every provider supports loading events. Check individual module documentation for more information.
  *
- * @see CommonTickingComponent
- * @see ServerTickingComponent
+ * @see ServerUnloadAwareComponent
  */
-public interface ClientTickingComponent extends Component {
+public interface ServerLoadAwareComponent extends Component {
+    /**
+     * Called after the provider of this component has been loaded.
+     *
+     * <p>The semantics of "loading" differ based on the provider.
+     * In <em>most</em> cases, this method will only be called once in an object's lifecycle,
+     * and it <em>should</em> be called as many times as the corresponding unloading event if applicable.
+     */
     @CalledByAsm
-    void clientTick();
+    void onLoadServerside();
 }

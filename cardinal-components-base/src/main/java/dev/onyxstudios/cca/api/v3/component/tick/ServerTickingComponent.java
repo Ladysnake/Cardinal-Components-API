@@ -24,6 +24,7 @@ package dev.onyxstudios.cca.api.v3.component.tick;
 
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
+import dev.onyxstudios.cca.internal.base.asm.CalledByAsm;
 import net.minecraft.util.Identifier;
 
 /**
@@ -37,5 +38,6 @@ import net.minecraft.util.Identifier;
  * @see CommonTickingComponent
  */
 public interface ServerTickingComponent extends Component {
+    @CalledByAsm
     void serverTick();
 }

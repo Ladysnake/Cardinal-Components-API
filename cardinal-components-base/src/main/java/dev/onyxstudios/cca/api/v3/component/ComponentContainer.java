@@ -24,8 +24,15 @@ package dev.onyxstudios.cca.api.v3.component;
 
 import com.demonwav.mcdev.annotations.CheckEnv;
 import com.demonwav.mcdev.annotations.Env;
+import dev.onyxstudios.cca.api.v3.component.load.ClientLoadAwareComponent;
+import dev.onyxstudios.cca.api.v3.component.load.ClientUnloadAwareComponent;
+import dev.onyxstudios.cca.api.v3.component.load.ServerLoadAwareComponent;
+import dev.onyxstudios.cca.api.v3.component.load.ServerUnloadAwareComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
+import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.api.v3.util.NbtSerializable;
 import dev.onyxstudios.cca.internal.base.GenericContainerBuilder;
+import dev.onyxstudios.cca.internal.base.asm.AsmGeneratedCallback;
 import dev.onyxstudios.cca.internal.base.asm.StaticComponentPluginBase;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.ApiStatus;
@@ -55,10 +62,26 @@ public interface ComponentContainer extends NbtSerializable {
     @Contract(mutates = "this")
     void copyFrom(ComponentContainer other);
 
+    @AsmGeneratedCallback(ServerTickingComponent.class)
     void tickServerComponents();
 
     @CheckEnv(Env.CLIENT)
+    @AsmGeneratedCallback(ClientTickingComponent.class)
     void tickClientComponents();
+
+    @AsmGeneratedCallback(ServerLoadAwareComponent.class)
+    void onServerLoad();
+
+    @AsmGeneratedCallback(ServerUnloadAwareComponent.class)
+    void onServerUnload();
+
+    @CheckEnv(Env.CLIENT)
+    @AsmGeneratedCallback(ClientLoadAwareComponent.class)
+    void onClientLoad();
+
+    @CheckEnv(Env.CLIENT)
+    @AsmGeneratedCallback(ClientUnloadAwareComponent.class)
+    void onClientUnload();
 
     /**
      * Reads this object's properties from a {@link NbtCompound}.

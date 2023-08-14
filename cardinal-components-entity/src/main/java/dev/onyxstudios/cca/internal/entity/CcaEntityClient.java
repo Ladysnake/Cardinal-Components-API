@@ -23,9 +23,11 @@
 package dev.onyxstudios.cca.internal.entity;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
@@ -33,7 +35,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.Objects;
 
-public final class CcaEntityClientNw {
+public final class CcaEntityClient {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             ClientPlayNetworking.registerGlobalReceiver(CardinalComponentsEntity.PACKET_ID, (client, handler, buffer, res) -> {
@@ -59,6 +61,10 @@ public final class CcaEntityClientNw {
                     throw e;
                 }
             });
+        }
+        if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {
+            ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> ((ComponentProvider) entity).getComponentContainer().onClientLoad());
+            ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> ((ComponentProvider) entity).getComponentContainer().onClientUnload());
         }
     }
 }

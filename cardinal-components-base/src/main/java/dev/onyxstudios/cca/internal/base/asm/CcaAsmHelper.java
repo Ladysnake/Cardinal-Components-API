@@ -26,15 +26,13 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import dev.onyxstudios.cca.api.v3.component.tick.ClientTickingComponent;
-import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent;
 import dev.onyxstudios.cca.internal.base.AbstractComponentContainer;
 import dev.onyxstudios.cca.internal.base.QualifiedComponentFactory;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.launch.common.FabricLauncherBase;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
@@ -50,8 +48,10 @@ import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,7 +68,7 @@ public final class CcaAsmHelper {
     public static final String COMPONENT_CONTAINER = Type.getInternalName(ComponentContainer.class);
     public static final String COMPONENT_TYPE = Type.getInternalName(ComponentKey.class);
     public static final String DYNAMIC_COMPONENT_CONTAINER_IMPL = Type.getInternalName(AbstractComponentContainer.class);
-    public static final String IDENTIFIER = (FabricLauncherBase.getLauncher() == null ? Identifier.class.getName() : FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960")).replace('.', '/');
+    public static final String IDENTIFIER = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960").replace('.', '/');
     public static final String EVENT = Type.getInternalName(Event.class);
     // generated references
     public static final String STATIC_COMPONENT_CONTAINER = "dev/onyxstudios/cca/_generated_/GeneratedComponentContainer";
@@ -77,12 +77,35 @@ public final class CcaAsmHelper {
     public static final String STATIC_CONTAINER_FACTORY = "dev/onyxstudios/cca/_generated_/GeneratedContainerFactory";
     public static final String ABSTRACT_COMPONENT_CONTAINER_CTOR_DESC;
 
+    private static final List<AsmGeneratedCallbackInfo> asmGeneratedCallbacks = findAsmComponentCallbacks();
+
+    record AsmGeneratedCallbackInfo(String containerCallbackName, Class<? extends Component> componentClass, String componentCallbackName) {}
+
     static {
         try {
             ABSTRACT_COMPONENT_CONTAINER_CTOR_DESC = Type.getConstructorDescriptor(AbstractComponentContainer.class.getConstructor());
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException("Failed to find one or more method descriptors", e);
         }
+    }
+
+    private static List<AsmGeneratedCallbackInfo> findAsmComponentCallbacks() {
+        List<AsmGeneratedCallbackInfo> asmGeneratedCallbacks = new ArrayList<>();
+        for (Method containerMethod : ComponentContainer.class.getMethods()) {
+            @Nullable AsmGeneratedCallback annotation = containerMethod.getAnnotation(AsmGeneratedCallback.class);
+            if (annotation != null) {
+                Class<? extends Component> componentClass = annotation.value();
+                boolean found = false;
+                for (Method componentMethod : componentClass.getDeclaredMethods()) {
+                    if (componentMethod.isAnnotationPresent(CalledByAsm.class)) {
+                        asmGeneratedCallbacks.add(new AsmGeneratedCallbackInfo(containerMethod.getName(), componentClass, componentMethod.getName()));
+                        found = true;
+                    }
+                }
+                if (!found) throw new IllegalStateException("No ASM-called method found in " + componentClass);
+            }
+        }
+        return asmGeneratedCallbacks;
     }
 
     public static Class<?> generateClass(ClassNode classNode) throws IOException {
@@ -116,8 +139,8 @@ public final class CcaAsmHelper {
         return identifier.toString()
             .replace(':', '$')
             .replace('/', '$')
-            .replace('.', '\u00A4' /*¤*/)
-            .replace('-', '\u00A3' /*£*/);
+            .replace('.', '¤')
+            .replace('-', '£');
     }
 
     public static String getStaticStorageGetterName(Identifier identifier) {
@@ -228,10 +251,12 @@ public final class CcaAsmHelper {
         init.visitVarInsn(Opcodes.ALOAD, 0);
         init.visitMethodInsn(Opcodes.INVOKESPECIAL, STATIC_COMPONENT_CONTAINER, "<init>", ABSTRACT_COMPONENT_CONTAINER_CTOR_DESC, false);
 
-        MethodVisitor serverTick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickServerComponents", "()V", null, null);
-        serverTick.visitCode();
-        MethodVisitor clientTick = classNode.visitMethod(Opcodes.ACC_PUBLIC, "tickClientComponents", "()V", null, null);
-        clientTick.visitCode();
+        Map<AsmGeneratedCallbackInfo, MethodVisitor> callbackMethods = new LinkedHashMap<>();
+        for (AsmGeneratedCallbackInfo callbackInfo : asmGeneratedCallbacks) {
+            MethodVisitor visitor = classNode.visitMethod(Opcodes.ACC_PUBLIC, callbackInfo.containerCallbackName(), "()V", null, null);
+            visitor.visitCode();
+            callbackMethods.put(callbackInfo, visitor);
+        }
 
         for (var entry : sorted.entrySet()) {
             Identifier identifier = entry.getKey().getId();
@@ -293,20 +318,27 @@ public final class CcaAsmHelper {
             getter.visitInsn(Opcodes.ARETURN);
             getter.visitEnd();
 
-            /* tick implementation */
-            if (ServerTickingComponent.class.isAssignableFrom(impl)) {
-                generateTickImpl(containerImplName, serverTick, componentFieldName, impl, componentFieldDescriptor, "serverTick");
-            }
-            if (ClientTickingComponent.class.isAssignableFrom(impl)) {
-                generateTickImpl(containerImplName, clientTick, componentFieldName, impl, componentFieldDescriptor, "clientTick");
+            /* no-arg callback implementations */
+            for (var e : callbackMethods.entrySet()) {
+                if (e.getKey().componentClass().isAssignableFrom(impl)) {
+                    generateCallbackImpl(
+                        containerImplName,
+                        e.getValue(),
+                        componentFieldName,
+                        impl,
+                        componentFieldDescriptor,
+                        e.getKey().componentCallbackName()
+                    );
+                }
             }
         }
         init.visitInsn(Opcodes.RETURN);
         init.visitEnd();
-        serverTick.visitInsn(Opcodes.RETURN);
-        serverTick.visitEnd();
-        clientTick.visitInsn(Opcodes.RETURN);
-        clientTick.visitEnd();
+
+        for (var e : callbackMethods.entrySet()) {
+            e.getValue().visitInsn(Opcodes.RETURN);
+            e.getValue().visitEnd();
+        }
 
         Class<? extends ComponentContainer> ret = generateClass(classNode).asSubclass(ComponentContainer.class);
 
@@ -331,7 +363,7 @@ public final class CcaAsmHelper {
         return ret;
     }
 
-    private static void generateTickImpl(String containerImplName, MethodVisitor tick, String componentFieldName, Class<? extends Component> impl, String componentFieldDescriptor, String target) {
+    private static void generateCallbackImpl(String containerImplName, MethodVisitor tick, String componentFieldName, Class<? extends Component> impl, String componentFieldDescriptor, String target) {
         tick.visitVarInsn(Opcodes.ALOAD, 0);
         // stack: <this>
         tick.visitFieldInsn(Opcodes.GETFIELD, containerImplName, componentFieldName, componentFieldDescriptor);

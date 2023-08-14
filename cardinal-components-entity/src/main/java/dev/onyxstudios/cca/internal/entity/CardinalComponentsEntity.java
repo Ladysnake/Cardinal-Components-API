@@ -30,6 +30,7 @@ import dev.onyxstudios.cca.api.v3.entity.PlayerCopyCallback;
 import dev.onyxstudios.cca.api.v3.entity.PlayerSyncCallback;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import dev.onyxstudios.cca.api.v3.entity.TrackingStartCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
@@ -56,6 +57,10 @@ public final class CardinalComponentsEntity {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
             TrackingStartCallback.EVENT.register(CardinalComponentsEntity::syncEntityComponents);
+        }
+        if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {
+            ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> ((ComponentProvider) entity).getComponentContainer().onServerLoad());
+            ServerEntityEvents.ENTITY_UNLOAD.register((entity, world) -> ((ComponentProvider) entity).getComponentContainer().onServerUnload());
         }
         PlayerCopyCallback.EVENT.register(CardinalComponentsEntity::copyData);
     }

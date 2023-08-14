@@ -20,26 +20,16 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.component.tick;
+package dev.onyxstudios.cca.internal.base.asm;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
-import dev.onyxstudios.cca.internal.base.asm.CalledByAsm;
-import net.minecraft.util.Identifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * A component that gets ticked alongside the provider it is attached to.
- *
- * <p>This interface must be visible at factory registration time - which means the class implementing it
- * must either be the parameter to {@link ComponentRegistryV3#getOrCreate(Identifier, Class)} or declared explicitly
- * using a dedicated method on the factory registry.
- *
- * <p>Not every provider supports client ticking. Check individual module documentation for more information.
- *
- * @see CommonTickingComponent
- * @see ServerTickingComponent
+ * Signals that the annotated method is called by an {@link AsmGeneratedCallback}
  */
-public interface ClientTickingComponent extends Component {
-    @CalledByAsm
-    void clientTick();
-}
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface CalledByAsm { }

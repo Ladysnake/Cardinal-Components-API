@@ -11,7 +11,7 @@
       "dev.onyxstudios.cca.internal.entity.CardinalComponentsEntity::init"
     ],
     "client": [
-      "dev.onyxstudios.cca.internal.entity.CcaEntityClientNw::initClient"
+      "dev.onyxstudios.cca.internal.entity.CcaEntityClient::initClient"
     ]
   },
   "custom": {

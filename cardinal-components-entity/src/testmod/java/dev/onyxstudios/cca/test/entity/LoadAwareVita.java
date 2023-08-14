@@ -22,30 +22,24 @@
  */
 package dev.onyxstudios.cca.test.entity;
 
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
-import dev.onyxstudios.cca.test.base.Vita;
-import net.fabricmc.api.ModInitializer;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import dev.onyxstudios.cca.api.v3.component.load.ServerLoadAwareComponent;
+import dev.onyxstudios.cca.api.v3.component.load.ServerUnloadAwareComponent;
+import dev.onyxstudios.cca.test.base.BaseVita;
 
-public class CcaEntityTestMod implements ModInitializer, EntityComponentInitializer {
+public class LoadAwareVita extends BaseVita implements ServerLoadAwareComponent, ServerUnloadAwareComponent {
+    private int loadCounter = 0;
 
-    public static final EntityType<TestEntity> TEST_ENTITY = EntityType.Builder.create(TestEntity::new, SpawnGroup.MISC).build("cca-entity-test");
-
-    @Override
-    public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.beginRegistration(PlayerEntity.class, Vita.KEY).impl(PlayerVita.class).end(PlayerVita::new);
-        registry.beginRegistration(ShulkerEntity.class, Vita.KEY).impl(LoadAwareVita.class).end(e -> new LoadAwareVita());
+    public int getLoadCounter() {
+        return loadCounter;
     }
 
     @Override
-    public void onInitialize() {
-        Registry.register(Registries.ENTITY_TYPE, new Identifier("cca-entity-test", "test"), TEST_ENTITY);
+    public void onLoadServerside() {
+        this.loadCounter++;
+    }
+
+    @Override
+    public void onUnloadServerside() {
+        this.loadCounter--;
     }
 }

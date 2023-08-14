@@ -23,10 +23,12 @@
 package dev.onyxstudios.cca.test.entity;
 
 import dev.onyxstudios.cca.test.base.Vita;
-import io.github.ladysnake.elmendorf.ElmendorfTestContext;
+import io.github.ladysnake.elmendorf.GameTestUtil;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.entity.Bucketable;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.ShulkerEntity;
 import net.minecraft.item.EntityBucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -35,11 +37,12 @@ import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 public class CcaEntityTestSuite implements FabricGameTest {
     @GameTest(templateName = EMPTY_STRUCTURE)
     public void bucketableWorks(TestContext ctx) {
-        ServerPlayerEntity player = ((ElmendorfTestContext) ctx).spawnServerPlayer(1, 0, 1);
+        ServerPlayerEntity player = ctx.spawnServerPlayer(1, 0, 1);
         player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
         BlockPos pos = new BlockPos(2, 0, 2);
         var axolotl = ctx.spawnMob(EntityType.AXOLOTL, pos);
@@ -47,6 +50,30 @@ public class CcaEntityTestSuite implements FabricGameTest {
         Bucketable.tryBucket(player, Hand.MAIN_HAND, axolotl);
         ((EntityBucketItem) Items.AXOLOTL_BUCKET).onEmptied(player, ctx.getWorld(), player.getStackInHand(Hand.MAIN_HAND), ctx.getAbsolutePos(pos));
         ctx.expectEntityWithDataEnd(pos, EntityType.AXOLOTL, a -> a.getComponent(Vita.KEY).getVitality(), 3);
+    }
+
+    @GameTest(templateName = EMPTY_STRUCTURE)
+    public void loadEventsWork(TestContext ctx) {
+        ShulkerEntity shulker = new ShulkerEntity(EntityType.SHULKER, ctx.getWorld());
+        Vec3d vec3d = ctx.getAbsolute(new Vec3d(1, 0, 1));
+        shulker.refreshPositionAndAngles(vec3d.x, vec3d.y, vec3d.z, shulker.getYaw(), shulker.getPitch());
+        GameTestUtil.assertTrue(
+            "Load counter should not be incremented until the entity joins the world",
+            ((LoadAwareVita) Vita.get(shulker)).getLoadCounter() == 0
+        );
+        ctx.getWorld().spawnEntity(shulker);
+        GameTestUtil.assertTrue(
+            "Load counter should be incremented once when the entity joins the world",
+            ((LoadAwareVita) Vita.get(shulker)).getLoadCounter() == 1
+        );
+        shulker.remove(Entity.RemovalReason.DISCARDED);
+        ctx.waitAndRun(1, () -> {
+            GameTestUtil.assertTrue(
+                "Load counter should be decremented when the entity leaves the world",
+                ((LoadAwareVita) Vita.get(shulker)).getLoadCounter() == 0
+            );
+            ctx.complete();
+        });
     }
 
     @GameTest(templateName = EMPTY_STRUCTURE)
