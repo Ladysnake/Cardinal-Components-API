@@ -22,6 +22,8 @@ allprojects {
     chenille {
         javaVersion = 17
         license = "MIT"
+        displayName = providers.gradleProperty("display_name").get()
+        owners = providers.gradleProperty("owners").get()
         configureTestmod {
             withBaseTestRuns()
         }
