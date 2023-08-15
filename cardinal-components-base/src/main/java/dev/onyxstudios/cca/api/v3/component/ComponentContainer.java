@@ -69,16 +69,20 @@ public interface ComponentContainer extends NbtSerializable {
     @AsmGeneratedCallback(ClientTickingComponent.class)
     void tickClientComponents();
 
+    @ApiStatus.Experimental
     @AsmGeneratedCallback(ServerLoadAwareComponent.class)
     void onServerLoad();
 
+    @ApiStatus.Experimental
     @AsmGeneratedCallback(ServerUnloadAwareComponent.class)
     void onServerUnload();
 
+    @ApiStatus.Experimental
     @CheckEnv(Env.CLIENT)
     @AsmGeneratedCallback(ClientLoadAwareComponent.class)
     void onClientLoad();
 
+    @ApiStatus.Experimental
     @CheckEnv(Env.CLIENT)
     @AsmGeneratedCallback(ClientUnloadAwareComponent.class)
     void onClientUnload();

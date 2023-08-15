@@ -41,7 +41,6 @@ If you have questions or need help with this library, you can also join the [Lad
 - 📤 Synchronize data with a single helper interface
 - 👥 Choose how your components are copied when a player respawns
 - ⏲️ Tick your components alongside their target
-- 🕯️ Implement advanced initialization or cleanup behaviors
 - 🛠️ Fine-tune everything so that it fits your needs
 - ☄️ And enjoy the blazing speed of ASM-generated extensions
 
@@ -166,7 +165,8 @@ class IncrementingIntComponent implements IntComponent, ServerLoadAwareComponent
 ```
 
 *Serverside load and unload is implemented for entities, block entities, chunks, worlds, and scoreboards.
-Clientside load and unload is only implemented for entities, block entities, and chunks.*
+Clientside load and unload is only implemented for entities, block entities, and chunks. This is an experimental feature,
+any feedback welcome.*
 
 The next step is to choose an identifier for your component, and to declare it as a custom property in your mod's metadata:
 
