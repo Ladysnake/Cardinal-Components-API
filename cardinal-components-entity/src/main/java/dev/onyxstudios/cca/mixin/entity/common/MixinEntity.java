@@ -26,9 +26,12 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.C2SComponentPacketWriter;
+import dev.onyxstudios.cca.api.v3.component.sync.C2SMessagingComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.entity.CardinalComponentsEntity;
 import dev.onyxstudios.cca.internal.entity.CardinalEntityInternals;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
@@ -95,6 +98,7 @@ public abstract class MixinEntity implements ComponentProvider {
         return List.of();
     }
 
+    @SuppressWarnings("AddedMixinMembersNamePattern")   // it's okay, we have custom types in the descriptor
     @Nullable
     @Override
     public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
@@ -105,4 +109,13 @@ public abstract class MixinEntity implements ComponentProvider {
         return new CustomPayloadS2CPacket(CardinalComponentsEntity.PACKET_ID, buf);
     }
 
+    @SuppressWarnings("AddedMixinMembersNamePattern")   // it's okay, we have custom types in the descriptor
+    @Override
+    public <C extends C2SMessagingComponent> void sendC2SMessage(ComponentKey<? super C> key, C2SComponentPacketWriter writer) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeInt(this.getId());
+        buf.writeIdentifier(key.getId());
+        writer.writeC2SComponentMessage(buf);
+        ClientPlayNetworking.send(CardinalComponentsEntity.PACKET_ID, buf);
+    }
 }

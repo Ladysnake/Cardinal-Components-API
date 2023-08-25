@@ -25,20 +25,26 @@ package dev.onyxstudios.cca.internal.entity;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.sync.C2SMessagingComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerCopyCallback;
 import dev.onyxstudios.cca.api.v3.entity.PlayerSyncCallback;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import dev.onyxstudios.cca.api.v3.entity.TrackingStartCallback;
+import dev.onyxstudios.cca.internal.base.ComponentsInternals;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
 
+import java.util.Objects;
 import java.util.Set;
 
 public final class CardinalComponentsEntity {
@@ -52,11 +58,47 @@ public final class CardinalComponentsEntity {
      * called on the game thread.
      */
     public static final Identifier PACKET_ID = new Identifier("cardinal-components", "entity_sync");
+    /**
+     * {@link CustomPayloadC2SPacket} channel for C2S entity component messages.
+     *
+     * <p> Packets emitted on this channel must begin with, in order, the {@link Entity#getId() entity id} (as an int),
+     * and the {@link ComponentKey#getId() component's type} (as an Identifier).
+     *
+     * <p> Components synchronized through this channel will have {@linkplain C2SMessagingComponent#handleMessageFromClient(ServerPlayerEntity, PacketByteBuf)}
+     * called on the game thread.
+     */
+    public static final Identifier C2S_PACKET_ID = new Identifier("cardinal-components", "entity_message_c2s");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
             TrackingStartCallback.EVENT.register(CardinalComponentsEntity::syncEntityComponents);
+            ServerPlayNetworking.registerGlobalReceiver(CardinalComponentsEntity.C2S_PACKET_ID, (server, player, handler, buffer, res) -> {
+                try {
+                    int entityId = buffer.readInt();
+                    Identifier componentTypeId = buffer.readIdentifier();
+                    ComponentKey<?> key = ComponentRegistry.get(componentTypeId);
+                    if (key == null) {
+                        return;
+                    }
+                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                    server.execute(() -> {
+                        try {
+                            if (key.maybeGet(Objects.requireNonNull(player.getWorld()).getEntityById(entityId))
+                                .orElse(null) instanceof C2SMessagingComponent cc) {
+                                if (cc.mayHandleMessageFromClient(player)) {
+                                    cc.handleMessageFromClient(player, copy);
+                                }
+                            }
+                        } finally {
+                            copy.release();
+                        }
+                    });
+                } catch (Exception e) {
+                    ComponentsInternals.LOGGER.error("Error while reading entity component message from network", e);
+                    throw e;
+                }
+            });
         }
         if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {
             ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> ((ComponentProvider) entity).getComponentContainer().onServerLoad());
