@@ -23,13 +23,10 @@
 package dev.onyxstudios.cca.api.v3.component;
 
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.component.sync.C2SComponentPacketWriter;
-import dev.onyxstudios.cca.api.v3.component.sync.C2SMessagingComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -72,17 +69,5 @@ public interface ComponentProvider extends ComponentAccess {
     @Nullable
     default <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
         return null;
-    }
-
-    /**
-     * Produces and sends a C2S update packet using the given information.
-     *
-     * @param key the key describing the component being sent an update
-     * @param writer a {@link C2SComponentPacketWriter} writing the component's data to the packet
-     * @since 5.3.0
-     */
-    @ApiStatus.Experimental
-    default <C extends C2SMessagingComponent> void sendC2SMessage(ComponentKey<? super C> key, C2SComponentPacketWriter writer) {
-        // NO-OP
     }
 }

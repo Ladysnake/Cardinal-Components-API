@@ -27,7 +27,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.component.sync.C2SMessagingComponent;
+import dev.onyxstudios.cca.api.v3.entity.C2SSelfMessagingComponent;
 import dev.onyxstudios.cca.api.v3.entity.PlayerCopyCallback;
 import dev.onyxstudios.cca.api.v3.entity.PlayerSyncCallback;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
@@ -44,7 +44,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
 
-import java.util.Objects;
 import java.util.Set;
 
 public final class CardinalComponentsEntity {
@@ -59,39 +58,34 @@ public final class CardinalComponentsEntity {
      */
     public static final Identifier PACKET_ID = new Identifier("cardinal-components", "entity_sync");
     /**
-     * {@link CustomPayloadC2SPacket} channel for C2S entity component messages.
+     * {@link CustomPayloadC2SPacket} channel for C2S player component messages.
      *
-     * <p> Packets emitted on this channel must begin with, in order, the {@link Entity#getId() entity id} (as an int),
-     * and the {@link ComponentKey#getId() component's type} (as an Identifier).
+     * <p> Packets emitted on this channel must begin with the {@link ComponentKey#getId() component's type} (as an Identifier).
      *
-     * <p> Components synchronized through this channel will have {@linkplain C2SMessagingComponent#handleMessageFromClient(ServerPlayerEntity, PacketByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain C2SSelfMessagingComponent#handleC2SMessage(PacketByteBuf)}
      * called on the game thread.
      */
-    public static final Identifier C2S_PACKET_ID = new Identifier("cardinal-components", "entity_message_c2s");
+    public static final Identifier C2S_SELF_PACKET_ID = new Identifier("cardinal-components", "player_message_c2s");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
             TrackingStartCallback.EVENT.register(CardinalComponentsEntity::syncEntityComponents);
-            ServerPlayNetworking.registerGlobalReceiver(CardinalComponentsEntity.C2S_PACKET_ID, (server, player, handler, buffer, res) -> {
+            ServerPlayNetworking.registerGlobalReceiver(CardinalComponentsEntity.C2S_SELF_PACKET_ID, (server, player, handler, buffer, res) -> {
                 try {
-                    int entityId = buffer.readInt();
                     Identifier componentTypeId = buffer.readIdentifier();
                     ComponentKey<?> key = ComponentRegistry.get(componentTypeId);
                     if (key == null) {
                         return;
                     }
-                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
+                    buffer.retain();
                     server.execute(() -> {
                         try {
-                            if (key.maybeGet(Objects.requireNonNull(player.getWorld()).getEntityById(entityId))
-                                .orElse(null) instanceof C2SMessagingComponent cc) {
-                                if (cc.mayHandleMessageFromClient(player)) {
-                                    cc.handleMessageFromClient(player, copy);
-                                }
+                            if (key.getNullable(player) instanceof C2SSelfMessagingComponent c) {
+                                c.handleC2SMessage(buffer);
                             }
                         } finally {
-                            copy.release();
+                            buffer.release();
                         }
                     });
                 } catch (Exception e) {

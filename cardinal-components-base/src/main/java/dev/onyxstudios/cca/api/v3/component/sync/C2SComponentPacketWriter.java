@@ -22,18 +22,21 @@
  */
 package dev.onyxstudios.cca.api.v3.component.sync;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import net.minecraft.network.PacketByteBuf;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
 /**
- * @see dev.onyxstudios.cca.api.v3.component.ComponentKey#sendToServer(ComponentProvider, C2SComponentPacketWriter)
- * @see C2SMessagingComponent
+ * @since 5.3.0
  */
 @ApiStatus.Experimental
 @FunctionalInterface
 public interface C2SComponentPacketWriter {
+    /**
+     * A no-op writer, for when simply sending an empty message is enough
+     */
+    C2SComponentPacketWriter EMPTY = buf -> {};
+
     @Contract(mutates = "param")
-    void writeC2SComponentMessage(PacketByteBuf buf);
+    void writeC2SPacket(PacketByteBuf buf);
 }

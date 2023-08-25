@@ -22,10 +22,7 @@
  */
 package dev.onyxstudios.cca.api.v3.component;
 
-import com.demonwav.mcdev.annotations.CheckEnv;
-import com.demonwav.mcdev.annotations.Env;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.component.sync.C2SComponentPacketWriter;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
@@ -202,11 +199,6 @@ public abstract class ComponentKey<C extends Component> {
                 player.networkHandler.sendPacket(packet);
             }
         }
-    }
-
-    @CheckEnv(Env.CLIENT)
-    public void sendToServer(ComponentProvider provider, C2SComponentPacketWriter writer) {
-        provider.sendC2SMessage(this, writer);
     }
 
     @Override
