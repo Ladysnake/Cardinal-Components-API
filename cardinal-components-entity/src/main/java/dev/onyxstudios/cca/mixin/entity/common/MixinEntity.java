@@ -57,7 +57,7 @@ public abstract class MixinEntity implements ComponentProvider {
     private ComponentContainer components;
 
     @Shadow
-    public World world;
+    private World world;
 
     @Shadow public abstract int getId();
 
@@ -95,6 +95,7 @@ public abstract class MixinEntity implements ComponentProvider {
         return List.of();
     }
 
+    @SuppressWarnings("AddedMixinMembersNamePattern")   // it's okay, we have custom types in the descriptor
     @Nullable
     @Override
     public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
@@ -104,5 +105,4 @@ public abstract class MixinEntity implements ComponentProvider {
         writer.writeSyncPacket(buf, recipient);
         return new CustomPayloadS2CPacket(CardinalComponentsEntity.PACKET_ID, buf);
     }
-
 }

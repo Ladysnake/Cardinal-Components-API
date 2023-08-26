@@ -88,6 +88,26 @@ public interface ComponentContainer extends NbtSerializable {
     void onClientUnload();
 
     /**
+     * Reverse-lookup for a key based on a component
+     *
+     * <p>If a component instance is associated to multiple keys, this will return the first one found.
+     *
+     * @param component the component of which to look up the key
+     * @return the found key, or {@code null} if the component is not part of this container
+     * @since 5.3.0
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    default ComponentKey<?> getKey(Component component) {
+        for (ComponentKey<?> key : keys()) {
+            if (key.getInternal(this) == component) {
+                return key;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Reads this object's properties from a {@link NbtCompound}.
      *
      * @param tag a {@code NbtCompound} on which this object's serializable data has been written
