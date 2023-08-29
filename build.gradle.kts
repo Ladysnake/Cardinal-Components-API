@@ -40,10 +40,6 @@ allprojects {
                 includeGroupByRegex("dev\\.onyxstudios.*")
             }
         }
-        maven {
-            name = "JitPack"
-            url = URI("https://jitpack.io")
-        }
     }
 
     dependencies {
