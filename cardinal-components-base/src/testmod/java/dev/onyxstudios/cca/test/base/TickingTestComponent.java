@@ -30,7 +30,10 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 
 public class TickingTestComponent implements ServerTickingComponent, ClientTickingComponent {
-    public static final ComponentKey<TickingTestComponent> KEY = ComponentRegistry.getOrCreate(new Identifier("cca-base-test", "ticking"), TickingTestComponent.class);
+    public static final ComponentKey<TickingTestComponent> KEY = ComponentRegistry.getOrCreate(
+        new Identifier("cca-base-test", "ticking"),
+        TickingTestComponent.class
+    );
 
     private int clientTicks;
     private int serverTicks;

@@ -59,10 +59,6 @@ allprojects {
         compileOnly("org.jetbrains:annotations:24.0.1")
     }
 
-    repositories {
-        mavenLocal()
-    }
-
     tasks.processResources {
         inputs.property("version", project.version)
 

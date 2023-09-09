@@ -20,17 +20,18 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.kotlin
+package dev.onyxstudios.cca.test.kotlin
 
-import dev.onyxstudios.cca.api.v3.component.Component
-import dev.onyxstudios.cca.api.v3.component.ComponentAccess
-import dev.onyxstudios.cca.api.v3.component.ComponentKey
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
-import net.minecraft.util.Identifier
-import kotlin.reflect.KProperty
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer
+import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy.ALWAYS_COPY
+import dev.onyxstudios.cca.api.v3.kotlin.register
+import dev.onyxstudios.cca.api.v3.kotlin.respawnStrategy
 
-inline fun <reified C: Component> componentKey(id: Identifier): ComponentKey<C> = ComponentRegistry.getOrCreate(id, C::class.java)
-
-operator fun <C: Component> ComponentKey<C>.getValue(self: ComponentAccess, prop: KProperty<*>): C {
-    return this.get(self)
+object KTestComponents : EntityComponentInitializer {
+    override fun registerEntityComponentFactories(registry: EntityComponentFactoryRegistry) {
+        registry.register(TestKomponent.KEY, TestKomponent::Impl) {
+            respawnStrategy(ALWAYS_COPY)
+        }
+    }
 }

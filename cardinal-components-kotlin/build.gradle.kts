@@ -1,27 +1,22 @@
-/*
- * Cardinal-Components-API
- * Copyright (C) 2019-2023 OnyxStudios
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
- * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
- * OR OTHER DEALINGS IN THE SOFTWARE.
- */
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+
+plugins {
+    kotlin("jvm") version "1.9.10"
+    kotlin("plugin.serialization") version "1.9.10"
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JVM_17)
+        freeCompilerArgs.add("-Xjvm-default=all")
+        freeCompilerArgs.add("-Xlambdas=indy")
+    }
+}
+
 dependencies {
     api(project(path = ":cardinal-components-base", configuration = "namedElements"))
     api(project(path = ":cardinal-components-entity", configuration = "namedElements"))
     modImplementation("net.fabricmc:fabric-language-kotlin:1.10.10+kotlin.1.9.10")
+    modApi("io.github.natanfudge:kotlinx-serialization-minecraft:2.0.0+1.20.1")
+    testmodImplementation(rootProject.project(":cardinal-components-base").sourceSets.testmod.get().output)
 }

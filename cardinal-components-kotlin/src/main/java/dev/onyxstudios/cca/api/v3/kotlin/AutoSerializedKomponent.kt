@@ -23,14 +23,18 @@
 package dev.onyxstudios.cca.api.v3.kotlin
 
 import dev.onyxstudios.cca.api.v3.component.Component
-import dev.onyxstudios.cca.api.v3.component.ComponentAccess
-import dev.onyxstudios.cca.api.v3.component.ComponentKey
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
-import net.minecraft.util.Identifier
-import kotlin.reflect.KProperty
+import dev.onyxstudios.cca.impl.v3.kotlin.KomponentSerializer
+import net.minecraft.nbt.NbtCompound
 
-inline fun <reified C: Component> componentKey(id: Identifier): ComponentKey<C> = ComponentRegistry.getOrCreate(id, C::class.java)
+/**
+ * @see AutoSerialize
+ */
+interface AutoSerializedKomponent : Component {
+    override fun readFromNbt(tag: NbtCompound) {
+        KomponentSerializer.get(this::class).readFromNbt(this, tag)
+    }
 
-operator fun <C: Component> ComponentKey<C>.getValue(self: ComponentAccess, prop: KProperty<*>): C {
-    return this.get(self)
+    override fun writeToNbt(tag: NbtCompound) {
+        KomponentSerializer.get(this::class).writeToNbt(this, tag)
+    }
 }

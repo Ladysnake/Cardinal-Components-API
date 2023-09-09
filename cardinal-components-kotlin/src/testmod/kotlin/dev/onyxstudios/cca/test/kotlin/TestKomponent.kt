@@ -20,17 +20,42 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.api.v3.kotlin
+package dev.onyxstudios.cca.test.kotlin
 
 import dev.onyxstudios.cca.api.v3.component.Component
-import dev.onyxstudios.cca.api.v3.component.ComponentAccess
 import dev.onyxstudios.cca.api.v3.component.ComponentKey
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
+import dev.onyxstudios.cca.api.v3.component.load.ServerLoadAwareComponent
+import dev.onyxstudios.cca.api.v3.kotlin.AutoSerialize
+import dev.onyxstudios.cca.api.v3.kotlin.AutoSyncedKomponent
+import dev.onyxstudios.cca.api.v3.kotlin.componentKey
+import dev.onyxstudios.cca.api.v3.kotlin.getValue
+import net.minecraft.entity.Entity
+import net.minecraft.entity.LivingEntity
+import net.minecraft.network.PacketByteBuf
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.Identifier
-import kotlin.reflect.KProperty
 
-inline fun <reified C: Component> componentKey(id: Identifier): ComponentKey<C> = ComponentRegistry.getOrCreate(id, C::class.java)
+interface TestKomponent : Component {
+    val mana: Int
 
-operator fun <C: Component> ComponentKey<C>.getValue(self: ComponentAccess, prop: KProperty<*>): C {
-    return this.get(self)
+    companion object {
+        val KEY: ComponentKey<TestKomponent> = componentKey<TestKomponent>(Identifier("cca-kotlin-test", "ktest"))
+        val Entity.testKomponent by KEY
+    }
+
+    class Impl(owner: LivingEntity) : TestKomponent, ServerLoadAwareComponent, AutoSyncedKomponent {
+        @AutoSerialize(sync = true)
+        override var mana by KEY.autoSync(owner, -1)
+
+        @AutoSerialize
+        private var x = "test"
+
+        override fun writeSyncPacket(buf: PacketByteBuf, recipient: ServerPlayerEntity) {
+            super.writeSyncPacket(buf, recipient)
+        }
+
+        override fun loadServerside() {
+            if (mana == -1) mana = 10
+        }
+    }
 }
