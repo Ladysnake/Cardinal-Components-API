@@ -35,6 +35,7 @@ allprojects {
             url = URI("https://maven.ladysnake.org/releases")
             content {
                 includeGroup("io.github.ladysnake")
+                includeGroup("org.ladysnake")
                 includeGroupByRegex("dev\\.emi.*")
                 includeGroupByRegex("dev\\.onyxstudios.*")
             }
@@ -55,7 +56,7 @@ allprojects {
         modImplementation(fabricApi.module("fabric-lifecycle-events-v1", fabricApiVersion))
 
         modCompileOnly(fabricApi.module("fabric-gametest-api-v1", fabricApiVersion))
-        modLocalImplementation("io.github.ladysnake:elmendorf:${props["elmendorf_version"]}")
+        modLocalImplementation("org.ladysnake:elmendorf:${props["elmendorf_version"]}")
 
         compileOnly("com.google.code.findbugs:jsr305:3.0.2")
         compileOnly("com.demonwav.mcdev:annotations:1.0")

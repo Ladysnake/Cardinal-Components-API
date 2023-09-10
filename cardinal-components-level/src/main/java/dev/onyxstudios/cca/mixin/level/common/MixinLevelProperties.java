@@ -33,11 +33,12 @@ import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.level.CardinalComponentsLevel;
 import dev.onyxstudios.cca.internal.level.StaticLevelComponentPlugin;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.boss.dragon.EnderDragonFight;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -97,7 +98,7 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Com
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
-        return new CustomPayloadS2CPacket(CardinalComponentsLevel.PACKET_ID, buf);
+        return (CustomPayloadS2CPacket) ServerPlayNetworking.createS2CPacket(CardinalComponentsLevel.PACKET_ID, buf);
     }
 
 }

@@ -23,13 +23,13 @@
 package dev.onyxstudios.componenttest.tests;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentAccess;
-import io.github.ladysnake.elmendorf.GameTestUtil;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 import net.minecraft.util.math.BlockPos;
+import org.ladysnake.elmendorf.GameTestUtil;
 
 import java.util.Objects;
 

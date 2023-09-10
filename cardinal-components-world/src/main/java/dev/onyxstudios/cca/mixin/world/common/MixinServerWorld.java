@@ -28,8 +28,9 @@ import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.world.CardinalComponentsWorld;
 import dev.onyxstudios.cca.internal.world.ComponentPersistentState;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentStateManager;
@@ -56,11 +57,15 @@ public abstract class MixinServerWorld extends MixinWorld {
 
     @Inject(at = @At("RETURN"), method = "<init>*")
     private void constructor(CallbackInfo ci) {
-        this.getPersistentStateManager().getOrCreate(
-            tag -> ComponentPersistentState.fromNbt(this.components, tag),
-            () -> new ComponentPersistentState(this.components),
-            PERSISTENT_STATE_KEY
-        );
+        try {
+            ComponentPersistentState.LOADING.set(true);
+            this.getPersistentStateManager().getOrCreate(
+                ComponentPersistentState.getType(this.components),
+                PERSISTENT_STATE_KEY
+            );
+        } finally {
+            ComponentPersistentState.LOADING.set(false);
+        }
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
@@ -79,6 +84,6 @@ public abstract class MixinServerWorld extends MixinWorld {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
-        return new CustomPayloadS2CPacket(CardinalComponentsWorld.PACKET_ID, buf);
+        return (CustomPayloadS2CPacket) ServerPlayNetworking.createS2CPacket(CardinalComponentsWorld.PACKET_ID, buf);
     }
 }

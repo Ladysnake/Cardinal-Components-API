@@ -30,8 +30,9 @@ import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.scoreboard.CardinalComponentsScoreboard;
 import dev.onyxstudios.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -84,7 +85,7 @@ public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
         buf.writeString(this.getName());
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
-        return new CustomPayloadS2CPacket(CardinalComponentsScoreboard.TEAM_PACKET_ID, buf);
+        return (CustomPayloadS2CPacket) ServerPlayNetworking.createS2CPacket(CardinalComponentsScoreboard.TEAM_PACKET_ID, buf);
     }
 
 }

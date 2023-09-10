@@ -25,6 +25,7 @@ package dev.onyxstudios.cca.mixin.entity.common;
 import dev.onyxstudios.cca.api.v3.entity.PlayerSyncCallback;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,7 +42,7 @@ public abstract class MixinPlayerManager {
                     target = "Lnet/minecraft/server/network/ServerPlayerEntity;getStatusEffects()Ljava/util/Collection;"
             )
     )
-    private void onPlayerLogIn(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
+    private void onPlayerLogIn(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
         PlayerSyncCallback.EVENT.invoker().onPlayerSync(player);
     }
 

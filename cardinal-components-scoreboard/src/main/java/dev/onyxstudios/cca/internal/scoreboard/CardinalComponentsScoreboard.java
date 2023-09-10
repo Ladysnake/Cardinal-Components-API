@@ -30,7 +30,7 @@ import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.Identifier;
 

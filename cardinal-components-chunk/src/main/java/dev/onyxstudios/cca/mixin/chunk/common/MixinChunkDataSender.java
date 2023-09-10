@@ -20,22 +20,22 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package dev.onyxstudios.cca.test.level;
+package dev.onyxstudios.cca.mixin.chunk.common;
 
-import dev.onyxstudios.cca.test.base.TickingTestComponent;
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-import net.minecraft.test.GameTest;
-import net.minecraft.test.TestContext;
-import org.ladysnake.elmendorf.GameTestUtil;
+import dev.onyxstudios.cca.api.v3.chunk.ChunkSyncCallback;
+import net.minecraft.server.network.ChunkDataSender;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.chunk.WorldChunk;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public class CcaLevelTestSuite implements FabricGameTest {
-    @GameTest(templateName = EMPTY_STRUCTURE)
-    public void levelComponentsTick(TestContext ctx) {
-        int baseTicks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
-        ctx.waitAndRun(5, () -> {
-            int ticks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
-            GameTestUtil.assertTrue("Component should tick 5 times", ticks - baseTicks == 5);
-            ctx.complete();
-        });
+@Mixin(ChunkDataSender.class)
+public abstract class MixinChunkDataSender {
+    @Inject(method = "sendChunkData", at = @At("RETURN"))
+    private static void sendChunkComponentsPackets(ServerPlayNetworkHandler handler, ServerWorld world, WorldChunk chunk, CallbackInfo ci) {
+        ChunkSyncCallback.EVENT.invoker().onChunkSync(handler.player, chunk);
     }
 }

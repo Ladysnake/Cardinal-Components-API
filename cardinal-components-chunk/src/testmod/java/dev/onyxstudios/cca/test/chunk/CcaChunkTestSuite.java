@@ -25,7 +25,6 @@ package dev.onyxstudios.cca.test.chunk;
 import dev.onyxstudios.cca.test.base.LoadAwareTestComponent;
 import dev.onyxstudios.cca.test.base.TickingTestComponent;
 import dev.onyxstudios.cca.test.base.Vita;
-import io.github.ladysnake.elmendorf.GameTestUtil;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.test.GameTest;
@@ -35,6 +34,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.ChunkSerializer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
+import org.ladysnake.elmendorf.GameTestUtil;
 
 public class CcaChunkTestSuite implements FabricGameTest {
     @GameTest(templateName = EMPTY_STRUCTURE)

@@ -7,10 +7,10 @@
     "common.MixinBlockDataObject",
     "common.MixinBlockEntity",
     "common.MixinBlockStateArgument",
+    "common.MixinChunkDataSender",
     "common.MixinChunkHolder",
     "common.MixinFallingBlockEntity",
     "common.MixinServerPlayerEntity",
-    "common.MixinThreadedAnvilChunkStorage",
     "common.MixinWorldChunk"
   ],
   "client": [

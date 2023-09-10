@@ -25,7 +25,6 @@ package dev.onyxstudios.cca.test.block;
 import dev.onyxstudios.cca.test.base.LoadAwareTestComponent;
 import dev.onyxstudios.cca.test.base.TickingTestComponent;
 import dev.onyxstudios.cca.test.base.Vita;
-import io.github.ladysnake.elmendorf.GameTestUtil;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -37,6 +36,7 @@ import net.minecraft.test.TestContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
+import org.ladysnake.elmendorf.GameTestUtil;
 
 import java.util.Objects;
 

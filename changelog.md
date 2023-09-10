@@ -1,6 +1,8 @@
 ------------------------------------------------------
 Version 5.3.0
 ------------------------------------------------------
+Updated to 1.20.2
+
 **Additions**
 - Added load- and unload-aware components as an experimental feature
   - This can be used to implement advanced initialization and cleanup 🧽

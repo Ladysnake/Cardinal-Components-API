@@ -29,8 +29,9 @@ import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.internal.chunk.CardinalComponentsChunk;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -78,7 +79,7 @@ public abstract class MixinWorldChunk extends Chunk implements ComponentProvider
         buf.writeInt(pos.z);
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
-        return new CustomPayloadS2CPacket(CardinalComponentsChunk.PACKET_ID, buf);
+        return (CustomPayloadS2CPacket) ServerPlayNetworking.createS2CPacket(CardinalComponentsChunk.PACKET_ID, buf);
     }
 
     @Inject(method = "<init>(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/chunk/ProtoChunk;Lnet/minecraft/world/chunk/WorldChunk$EntityLoader;)V", at = @At("RETURN"))

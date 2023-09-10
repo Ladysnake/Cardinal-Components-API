@@ -31,12 +31,13 @@ import dev.onyxstudios.cca.internal.CardinalComponentsBlock;
 import dev.onyxstudios.cca.internal.block.CardinalBlockInternals;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -125,7 +126,7 @@ public abstract class MixinBlockEntity implements ComponentProvider {
         buf.writeBlockPos(this.getPos());
         buf.writeIdentifier(key.getId());
         writer.writeSyncPacket(buf, recipient);
-        return new CustomPayloadS2CPacket(CardinalComponentsBlock.PACKET_ID, buf);
+        return (CustomPayloadS2CPacket) ServerPlayNetworking.createS2CPacket(CardinalComponentsBlock.PACKET_ID, buf);
     }
 
 }
