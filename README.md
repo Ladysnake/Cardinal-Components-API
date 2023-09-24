@@ -15,7 +15,7 @@ A components API for Quilt and Fabric that is easy, modular, and extremely fast.
 *Cardinal Components API is a library for Minecraft mods to create data
 components that can be attached to various providers. Those components
 provide a standardized interface for mods to interact with otherwise opaque
-objects and behaviours, thereby helping both mod creation and compatibility.*
+objects and behaviours, thereby helping both mod creation and compatibility.* [^1]
 
 
 **TL;DR: It allows you to attach data to things**
@@ -271,3 +271,5 @@ public static void useMagik(Entity provider) { // anything will work, as long as
 ## Test Mod
 A test mod for the API is available in this repository, under `src/testmod`. It makes uses of most features from the API.
 Its code is outlined in a secondary [readme](./src/testmod/readme.md).
+
+[^1]: this description has been made exaggeratedly convoluted for comedic effects.
