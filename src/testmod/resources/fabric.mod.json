@@ -7,19 +7,19 @@
     "version": "${version}",
     "entrypoints": {
         "main": [
-          "dev.onyxstudios.componenttest.content.CardinalComponentsTest::init"
+          "org.ladysnake.componenttest.content.CardinalComponentsTest::init"
         ],
         "client": [
-          "dev.onyxstudios.componenttest.content.CCATestClient::clientInit"
+          "org.ladysnake.componenttest.content.CCATestClient::clientInit"
         ],
         "cardinal-components:static-init": [
-          "dev.onyxstudios.componenttest.content.TestStaticComponentInitializer"
+          "org.ladysnake.componenttest.content.TestStaticComponentInitializer"
         ],
         "cardinal-components": [
-          "dev.onyxstudios.componenttest.content.TestComponents"
+          "org.ladysnake.componenttest.content.TestComponents"
         ],
         "fabric-gametest": [
-          "dev.onyxstudios.componenttest.tests.CcaTestSuite"
+          "org.ladysnake.componenttest.tests.CcaTestSuite"
         ]
     },
     "custom": {

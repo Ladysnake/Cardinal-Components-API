@@ -1,3 +1,11 @@
+
+------------------------------------------------------
+Version 6.0.0
+------------------------------------------------------
+**Changes**
+- Migrate all packages from `dev.onyxstudios` to `org.ladysnake`
+- Update documentation and licenses to reflect package change
+
 ------------------------------------------------------
 Version 5.3.0
 ------------------------------------------------------

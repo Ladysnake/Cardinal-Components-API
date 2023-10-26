@@ -7,13 +7,13 @@
     "version": "${version}",
     "entrypoints": {
         "main": [
-          "dev.onyxstudios.cca.test.entity.CcaEntityTestMod"
+          "org.ladysnake.cca.test.entity.CcaEntityTestMod"
         ],
         "cardinal-components": [
-          "dev.onyxstudios.cca.test.entity.CcaEntityTestMod"
+          "org.ladysnake.cca.test.entity.CcaEntityTestMod"
         ],
         "fabric-gametest": [
-          "dev.onyxstudios.cca.test.entity.CcaEntityTestSuite"
+          "org.ladysnake.cca.test.entity.CcaEntityTestSuite"
         ]
     },
     "depends": {

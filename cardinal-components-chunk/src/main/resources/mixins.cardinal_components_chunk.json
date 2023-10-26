@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
-  "package": "dev.onyxstudios.cca.mixin.chunk",
+  "package": "org.ladysnake.cca.mixin.chunk",
   "mixins": [
     "common.MixinChunk",
     "common.MixinChunkDataSender",
