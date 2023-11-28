@@ -91,28 +91,29 @@ public class CcaBlockTestSuite implements FabricGameTest {
 
     @GameTest(templateName = EMPTY_STRUCTURE)
     public void beComponentsTick(TestContext ctx) {
-        ctx.setBlockState(BlockPos.ORIGIN, Blocks.END_PORTAL);
-        ctx.waitAndRun(5, () -> {
-            int ticks = Objects.requireNonNull(ctx.getBlockEntity(BlockPos.ORIGIN)).getComponent(TickingTestComponent.KEY).serverTicks();
+        BlockPos pos = new BlockPos(1, 1, 1);
+        ctx.setBlockState(pos, Blocks.END_PORTAL);
+        ctx.addFinalTaskWithDuration(5, () -> {
+            int ticks = Objects.requireNonNull(ctx.getBlockEntity(pos)).getComponent(TickingTestComponent.KEY).serverTicks();
             GameTestUtil.assertTrue("Component should tick 5 times", ticks == 5);
-            ctx.complete();
         });
     }
 
     @GameTest(templateName = EMPTY_STRUCTURE)
     public void beComponentsLoadUnload(TestContext ctx) {
-        BlockEntity firstCommandBlock = new CommandBlockBlockEntity(ctx.getAbsolutePos(BlockPos.ORIGIN), Blocks.CHAIN_COMMAND_BLOCK.getDefaultState());
+        BlockPos pos = new BlockPos(1, 1, 1);
+        BlockEntity firstCommandBlock = new CommandBlockBlockEntity(ctx.getAbsolutePos(pos), Blocks.CHAIN_COMMAND_BLOCK.getDefaultState());
         GameTestUtil.assertTrue(
             "Load counter should not be incremented until the block entity joins the world",
             LoadAwareTestComponent.KEY.get(firstCommandBlock).getLoadCounter() == 0
         );
-        ctx.setBlockState(BlockPos.ORIGIN, Blocks.CHAIN_COMMAND_BLOCK);
-        BlockEntity commandBlock = Objects.requireNonNull(ctx.getBlockEntity(BlockPos.ORIGIN));
+        ctx.setBlockState(pos, Blocks.CHAIN_COMMAND_BLOCK);
+        BlockEntity commandBlock = Objects.requireNonNull(ctx.getBlockEntity(pos));
         GameTestUtil.assertTrue(
             "Load counter should be incremented once when the block entity joins the world",
             LoadAwareTestComponent.KEY.get(commandBlock).getLoadCounter() == 1
         );
-        ctx.setBlockState(BlockPos.ORIGIN, Blocks.AIR);
+        ctx.setBlockState(pos, Blocks.AIR);
         ctx.waitAndRun(1, () -> {
             GameTestUtil.assertTrue(
                 "Load counter should be decremented when the block entity leaves the world",
