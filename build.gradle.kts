@@ -4,9 +4,8 @@ import net.fabricmc.loom.task.RemapJarTask
 import java.net.URI
 
 plugins {
-    id("fabric-loom") version "1.3-SNAPSHOT" apply false
-    id("io.github.juuxel.loom-quiltflower") version "1.6.0"
-    id("io.github.ladysnake.chenille") version "0.11.3"
+    id("fabric-loom") version "1.5-SNAPSHOT"
+    id("io.github.ladysnake.chenille") version "0.12.0-SNAPSHOT+build.1"
     id("org.cadixdev.licenser") version "0.6.1"
 }
 
@@ -15,9 +14,8 @@ val fabricApiVersion: String = providers.gradleProperty("fabric_api_version").ge
 allprojects {
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
-    apply(plugin = "io.github.ladysnake.chenille")
-    apply(plugin = "org.cadixdev.licenser")
     apply(plugin = "fabric-loom")
+    apply(plugin = "io.github.ladysnake.chenille")
 
     chenille {
         javaVersion = 17
@@ -61,10 +59,6 @@ allprojects {
         compileOnly("com.google.code.findbugs:jsr305:3.0.2")
         compileOnly("com.demonwav.mcdev:annotations:1.0")
         compileOnly("org.jetbrains:annotations:24.0.1")
-    }
-
-    repositories {
-        mavenLocal()
     }
 
     tasks.processResources {

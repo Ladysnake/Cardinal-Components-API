@@ -25,15 +25,19 @@ package dev.onyxstudios.cca.internal.chunk;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkSyncCallback;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
+import dev.onyxstudios.cca.internal.base.ComponentUpdatePayload;
+import dev.onyxstudios.cca.internal.base.MorePacketCodecs;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.math.ChunkPos;
 
 public final class CardinalComponentsChunk {
-    public static final Identifier PACKET_ID = new Identifier("cardinal-components", "chunk_sync");
+    public static final CustomPayload.Id<ComponentUpdatePayload<ChunkPos>> PACKET_ID = CustomPayload.id("cardinal-components:chunk_sync");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
+            ComponentUpdatePayload.register(PACKET_ID, MorePacketCodecs.CHUNKPOS);
             ChunkSyncCallback.EVENT.register((player, tracked) -> {
                 for (ComponentKey<?> key : tracked.asComponentProvider().getComponentContainer().keys()) {
                     key.syncWith(player, (ComponentProvider) tracked);

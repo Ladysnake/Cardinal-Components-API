@@ -26,7 +26,14 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
 import dev.onyxstudios.cca.internal.base.asm.CcaBootstrap;
-import net.minecraft.network.packet.Packet;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.PacketCallbacks;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
@@ -47,6 +54,13 @@ import java.util.Optional;
  */
 @ApiStatus.NonExtendable
 public abstract class ComponentKey<C extends Component> {
+    public static final PacketCodec<ByteBuf, ComponentKey<? extends Component>> PACKET_CODEC = PacketCodecs.STRING.xmap(
+            id -> Objects.requireNonNull(
+                ComponentRegistry.get(new Identifier(id)),
+                "No component key with id " + id
+            ),
+            key -> key.getId().toString()
+    );
 
     public final Identifier getId() {
         return this.id;
@@ -193,10 +207,14 @@ public abstract class ComponentKey<C extends Component> {
     @ApiStatus.Experimental
     public void syncWith(ServerPlayerEntity player, ComponentProvider provider, ComponentPacketWriter writer, PlayerSyncPredicate predicate) {
         if (predicate.shouldSyncWith(player)) {
-            Packet<?> packet = provider.toComponentPacket(this, writer, player);
+            RegistryByteBuf buf = new RegistryByteBuf(Unpooled.buffer(), player.getServerWorld().getRegistryManager());
+            writer.writeSyncPacket(buf, player);
+            CustomPayload payload = provider.toComponentPacket(this, buf);
 
-            if (packet != null) {
-                player.networkHandler.sendPacket(packet);
+            if (payload != null) {
+                ServerPlayNetworking.getSender(player).sendPacket(payload, PacketCallbacks.always(buf::release));
+            } else {
+                buf.release();
             }
         }
     }

@@ -22,42 +22,16 @@
  */
 package dev.onyxstudios.cca.internal.world;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.util.Identifier;
+import dev.onyxstudios.cca.internal.base.CcaClientInternals;
+import net.fabricmc.loader.api.FabricLoader;
 
 public final class CcaWorldClient {
     public static void initClient() {
-        ClientPlayNetworking.registerGlobalReceiver(CardinalComponentsWorld.PACKET_ID, (client, handler, buf, res) -> {
-            try {
-                Identifier componentTypeId = buf.readIdentifier();
-                ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
-
-                if (componentType == null) {
-                    return;
-                }
-
-                buf.retain();
-
-                client.execute(() -> {
-                    try {
-                        assert client.world != null;
-                        Component c = componentType.get(client.world);
-                        if (c instanceof AutoSyncedComponent) {
-                            ((AutoSyncedComponent) c).applySyncPacket(buf);
-                        }
-                    } finally {
-                        buf.release();
-                    }
-                });
-            } catch (Exception e) {
-                ComponentsInternals.LOGGER.error("Error while reading world components from network", e);
-                throw e;
-            }
-        });
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
+            CcaClientInternals.registerComponentSync(
+                CardinalComponentsWorld.PACKET_ID,
+                (payload, ctx) -> payload.componentKey().maybeGet(ctx.client().world)
+            );
+        }
     }
 }

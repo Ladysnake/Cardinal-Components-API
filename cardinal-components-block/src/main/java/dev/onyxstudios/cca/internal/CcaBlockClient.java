@@ -22,50 +22,20 @@
  */
 package dev.onyxstudios.cca.internal;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.internal.base.ComponentsInternals;
+import dev.onyxstudios.cca.internal.base.CcaClientInternals;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 
 public class CcaBlockClient {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
-            ClientPlayNetworking.registerGlobalReceiver(CardinalComponentsBlock.PACKET_ID, (client, handler, buffer, res) -> {
-                try {
-                    Identifier blockEntityTypeId = buffer.readIdentifier();
-                    BlockPos position = buffer.readBlockPos();
-                    Identifier componentTypeId = buffer.readIdentifier();
-                    BlockEntityType<?> blockEntityType = Registries.BLOCK_ENTITY_TYPE.get(blockEntityTypeId);
-                    ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
-
-                    if (componentType == null || blockEntityType == null) {
-                        return;
-                    }
-
-                    buffer.retain();
-
-                    client.execute(() -> {
-                        try {
-                            componentType.maybeGet(blockEntityType.get(client.world, position))
-                                .filter(c -> c instanceof AutoSyncedComponent)
-                                .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(buffer));
-                        } finally {
-                            buffer.release();
-                        }
-                    });
-                } catch (Exception e) {
-                    ComponentsInternals.LOGGER.error("Error while reading block entity components from network", e);
-                    throw e;
-                }
-            });
+            CcaClientInternals.registerComponentSync(CardinalComponentsBlock.PACKET_ID,
+                (payload, ctx) -> payload.componentKey().maybeGet(payload.targetData().beType().get(
+                    ctx.client().world,
+                    payload.targetData().bePos()
+                ))
+            );
         }
         if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {
             ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register((be, world) -> ((ComponentProvider) be).getComponentContainer().onServerLoad());

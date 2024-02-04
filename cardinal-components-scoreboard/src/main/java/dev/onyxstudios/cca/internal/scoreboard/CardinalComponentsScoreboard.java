@@ -22,41 +22,42 @@
  */
 package dev.onyxstudios.cca.internal.scoreboard;
 
+import com.mojang.datafixers.util.Unit;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.scoreboard.ScoreboardSyncCallback;
 import dev.onyxstudios.cca.api.v3.scoreboard.TeamAddCallback;
+import dev.onyxstudios.cca.internal.base.ComponentUpdatePayload;
+import dev.onyxstudios.cca.internal.base.MorePacketCodecs;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.scoreboard.Team;
-import net.minecraft.util.Identifier;
 
 public final class CardinalComponentsScoreboard {
     /**
      * {@link CustomPayloadS2CPacket} channel for default scoreboard component synchronization.
      *
-     * <p> Packets emitted on this channel must begin with the {@link Identifier} for the component's type.
-     *
      * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
      * called on the game thread.
      */
-    public static final Identifier SCOREBOARD_PACKET_ID = new Identifier("cardinal-components", "scoreboard_sync");
+    public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> SCOREBOARD_PACKET_ID = CustomPayload.id("cardinal-components:scoreboard_sync");
     /**
      * {@link CustomPayloadS2CPacket} channel for default team component synchronization.
      *
-     * <p> Packets emitted on this channel must begin with, in order, the team's name as a {@link String},
-     * and the {@link Identifier} for the component's type.
-     *
      * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
      * called on the game thread.
      */
-    public static final Identifier TEAM_PACKET_ID = new Identifier("cardinal-components", "team_sync");
+    public static final CustomPayload.Id<ComponentUpdatePayload<String>> TEAM_PACKET_ID = CustomPayload.id("cardinal-components:team_sync");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
+            ComponentUpdatePayload.register(SCOREBOARD_PACKET_ID, MorePacketCodecs.EMPTY);
+            ComponentUpdatePayload.register(TEAM_PACKET_ID, PacketCodecs.STRING);
             ScoreboardSyncCallback.EVENT.register((player, tracked) -> {
                 for (ComponentKey<?> key : tracked.asComponentProvider().getComponentContainer().keys()) {
                     key.syncWith(player, tracked.asComponentProvider());

@@ -26,18 +26,16 @@ import dev.onyxstudios.cca.api.v3.component.ComponentContainer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
+import dev.onyxstudios.cca.internal.BlockEntityAddress;
 import dev.onyxstudios.cca.internal.CardinalComponentsBlock;
+import dev.onyxstudios.cca.internal.base.ComponentUpdatePayload;
 import dev.onyxstudios.cca.internal.block.CardinalBlockInternals;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -118,15 +116,14 @@ public abstract class MixinBlockEntity implements ComponentProvider {
         return List.of();
     }
 
-    @Nullable
     @Override
-    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeIdentifier(BlockEntityType.getId(this.getType()));
-        buf.writeBlockPos(this.getPos());
-        buf.writeIdentifier(key.getId());
-        writer.writeSyncPacket(buf, recipient);
-        return (CustomPayloadS2CPacket) ServerPlayNetworking.createS2CPacket(CardinalComponentsBlock.PACKET_ID, buf);
+    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, RegistryByteBuf data) {
+        return new ComponentUpdatePayload<>(
+            CardinalComponentsBlock.PACKET_ID,
+            new BlockEntityAddress(this.getType(), this.getPos()),
+            key,
+            data
+        );
     }
 
 }

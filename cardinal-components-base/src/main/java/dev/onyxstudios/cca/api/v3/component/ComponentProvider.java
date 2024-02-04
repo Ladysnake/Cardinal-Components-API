@@ -23,11 +23,12 @@
 package dev.onyxstudios.cca.api.v3.component;
 
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
 import dev.onyxstudios.cca.api.v3.component.sync.PlayerSyncPredicate;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import dev.onyxstudios.cca.internal.base.ComponentUpdatePayload;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -61,15 +62,15 @@ public interface ComponentProvider extends ComponentAccess {
     /**
      * Produces a sync packet using the given information.
      *
-     * @param key the key describing the component being synchronized
-     * @param writer a {@link ComponentPacketWriter} writing the component's data to the packet
-     * @param recipient the player receiving the packet
-     * @return a {@link net.minecraft.network.packet.Packet} that has all the information required to perform the component sync
-     * @since 3.0.0
+     * <p>It is the responsibility of the caller to {@link ByteBuf#release() release} the buffer after this method returns.
+     *
+     * @param key  the key describing the component being synchronized
+     * @param data the component's raw sync data
+     * @return a {@link ComponentUpdatePayload} that has all the information required to perform the component sync
+     * @since 6.0.0
      */
     @Nullable
-    @ApiStatus.Experimental // TODO change the return value to Packet<ClientCommonPacketListener>
-    default <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
+    default <C extends AutoSyncedComponent> CustomPayload toComponentPacket(ComponentKey<? super C> key, RegistryByteBuf data) {
         return null;
     }
 }

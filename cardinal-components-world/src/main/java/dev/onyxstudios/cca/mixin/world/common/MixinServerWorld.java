@@ -22,15 +22,13 @@
  */
 package dev.onyxstudios.cca.mixin.world.common;
 
+import com.mojang.datafixers.util.Unit;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
-import dev.onyxstudios.cca.api.v3.component.sync.ComponentPacketWriter;
+import dev.onyxstudios.cca.internal.base.ComponentUpdatePayload;
 import dev.onyxstudios.cca.internal.world.CardinalComponentsWorld;
 import dev.onyxstudios.cca.internal.world.ComponentPersistentState;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentStateManager;
@@ -41,7 +39,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
@@ -78,12 +75,13 @@ public abstract class MixinServerWorld extends MixinWorld {
         return this.getPlayers();
     }
 
-    @Nullable
     @Override
-    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeIdentifier(key.getId());
-        writer.writeSyncPacket(buf, recipient);
-        return (CustomPayloadS2CPacket) ServerPlayNetworking.createS2CPacket(CardinalComponentsWorld.PACKET_ID, buf);
+    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, RegistryByteBuf data) {
+        return new ComponentUpdatePayload<>(
+            CardinalComponentsWorld.PACKET_ID,
+            Unit.INSTANCE,
+            key,
+            data
+        );
     }
 }

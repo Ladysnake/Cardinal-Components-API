@@ -22,18 +22,22 @@
  */
 package dev.onyxstudios.cca.internal.world;
 
+import com.mojang.datafixers.util.Unit;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentProvider;
 import dev.onyxstudios.cca.api.v3.world.WorldSyncCallback;
+import dev.onyxstudios.cca.internal.base.ComponentUpdatePayload;
+import dev.onyxstudios.cca.internal.base.MorePacketCodecs;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.packet.CustomPayload;
 
 public final class CardinalComponentsWorld {
-    public static final Identifier PACKET_ID = new Identifier("cardinal-components", "world_sync");
+    public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> PACKET_ID = ComponentUpdatePayload.id("world_sync");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
+            ComponentUpdatePayload.register(PACKET_ID, MorePacketCodecs.EMPTY);
             WorldSyncCallback.EVENT.register((player, world) -> {
                 ComponentProvider provider = (ComponentProvider) world;
                 for (ComponentKey<?> key : provider.getComponentContainer().keys()) {
