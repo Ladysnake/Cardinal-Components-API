@@ -22,42 +22,16 @@
  */
 package org.ladysnake.cca.internal.world;
 
-import org.ladysnake.cca.api.v3.component.Component;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.component.ComponentRegistry;
-import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
-import org.ladysnake.cca.internal.base.ComponentsInternals;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.util.Identifier;
+import net.fabricmc.loader.api.FabricLoader;
+import org.ladysnake.cca.internal.base.CcaClientInternals;
 
 public final class CcaWorldClient {
     public static void initClient() {
-        ClientPlayNetworking.registerGlobalReceiver(CardinalComponentsWorld.PACKET_ID, (client, handler, buf, res) -> {
-            try {
-                Identifier componentTypeId = buf.readIdentifier();
-                ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
-
-                if (componentType == null) {
-                    return;
-                }
-
-                buf.retain();
-
-                client.execute(() -> {
-                    try {
-                        assert client.world != null;
-                        Component c = componentType.get(client.world);
-                        if (c instanceof AutoSyncedComponent) {
-                            ((AutoSyncedComponent) c).applySyncPacket(buf);
-                        }
-                    } finally {
-                        buf.release();
-                    }
-                });
-            } catch (Exception e) {
-                ComponentsInternals.LOGGER.error("Error while reading world components from network", e);
-                throw e;
-            }
-        });
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
+            CcaClientInternals.registerComponentSync(
+                CardinalComponentsWorld.PACKET_ID,
+                (payload, ctx) -> payload.componentKey().maybeGet(ctx.client().world)
+            );
+        }
     }
 }

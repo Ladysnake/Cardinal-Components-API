@@ -22,45 +22,20 @@
  */
 package org.ladysnake.cca.internal.entity;
 
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.component.ComponentProvider;
-import org.ladysnake.cca.api.v3.component.ComponentRegistry;
-import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
-import org.ladysnake.cca.internal.base.ComponentsInternals;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.ladysnake.cca.internal.base.CcaClientInternals;
 
 import java.util.Objects;
 
 public final class CcaEntityClient {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
-            ClientPlayNetworking.registerGlobalReceiver(CardinalComponentsEntity.PACKET_ID, (client, handler, buffer, res) -> {
-                try {
-                    int entityId = buffer.readInt();
-                    Identifier componentTypeId = buffer.readIdentifier();
-                    ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
-                    if (componentType == null) {
-                        return;
-                    }
-                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-                    client.execute(() -> {
-                        try {
-                            componentType.maybeGet(Objects.requireNonNull(client.world).getEntityById(entityId))
-                                .filter(c -> c instanceof AutoSyncedComponent)
-                                .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(copy));
-                        } finally {
-                            copy.release();
-                        }
-                    });
-                } catch (Exception e) {
-                    ComponentsInternals.LOGGER.error("Error while reading entity components from network", e);
-                    throw e;
-                }
-            });
+            CcaClientInternals.registerComponentSync(
+                CardinalComponentsEntity.PACKET_ID,
+                (payload, ctx) -> payload.componentKey().maybeGet(Objects.requireNonNull(ctx.client().world).getEntityById(payload.targetData()))
+            );
         }
         if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {
             ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> ((ComponentProvider) entity).getComponentContainer().onClientLoad());

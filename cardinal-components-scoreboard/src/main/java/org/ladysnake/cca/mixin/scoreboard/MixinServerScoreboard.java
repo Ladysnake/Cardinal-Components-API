@@ -22,22 +22,20 @@
  */
 package org.ladysnake.cca.mixin.scoreboard;
 
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
-import org.ladysnake.cca.api.v3.component.sync.ComponentPacketWriter;
-import org.ladysnake.cca.api.v3.scoreboard.TeamAddCallback;
-import org.ladysnake.cca.internal.scoreboard.CardinalComponentsScoreboard;
-import org.ladysnake.cca.internal.scoreboard.ScoreboardComponentContainerFactory;
-import org.ladysnake.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import com.mojang.datafixers.util.Unit;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
+import org.ladysnake.cca.api.v3.scoreboard.TeamAddCallback;
+import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
+import org.ladysnake.cca.internal.scoreboard.CardinalComponentsScoreboard;
+import org.ladysnake.cca.internal.scoreboard.ScoreboardComponentContainerFactory;
+import org.ladysnake.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -46,7 +44,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -69,13 +66,14 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
         return List.of();
     }
 
-    @Nullable
     @Override
-    public <C extends AutoSyncedComponent> CustomPayloadS2CPacket toComponentPacket(ComponentKey<? super C> key, ComponentPacketWriter writer, ServerPlayerEntity recipient) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeIdentifier(key.getId());
-        writer.writeSyncPacket(buf, recipient);
-        return (CustomPayloadS2CPacket) ServerPlayNetworking.createS2CPacket(CardinalComponentsScoreboard.SCOREBOARD_PACKET_ID, buf);
+    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, RegistryByteBuf data) {
+        return new ComponentUpdatePayload<>(
+            CardinalComponentsScoreboard.SCOREBOARD_PACKET_ID,
+            Unit.INSTANCE,
+            key,
+            data
+        );
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))

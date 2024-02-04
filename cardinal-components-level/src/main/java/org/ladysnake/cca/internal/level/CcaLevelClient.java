@@ -22,46 +22,18 @@
  */
 package org.ladysnake.cca.internal.level;
 
-import org.ladysnake.cca.api.v3.component.Component;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.component.ComponentRegistry;
-import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
-import org.ladysnake.cca.internal.base.ComponentsInternals;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
+import org.ladysnake.cca.internal.base.CcaClientInternals;
+
+import java.util.Objects;
 
 public final class CcaLevelClient {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
-            ClientPlayNetworking.registerGlobalReceiver(CardinalComponentsLevel.PACKET_ID, (client, handler, buffer, res) -> {
-                try {
-                    Identifier componentTypeId = buffer.readIdentifier();
-                    ComponentKey<?> componentKey = ComponentRegistry.get(componentTypeId);
-
-                    if (componentKey == null) {
-                        return;
-                    }
-
-                    PacketByteBuf copy = new PacketByteBuf(buffer.copy());
-                    client.execute(() -> {
-                        try {
-                            assert client.world != null;
-                            Component c = componentKey.get(client.world.getLevelProperties());
-
-                            if (c instanceof AutoSyncedComponent) {
-                                ((AutoSyncedComponent) c).applySyncPacket(copy);
-                            }
-                        } finally {
-                            copy.release();
-                        }
-                    });
-                } catch (Exception e) {
-                    ComponentsInternals.LOGGER.error("Error while reading world save components from network", e);
-                    throw e;
-                }
-            });
+            CcaClientInternals.registerComponentSync(
+                CardinalComponentsLevel.PACKET_ID,
+                (payload, ctx) -> payload.componentKey().maybeGet(Objects.requireNonNull(ctx.client().world).getLevelProperties())
+            );
         }
     }
 }

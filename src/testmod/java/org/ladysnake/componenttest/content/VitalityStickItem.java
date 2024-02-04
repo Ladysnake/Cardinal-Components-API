@@ -107,7 +107,7 @@ public class VitalityStickItem extends Item {
             vita.ifPresent(v -> v.transferTo(Vita.get(team), 1));
         }
 
-        stack.damage(1, holder, e -> e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND));
+        stack.damage(1, holder, EquipmentSlot.MAINHAND);
         return true;
     }
 

@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,29 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.componenttest.content.vita;
+package org.ladysnake.cca.internal.base;
 
-import net.minecraft.item.ItemStack;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.item.ItemComponent;
-import org.ladysnake.cca.test.base.Vita;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.network.packet.CustomPayload;
+import org.ladysnake.cca.api.v3.component.Component;
+import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 
-public class ItemVita extends ItemComponent implements Vita {
-    public ItemVita(ItemStack stack) {
-        super(stack);
+import java.util.Optional;
+import java.util.function.BiFunction;
+
+public final class CcaClientInternals {
+    public static <T extends org.ladysnake.cca.internal.base.ComponentUpdatePayload<?>> void registerComponentSync(CustomPayload.Id<T> packetId, BiFunction<T, ClientPlayNetworking.Context, Optional<? extends Component>> getter) {
+        ClientPlayNetworking.registerGlobalReceiver(packetId, (payload, ctx) -> {
+            try {
+                getter.apply(payload, ctx).ifPresent(c -> {
+                    if (c instanceof AutoSyncedComponent synced) {
+                        synced.applySyncPacket(payload.buf());
+                    }
+                });
+            } finally {
+                payload.buf().release();
+            }
+        });
     }
 
-    public ItemVita(ItemStack stack, ComponentKey<? super ItemVita> key) {
-        super(stack, key);
-    }
-
-    @Override
-    public int getVitality() {
-        return this.getInt("vitality");
-    }
-
-    @Override
-    public void setVitality(int value) {
-        this.putInt("vitality", value);
-    }
 }

@@ -22,6 +22,15 @@
  */
 package org.ladysnake.cca.internal.entity;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.entity.Entity;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.GameRules;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
@@ -30,14 +39,7 @@ import org.ladysnake.cca.api.v3.entity.PlayerCopyCallback;
 import org.ladysnake.cca.api.v3.entity.PlayerSyncCallback;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 import org.ladysnake.cca.api.v3.entity.TrackingStartCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.Entity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.GameRules;
+import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
 
 import java.util.Set;
 
@@ -45,16 +47,14 @@ public final class CardinalComponentsEntity {
     /**
      * {@link CustomPayloadS2CPacket} channel for default entity component synchronization.
      *
-     * <p> Packets emitted on this channel must begin with, in order, the {@link Entity#getId() entity id} (as an int),
-     * and the {@link ComponentKey#getId() component's type} (as an Identifier).
-     *
      * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
      * called on the game thread.
      */
-    public static final Identifier PACKET_ID = new Identifier("cardinal-components", "entity_sync");
+    public static final CustomPayload.Id<ComponentUpdatePayload<Integer>> PACKET_ID = CustomPayload.id("cardinal-components:entity_sync");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
+            ComponentUpdatePayload.register(PACKET_ID, PacketCodecs.VAR_INT);
             PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
             TrackingStartCallback.EVENT.register(CardinalComponentsEntity::syncEntityComponents);
         }

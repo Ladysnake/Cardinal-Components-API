@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 OnyxStudios
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,23 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.componenttest.content.vita;
+package org.ladysnake.cca.internal;
 
-import net.minecraft.item.ItemStack;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.item.ItemComponent;
-import org.ladysnake.cca.test.base.Vita;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.math.BlockPos;
 
-public class ItemVita extends ItemComponent implements Vita {
-    public ItemVita(ItemStack stack) {
-        super(stack);
-    }
+public record BlockEntityAddress(
+    BlockEntityType<?> beType,
+    BlockPos bePos
+) {
 
-    public ItemVita(ItemStack stack, ComponentKey<? super ItemVita> key) {
-        super(stack, key);
-    }
-
-    @Override
-    public int getVitality() {
-        return this.getInt("vitality");
-    }
-
-    @Override
-    public void setVitality(int value) {
-        this.putInt("vitality", value);
-    }
+    public static final PacketCodec<RegistryByteBuf, BlockEntityAddress> CODEC = PacketCodec.tuple(
+        PacketCodecs.entryOf(Registries.BLOCK_ENTITY_TYPE), BlockEntityAddress::beType,
+        BlockPos.PACKET_CODEC, BlockEntityAddress::bePos,
+        BlockEntityAddress::new
+    );
 }

@@ -22,18 +22,22 @@
  */
 package org.ladysnake.cca.internal.world;
 
+import com.mojang.datafixers.util.Unit;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.network.packet.CustomPayload;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.world.WorldSyncCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.Identifier;
+import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
+import org.ladysnake.cca.internal.base.MorePacketCodecs;
 
 public final class CardinalComponentsWorld {
-    public static final Identifier PACKET_ID = new Identifier("cardinal-components", "world_sync");
+    public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> PACKET_ID = ComponentUpdatePayload.id("world_sync");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
+            ComponentUpdatePayload.register(PACKET_ID, MorePacketCodecs.EMPTY);
             WorldSyncCallback.EVENT.register((player, world) -> {
                 ComponentProvider provider = (ComponentProvider) world;
                 for (ComponentKey<?> key : provider.getComponentContainer().keys()) {

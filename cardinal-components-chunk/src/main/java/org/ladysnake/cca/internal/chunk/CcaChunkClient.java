@@ -22,46 +22,23 @@
  */
 package org.ladysnake.cca.internal.chunk;
 
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.component.ComponentProvider;
-import org.ladysnake.cca.api.v3.component.ComponentRegistry;
-import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
-import org.ladysnake.cca.internal.base.ComponentsInternals;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.Identifier;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.ladysnake.cca.internal.base.CcaClientInternals;
 
 import java.util.Objects;
 
 public class CcaChunkClient {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
-            ClientPlayNetworking.registerGlobalReceiver(CardinalComponentsChunk.PACKET_ID, (client, handler, buffer, res) -> {
-                try {
-                    int chunkX = buffer.readInt();
-                    int chunkZ = buffer.readInt();
-                    Identifier componentTypeId = buffer.readIdentifier();
-                    ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
-                    if (componentType == null) {
-                        return;
-                    }
-                    buffer.retain();
-                    client.execute(() -> {
-                        try {
-                            // Note: on the client, unloaded chunks return EmptyChunk
-                            componentType.maybeGet(Objects.requireNonNull(client.world).getChunk(chunkX, chunkZ))
-                                .filter(c -> c instanceof AutoSyncedComponent)
-                                .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(buffer));
-                        } finally {
-                            buffer.release();
-                        }
-                    });
-                } catch (Exception e) {
-                    ComponentsInternals.LOGGER.error("Error while reading chunk components from network", e);
-                    throw e;
-                }
-            });
+            CcaClientInternals.registerComponentSync(
+                CardinalComponentsChunk.PACKET_ID,
+                (payload, ctx) -> payload.componentKey().maybeGet(Objects.requireNonNull(ctx.client().world).getChunk(
+                    payload.targetData().x,
+                    payload.targetData().z
+                ))
+            );
         }
         if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {
             ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> ((ComponentProvider) chunk).getComponentContainer().onServerLoad());

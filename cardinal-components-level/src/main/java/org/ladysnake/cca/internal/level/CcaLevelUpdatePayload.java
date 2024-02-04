@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,27 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.componenttest.content.vita;
+package org.ladysnake.cca.internal.level;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.CustomPayload;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.item.ItemComponent;
-import org.ladysnake.cca.test.base.Vita;
+import org.ladysnake.cca.internal.base.MorePacketCodecs;
 
-public class ItemVita extends ItemComponent implements Vita {
-    public ItemVita(ItemStack stack) {
-        super(stack);
-    }
+public record CcaLevelUpdatePayload(
+    ComponentKey<?> componentKey,
+    RegistryByteBuf buf
+) implements CustomPayload {
 
-    public ItemVita(ItemStack stack, ComponentKey<? super ItemVita> key) {
-        super(stack, key);
-    }
-
-    @Override
-    public int getVitality() {
-        return this.getInt("vitality");
-    }
+    public static final PacketCodec<RegistryByteBuf, CcaLevelUpdatePayload> CODEC = PacketCodec.tuple(
+        ComponentKey.PACKET_CODEC, CcaLevelUpdatePayload::componentKey,
+        MorePacketCodecs.REG_BYTE_BUF, CcaLevelUpdatePayload::buf,
+        CcaLevelUpdatePayload::new
+    );
 
     @Override
-    public void setVitality(int value) {
-        this.putInt("vitality", value);
+    public Id<? extends CustomPayload> getId() {
+        return CardinalComponentsLevel.PACKET_ID;
     }
 }

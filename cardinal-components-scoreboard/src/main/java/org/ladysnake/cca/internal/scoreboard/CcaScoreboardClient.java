@@ -22,57 +22,22 @@
  */
 package org.ladysnake.cca.internal.scoreboard;
 
-import org.ladysnake.cca.api.v3.component.Component;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.component.ComponentRegistry;
-import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
-import org.ladysnake.cca.internal.base.ComponentsInternals;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.util.Identifier;
+import org.ladysnake.cca.internal.base.CcaClientInternals;
 
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.Objects;
 
 public final class CcaScoreboardClient {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
-            registerScoreboardSync(CardinalComponentsScoreboard.TEAM_PACKET_ID, buf -> {
-                String teamName = buf.readString();
-                return (componentType, scoreboard) -> componentType.maybeGet(scoreboard.getTeam(teamName));
-            });
-            registerScoreboardSync(CardinalComponentsScoreboard.SCOREBOARD_PACKET_ID,
-                buf -> ComponentKey::maybeGet
+            CcaClientInternals.registerComponentSync(
+                CardinalComponentsScoreboard.TEAM_PACKET_ID,
+                (payload, ctx) -> payload.componentKey().maybeGet(Objects.requireNonNull(ctx.client().world).getScoreboard().getTeam(payload.targetData()))
+            );
+            CcaClientInternals.registerComponentSync(
+                CardinalComponentsScoreboard.SCOREBOARD_PACKET_ID,
+                (payload, ctx) -> payload.componentKey().maybeGet(Objects.requireNonNull(ctx.client().world).getScoreboard())
             );
         }
-    }
-
-    private static void registerScoreboardSync(Identifier packetId, Function<PacketByteBuf, BiFunction<ComponentKey<?>, Scoreboard, Optional<? extends Component>>> reader) {
-        ClientPlayNetworking.registerGlobalReceiver(packetId, (client, handler, buffer, res) -> {
-            try {
-                BiFunction<ComponentKey<?>, Scoreboard, Optional<? extends Component>> getter = reader.apply(buffer);
-                Identifier componentTypeId = buffer.readIdentifier();
-                ComponentKey<?> componentType = ComponentRegistry.get(componentTypeId);
-
-                if (componentType != null) {
-                    buffer.retain();
-                    client.execute(() -> {
-                        try {
-                            getter.apply(componentType, handler.getWorld().getScoreboard())
-                                .filter(c -> c instanceof AutoSyncedComponent)
-                                .ifPresent(c -> ((AutoSyncedComponent) c).applySyncPacket(buffer));
-                        } finally {
-                            buffer.release();
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                ComponentsInternals.LOGGER.error("Error while reading scoreboard components from network", e);
-                throw e;
-            }
-        });
     }
 }
