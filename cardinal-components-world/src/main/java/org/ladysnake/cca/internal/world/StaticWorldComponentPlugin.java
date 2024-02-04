@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,8 @@
 package org.ladysnake.cca.internal.world;
 
 import com.google.common.base.Suppliers;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.minecraft.world.World;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
@@ -30,8 +32,6 @@ import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.world.WorldComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.world.WorldComponentInitializer;
 import org.ladysnake.cca.internal.base.asm.StaticComponentPluginBase;
-import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
-import net.minecraft.world.World;
 
 import java.util.Collection;
 import java.util.function.Supplier;

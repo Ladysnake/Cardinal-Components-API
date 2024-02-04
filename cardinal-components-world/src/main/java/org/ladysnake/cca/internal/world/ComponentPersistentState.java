@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,10 @@
  */
 package org.ladysnake.cca.internal.world;
 
-import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.world.PersistentState;
+import org.ladysnake.cca.api.v3.component.ComponentContainer;
 
 public class ComponentPersistentState extends PersistentState {
     public static final ThreadLocal<Boolean> LOADING = ThreadLocal.withInitial(() -> false);

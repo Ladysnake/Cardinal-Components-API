@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,11 @@ package org.ladysnake.cca.api.v3.component;
 
 import com.demonwav.mcdev.annotations.CheckEnv;
 import com.demonwav.mcdev.annotations.Env;
+import net.minecraft.nbt.NbtCompound;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import org.ladysnake.cca.api.v3.component.load.ClientLoadAwareComponent;
 import org.ladysnake.cca.api.v3.component.load.ClientUnloadAwareComponent;
 import org.ladysnake.cca.api.v3.component.load.ServerLoadAwareComponent;
@@ -34,11 +39,6 @@ import org.ladysnake.cca.api.v3.util.NbtSerializable;
 import org.ladysnake.cca.internal.base.GenericContainerBuilder;
 import org.ladysnake.cca.internal.base.asm.AsmGeneratedCallback;
 import org.ladysnake.cca.internal.base.asm.StaticComponentPluginBase;
-import net.minecraft.nbt.NbtCompound;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
 import java.util.Set;

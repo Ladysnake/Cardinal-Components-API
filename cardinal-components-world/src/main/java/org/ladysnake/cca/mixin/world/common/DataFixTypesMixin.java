@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,8 @@ package org.ladysnake.cca.mixin.world.common;
 
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
-import org.ladysnake.cca.internal.world.ComponentPersistentState;
 import net.minecraft.datafixer.DataFixTypes;
+import org.ladysnake.cca.internal.world.ComponentPersistentState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

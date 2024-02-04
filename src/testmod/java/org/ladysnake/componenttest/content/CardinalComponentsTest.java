@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,6 @@
  */
 package org.ladysnake.componenttest.content;
 
-import org.ladysnake.cca.api.v3.component.Component;
-import org.ladysnake.cca.api.v3.component.ComponentContainer;
-import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
-import org.ladysnake.cca.internal.base.GenericContainerBuilder;
-import org.ladysnake.cca.test.base.BaseVita;
-import org.ladysnake.cca.test.base.Vita;
-import org.ladysnake.cca.test.block.CcaBlockTestMod;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -52,6 +45,13 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.chunk.ChunkStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.ladysnake.cca.api.v3.component.Component;
+import org.ladysnake.cca.api.v3.component.ComponentContainer;
+import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
+import org.ladysnake.cca.internal.base.GenericContainerBuilder;
+import org.ladysnake.cca.test.base.BaseVita;
+import org.ladysnake.cca.test.base.Vita;
+import org.ladysnake.cca.test.block.CcaBlockTestMod;
 
 import javax.annotation.Nullable;
 import java.util.List;

@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,6 @@
  */
 package org.ladysnake.cca.test.block;
 
-import org.ladysnake.cca.api.v3.block.BlockComponentFactoryRegistry;
-import org.ladysnake.cca.api.v3.block.BlockComponentInitializer;
-import org.ladysnake.cca.api.v3.block.BlockComponents;
-import org.ladysnake.cca.test.base.LoadAwareTestComponent;
-import org.ladysnake.cca.test.base.TickingTestComponent;
-import org.ladysnake.cca.test.base.Vita;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.block.entity.BlockEntityType;
@@ -36,6 +30,12 @@ import net.minecraft.block.entity.EndGatewayBlockEntity;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
+import org.ladysnake.cca.api.v3.block.BlockComponentFactoryRegistry;
+import org.ladysnake.cca.api.v3.block.BlockComponentInitializer;
+import org.ladysnake.cca.api.v3.block.BlockComponents;
+import org.ladysnake.cca.test.base.LoadAwareTestComponent;
+import org.ladysnake.cca.test.base.TickingTestComponent;
+import org.ladysnake.cca.test.base.Vita;
 
 public class CcaBlockTestMod implements ModInitializer, BlockComponentInitializer {
     public static final String MOD_ID = "cca-block-test";

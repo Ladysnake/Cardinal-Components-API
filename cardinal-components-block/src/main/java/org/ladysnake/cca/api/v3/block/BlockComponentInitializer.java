@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,8 @@
  */
 package org.ladysnake.cca.api.v3.block;
 
-import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
 import net.minecraft.block.entity.BlockEntity;
+import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> block component factories.

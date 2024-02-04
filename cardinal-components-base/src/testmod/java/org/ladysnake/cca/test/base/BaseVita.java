@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,9 @@
  */
 package org.ladysnake.cca.test.base;
 
+import net.minecraft.nbt.NbtCompound;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
-import net.minecraft.nbt.NbtCompound;
 
 public class BaseVita implements Vita, Component, CopyableComponent<BaseVita> {
     protected int vitality;

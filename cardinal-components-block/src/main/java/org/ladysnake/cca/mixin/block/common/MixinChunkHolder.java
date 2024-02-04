@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,9 @@
  */
 package org.ladysnake.cca.mixin.block.common;
 
-import org.ladysnake.cca.api.v3.block.BlockEntitySyncAroundCallback;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.world.ChunkHolder;
+import org.ladysnake.cca.api.v3.block.BlockEntitySyncAroundCallback;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;

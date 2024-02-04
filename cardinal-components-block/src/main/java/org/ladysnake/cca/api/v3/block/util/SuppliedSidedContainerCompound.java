@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,9 @@
  */
 package org.ladysnake.cca.api.v3.block.util;
 
-import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Direction;
+import org.ladysnake.cca.api.v3.component.ComponentContainer;
 
 import javax.annotation.Nullable;
 import java.util.EnumMap;

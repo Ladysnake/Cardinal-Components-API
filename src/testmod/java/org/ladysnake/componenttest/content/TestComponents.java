@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,13 @@
  */
 package org.ladysnake.componenttest.content;
 
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.block.entity.EndPortalBlockEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.passive.CowEntity;
+import net.minecraft.item.Items;
+import net.minecraft.util.Identifier;
 import org.ladysnake.cca.api.v3.block.BlockComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.block.BlockComponentInitializer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -37,13 +44,6 @@ import org.ladysnake.cca.test.base.SyncedVita;
 import org.ladysnake.cca.test.base.Vita;
 import org.ladysnake.componenttest.content.vita.ItemVita;
 import org.ladysnake.componenttest.content.vita.TeamVita;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.minecraft.block.entity.EndPortalBlockEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.passive.CowEntity;
-import net.minecraft.item.Items;
-import net.minecraft.util.Identifier;
 
 public final class TestComponents implements
     EntityComponentInitializer,

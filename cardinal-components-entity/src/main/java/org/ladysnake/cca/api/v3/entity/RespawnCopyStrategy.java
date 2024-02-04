@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,12 @@
  */
 package org.ladysnake.cca.api.v3.entity;
 
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.world.GameRules;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
 import org.ladysnake.cca.internal.entity.CardinalEntityInternals;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.world.GameRules;
 
 /**
  * Represents a strategy to copy a component from a player to another.

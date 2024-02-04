@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,6 @@
  */
 package org.ladysnake.cca.test.block;
 
-import org.ladysnake.cca.test.base.LoadAwareTestComponent;
-import org.ladysnake.cca.test.base.TickingTestComponent;
-import org.ladysnake.cca.test.base.Vita;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -36,6 +33,9 @@ import net.minecraft.test.TestContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
+import org.ladysnake.cca.test.base.LoadAwareTestComponent;
+import org.ladysnake.cca.test.base.TickingTestComponent;
+import org.ladysnake.cca.test.base.Vita;
 import org.ladysnake.elmendorf.GameTestUtil;
 
 import java.util.Objects;

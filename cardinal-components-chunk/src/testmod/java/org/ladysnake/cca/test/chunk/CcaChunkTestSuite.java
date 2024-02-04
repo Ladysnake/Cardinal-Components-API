@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,6 @@
  */
 package org.ladysnake.cca.test.chunk;
 
-import org.ladysnake.cca.test.base.LoadAwareTestComponent;
-import org.ladysnake.cca.test.base.TickingTestComponent;
-import org.ladysnake.cca.test.base.Vita;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.test.GameTest;
@@ -34,6 +31,9 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.ChunkSerializer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
+import org.ladysnake.cca.test.base.LoadAwareTestComponent;
+import org.ladysnake.cca.test.base.TickingTestComponent;
+import org.ladysnake.cca.test.base.Vita;
 import org.ladysnake.elmendorf.GameTestUtil;
 
 public class CcaChunkTestSuite implements FabricGameTest {

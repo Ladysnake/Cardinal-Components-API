@@ -1,6 +1,6 @@
 /*
  * Cardinal-Components-API
- * Copyright (C) 2019-2023 Ladysnake
+ * Copyright (C) 2019-2024 Ladysnake
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,9 @@
  */
 package org.ladysnake.cca.test.chunk;
 
+import net.minecraft.world.chunk.Chunk;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.test.base.BaseVita;
-import net.minecraft.world.chunk.Chunk;
 
 public class ChunkVita extends BaseVita implements AutoSyncedComponent {
     private final Chunk owner;
