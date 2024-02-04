@@ -37,7 +37,7 @@ The issue tracker is the preferred channel for [bug reports](#bugs),
 requests](#pull-requests), but please respect the following restrictions:
 
 * Please **do not** use the issue tracker for personal support requests (you
-  can ask well-formed questions in adequate channels on the [Fabric Discord](https://discord.gg/v6v4pMv) or on the [Ladysnake Discord](https://discord.gg/vKV9EgH)).
+  can ask well-formed questions in adequate channels on the [Fabric Discord](https://discord.gg/v6v4pMv) or on the [Ladysnake Discord](https://discord.ladysnake.org)).
 * Please **do not** derail or troll issues. Keep the discussion on topic and
   respect the opinions of others
 

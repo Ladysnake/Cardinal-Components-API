@@ -135,7 +135,7 @@ class SyncedIntComponent implements IntComponent, AutoSyncedComponent {
 **[[More information on component synchronization]](https://ladysnake.org/wiki/cardinal-components-api/synchronization)**
 
 If you want your component to **tick alongside its provider**, you can add the
-[`ServerTickingComponent`](./cardinal-components-base/src/main/java/prg/ladysnake/cca/api/v3/component/tick/ServerTickingComponent.java)
+[`ServerTickingComponent`](./cardinal-components-base/src/main/java/org/ladysnake/cca/api/v3/component/tick/ServerTickingComponent.java)
 or [`ClientTickingComponent`](./cardinal-components-base/src/main/java/org/ladysnake/cca/api/v3/component/tick/ClientTickingComponent.java)
 (or both) to your *component interface* (here, `IntComponent`). If you'd rather add the ticking interface to a single
 component subclass, **you have to use one of the specific methods provided in the individual modules**
