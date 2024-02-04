@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
-  "package": "dev.onyxstudios.cca.mixin.entity",
+  "package": "org.ladysnake.cca.mixin.entity",
   "mixins": [
     "common.BucketableMixin",
     "common.MixinEntity",

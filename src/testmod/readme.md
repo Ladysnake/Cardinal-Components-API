@@ -17,7 +17,7 @@ vita available in the chunk.
 
 ## Code map
 
-- `dev.onyxstudios.componenttest`: root package
+- `org.ladysnake.componenttest`: root package
     - `content`: implementation of the content in the test mod
         - `vita`: component classes
             - `Vita`: the interface defining the vita component

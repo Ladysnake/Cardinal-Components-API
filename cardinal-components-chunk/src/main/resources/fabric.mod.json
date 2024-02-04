@@ -8,10 +8,10 @@
   "icon": "assets/cardinal-components-chunk/icon.png",
   "entrypoints": {
     "main": [
-      "dev.onyxstudios.cca.internal.chunk.CardinalComponentsChunk::init"
+      "org.ladysnake.cca.internal.chunk.CardinalComponentsChunk::init"
     ],
     "client": [
-      "dev.onyxstudios.cca.internal.chunk.CcaChunkClient::initClient"
+      "org.ladysnake.cca.internal.chunk.CcaChunkClient::initClient"
     ]
   },
   "custom": {
@@ -26,7 +26,7 @@
     },
     "loom:injected_interfaces": {
       "net/minecraft/class_2791": [
-        "dev/onyxstudios/cca/api/v3/component/ComponentAccess"
+        "org/ladysnake/cca/api/v3/component/ComponentAccess"
       ]
     }
   },

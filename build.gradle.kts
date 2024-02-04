@@ -24,7 +24,7 @@ allprojects {
         owners = providers.gradleProperty("owners").get()
     }
 
-    group = "dev.onyxstudios.cardinal-components-api"
+    group = "org.ladysnake.cardinal-components-api"
     version = providers.gradleProperty("mod_version").get()
 
     repositories {
@@ -148,7 +148,7 @@ subprojects {
 
     extensions.configure(PublishingExtension::class.java) {
         publications {
-            create("relocation", MavenPublication::class.java) {
+            create("relocation1", MavenPublication::class.java) {
                 pom {
                     // Old artifact coordinates
                     groupId = "io.github.onyxstudios.Cardinal-Components-API"
@@ -156,7 +156,21 @@ subprojects {
                     distributionManagement {
                         relocation {
                             // New artifact coordinates
-                            groupId = "dev.onyxstudios.cardinal-components-api"
+                            groupId = "org.ladysnake.cardinal-components-api"
+                            message = "groupId has been changed"
+                        }
+                    }
+                }
+            }
+            create("relocation2", MavenPublication::class.java) {
+                pom {
+                    // Old artifact coordinates
+                    groupId = "dev.onyxstudios.cardinal-components-api"
+
+                    distributionManagement {
+                        relocation {
+                            // New artifact coordinates
+                            groupId = "org.ladysnake.cardinal-components-api"
                             message = "groupId has been changed"
                         }
                     }

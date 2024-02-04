@@ -48,7 +48,7 @@ If you have questions or need help with this library, you can also join the [Lad
 
 ## Adding the API to your buildscript:
 
-**Upgrade information: versions 4.1.0 onwards of Cardinal Components API use the `dev.onyxstudios.cardinal-components-api` (lowercase) maven group instead of `io.github.onyxstudios.Cardinal-Components-API`**
+**Upgrade information: versions 4.1.0 onwards of Cardinal Components API use the `org.ladysnake.cardinal-components-api` (lowercase) maven group instead of `io.github.onyxstudios.Cardinal-Components-API`**
 
 Latest versions of Cardinal Components API are available on the Ladysnake maven:
 ```gradle
@@ -62,33 +62,33 @@ repositories {
 dependencies {
     // Adds a dependency on the base cardinal components module (required by every other module)
     // Replace modImplementation with modApi if you expose components in your own API
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:<VERSION>"
+    modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-base:<VERSION>"
     // Adds a dependency on a specific module
-    modImplementation "dev.onyxstudios.cardinal-components-api:<MODULE>:<VERSION>"
+    modImplementation "org.ladysnake.cardinal-components-api:<MODULE>:<VERSION>"
     // Includes Cardinal Components API as a Jar-in-Jar dependency (optional)
-    include "dev.onyxstudios.cardinal-components-api:cardinal-components-base:<VERSION>"
-    include "dev.onyxstudios.cardinal-components-api:<MODULE>:<VERSION>"
+    include "org.ladysnake.cardinal-components-api:cardinal-components-base:<VERSION>"
+    include "org.ladysnake.cardinal-components-api:<MODULE>:<VERSION>"
 }
 ```
 
 Check out **https://ladysnake.org/wiki/cardinal-components-api/dev-install** for up-to-date buildscript samples
 with `build.gradle`, `build.gradle.kts`, and  `libs.versions.toml`.
 
-You can find the current version of the API in the [**releases**](https://github.com/OnyxStudios/Cardinal-Components-API/releases) tab of the repository on Github.
+You can find the current version of the API in the [**releases**](https://github.com/Ladysnake/Cardinal-Components-API/releases) tab of the repository on Github.
 
 Cardinal Components API is split into several modules. To depend on the all-encompassing master jar, use the dependency string
-`dev.onyxstudios.cardinal-components-api:cardinal-components-api:<VERSION>`.
+`org.ladysnake.cardinal-components-api:cardinal-components-api:<VERSION>`.
 That artifact brings every module to your dev env, but you often do not need all of them for a project.
 Also note that the maven version of the fat jar is actually empty, so you will have to require users to install it from curseforge or modrinth if you do not bundle all required modules.
 
-**[[List of individual module names and descriptions]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki#modules)**
+**[[List of individual module names and descriptions]](https://ladysnake.org/wiki/cardinal-components-api/landing#modules)**
 
 Example:
 ```gradle
 // Adds an API dependency on the base cardinal components module (required by every other module)
-modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-base:<VERSION>"
+modApi "org.ladysnake.cardinal-components-api:cardinal-components-base:<VERSION>"
 // Adds an implementation dependency on the entity module
-modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:<VERSION>"
+modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-entity:<VERSION>"
 ```
 
 ## Basic Usage
@@ -114,7 +114,7 @@ class RandomIntComponent implements IntComponent {
 *Note: a component class can be reused for several component types*
 
 If you want your component to be **automatically synchronized with watching clients**,
-you can also add the [`AutoSyncedComponent`](./cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/sync/AutoSyncedComponent.java)
+you can also add the [`AutoSyncedComponent`](./cardinal-components-base/src/main/java/org/ladysnake/cca/api/v3/component/sync/AutoSyncedComponent.java)
 interface to your implementation:
 
 ```java
@@ -132,11 +132,11 @@ class SyncedIntComponent implements IntComponent, AutoSyncedComponent {
 }
 ```
 
-**[[More information on component synchronization]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Synchronizing-components)**
+**[[More information on component synchronization]](https://ladysnake.org/wiki/cardinal-components-api/synchronization)**
 
 If you want your component to **tick alongside its provider**, you can add the
-[`ServerTickingComponent`](./cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/tick/ServerTickingComponent.java)
-or [`ClientTickingComponent`](./cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/tick/ClientTickingComponent.java)
+[`ServerTickingComponent`](./cardinal-components-base/src/main/java/org/ladysnake/cca/api/v3/component/tick/ServerTickingComponent.java)
+or [`ClientTickingComponent`](./cardinal-components-base/src/main/java/org/ladysnake/cca/api/v3/component/tick/ClientTickingComponent.java)
 (or both) to your *component interface* (here, `IntComponent`). If you'd rather add the ticking interface to a single
 component subclass, **you have to use one of the specific methods provided in the individual modules**
 (here something of the form `registry.beginRegistration(IntComponent.KEY).impl(IncrementingIntComponent.class).end(IncrementingIntComponent::new)`).
@@ -153,8 +153,8 @@ class IncrementingIntComponent implements IntComponent, ServerTickingComponent {
  Clientside ticking is only implemented for entities, block entities, and worlds.*
 
 If you want your component to **be notified of its provider being loaded and unloaded**, typically for advanced setup or cleanup,
-you can add the [`ServerLoadAwareComponent`](./cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/load/ServerLoadAwareComponent.java)
-or [`ClientLoadAwareComponent`](./cardinal-components-base/src/main/java/dev/onyxstudios/cca/api/v3/component/load/ClientLoadAwareComponent.java)
+you can add the [`ServerLoadAwareComponent`](./cardinal-components-base/src/main/java/org/ladysnake/cca/api/v3/component/load/ServerLoadAwareComponent.java)
+or [`ClientLoadAwareComponent`](./cardinal-components-base/src/main/java/org/ladysnake/cca/api/v3/component/load/ClientLoadAwareComponent.java)
 (or both) and their "Unload" variants to your *component interface* (here, `IntComponent`). Just like with ticking,
 if you'd rather add the (un)load-aware interface to a single component subclass,
 **you have to use one of the specific methods provided in the individual modules**.
@@ -201,10 +201,10 @@ The next step is to choose an identifier for your component, and to declare it a
 ```
 
 Components can be provided by objects of various classes, depending on which modules you installed.
-The most common providers are [entities](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Entity),
-[item stacks](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Item),
-[worlds](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-World)
-and [chunks](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Cardinal-Components-Chunk),
+The most common providers are [entities](https://ladysnake.org/wiki/cardinal-components-api/modules/entity),
+[item stacks](https://ladysnake.org/wiki/cardinal-components-api/modules/entity),
+[worlds](https://ladysnake.org/wiki/cardinal-components-api/modules/world)
+and [chunks](https://ladysnake.org/wiki/cardinal-components-api/modules/chunk),
 but more are available.
 To interact with them, you need to **register a component key**, using `ComponentRegistryV3#getOrCreate`;
 the resulting `ComponentKey` instance has the query methods you need. You will also need to **attach your
@@ -254,7 +254,7 @@ Do not forget to declare your component initializer as an entrypoint in your mod
 }
 ```
 
-**[[More information on component registration]](https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Registering-and-using-a-component)**
+**[[More information on component registration]](https://ladysnake.org/wiki/cardinal-components-api/registration)**
 
 Now, all that is left is to actually use that component. You can access individual instances of your component by using the dedicated getters on your `ComponentKey`:
 
