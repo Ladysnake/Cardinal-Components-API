@@ -102,10 +102,20 @@ public final class CcaAsmHelper {
         return asmGeneratedCallbacks;
     }
 
+    /**
+     * {@return the internal name of a class with the given name in the same packages as {@link CcaAsmHelper}}
+     */
     public static String createClassName(String name) {
         return CcaAsmHelper.class.getPackageName().replace('.', '/') + "/_generated_$" + name;
     }
 
+    /**
+     * Creates a new class in the same package as {@link CcaAsmHelper}.
+     * @param classNode the class to generate
+     * @param hidden whether the class should be hidden, in which case the name need not be unique
+     * @param classData if the class is hidden, the data to attach to it, accessible through {@link MethodHandles#classData(MethodHandles.Lookup, String, Class)}
+     * @return the generated class
+     */
     public static Class<?> generateClass(ClassNode classNode, boolean hidden, @Nullable Object classData) throws IOException {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         classNode.accept(writer);
@@ -350,6 +360,7 @@ public final class CcaAsmHelper {
         classData[0] = Collections.unmodifiableSet(new ReferenceArraySet<>(sorted.keySet()));
         // On class init, we pull out the class data and put it in the proper fields
         MethodVisitor clinit = classNode.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
+        clinit.visitCode();
         Object constantClassData = constantClassData(Object[].class);
         clinit.visitLdcInsn(constantClassData);
         clinit.visitInsn(Opcodes.DUP);
@@ -370,7 +381,6 @@ public final class CcaAsmHelper {
         }
         clinit.visitInsn(Opcodes.POP);
         clinit.visitInsn(Opcodes.RETURN);
-        clinit.visitMaxs(0, 0);
         clinit.visitEnd();
 
         return generateClass(classNode, true, classData).asSubclass(ComponentContainer.class);
