@@ -348,11 +348,6 @@ public final class CcaAsmHelper {
 
         Object[] classData = new Object[sorted.size() + 1];
         classData[0] = Collections.unmodifiableSet(new ReferenceArraySet<>(sorted.keySet()));
-        int i = 1;
-        for (var entry : sorted.entrySet()) {
-            classData[i++] = entry.getValue().factory();
-        }
-
         // On class init, we pull out the class data and put it in the proper fields
         MethodVisitor clinit = classNode.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
         Object constantClassData = constantClassData(Object[].class);
@@ -363,8 +358,9 @@ public final class CcaAsmHelper {
         clinit.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(Set.class));
         clinit.visitFieldInsn(Opcodes.PUTSTATIC, containerImplName, "componentKeys", Type.getDescriptor(Set.class));
 
-        i = 1;
+        int i = 1;
         for (var entry : sorted.entrySet()) {
+            classData[i++] = entry.getValue().factory();
             clinit.visitInsn(Opcodes.DUP);
             clinit.visitLdcInsn(i++);
             clinit.visitInsn(Opcodes.AALOAD);
