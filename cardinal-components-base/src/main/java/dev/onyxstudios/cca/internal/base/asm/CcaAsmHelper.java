@@ -63,8 +63,7 @@ public final class CcaAsmHelper {
      * If {@code true}, any class generated through {@link #generateClass(ClassWriter, String, boolean, Object)} will
      * be checked and written to disk. Highly recommended when editing methods in this class.
      */
-    //public static final boolean DEBUG_CLASSES = Boolean.getBoolean("cca.debug.asm");
-    public static final boolean DEBUG_CLASSES = true;
+    public static final boolean DEBUG_CLASSES = Boolean.getBoolean("cca.debug.asm");
     public static final int ASM_VERSION = Opcodes.ASM9;
     // existing references
     public static final String COMPONENT = Type.getInternalName(Component.class);
@@ -121,6 +120,7 @@ public final class CcaAsmHelper {
         return generateClass(writer, classNode.name, hidden, classData);
     }
 
+    // Only used while debugging, so that the hidden classes don't all overwrite eachother
     private static final AtomicInteger nextDebugId = new AtomicInteger();
     private static Class<?> generateClass(ClassWriter classWriter, String className, boolean hidden, @Nullable Object classData) throws IOException {
         try {
