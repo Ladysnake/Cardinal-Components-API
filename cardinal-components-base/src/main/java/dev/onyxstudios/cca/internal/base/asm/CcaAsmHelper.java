@@ -360,12 +360,13 @@ public final class CcaAsmHelper {
 
         int i = 1;
         for (var entry : sorted.entrySet()) {
-            classData[i++] = entry.getValue().factory();
+            classData[i] = entry.getValue().factory();
             clinit.visitInsn(Opcodes.DUP);
-            clinit.visitLdcInsn(i++);
+            clinit.visitLdcInsn(i);
             clinit.visitInsn(Opcodes.AALOAD);
             clinit.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(componentFactoryType));
             clinit.visitFieldInsn(Opcodes.PUTSTATIC, containerImplName, getFactoryFieldName(entry.getKey().getId()), Type.getDescriptor(componentFactoryType));
+            i++;
         }
         clinit.visitInsn(Opcodes.POP);
         clinit.visitInsn(Opcodes.RETURN);
