@@ -120,7 +120,7 @@ public final class CcaAsmHelper {
         return generateClass(writer, classNode.name, hidden, classData);
     }
 
-    // Only used while debugging, so that the hidden classes don't all overwrite eachother
+    // Only used while debugging, so that the hidden classes don't all overwrite each other
     private static final AtomicInteger nextDebugId = new AtomicInteger();
     private static Class<?> generateClass(ClassWriter classWriter, String className, boolean hidden, @Nullable Object classData) throws IOException {
         try {
