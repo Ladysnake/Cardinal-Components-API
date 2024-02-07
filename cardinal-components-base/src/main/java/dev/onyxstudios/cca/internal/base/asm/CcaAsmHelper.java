@@ -33,28 +33,19 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class CcaAsmHelper {
@@ -237,7 +228,7 @@ public final class CcaAsmHelper {
         String ctorDesc = Type.getMethodDescriptor(Type.VOID_TYPE, actualCtorArgs);
         ClassNode classNode = new ClassNode(ASM_VERSION);
         classNode.visit(
-            Opcodes.V1_8,
+            Opcodes.V17,
             Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL,
             containerImplName,
             null,
@@ -247,7 +238,7 @@ public final class CcaAsmHelper {
 
         String factoryFieldDescriptor = Type.getDescriptor(componentFactoryType);
 
-        classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, "componentKeys", "Ljava/util/Set;", "Ljava/util/Set<Ldev/onyxstudios/cca/api/v3/component/ComponentKey<*>;>;", null);
+        classNode.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, "componentKeys", "Ljava/util/Set;", "Ljava/util/Set<Ldev/onyxstudios/cca/api/v3/component/ComponentKey<*>;>;", null);
 
         MethodVisitor keys = classNode.visitMethod(Opcodes.ACC_PUBLIC, "keys", "()Ljava/util/Set;", "()Ljava/util/Set<Ldev/onyxstudios/cca/api/v3/component/ComponentKey<*>;>;", null);
         keys.visitFieldInsn(Opcodes.GETSTATIC, containerImplName, "componentKeys", "Ljava/util/Set;");
@@ -280,7 +271,7 @@ public final class CcaAsmHelper {
             String factoryFieldName = getFactoryFieldName(identifier);
             /* field declaration */
             classNode.visitField(
-                Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC,
+                Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL,
                 factoryFieldName,
                 factoryFieldDescriptor,
                 null,
@@ -354,27 +345,47 @@ public final class CcaAsmHelper {
             e.getValue().visitEnd();
         }
 
-        Class<? extends ComponentContainer> ret = generateClass(classNode, true, null).asSubclass(ComponentContainer.class);
-
-        try {
-            Field keySet = ret.getDeclaredField("componentKeys");
-            keySet.setAccessible(true);
-            // TODO use a custom class with baked in immutability + BitSet contains + array iterator
-            keySet.set(null, Collections.unmodifiableSet(new ReferenceArraySet<>(sorted.keySet())));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new StaticComponentLoadingException("Failed to initialize the set of component keys for " + ret, e);
-        }
-
+        Object[] classData = new Object[sorted.size() + 1];
+        classData[0] = Collections.unmodifiableSet(new ReferenceArraySet<>(sorted.keySet()));
+        int i = 1;
         for (var entry : sorted.entrySet()) {
-            try {
-                Field factoryField = ret.getDeclaredField(getFactoryFieldName(entry.getKey().getId()));
-                factoryField.setAccessible(true);
-                factoryField.set(null, entry.getValue().factory());
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new StaticComponentLoadingException("Failed to initialize factory field for component type " + entry.getKey(), e);
-            }
+            classData[i++] = entry.getValue().factory();
         }
-        return ret;
+
+        // On class init, we pull out the class data and put it in the proper fields
+        MethodVisitor clinit = classNode.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
+        Object constantClassData = new ConstantDynamic(
+            "_",
+            Type.getDescriptor(Object[].class),
+            new Handle(
+                Opcodes.H_INVOKESTATIC,
+                Type.getInternalName(MethodHandles.class),
+                "classData",
+                MethodType.methodType(Object.class, MethodHandles.Lookup.class, String.class, Class.class).descriptorString(),
+                false
+            )
+        );
+        clinit.visitLdcInsn(constantClassData);
+        clinit.visitInsn(Opcodes.DUP);
+        clinit.visitInsn(Opcodes.ICONST_0);
+        clinit.visitInsn(Opcodes.AALOAD);
+        clinit.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(Set.class));
+        clinit.visitFieldInsn(Opcodes.PUTSTATIC, containerImplName, "componentKeys", Type.getDescriptor(Set.class));
+
+        i = 1;
+        for (var entry : sorted.entrySet()) {
+            clinit.visitInsn(Opcodes.DUP);
+            clinit.visitLdcInsn(i++);
+            clinit.visitInsn(Opcodes.AALOAD);
+            clinit.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(componentFactoryType));
+            clinit.visitFieldInsn(Opcodes.PUTSTATIC, containerImplName, getFactoryFieldName(entry.getKey().getId()), Type.getDescriptor(componentFactoryType));
+        }
+        clinit.visitInsn(Opcodes.POP);
+        clinit.visitInsn(Opcodes.RETURN);
+        clinit.visitMaxs(0, 0);
+        clinit.visitEnd();
+
+        return generateClass(classNode, true, classData).asSubclass(ComponentContainer.class);
     }
 
     private static void generateCallbackImpl(String containerImplName, MethodVisitor tick, String componentFieldName, Class<? extends Component> impl, String componentFieldDescriptor, String target) {
