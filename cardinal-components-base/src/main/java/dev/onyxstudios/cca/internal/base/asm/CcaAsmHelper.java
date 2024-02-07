@@ -32,6 +32,7 @@ import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.ClassNode;
@@ -354,17 +355,7 @@ public final class CcaAsmHelper {
 
         // On class init, we pull out the class data and put it in the proper fields
         MethodVisitor clinit = classNode.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
-        Object constantClassData = new ConstantDynamic(
-            "_",
-            Type.getDescriptor(Object[].class),
-            new Handle(
-                Opcodes.H_INVOKESTATIC,
-                Type.getInternalName(MethodHandles.class),
-                "classData",
-                MethodType.methodType(Object.class, MethodHandles.Lookup.class, String.class, Class.class).descriptorString(),
-                false
-            )
-        );
+        Object constantClassData = constantClassData(Object[].class);
         clinit.visitLdcInsn(constantClassData);
         clinit.visitInsn(Opcodes.DUP);
         clinit.visitInsn(Opcodes.ICONST_0);
@@ -386,6 +377,20 @@ public final class CcaAsmHelper {
         clinit.visitEnd();
 
         return generateClass(classNode, true, classData).asSubclass(ComponentContainer.class);
+    }
+
+    @NotNull public static ConstantDynamic constantClassData(Class<?> dataType) {
+        return new ConstantDynamic(
+            "_",
+            Type.getDescriptor(dataType),
+            new Handle(
+                Opcodes.H_INVOKESTATIC,
+                Type.getInternalName(MethodHandles.class),
+                "classData",
+                MethodType.methodType(Object.class, MethodHandles.Lookup.class, String.class, Class.class).descriptorString(),
+                false
+            )
+        );
     }
 
     private static void generateCallbackImpl(String containerImplName, MethodVisitor tick, String componentFieldName, Class<? extends Component> impl, String componentFieldDescriptor, String target) {

@@ -105,17 +105,7 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
         init.visitEnd();
         MethodVisitor createContainer = containerFactoryWriter.visitMethod(Opcodes.ACC_PUBLIC, factorySam.getName(), Type.getMethodDescriptor(factorySam), null, null);
         // The JIT can inline this methodhandle as long as it's constant (psf field or LDC, we use LDC here)
-        Object constantClassData = new ConstantDynamic(
-            "_",
-            Type.getDescriptor(MethodHandle.class),
-            new Handle(
-                Opcodes.H_INVOKESTATIC,
-                Type.getInternalName(MethodHandles.class),
-                "classData",
-                MethodType.methodType(Object.class, MethodHandles.Lookup.class, String.class, Class.class).descriptorString(),
-                false
-            )
-        );
+        Object constantClassData = CcaAsmHelper.constantClassData(MethodHandle.class);
         createContainer.visitLdcInsn(constantClassData);
         // stack: methodhandle
         for (int i = 0; i < actualFactoryParams.size(); i++) {
