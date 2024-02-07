@@ -126,13 +126,14 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
         createContainer.visitInsn(Opcodes.ARETURN);
         createContainer.visitEnd();
         containerFactoryWriter.visitEnd();
+        MethodHandle containerCtor;
         try {
-            MethodHandle containerCtor = lookup.findConstructor(containerImpl, MethodType.methodType(void.class, factorySam.getParameterTypes())).asType(MethodType.methodType(factorySam.getReturnType(), factorySam.getParameterTypes()));
-            @SuppressWarnings("unchecked") Class<? extends I> ret = (Class<? extends I>) CcaAsmHelper.generateClass(containerFactoryWriter, true, containerCtor);
-            return ret;
+            containerCtor = lookup.findConstructor(containerImpl, MethodType.methodType(void.class, factorySam.getParameterTypes())).asType(MethodType.methodType(factorySam.getReturnType(), factorySam.getParameterTypes()));
         } catch (Throwable e) {
-            throw new RuntimeException("Could not construct factory class", e);
+            throw new RuntimeException("Could not find container constructor", e);
         }
+        @SuppressWarnings("unchecked") Class<? extends I> ret = (Class<? extends I>) CcaAsmHelper.generateClass(containerFactoryWriter, true, containerCtor);
+        return ret;
     }
 
     public static ComponentContainer createEmptyContainer() {
