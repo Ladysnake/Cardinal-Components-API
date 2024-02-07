@@ -38,11 +38,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 public class GenericContainerBuilder<I, R> {
-    private static final AtomicInteger nextId = new AtomicInteger();
 
     private boolean built;
     private String factoryNameSuffix;
@@ -96,12 +94,11 @@ public class GenericContainerBuilder<I, R> {
                 return this.emptyFactory;
             }
 
-            String implNameSuffix = factoryNameSuffix != null ? factoryNameSuffix : Integer.toString(nextId.getAndIncrement());
             Class<? extends ComponentContainer> containerClass = CcaAsmHelper.spinComponentContainer(
-                this.componentFactoryClass, this.factories, implNameSuffix
+                this.componentFactoryClass, this.factories
             );
             Class<? extends R> factoryClass = StaticComponentPluginBase.spinContainerFactory(
-                implNameSuffix, this.containerFactoryType, containerClass, this.argClasses
+                this.containerFactoryType, containerClass, this.argClasses
             );
             return ComponentsInternals.createFactory(factoryClass);
         } catch (IOException e) {

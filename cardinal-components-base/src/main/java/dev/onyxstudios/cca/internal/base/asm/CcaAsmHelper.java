@@ -42,6 +42,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -54,15 +55,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class CcaAsmHelper {
 
     /**
-     * If {@code true}, any class generated through {@link #generateClass(ClassWriter, String)} will
+     * If {@code true}, any class generated through {@link #generateClass(ClassWriter, String, boolean, Object)} will
      * be checked and written to disk. Highly recommended when editing methods in this class.
      */
-    public static final boolean DEBUG_CLASSES = Boolean.getBoolean("cca.debug.asm");
-    public static final int ASM_VERSION = Opcodes.ASM6;
+    //public static final boolean DEBUG_CLASSES = Boolean.getBoolean("cca.debug.asm");
+    public static final boolean DEBUG_CLASSES = true;
+    public static final int ASM_VERSION = Opcodes.ASM9;
     // existing references
     public static final String COMPONENT = Type.getInternalName(Component.class);
     public static final String COMPONENT_CONTAINER = Type.getInternalName(ComponentContainer.class);
@@ -71,10 +74,10 @@ public final class CcaAsmHelper {
     public static final String IDENTIFIER = FabricLoader.getInstance().getMappingResolver().mapClassName("intermediary", "net.minecraft.class_2960").replace('.', '/');
     public static final String EVENT = Type.getInternalName(Event.class);
     // generated references
-    public static final String STATIC_COMPONENT_CONTAINER = "dev/onyxstudios/cca/_generated_/GeneratedComponentContainer";
+    public static final String STATIC_COMPONENT_CONTAINER = createClassName("GeneratedComponentContainer");
     public static final String STATIC_CONTAINER_GETTER_DESC = "()L" + COMPONENT + ";";
-    public static final String STATIC_COMPONENT_TYPE = "dev/onyxstudios/cca/_generated_/ComponentType";
-    public static final String STATIC_CONTAINER_FACTORY = "dev/onyxstudios/cca/_generated_/GeneratedContainerFactory";
+    public static final String STATIC_COMPONENT_TYPE = createClassName("ComponentType");
+    public static final String STATIC_CONTAINER_FACTORY = createClassName("GeneratedContainerFactory");
     public static final String ABSTRACT_COMPONENT_CONTAINER_CTOR_DESC;
 
     private static final List<AsmGeneratedCallbackInfo> asmGeneratedCallbacks = findAsmComponentCallbacks();
@@ -108,31 +111,45 @@ public final class CcaAsmHelper {
         return asmGeneratedCallbacks;
     }
 
-    public static Class<?> generateClass(ClassNode classNode) throws IOException {
-        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        classNode.accept(writer);
-        return generateClass(writer, classNode.name);
+    public static String createClassName(String name) {
+        return CcaAsmHelper.class.getPackageName().replace('.', '/') + "/_generated_$" + name;
     }
 
-    private static Class<?> generateClass(ClassWriter classWriter, String className) throws IOException {
+    public static Class<?> generateClass(ClassNode classNode, boolean hidden, @Nullable Object classData) throws IOException {
+        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        classNode.accept(writer);
+        return generateClass(writer, classNode.name, hidden, classData);
+    }
+
+    private static final AtomicInteger nextDebugId = new AtomicInteger();
+    private static Class<?> generateClass(ClassWriter classWriter, String className, boolean hidden, @Nullable Object classData) throws IOException {
         try {
+            if (!hidden && classData != null) {
+                throw new IllegalArgumentException("Class data is only supported for hidden classes");
+            }
             byte[] bytes = classWriter.toByteArray();
             if (DEBUG_CLASSES) {
                 ClassReader classReader = new ClassReader(bytes);
                 classReader.accept(new CheckClassAdapter(null), 0);
-                Path path = Paths.get(classReader.getClassName() + ".class");
+                Path path = Paths.get(classReader.getClassName() + '_' + nextDebugId.getAndIncrement() + ".class");
                 Files.createDirectories(path.getParent());
                 Files.write(path, bytes);
             }
-            return CcaClassLoader.INSTANCE.define(className.replace('/', '.'), bytes);
+            if (hidden) {
+                if (classData == null) {
+                    return MethodHandles.lookup().defineHiddenClass(bytes, false, MethodHandles.Lookup.ClassOption.STRONG).lookupClass();
+                } else {
+                    return MethodHandles.lookup().defineHiddenClassWithClassData(bytes, classData, false, MethodHandles.Lookup.ClassOption.STRONG).lookupClass();
+                }
+            } else {
+                return MethodHandles.lookup().defineClass(bytes);
+            }
         } catch (IOException | IllegalArgumentException | IllegalStateException e) {
             // IllegalStateException and IllegalArgumentException can be thrown by CheckClassAdapter
             throw new IOException("Failed to generate class " + className, e);
+        } catch (IllegalAccessException e) {
+            throw new StaticComponentLoadingException("Failed to define class " + className, e);
         }
-    }
-
-    public static String getComponentTypeName(Identifier identifier) {
-        return STATIC_COMPONENT_TYPE + "$" + getJavaIdentifierName(identifier);
     }
 
     public static String getJavaIdentifierName(Identifier identifier) {
@@ -179,17 +196,16 @@ public final class CcaAsmHelper {
      * @param componentFactoryType the interface implemented by the component factories used to initialize this container
      * @param componentFactories   a map of {@link ComponentKey}s to factories for components of that type
      * @param componentImpls       a map of {@link ComponentKey}s to their actual implementation classes for the container
-     * @param implNameSuffix       a unique suffix for the generated class
      * @return the generated container class
      * @deprecated cannot remove in 1.17 because internal compatibility
      */
     @Deprecated(forRemoval = true)
-    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, Map<ComponentKey<?>, Class<? extends Component>> componentImpls, String implNameSuffix) throws IOException {
+    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, Map<ComponentKey<?>, Class<? extends Component>> componentImpls) throws IOException {
         Map<ComponentKey<?>, QualifiedComponentFactory<I>> merged = new LinkedHashMap<>();
         for (var entry : componentFactories.entrySet()) {
             merged.put(entry.getKey(), new QualifiedComponentFactory<>(entry.getValue(), componentImpls.get(entry.getKey()), Set.of()));
         }
-        return spinComponentContainer(componentFactoryType, merged, implNameSuffix);
+        return spinComponentContainer(componentFactoryType, merged);
     }
 
     /**
@@ -200,16 +216,14 @@ public final class CcaAsmHelper {
      *
      * @param componentFactoryType the interface implemented by the component factories used to initialize this container
      * @param componentFactories   a map of {@link ComponentKey} ids to factories for components of that type
-     * @param implNameSuffix       a unique suffix for the generated class
      * @return the generated container class
      */
-    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, QualifiedComponentFactory<I>> componentFactories, String implNameSuffix) throws IOException {
+    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, QualifiedComponentFactory<I>> componentFactories) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
 
         QualifiedComponentFactory.checkDependenciesSatisfied(componentFactories);
         Map<ComponentKey<?>, QualifiedComponentFactory<I>> sorted = QualifiedComponentFactory.sort(componentFactories);
-        checkValidJavaIdentifier(implNameSuffix);
-        String containerImplName = STATIC_COMPONENT_CONTAINER + '_' + implNameSuffix;
+        String containerImplName = STATIC_COMPONENT_CONTAINER + "Impl";
         String componentFactoryName = Type.getInternalName(componentFactoryType);
         Method sam = findSam(componentFactoryType);
         String samDescriptor = Type.getMethodDescriptor(sam);
@@ -340,7 +354,7 @@ public final class CcaAsmHelper {
             e.getValue().visitEnd();
         }
 
-        Class<? extends ComponentContainer> ret = generateClass(classNode).asSubclass(ComponentContainer.class);
+        Class<? extends ComponentContainer> ret = generateClass(classNode, true, null).asSubclass(ComponentContainer.class);
 
         try {
             Field keySet = ret.getDeclaredField("componentKeys");
@@ -378,13 +392,4 @@ public final class CcaAsmHelper {
     private static String getFactoryFieldName(Identifier identifier) {
         return getJavaIdentifierName(identifier) + "$factory";
     }
-
-    public static void checkValidJavaIdentifier(String implNameSuffix) {
-        for (int i = 0; i < implNameSuffix.length(); i++) {
-            if (!Character.isJavaIdentifierPart(implNameSuffix.charAt(i))) {
-                throw new IllegalArgumentException(implNameSuffix + " is not a valid suffix for a java identifier");
-            }
-        }
-    }
-
 }

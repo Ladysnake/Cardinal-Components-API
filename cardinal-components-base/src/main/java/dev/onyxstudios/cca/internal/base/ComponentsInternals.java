@@ -32,11 +32,10 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
 
@@ -66,17 +65,11 @@ public final class ComponentsInternals {
         }
     }
 
-    @Nonnull
+    @SuppressWarnings("unchecked") @Nonnull
     public static <R> R createFactory(Class<R> factoryClass) {
         try {
-            Constructor<?>[] constructors = factoryClass.getConstructors();
-            if (constructors.length != 1) {
-                throw new IllegalArgumentException("Expected 1 constructor declaration in " + factoryClass + ", got " + Arrays.toString(constructors));
-            }
-            @SuppressWarnings("unchecked") R ret =
-                (R) constructors[0].newInstance();
-            return ret;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            return (R) MethodHandles.lookup().findConstructor(factoryClass, MethodType.methodType(void.class)).invoke();
+        } catch (Throwable e) {
             throw new StaticComponentLoadingException("Failed to instantiate generated component factory", e);
         }
     }
