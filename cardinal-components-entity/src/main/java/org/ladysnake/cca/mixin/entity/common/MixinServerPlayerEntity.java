@@ -23,12 +23,8 @@
 package org.ladysnake.cca.mixin.entity.common;
 
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.ladysnake.cca.api.v3.entity.PlayerCopyCallback;
 import org.ladysnake.cca.internal.entity.SwitchablePlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class MixinServerPlayerEntity implements SwitchablePlayerEntity {
@@ -42,10 +38,5 @@ public abstract class MixinServerPlayerEntity implements SwitchablePlayerEntity 
     @Override
     public boolean cca$isSwitchingCharacter() {
         return this.switchingCharacter;
-    }
-
-    @Inject(method = "copyFrom", at = @At("RETURN"))
-    private void copyDataFrom(ServerPlayerEntity original, boolean lossless, CallbackInfo ci) {
-        PlayerCopyCallback.EVENT.invoker().copyData(original, (ServerPlayerEntity) (Object) this, lossless);
     }
 }

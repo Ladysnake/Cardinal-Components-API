@@ -24,6 +24,7 @@ package org.ladysnake.cca.internal.world;
 
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.world.PersistentState;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 
@@ -33,7 +34,7 @@ public class ComponentPersistentState extends PersistentState {
     public static Type<ComponentPersistentState> getType(ComponentContainer components) {
         return new Type<>(
             () -> new ComponentPersistentState(components),
-            tag -> ComponentPersistentState.fromNbt(components, tag),
+            (tag, w) -> ComponentPersistentState.fromNbt(components, tag),
             DataFixTypes.LEVEL
         );
     }
@@ -51,7 +52,7 @@ public class ComponentPersistentState extends PersistentState {
     }
 
     @Override
-    public NbtCompound writeNbt(NbtCompound tag) {
+    public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup w) {
         return this.components.toTag(tag);
     }
 

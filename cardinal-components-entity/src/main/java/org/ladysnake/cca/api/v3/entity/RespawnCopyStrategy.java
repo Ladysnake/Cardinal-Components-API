@@ -23,6 +23,7 @@
 package org.ladysnake.cca.api.v3.entity;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -30,12 +31,12 @@ import org.ladysnake.cca.api.v3.component.CopyableComponent;
 import org.ladysnake.cca.internal.entity.CardinalEntityInternals;
 
 /**
- * Represents a strategy to copy a component from a player to another.
+ * Represents a strategy to copy a component from an entity to another.
  *
  * <p>Copy strategies can be registered using methods on {@link EntityComponentFactoryRegistry}.
  *
  * @param <C> the type of components handled by this strategy
- * @see PlayerCopyCallback
+ * @see net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents#COPY_FROM
  */
 @FunctionalInterface
 public interface RespawnCopyStrategy<C extends Component> {
@@ -87,9 +88,17 @@ public interface RespawnCopyStrategy<C extends Component> {
      * Never copy a component no matter the cause of respawn.
      *
      * <p>This strategy can be used when {@code RespawnCopyStrategy} does not offer enough context,
-     * in which case {@link PlayerCopyCallback} may be used directly.
+     * in which case {@link net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents#COPY_FROM} may be used directly.
      */
     RespawnCopyStrategy<Component> NEVER_COPY = (from, to, lossless, keepInventory, sameCharacter) -> { };
+
+    /**
+     * The event phase used by CCA to copy components
+     *
+     * <p>Mods that depend on component data for their own copying logic can {@linkplain net.fabricmc.fabric.api.event.Event#addPhaseOrdering(Identifier, Identifier) add a phase ordering}
+     * to run after CCA's listeners.
+     */
+    Identifier EVENT_PHASE = new Identifier("cardinal-components", "component-copy");
 
     static <C extends Component> RespawnCopyStrategy<? super C> get(ComponentKey<C> key) {
         return CardinalEntityInternals.getRespawnCopyStrategy(key);

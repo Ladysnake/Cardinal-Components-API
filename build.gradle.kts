@@ -50,6 +50,7 @@ allprojects {
         mappings("net.fabricmc:yarn:${props["minecraft_version"]}+build.${props["yarn_mappings"]}:v2")
         modApi("net.fabricmc:fabric-loader:${props["loader_version"]}")
         modApi(fabricApi.module("fabric-api-base", fabricApiVersion))
+        modImplementation(fabricApi.module("fabric-entity-events-v1", fabricApiVersion))
         modImplementation(fabricApi.module("fabric-networking-api-v1", fabricApiVersion))
         modImplementation(fabricApi.module("fabric-lifecycle-events-v1", fabricApiVersion))
 

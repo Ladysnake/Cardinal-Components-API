@@ -2,9 +2,17 @@
 ------------------------------------------------------
 Version 6.0.0
 ------------------------------------------------------
+Updated to 1.20.5
+
+**Additions**
+- Added a `PacketCodec` for component keys
+
 **Changes**
 - Migrate all packages from `dev.onyxstudios` to `org.ladysnake`
 - Update documentation and licenses to reflect package change
+
+**Removals**
+- Removed `PlayerCopyCallback` - if you were using it, you can switch to `ServerPlayerEvents.COPY_FROM` from Fabric API
 
 ------------------------------------------------------
 Version 5.4.0

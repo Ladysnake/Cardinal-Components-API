@@ -136,7 +136,7 @@ public interface EntityComponentFactoryRegistry {
          * Calling this method allows one to customize the copy process.
          *
          * @param strategy a copy strategy to use when copying components between player instances
-         * @see PlayerCopyCallback
+         * @see net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents#COPY_FROM
          * @see RespawnCopyStrategy#ALWAYS_COPY
          * @see RespawnCopyStrategy#CHARACTER
          * @see RespawnCopyStrategy#INVENTORY

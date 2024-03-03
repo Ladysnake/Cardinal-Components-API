@@ -22,6 +22,7 @@
  */
 package org.ladysnake.cca.internal.entity;
 
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
@@ -35,7 +36,6 @@ import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
-import org.ladysnake.cca.api.v3.entity.PlayerCopyCallback;
 import org.ladysnake.cca.api.v3.entity.PlayerSyncCallback;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 import org.ladysnake.cca.api.v3.entity.TrackingStartCallback;
@@ -62,7 +62,7 @@ public final class CardinalComponentsEntity {
             ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> ((ComponentProvider) entity).getComponentContainer().onServerLoad());
             ServerEntityEvents.ENTITY_UNLOAD.register((entity, world) -> ((ComponentProvider) entity).getComponentContainer().onServerUnload());
         }
-        PlayerCopyCallback.EVENT.register(CardinalComponentsEntity::copyData);
+        ServerPlayerEvents.COPY_FROM.register(RespawnCopyStrategy.EVENT_PHASE, CardinalComponentsEntity::copyData);
     }
 
     private static void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless) {

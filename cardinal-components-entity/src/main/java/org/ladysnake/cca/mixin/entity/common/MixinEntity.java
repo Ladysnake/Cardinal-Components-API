@@ -54,7 +54,7 @@ public abstract class MixinEntity implements ComponentProvider {
     private ComponentContainer components;
 
     @Shadow
-    public World world;
+    private World world;
 
     @Shadow public abstract int getId();
 
