@@ -26,21 +26,18 @@ import net.minecraft.item.ItemStack;
 import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
 
 /**
- * Entrypoint getting invoked to register <em>static</em> item component factories.
+ * Entrypoint getting invoked to register item component migrations.
  *
  * <p>The entrypoint is exposed as either {@code "cardinal-components"} or {@code "cardinal-components-item"} in the mod json and runs for any environment.
  * It usually executes right before the first {@link ItemStack} instance is created.
  *
- * @since 2.4.0
+ * @since 6.0.0
  */
 public interface ItemComponentInitializer extends ComponentRegistrationInitializer {
     /**
-     * Called to register component factories for statically declared component types.
+     * Called to register component migrations from CCA to {@link net.minecraft.component.DataComponentType}.
      *
-     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
-     * must not be registered outside of this method.
-     *
-     * @param registry an {@link ItemComponentFactoryRegistry} for <em>statically declared</em> components
+     * @param registry an {@link ItemComponentMigrationRegistry} for component migrations
      */
-    void registerItemComponentFactories(ItemComponentFactoryRegistry registry);
+    void registerItemComponentMigrations(ItemComponentMigrationRegistry registry);
 }

@@ -22,27 +22,48 @@
  */
 package org.ladysnake.componenttest.content.vita;
 
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.component.DataComponentType;
 import net.minecraft.item.ItemStack;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.item.ItemComponent;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import org.jetbrains.annotations.Nullable;
+import org.ladysnake.cca.api.v3.component.TransientComponent;
 import org.ladysnake.cca.test.base.Vita;
 
-public class ItemVita extends ItemComponent implements Vita {
-    public ItemVita(ItemStack stack) {
-        super(stack);
-    }
+public class ItemVita implements Vita, TransientComponent {
+    public static final DataComponentType<ItemVita.Data> COMPONENT_TYPE = DataComponentType.<ItemVita.Data>builder()
+        .codec(Data.CODEC)
+        .packetCodec(Data.PACKET_CODEC)
+        .build();
 
-    public ItemVita(ItemStack stack, ComponentKey<? super ItemVita> key) {
-        super(stack, key);
+    public static final DataComponentType<ItemVita.Data> ALT_COMPONENT_TYPE = DataComponentType.<ItemVita.Data>builder()
+        .codec(Data.CODEC)
+        .packetCodec(Data.PACKET_CODEC)
+        .build();
+
+    private final DataComponentType<ItemVita.Data> componentType;
+    private final ItemStack stack;
+
+    public ItemVita(DataComponentType<ItemVita.Data> componentType, ItemStack stack) {
+        this.componentType = componentType;
+        this.stack = stack;
     }
 
     @Override
     public int getVitality() {
-        return this.getInt("vitality");
+        return this.stack.getOrDefault(this.componentType, Data.EMPTY).vitality();
     }
 
     @Override
     public void setVitality(int value) {
-        this.putInt("vitality", value);
+        this.stack.set(this.componentType, new Data(value));
+    }
+
+    public record Data(int vitality) {
+        public static final Data EMPTY = new Data(0);
+        public static final Codec<Data> CODEC = Codec.INT.xmap(Data::new, Data::vitality);
+        public static final PacketCodec<ByteBuf, Data> PACKET_CODEC = PacketCodecs.INTEGER.xmap(Data::new, Data::vitality);
     }
 }

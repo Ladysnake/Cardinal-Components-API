@@ -20,30 +20,21 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.block.common;
+package org.ladysnake.cca.api.v3.item;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.command.argument.BlockStateArgument;
-import net.minecraft.nbt.NbtCompound;
-import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import net.minecraft.component.DataComponentType;
+import net.minecraft.util.Identifier;
+import org.ladysnake.cca.api.v3.component.ComponentKey;
 
-@Mixin(BlockStateArgument.class)
-public class MixinBlockStateArgument {
-    @Shadow
-    @Final
-    @Nullable
-    private NbtCompound data;
-
-    @ModifyVariable(method = "setBlockState", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;readNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
-    private BlockEntity readComponentData(BlockEntity be) {
-        if (this.data != null) {
-            be.asComponentProvider().getComponentContainer().fromTag(this.data);
-        }
-        return be;
-    }
+/**
+ * Allows registering a migration for an item
+ */
+public interface ItemComponentMigrationRegistry {
+    /**
+     * Registers an item component migration from the specified {@link ComponentKey#getId() CCA Component ID} to an equivalent {@link DataComponentType}
+     *
+     * @param oldComponentId the item component ID from CCA days
+     * @param mcComponentType the new vanilla component type
+     */
+    void registerMigration(Identifier oldComponentId, DataComponentType<?> mcComponentType);
 }

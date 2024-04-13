@@ -28,6 +28,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -66,13 +67,6 @@ public abstract class MixinBlockEntity implements ComponentProvider {
     @Unique
     private ComponentContainer components;
 
-    @Inject(method = "createFromNbt", at = @At("RETURN"))
-    private static void readComponentData(BlockPos pos, BlockState state, NbtCompound nbt, CallbackInfoReturnable<BlockEntity> cir) {
-        if (cir.getReturnValue() != null) {
-            cir.getReturnValue().asComponentProvider().getComponentContainer().fromTag(nbt);
-        }
-    }
-
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(BlockEntityType<?> type, BlockPos pos, BlockState state, CallbackInfo ci) {
         // Promise, this is a BlockEntity
@@ -85,19 +79,9 @@ public abstract class MixinBlockEntity implements ComponentProvider {
         this.components.toTag(cir.getReturnValue());
     }
 
-    /**
-     * Yay redundancy!
-     *
-     * <p>This method may be overridden without calling super(), so we need safety nets.
-     * On the other hand, we still need this inject because mods can also call {@link BlockEntity#readNbt(NbtCompound)} directly.
-     * We mostly do not care about what happens on the client though, since we have our own packets.
-     *
-     * @see #readComponentData(BlockPos, BlockState, NbtCompound, CallbackInfoReturnable)
-     * @see MixinBlockDataObject#readComponentData(NbtCompound, CallbackInfo)
-     */
-    @Inject(method = "readNbt", at = @At(value = "RETURN"))
-    private void readNbt(NbtCompound tag, CallbackInfo ci) {
-        this.components.fromTag(tag);
+    @Inject(method = "read", at = @At(value = "RETURN"))
+    private void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
+        this.components.fromTag(nbt);
     }
 
     @Nonnull
@@ -125,5 +109,4 @@ public abstract class MixinBlockEntity implements ComponentProvider {
             data
         );
     }
-
 }

@@ -24,6 +24,7 @@ package org.ladysnake.cca.test.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.data.DataTracker;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -35,7 +36,7 @@ public class TestEntity extends Entity {
     }
 
     @Override
-    protected void initDataTracker() {
+    protected void initDataTracker(DataTracker.Builder builder) {
 
     }
 

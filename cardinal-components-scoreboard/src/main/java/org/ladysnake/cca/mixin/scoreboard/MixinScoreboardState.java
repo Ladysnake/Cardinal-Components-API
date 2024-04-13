@@ -22,11 +22,15 @@
  */
 package org.ladysnake.cca.mixin.scoreboard;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.scoreboard.AbstractTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardState;
 import net.minecraft.scoreboard.Team;
+import net.minecraft.text.Text;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -47,12 +51,12 @@ public abstract class MixinScoreboardState {
     private Scoreboard scoreboard;
 
     @Inject(method = "writeNbt", at = @At("RETURN"))
-    private void saveComponents(NbtCompound tag, CallbackInfoReturnable<NbtCompound> cir) {
+    private void saveComponents(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup, CallbackInfoReturnable<NbtCompound> cir) {
         ((ComponentProvider) this.scoreboard).getComponentContainer().toTag(tag);
     }
 
     @Inject(method = "readNbt", at = @At("RETURN"))
-    private void loadComponents(NbtCompound tag, CallbackInfoReturnable<ScoreboardState> ci) {
+    private void loadComponents(NbtCompound tag, RegistryWrapper.WrapperLookup registries, CallbackInfoReturnable<ScoreboardState> cir) {
         ((ComponentProvider) this.scoreboard).getComponentContainer().fromTag(tag);
     }
 
@@ -62,10 +66,9 @@ public abstract class MixinScoreboardState {
             value = "INVOKE",
             target = "Lnet/minecraft/scoreboard/ScoreboardState;readTeamPlayersNbt(Lnet/minecraft/scoreboard/Team;Lnet/minecraft/nbt/NbtList;)V",
             shift = At.Shift.AFTER
-        ),
-        locals = LocalCapture.CAPTURE_FAILEXCEPTION
+        )
     )
-    private void loadTeamComponents(NbtList teamsData, CallbackInfo ci, int i, NbtCompound teamData, String name, Team team) {
+    private void loadTeamComponents(NbtList nbt, RegistryWrapper.WrapperLookup registries, CallbackInfo ci, @Local NbtCompound teamData, @Local Team team) {
         ((ComponentProvider) team).getComponentContainer().fromTag(teamData);
     }
 
@@ -74,16 +77,12 @@ public abstract class MixinScoreboardState {
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/scoreboard/Team;getPlayerList()Ljava/util/Collection;"
-        ),
-        locals = LocalCapture.CAPTURE_FAILEXCEPTION
+        )
     )
     private void saveTeamComponents(
         CallbackInfoReturnable<NbtList> cir,
-        NbtList teamsData,
-        Collection<Team> teams,
-        Iterator<Team> it,
-        Team team,
-        NbtCompound teamData
+        @Local Team team,
+        @Local NbtCompound teamData
     ) {
         ((ComponentProvider) team).getComponentContainer().toTag(teamData);
     }

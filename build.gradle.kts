@@ -4,8 +4,8 @@ import net.fabricmc.loom.task.RemapJarTask
 import java.net.URI
 
 plugins {
-    id("fabric-loom") version "1.5-SNAPSHOT"
-    id("io.github.ladysnake.chenille") version "0.12.0-SNAPSHOT+build.1"
+    id("fabric-loom") version "1.6-SNAPSHOT"
+    id("io.github.ladysnake.chenille") version "0.12.0"
     id("org.cadixdev.licenser") version "0.6.1"
 }
 
@@ -18,7 +18,7 @@ allprojects {
     apply(plugin = "io.github.ladysnake.chenille")
 
     chenille {
-        javaVersion = 17
+        javaVersion = 21
         license = "MIT"
         displayName = providers.gradleProperty("display_name").get()
         owners = providers.gradleProperty("owners").get()
@@ -36,6 +36,13 @@ allprojects {
                 includeGroup("org.ladysnake")
                 includeGroupByRegex("dev\\.emi.*")
                 includeGroupByRegex("dev\\.onyxstudios.*")
+            }
+        }
+        maven {
+            name = "Ladysnake Mods Snapshots"
+            url = URI("https://maven.ladysnake.org/snapshots")
+            content {
+                includeGroup("org.ladysnake")
             }
         }
         maven {

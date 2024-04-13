@@ -22,6 +22,7 @@
  */
 package org.ladysnake.cca.mixin.entity.common;
 
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Bucketable;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.ItemStack;
@@ -33,12 +34,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Bucketable.class)
 public interface BucketableMixin {
-    @Inject(method = "copyDataToStack(Lnet/minecraft/entity/mob/MobEntity;Lnet/minecraft/item/ItemStack;)V", at = @At("RETURN"))
-    private static void writeComponentsToStack(MobEntity entity, ItemStack stack, CallbackInfo ci) {
-        NbtCompound nbt = stack.getNbt();
-        if (nbt != null) {
-            entity.asComponentProvider().getComponentContainer().toTag(nbt);
-        }
+    @Inject(method = "method_57302", at = @At("RETURN"))
+    private static void writeComponentsToStack(MobEntity mobEntity, NbtCompound nbtCompound, CallbackInfo ci) {
+        mobEntity.asComponentProvider().getComponentContainer().toTag(nbtCompound);
     }
 
     @Inject(method = "copyDataFromNbt(Lnet/minecraft/entity/mob/MobEntity;Lnet/minecraft/nbt/NbtCompound;)V", at = @At("RETURN"))

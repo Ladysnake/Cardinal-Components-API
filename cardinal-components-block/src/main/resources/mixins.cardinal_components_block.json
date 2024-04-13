@@ -4,12 +4,9 @@
   "compatibilityLevel": "JAVA_8",
   "package": "org.ladysnake.cca.mixin.block",
   "mixins": [
-    "common.MixinBlockDataObject",
     "common.MixinBlockEntity",
-    "common.MixinBlockStateArgument",
     "common.MixinChunkDataSender",
     "common.MixinChunkHolder",
-    "common.MixinFallingBlockEntity",
     "common.MixinServerPlayerEntity",
     "common.MixinWorldChunk"
   ],

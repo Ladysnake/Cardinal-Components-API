@@ -30,7 +30,7 @@ import net.minecraft.text.Text;
 public final class CCATestClient {
     public static void clientInit() {
         EntityRendererRegistry.register(CardinalComponentsTest.VITALITY_ZOMBIE, ZombieEntityRenderer::new);
-        ItemTooltipCallback.EVENT.register((stack, tooltipContext, lines) ->
+        ItemTooltipCallback.EVENT.register((stack, tooltipContext, tooltipType, lines) ->
             TestComponents.ALT_VITA.maybeGet(stack).ifPresent(vita -> lines.add(Text.translatable("componenttest:tooltip.vitality.native", vita.getVitality())))
         );
     }

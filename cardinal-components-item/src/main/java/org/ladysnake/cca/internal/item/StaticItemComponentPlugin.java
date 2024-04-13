@@ -22,137 +22,50 @@
  */
 package org.ladysnake.cca.internal.item;
 
-import com.google.common.collect.Iterables;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import com.mojang.serialization.Dynamic;
+import net.fabricmc.api.ModInitializer;
+import net.minecraft.component.DataComponentType;
+import net.minecraft.datafixer.fix.ItemStackComponentizationFix;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
-import org.ladysnake.cca.api.v3.component.Component;
-import org.ladysnake.cca.api.v3.component.ComponentContainer;
-import org.ladysnake.cca.api.v3.component.ComponentFactory;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.component.TransientComponent;
-import org.ladysnake.cca.api.v3.item.ItemComponent;
-import org.ladysnake.cca.api.v3.item.ItemComponentFactoryRegistry;
+import org.ladysnake.cca.api.v3.item.ItemComponentMigrationRegistry;
 import org.ladysnake.cca.api.v3.item.ItemComponentInitializer;
-import org.ladysnake.cca.internal.base.LazyDispatcher;
-import org.ladysnake.cca.internal.base.asm.CcaAsmHelper;
+import org.ladysnake.cca.internal.base.AbstractComponentContainer;
+import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.ladysnake.cca.internal.base.asm.StaticComponentPluginBase;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Predicate;
 
-public final class StaticItemComponentPlugin extends LazyDispatcher implements ItemComponentFactoryRegistry {
+public final class StaticItemComponentPlugin implements ItemComponentMigrationRegistry, ModInitializer {
     public static final StaticItemComponentPlugin INSTANCE = new StaticItemComponentPlugin();
 
-    private StaticItemComponentPlugin() {
-        super("creating an ItemStack");
-    }
+    private StaticItemComponentPlugin() {}
 
-    private final List<PredicatedComponentFactory<?>> dynamicFactories = new ArrayList<>();
-    private final Map<@Nullable Identifier, ComponentContainer.Factory.Builder<ItemStack>> componentFactories = new HashMap<>();
-    private final ComponentContainer.Factory<ItemStack> emptyFactory = stack -> ComponentContainer.EMPTY;
+    private final Map<Identifier, DataComponentType<?>> migrations = new HashMap<>();
 
-    private static String getSuffix(Identifier itemId) {
-        return "ItemStackImpl_" + CcaAsmHelper.getJavaIdentifierName(itemId);
-    }
-
-    /**
-     * Creates a container factory for an item id.
-     */
-    public static ComponentContainer.Factory<ItemStack> createItemStackContainerFactory(Item item) {
-        Identifier itemId = Registries.ITEM.getId(item);
-        return INSTANCE.getFactoryClass(item, itemId);
-    }
-
-    public ComponentContainer.Factory<ItemStack> getFactoryClass(Item item, Identifier itemId) {
-        this.ensureInitialized();
-        Objects.requireNonNull(item);
-
-        for (PredicatedComponentFactory<?> dynamicFactory : this.dynamicFactories) {
-            dynamicFactory.tryRegister(item, itemId);
+    @Override
+    public void registerMigration(Identifier oldComponentId, DataComponentType<?> mcComponentType) {
+        if (this.migrations.put(oldComponentId, mcComponentType) != null) {
+            ComponentsInternals.LOGGER.warn("[Cardinal-Components-API] Overwriting component migration for {}", oldComponentId);
         }
+    }
 
-        if (this.componentFactories.containsKey(itemId)) {
-            return this.componentFactories.get(itemId).factoryNameSuffix(getSuffix(itemId)).build();
+    public void migrate(ItemStackComponentizationFix.StackData data) {
+        for (Map.Entry<Identifier, DataComponentType<?>> entry : migrations.entrySet()) {
+            String oldComponentId = entry.getKey().toString();
+            String mcComponentId = Registries.DATA_COMPONENT_TYPE.getKey(entry.getValue()).orElseThrow(
+                () -> new IllegalStateException("Registered migration for component " + oldComponentId + " towards unregistered item component type " + entry.getValue())
+            ).getValue().toString();
+            data.moveToComponent(oldComponentId, mcComponentId);
         }
-
-        return this.emptyFactory;
     }
 
     @Override
-    protected void init() {
+    public void onInitialize() {
         StaticComponentPluginBase.processInitializers(
             StaticComponentPluginBase.getComponentEntrypoints("cardinal-components-item", ItemComponentInitializer.class),
-            initializer -> initializer.registerItemComponentFactories(this)
+            initializer -> initializer.registerItemComponentMigrations(this)
         );
-    }
-
-    public <C extends Component> void registerFor(Identifier itemId, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
-        this.checkLoading(ItemComponentFactoryRegistry.class, "register");
-        this.register0(itemId, type, factory);
-    }
-
-    public <C extends Component> void registerFor(Item item, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
-        if (!Iterables.contains(Registries.ITEM, item)) {
-            throw new IllegalStateException(item + " must be registered to Registry.ITEM before using it for component registration");
-        }
-        Identifier id = Registries.ITEM.getId(item);
-        this.registerFor(id, type, factory);
-    }
-
-    @Override
-    public <C extends ItemComponent> void register(Predicate<Item> test, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory) {
-        this.registerFor(test, type, ItemComponent.wrapFactory(type, factory));
-    }
-
-    @Override
-    public <C extends ItemComponent> void register(Item item, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory) {
-        this.registerFor(item, type, ItemComponent.wrapFactory(type, factory));
-    }
-
-    @Override
-    public <C extends TransientComponent> void registerTransient(Predicate<Item> test, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory) {
-        this.registerFor(test, type, factory);
-    }
-
-    @Override
-    public <C extends TransientComponent> void registerTransient(Item item, ComponentKey<? super C> type, ComponentFactory<ItemStack, C> factory) {
-        this.registerFor(item, type, factory);
-    }
-
-    private <C extends Component> void registerFor(Predicate<Item> test, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
-        this.dynamicFactories.add(new PredicatedComponentFactory<>(test, type, factory));
-    }
-
-    private <C extends Component> void register0(Identifier itemId, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
-        Objects.requireNonNull(itemId);
-
-        ComponentContainer.Factory.Builder<ItemStack> builder = this.componentFactories.computeIfAbsent(itemId, t -> ComponentContainer.Factory.builder(ItemStack.class));
-        builder.checkDuplicate(type, previousFactory -> "Duplicate factory declarations for " + type.getId() + " on item '" + itemId + "': " + factory + " and " + previousFactory);
-        builder.component(type, factory);
-    }
-
-    private final class PredicatedComponentFactory<C extends Component> {
-        private final Predicate<Item> predicate;
-        private final ComponentKey<C> type;
-        private final ComponentFactory<ItemStack, ? extends C> factory;
-
-        public PredicatedComponentFactory(Predicate<Item> predicate, ComponentKey<C> type, ComponentFactory<ItemStack, ? extends C> factory) {
-            this.type = type;
-            this.factory = factory;
-            this.predicate = predicate;
-        }
-
-        public void tryRegister(Item item, Identifier id) {
-            if (this.predicate.test(item)) {
-                StaticItemComponentPlugin.this.register0(id, this.type, this.factory);
-            }
-        }
     }
 }

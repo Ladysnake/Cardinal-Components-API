@@ -22,12 +22,10 @@
  */
 package org.ladysnake.componenttest.content;
 
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.passive.CowEntity;
-import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import org.ladysnake.cca.api.v3.block.BlockComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.block.BlockComponentInitializer;
@@ -35,8 +33,8 @@ import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
-import org.ladysnake.cca.api.v3.item.ItemComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.item.ItemComponentInitializer;
+import org.ladysnake.cca.api.v3.item.ItemComponentMigrationRegistry;
 import org.ladysnake.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
 import org.ladysnake.cca.test.base.BaseVita;
@@ -75,16 +73,9 @@ public final class TestComponents implements
     }
 
     @Override
-    public void registerItemComponentFactories(ItemComponentFactoryRegistry registry) {
-        // this first line adds data to every stack, which is a fairly bad idea for several reasons
-        // it also initializes the component with volatile data (stack count), which is an even worse idea and will cause desync
-        registry.register(i -> true, ALT_VITA, (stack) -> {
-            ItemVita ret = new ItemVita(stack, ALT_VITA);
-            ret.setVitality(stack.getItem() == Items.DIAMOND_CHESTPLATE ? 3 : stack.getCount());
-            return ret;
-        });
-        registry.register(CardinalComponentsTest.VITALITY_STICK, Vita.KEY, ItemVita::new);
-        ItemGroupEvents.modifyEntriesEvent(CardinalComponentsTest.ITEM_GROUP_KEY).register(entries -> entries.add(CardinalComponentsTest.VITALITY_STICK));
+    public void registerItemComponentMigrations(ItemComponentMigrationRegistry registry) {
+        registry.registerMigration(ALT_VITA.getId(), ItemVita.ALT_COMPONENT_TYPE);
+        registry.registerMigration(Vita.KEY.getId(), ItemVita.COMPONENT_TYPE);
     }
 
     @Override

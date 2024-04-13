@@ -22,11 +22,10 @@
  */
 package org.ladysnake.componenttest.content;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipType;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -44,8 +43,8 @@ import net.minecraft.world.World;
 import org.ladysnake.cca.test.base.Vita;
 import org.ladysnake.cca.test.block.CcaBlockTestMod;
 import org.ladysnake.cca.test.world.AmbientVita;
+import org.ladysnake.componenttest.content.vita.ItemVita;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +56,7 @@ public class VitalityStickItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
-        Vita vita = Vita.get(stack);
+        Vita vita = CardinalComponentsTest.ITEM_VITA_LOOKUP.find(stack, null);
         if (!world.isClient) {
             if (player.isSneaking()) {
                 Vita src = vita.getVitality() > 0 ? vita : Vita.get(player);
@@ -111,14 +110,13 @@ public class VitalityStickItem extends Item {
         return true;
     }
 
-    @Environment(EnvType.CLIENT)
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> lines, TooltipContext ctx) {
-        super.appendTooltip(stack, world, lines, ctx);
-        lines.add(Text.translatable("componenttest:tooltip.vitality", Vita.KEY.get(stack).getVitality()));
-        PlayerEntity holder = MinecraftClient.getInstance().player;
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, tooltip, type);
+        tooltip.add(Text.translatable("componenttest:tooltip.vitality", stack.getOrDefault(ItemVita.COMPONENT_TYPE, ItemVita.Data.EMPTY).vitality()));
+        ClientPlayerEntity holder = MinecraftClient.getInstance().player;
         if (holder != null) {
-            lines.add(Text.translatable("componenttest:tooltip.self_vitality", Vita.KEY.get(holder).getVitality()));
+            tooltip.add(Text.translatable("componenttest:tooltip.self_vitality", Vita.KEY.get(holder).getVitality()));
         }
     }
 

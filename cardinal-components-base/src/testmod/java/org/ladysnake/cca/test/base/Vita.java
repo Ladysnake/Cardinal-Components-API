@@ -27,8 +27,7 @@ import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 import org.ladysnake.cca.api.v3.component.ComponentV3;
 
-public interface
-Vita extends ComponentV3 {
+public interface Vita extends ComponentV3 {
     ComponentKey<Vita> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("cca-base-test", "vita"), Vita.class);
 
     static Vita get(Object provider) {

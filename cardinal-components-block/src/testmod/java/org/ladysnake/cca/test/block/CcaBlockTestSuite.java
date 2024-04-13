@@ -51,14 +51,14 @@ public class CcaBlockTestSuite implements FabricGameTest {
             )
         );
         be.getComponent(Vita.KEY).setVitality(42);
-        NbtCompound nbt = be.createNbt();
+        NbtCompound nbt = be.createNbt(ctx.getWorld().getRegistryManager());
         BlockEntity be1 = Objects.requireNonNull(
             BlockEntityType.END_GATEWAY.instantiate(
                 pos, Blocks.END_GATEWAY.getDefaultState()
             )
         );
         GameTestUtil.assertTrue("New BlockEntity should have values zeroed", be1.getComponent(Vita.KEY).getVitality() == 0);
-        be1.readNbt(nbt);
+        be1.read(nbt, ctx.getWorld().getRegistryManager());
         GameTestUtil.assertTrue("BlockEntity component data should survive deserialization", be1.getComponent(Vita.KEY).getVitality() == 42);
         ctx.complete();
     }
@@ -73,14 +73,14 @@ public class CcaBlockTestSuite implements FabricGameTest {
             )
         );
         getVita(ctx, pos, be).setVitality(42);
-        NbtCompound nbt = be.createNbt();
+        NbtCompound nbt = be.createNbt(ctx.getWorld().getRegistryManager());
         BlockEntity be1 = Objects.requireNonNull(
             BlockEntityType.END_GATEWAY.instantiate(
                 pos, Blocks.END_GATEWAY.getDefaultState()
             )
         );
         GameTestUtil.assertTrue("New BlockEntity should have values zeroed", getVita(ctx, pos, be1).getVitality() == 0);
-        be1.readNbt(nbt);
+        be1.read(nbt, ctx.getWorld().getRegistryManager());
         GameTestUtil.assertTrue("BlockEntity component data should survive deserialization", getVita(ctx, pos, be1).getVitality() == 42);
         ctx.complete();
     }
