@@ -23,12 +23,15 @@
 package org.ladysnake.cca.internal.entity;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
-import org.ladysnake.cca.api.v3.entity.PlayerComponent;
+import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
+import org.ladysnake.cca.internal.base.ComponentsInternals;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +44,7 @@ public final class CardinalEntityInternals {
     private CardinalEntityInternals() { throw new AssertionError(); }
 
     private static final Map<Class<? extends Entity>, ComponentContainer.Factory<Entity>> entityContainerFactories = new HashMap<>();
-    private static final Map<ComponentKey<?>, RespawnCopyStrategy<?>> respawnCopyStrategies = new HashMap<>();
+    private static final Map<ComponentKey<?>, Map<Class<? extends Entity>, RespawnCopyStrategy<?>>> respawnCopyStrategies = new HashMap<>();
     private static final Object factoryMutex = new Object();
 
     /**
@@ -78,25 +81,33 @@ public final class CardinalEntityInternals {
         return factory;
     }
 
-    public static <C extends Component> void registerRespawnCopyStrat(ComponentKey<? super C> type, RespawnCopyStrategy<? super C> strategy) {
-        respawnCopyStrategies.put(type, strategy);
+    public static <C extends Component> void registerRespawnCopyStrat(ComponentKey<? super C> type, Class<? extends Entity> entityClass, RespawnCopyStrategy<? super C> strategy) {
+        if (respawnCopyStrategies.computeIfAbsent(type, (t) -> new HashMap<>()).put(entityClass, strategy) != null) {
+            ComponentsInternals.LOGGER.warn("Multiple respawn copy strategies registered for key {} and entity class {}", type, entityClass);
+        }
     }
 
     @SuppressWarnings("unchecked")
-    public static <C extends Component> RespawnCopyStrategy<? super C> getRespawnCopyStrategy(ComponentKey<C> type) {
-        return (RespawnCopyStrategy<? super C>) respawnCopyStrategies.getOrDefault(type, DEFAULT_COPY_STRATEGY);
+    public static <C extends Component> RespawnCopyStrategy<? super C> getRespawnCopyStrategy(ComponentKey<C> type, Class<? extends LivingEntity> entityClass) {
+        @Nullable RespawnCopyStrategy<?> strat = null;
+        Class<?> c = entityClass;
+        while (strat == null && LivingEntity.class.isAssignableFrom(c)) {
+            strat = respawnCopyStrategies.getOrDefault(type, Map.of()).get(entityClass);
+            c = c.getSuperclass();
+        }
+        return strat == null ? DEFAULT_COPY_STRATEGY : (RespawnCopyStrategy<? super C>) strat;
     }
 
     private static void defaultCopyStrategy(Component from, Component to, boolean lossless, boolean keepInventory, boolean sameCharacter) {
-        if (to instanceof PlayerComponent) {
-            playerComponentCopy(from, (PlayerComponent<?>) to, lossless, keepInventory, sameCharacter);
+        if (to instanceof RespawnableComponent) {
+            playerComponentCopy(from, (RespawnableComponent<?>) to, lossless, keepInventory, sameCharacter);
         } else {
             RespawnCopyStrategy.LOSSLESS_ONLY.copyForRespawn(from, to, lossless, keepInventory, sameCharacter);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static <C extends Component> void playerComponentCopy(Component from, PlayerComponent<C> to, boolean lossless, boolean keepInventory, boolean sameCharacter) {
+    private static <C extends Component> void playerComponentCopy(Component from, RespawnableComponent<C> to, boolean lossless, boolean keepInventory, boolean sameCharacter) {
         if (to.shouldCopyForRespawn(lossless, keepInventory, sameCharacter)) {
             to.copyForRespawn((C) from, lossless, keepInventory, sameCharacter);
         }

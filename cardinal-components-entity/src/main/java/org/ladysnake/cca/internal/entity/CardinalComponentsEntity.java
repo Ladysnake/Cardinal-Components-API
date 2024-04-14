@@ -22,10 +22,12 @@
  */
 package org.ladysnake.cca.internal.entity;
 
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
@@ -61,7 +63,18 @@ public final class CardinalComponentsEntity {
             ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> ((ComponentProvider) entity).getComponentContainer().onServerLoad());
             ServerEntityEvents.ENTITY_UNLOAD.register((entity, world) -> ((ComponentProvider) entity).getComponentContainer().onServerUnload());
         }
+        ServerLivingEntityEvents.MOB_CONVERSION.register(RespawnCopyStrategy.EVENT_PHASE, CardinalComponentsEntity::copyData);
         ServerPlayerEvents.COPY_FROM.register(RespawnCopyStrategy.EVENT_PHASE, CardinalComponentsEntity::copyData);
+    }
+
+    private static void copyData(LivingEntity original, LivingEntity clone, boolean keepInventory) {
+        Set<ComponentKey<?>> keys = ((ComponentProvider) original).getComponentContainer().keys();
+
+        for (ComponentKey<?> key : keys) {
+            if (key.isProvidedBy(clone)) {
+                copyData(original, clone, false, keepInventory, key, true);
+            }
+        }
     }
 
     private static void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless) {
@@ -73,10 +86,10 @@ public final class CardinalComponentsEntity {
         }
     }
 
-    private static <C extends Component> void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless, boolean keepInventory, ComponentKey<C> key, boolean sameCharacter) {
+    private static <C extends Component> void copyData(LivingEntity original, LivingEntity clone, boolean lossless, boolean keepInventory, ComponentKey<C> key, boolean sameCharacter) {
         C from = key.get(original);
         C to = key.get(clone);
-        RespawnCopyStrategy.get(key).copyForRespawn(from, to, lossless, keepInventory, sameCharacter);
+        RespawnCopyStrategy.get(key, original.getClass()).copyForRespawn(from, to, lossless, keepInventory, sameCharacter);
     }
 
     private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {

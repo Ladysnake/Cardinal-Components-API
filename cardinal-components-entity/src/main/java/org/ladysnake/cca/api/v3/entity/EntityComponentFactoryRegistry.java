@@ -81,7 +81,7 @@ public interface EntityComponentFactoryRegistry {
      * @throws NullPointerException if any of the arguments is {@code null}
      * @since 2.6
      */
-    <C extends PlayerComponent<? super C>> void registerForPlayers(ComponentKey<? super C> key, ComponentFactory<PlayerEntity, C> factory);
+    <C extends RespawnableComponent<? super C>> void registerForPlayers(ComponentKey<? super C> key, ComponentFactory<PlayerEntity, C> factory);
 
     /**
      * Registers a {@link ComponentFactory} for all {@link PlayerEntity} instances, with a specific {@link RespawnCopyStrategy}.

@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.sync.PlayerSyncPredicate;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
-import org.ladysnake.cca.api.v3.entity.PlayerComponent;
+import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 import org.ladysnake.cca.test.base.BaseVita;
 import org.ladysnake.cca.test.base.CardinalGameTest;
 import org.ladysnake.cca.test.base.Vita;
@@ -40,7 +40,7 @@ import org.ladysnake.cca.test.base.Vita;
 /**
  * A Vita component attached to players, and automatically synchronized with their owner
  */
-public class PlayerVita extends EntityVita implements AutoSyncedComponent, ServerTickingComponent, PlayerComponent<BaseVita> {
+public class PlayerVita extends EntityVita implements AutoSyncedComponent, ServerTickingComponent, RespawnableComponent<BaseVita> {
     public static final int INCREASE_VITA = 0b10;
     public static final int DECREASE_VITA = 0b100;
 
@@ -103,7 +103,7 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
 
     @Override
     public void copyForRespawn(@NotNull BaseVita original, boolean lossless, boolean keepInventory, boolean switchingCharacter) {
-        PlayerComponent.super.copyForRespawn(original, lossless, keepInventory, switchingCharacter);
+        RespawnableComponent.super.copyForRespawn(original, lossless, keepInventory, switchingCharacter);
         if (!lossless && !keepInventory) {
             this.vitality -= 5;
         }

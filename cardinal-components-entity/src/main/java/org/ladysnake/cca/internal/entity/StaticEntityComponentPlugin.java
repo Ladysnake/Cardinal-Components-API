@@ -30,7 +30,7 @@ import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
-import org.ladysnake.cca.api.v3.entity.PlayerComponent;
+import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 import org.ladysnake.cca.internal.base.LazyDispatcher;
 import org.ladysnake.cca.internal.base.QualifiedComponentFactory;
@@ -125,14 +125,14 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     }
 
     @Override
-    public <C extends PlayerComponent<? super C>> void registerForPlayers(ComponentKey<? super C> key, ComponentFactory<PlayerEntity, C> factory) {
+    public <C extends RespawnableComponent<? super C>> void registerForPlayers(ComponentKey<? super C> key, ComponentFactory<PlayerEntity, C> factory) {
         this.registerForPlayers(key, factory, CardinalEntityInternals.DEFAULT_COPY_STRATEGY);
     }
 
     @Override
     public <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, ComponentFactory<PlayerEntity, P> factory, RespawnCopyStrategy<? super P> respawnStrategy) {
         this.registerFor(PlayerEntity.class, key, factory);
-        CardinalEntityInternals.registerRespawnCopyStrat(key, respawnStrategy);
+        CardinalEntityInternals.registerRespawnCopyStrat(key, PlayerEntity.class, respawnStrategy);
     }
 
     private <C extends Component, F extends C, E extends Entity> void register0(Class<? extends E> target, ComponentKey<? super C> key, QualifiedComponentFactory<ComponentFactory<E, F>> factory) {
@@ -202,7 +202,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
 
         @Override
         public Registration<C, E> respawnStrategy(RespawnCopyStrategy<? super C> strategy) {
-            CardinalEntityInternals.registerRespawnCopyStrat(this.key, strategy);
+            CardinalEntityInternals.registerRespawnCopyStrat(this.key, this.target, strategy);
             return this;
         }
 

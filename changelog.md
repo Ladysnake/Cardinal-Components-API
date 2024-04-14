@@ -12,6 +12,7 @@ This update introduces multiple breaking changes - a migration guide is availabl
 **Changes**
 - Migrate all packages from `dev.onyxstudios` to `org.ladysnake`
 - Update documentation and licenses to reflect package change
+- `RespawnCopyStrategy` now also applies on mob conversion
 
 **Removals**
 - *Removed item components.* The `cardinal-components-item` module now contains an `ItemComponentMigrationRegistry`, which is used to help you migrate to vanilla components.

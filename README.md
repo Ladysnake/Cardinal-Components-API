@@ -48,8 +48,6 @@ If you have questions or need help with this library, you can also join the [Lad
 
 ## Adding the API to your buildscript:
 
-**Upgrade information: versions 4.1.0 onwards of Cardinal Components API use the `org.ladysnake.cardinal-components-api` (lowercase) maven group instead of `io.github.onyxstudios.Cardinal-Components-API`**
-
 Latest versions of Cardinal Components API are available on the Ladysnake maven:
 ```gradle
 repositories {

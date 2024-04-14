@@ -30,14 +30,14 @@ import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
 
 @ApiStatus.Experimental
-public interface PlayerComponent<C extends Component> extends Component, CopyableComponent<C> {
+public interface RespawnableComponent<C extends Component> extends Component, CopyableComponent<C> {
     /**
      * Check whether component data should be copied as part of a respawn situation.
      *
-     * @param lossless      {@code true} if the player is copied exactly, such as when coming back from the End
-     * @param keepInventory {@code true} if the player's inventory and XP are kept, such as when
+     * @param lossless      {@code true} if the entity is copied exactly, such as when coming back from the End
+     * @param keepInventory {@code true} if the entity's inventory and XP are kept, such as - in the case of a player - when
      *                      {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
-     * @param sameCharacter {@code true} if the player is not switching to an unrelated body.
+     * @param sameCharacter {@code true} unless the entity is a player switching to an unrelated body.
      *                      Can only be {@code false} with other mods installed.
      * @return {@code true} if {@link #copyForRespawn} should be called for the current respawn situation
      */

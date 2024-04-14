@@ -40,6 +40,7 @@ import org.ladysnake.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
 import org.ladysnake.cca.test.base.BaseVita;
 import org.ladysnake.cca.test.base.SyncedVita;
 import org.ladysnake.cca.test.base.Vita;
+import org.ladysnake.cca.test.entity.CcaEntityTestMod;
 import org.ladysnake.componenttest.content.vita.ItemVita;
 import org.ladysnake.componenttest.content.vita.TeamVita;
 
@@ -54,16 +55,11 @@ public final class TestComponents implements
 
     public static final ComponentKey<Vita> ALT_VITA = ComponentRegistryV3.INSTANCE.getOrCreate(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
 
-    private static BaseVita createForEntity(LivingEntity e) {
-        return new BaseVita((int) (Math.random() * 10));
-    }
-
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.beginRegistration(HostileEntity.class, ALT_VITA).after(Vita.KEY).end(e -> new BaseVita());
-        registry.registerFor(LivingEntity.class, Vita.KEY, TestComponents::createForEntity);
         registry.registerFor(VitalityZombieEntity.class, Vita.KEY, VitalityZombieEntity::createVitaComponent);
-        registry.beginRegistration(LivingEntity.class, ALT_VITA).filter(CowEntity.class::isAssignableFrom).end(TestComponents::createForEntity);
+        registry.beginRegistration(LivingEntity.class, ALT_VITA).filter(CowEntity.class::isAssignableFrom).end(CcaEntityTestMod::createForEntity);
     }
 
     @Override

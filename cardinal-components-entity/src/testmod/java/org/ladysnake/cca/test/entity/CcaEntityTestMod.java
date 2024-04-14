@@ -24,24 +24,36 @@ package org.ladysnake.cca.test.entity;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.mob.ShulkerEntity;
+import net.minecraft.entity.passive.CamelEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
+import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
+import org.ladysnake.cca.test.base.BaseVita;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.Vita;
 
 public class CcaEntityTestMod implements ModInitializer, EntityComponentInitializer {
 
     public static final EntityType<TestEntity> TEST_ENTITY = EntityType.Builder.create(TestEntity::new, SpawnGroup.MISC).build("cca-entity-test");
+    public static final int NATURAL_VITA_CEILING = 10;
+    public static final int CAMEL_BASE_VITA = 50;
+
+    public static BaseVita createForEntity(LivingEntity e) {
+        return new BaseVita((int) (Math.random() * NATURAL_VITA_CEILING));
+    }
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
+        registry.registerFor(LivingEntity.class, Vita.KEY, CcaEntityTestMod::createForEntity);
         registry.beginRegistration(PlayerEntity.class, Vita.KEY).impl(PlayerVita.class).end(PlayerVita::new);
+        registry.beginRegistration(CamelEntity.class, Vita.KEY).impl(EntityVita.class).respawnStrategy(RespawnCopyStrategy.ALWAYS_COPY).end(owner -> new EntityVita(owner, CAMEL_BASE_VITA));
         registry.beginRegistration(ShulkerEntity.class, LoadAwareTestComponent.KEY).impl(LoadAwareTestComponent.class).end(e -> new LoadAwareTestComponent());
     }
 

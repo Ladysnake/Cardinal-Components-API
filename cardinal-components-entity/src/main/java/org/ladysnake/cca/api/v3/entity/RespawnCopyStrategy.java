@@ -22,6 +22,7 @@
  */
 package org.ladysnake.cca.api.v3.entity;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
@@ -37,6 +38,7 @@ import org.ladysnake.cca.internal.entity.CardinalEntityInternals;
  *
  * @param <C> the type of components handled by this strategy
  * @see net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents#COPY_FROM
+ * @see net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents#MOB_CONVERSION
  */
 @FunctionalInterface
 public interface RespawnCopyStrategy<C extends Component> {
@@ -63,7 +65,7 @@ public interface RespawnCopyStrategy<C extends Component> {
     };
 
     /**
-     * Copy a component whenever the player's inventory would be copied.
+     * Copy a component whenever the entity's inventory would be copied.
      *
      * <p>This strategy is relevant for any data storage tied to items or experience.
      */
@@ -100,8 +102,11 @@ public interface RespawnCopyStrategy<C extends Component> {
      */
     Identifier EVENT_PHASE = new Identifier("cardinal-components", "component-copy");
 
-    static <C extends Component> RespawnCopyStrategy<? super C> get(ComponentKey<C> key) {
-        return CardinalEntityInternals.getRespawnCopyStrategy(key);
+    /**
+     * @param entityClass the class of the source entity being respawned or converted
+     */
+    static <C extends Component> RespawnCopyStrategy<? super C> get(ComponentKey<C> key, Class<? extends LivingEntity> entityClass) {
+        return CardinalEntityInternals.getRespawnCopyStrategy(key, entityClass);
     }
 
     /**
