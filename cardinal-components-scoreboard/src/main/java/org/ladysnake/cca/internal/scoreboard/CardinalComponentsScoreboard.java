@@ -25,7 +25,6 @@ package org.ladysnake.cca.internal.scoreboard;
 import com.mojang.datafixers.util.Unit;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
@@ -42,14 +41,14 @@ public final class CardinalComponentsScoreboard {
     /**
      * {@link CustomPayloadS2CPacket} channel for default scoreboard component synchronization.
      *
-     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryByteBuf)}
      * called on the game thread.
      */
     public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> SCOREBOARD_PACKET_ID = CustomPayload.id("cardinal-components:scoreboard_sync");
     /**
      * {@link CustomPayloadS2CPacket} channel for default team component synchronization.
      *
-     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryByteBuf)}
      * called on the game thread.
      */
     public static final CustomPayload.Id<ComponentUpdatePayload<String>> TEAM_PACKET_ID = CustomPayload.id("cardinal-components:team_sync");

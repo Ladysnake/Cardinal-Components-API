@@ -26,7 +26,7 @@ import com.demonwav.mcdev.annotations.CheckEnv;
 import com.demonwav.mcdev.annotations.Env;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Contract;
@@ -75,11 +75,11 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      * nearly always provide a better implementation.
      * @see ComponentKey#sync(Object)
      * @see ComponentKey#sync(Object, ComponentPacketWriter)
-     * @see #applySyncPacket(PacketByteBuf)
+     * @see #applySyncPacket(RegistryByteBuf)
      */
     @Contract(mutates = "param1")
     @Override
-    default void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
+    default void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity recipient) {
         NbtCompound tag = new NbtCompound();
         this.writeToNbt(tag);
         buf.writeNbt(tag);
@@ -90,12 +90,12 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      *
      * @implSpec The default implementation converts the buffer's content
      * to a {@link NbtCompound} and calls {@link #readFromNbt(NbtCompound)}.
-     * @implNote any implementing class overriding {@link #writeSyncPacket(PacketByteBuf, ServerPlayerEntity)}
+     * @implNote any implementing class overriding {@link #writeSyncPacket(RegistryByteBuf, ServerPlayerEntity)}
      * such that it uses a different data format must override this method.
-     * @see #writeSyncPacket(PacketByteBuf, ServerPlayerEntity)
+     * @see #writeSyncPacket(RegistryByteBuf, ServerPlayerEntity)
      */
     @CheckEnv(Env.CLIENT)
-    default void applySyncPacket(PacketByteBuf buf) {
+    default void applySyncPacket(RegistryByteBuf buf) {
         NbtCompound tag = buf.readNbt();
         if (tag != null) {
             this.readFromNbt(tag);

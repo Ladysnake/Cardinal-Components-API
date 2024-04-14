@@ -24,7 +24,6 @@ package org.ladysnake.cca.internal.level;
 
 import com.mojang.datafixers.util.Unit;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.world.WorldProperties;
@@ -39,7 +38,7 @@ public final class CardinalComponentsLevel {
     /**
      * {@link CustomPayloadS2CPacket} channel for default level component synchronization.
      *
-     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(PacketByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryByteBuf)}
      * called on the game thread.
      */
     public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> PACKET_ID = CustomPayload.id("cardinal-components:level_sync");

@@ -24,7 +24,7 @@ package org.ladysnake.cca.test.world;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -42,7 +42,7 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
     public abstract void syncWithAll(MinecraftServer server);
 
     @Override
-    public void applySyncPacket(PacketByteBuf buf) {
+    public void applySyncPacket(RegistryByteBuf buf) {
         int vita = buf.readInt();
         this.setVitality(vita);
         World world = Objects.requireNonNull(MinecraftClient.getInstance().player).getWorld();
@@ -65,7 +65,7 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
      * proper implementation of {@code writeToPacket}, writes a single int instead of a whole tag
      */
     @Override
-    public void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity player) {
+    public void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity player) {
         buf.writeInt(this.getVitality());
     }
 

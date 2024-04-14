@@ -25,7 +25,7 @@ package org.ladysnake.cca.test.block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -75,7 +75,7 @@ public class VitaCompound implements AutoSyncedComponent {
     }
 
     @Override
-    public void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
+    public void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity recipient) {
         for (SyncedVita value : this.storage.values()) {
             if (value.shouldSyncWith(recipient)) {
                 value.writeSyncPacket(buf, recipient);
@@ -84,7 +84,7 @@ public class VitaCompound implements AutoSyncedComponent {
     }
 
     @Override
-    public void applySyncPacket(PacketByteBuf buf) {
+    public void applySyncPacket(RegistryByteBuf buf) {
         for (SyncedVita value : this.storage.values()) {
             value.applySyncPacket(buf);
         }
