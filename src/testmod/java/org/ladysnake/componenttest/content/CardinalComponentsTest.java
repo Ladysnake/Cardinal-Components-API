@@ -22,12 +22,9 @@
  */
 package org.ladysnake.componenttest.content;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -78,7 +75,6 @@ public class CardinalComponentsTest {
     // inline self component callback registration
     public static final VitalityStickItem VITALITY_STICK = Registry.register(Registries.ITEM, VITA_STICK_ID,
             new VitalityStickItem(new Item.Settings().maxDamage(50)));
-    public static final ItemApiLookup<Vita, Void> ITEM_VITA_LOOKUP = ItemApiLookup.get(id("vita"), Vita.class, Void.class);
 
     public static final VitalityCondenser VITALITY_CONDENSER = new VitalityCondenser(FabricBlockSettings.copyOf(Blocks.STONE).dropsNothing().luminance(s -> 5).ticksRandomly());
 
@@ -93,14 +89,14 @@ public class CardinalComponentsTest {
         LOGGER.info("Hello, Components!");
 
         Registry.register(Registries.ITEM_GROUP, ITEM_GROUP_KEY, ITEM_GROUP);
-        Registry.register(Registries.DATA_COMPONENT_TYPE, id("vita"), ItemVita.COMPONENT_TYPE);
-        Registry.register(Registries.DATA_COMPONENT_TYPE, id("alt_vita"), ItemVita.ALT_COMPONENT_TYPE);
+        Registry.register(Registries.DATA_COMPONENT_TYPE, id("vita"), ItemVita.Data.COMPONENT_TYPE);
+        Registry.register(Registries.DATA_COMPONENT_TYPE, id("alt_vita"), ItemVita.Data.ALT_COMPONENT_TYPE);
 
         Registry.register(Registries.BLOCK, "componenttest:vita_condenser", VITALITY_CONDENSER);
         CommandRegistrationCallback.EVENT.register((dispatcher, reg, dedicated) -> VitaCommand.register(dispatcher));
 
         FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
-        ITEM_VITA_LOOKUP.registerForItems((stack, ctx) -> new ItemVita(ItemVita.COMPONENT_TYPE, stack), VITALITY_STICK);
+        ItemVita.LOOKUP.registerForItems((stack, ctx) -> new ItemVita(ItemVita.Data.COMPONENT_TYPE, stack), VITALITY_STICK);
 
         ComponentContainer.Factory.Builder<Integer> factoryBuilder = ComponentContainer.Factory.builder(Integer.class)
             .component(Vita.KEY, BaseVita::new);

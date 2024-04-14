@@ -74,8 +74,8 @@ public final class TestComponents implements
 
     @Override
     public void registerItemComponentMigrations(ItemComponentMigrationRegistry registry) {
-        registry.registerMigration(ALT_VITA.getId(), ItemVita.ALT_COMPONENT_TYPE);
-        registry.registerMigration(Vita.KEY.getId(), ItemVita.COMPONENT_TYPE);
+        registry.registerMigration(ALT_VITA.getId(), ItemVita.Data.ALT_COMPONENT_TYPE);
+        registry.registerMigration(Vita.KEY.getId(), ItemVita.Data.COMPONENT_TYPE);
     }
 
     @Override

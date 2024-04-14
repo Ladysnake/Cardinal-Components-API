@@ -4,6 +4,8 @@ Version 6.0.0
 ------------------------------------------------------
 Updated to 1.20.5
 
+This update introduces multiple breaking changes - a migration guide is available on [the Ladysnake website](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes).
+
 **Additions**
 - Added a `PacketCodec` for component keys
 
@@ -12,6 +14,7 @@ Updated to 1.20.5
 - Update documentation and licenses to reflect package change
 
 **Removals**
+- *Removed item components.* The `cardinal-components-item` module now contains an `ItemComponentMigrationRegistry`, which is used to help you migrate to vanilla components.
 - Removed `PlayerCopyCallback` - if you were using it, you can switch to `ServerPlayerEvents.COPY_FROM` from Fabric API
 
 ------------------------------------------------------

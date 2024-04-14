@@ -24,24 +24,29 @@ package org.ladysnake.componenttest.content.vita;
 
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
+import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.minecraft.component.DataComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
-import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.TransientComponent;
+import org.ladysnake.cca.test.base.EmptyVita;
 import org.ladysnake.cca.test.base.Vita;
+import org.ladysnake.componenttest.content.CardinalComponentsTest;
+
+import java.util.Optional;
 
 public class ItemVita implements Vita, TransientComponent {
-    public static final DataComponentType<ItemVita.Data> COMPONENT_TYPE = DataComponentType.<ItemVita.Data>builder()
-        .codec(Data.CODEC)
-        .packetCodec(Data.PACKET_CODEC)
-        .build();
+    public static final ItemApiLookup<Vita, Void> LOOKUP = ItemApiLookup.get(CardinalComponentsTest.id("vita"), Vita.class, Void.class);
 
-    public static final DataComponentType<ItemVita.Data> ALT_COMPONENT_TYPE = DataComponentType.<ItemVita.Data>builder()
-        .codec(Data.CODEC)
-        .packetCodec(Data.PACKET_CODEC)
-        .build();
+    public static Vita getOrEmpty(ItemStack stack) {
+        Vita vita = LOOKUP.find(stack, null);
+        return vita == null ? EmptyVita.INSTANCE : vita;
+    }
+
+    public static Optional<Vita> maybeGet(ItemStack stack) {
+        return Optional.ofNullable(LOOKUP.find(stack, null));
+    }
 
     private final DataComponentType<ItemVita.Data> componentType;
     private final ItemStack stack;
@@ -65,5 +70,13 @@ public class ItemVita implements Vita, TransientComponent {
         public static final Data EMPTY = new Data(0);
         public static final Codec<Data> CODEC = Codec.INT.xmap(Data::new, Data::vitality);
         public static final PacketCodec<ByteBuf, Data> PACKET_CODEC = PacketCodecs.INTEGER.xmap(Data::new, Data::vitality);
+        public static final DataComponentType<Data> COMPONENT_TYPE = DataComponentType.<Data>builder()
+            .codec(CODEC)
+            .packetCodec(PACKET_CODEC)
+            .build();
+        public static final DataComponentType<Data> ALT_COMPONENT_TYPE = DataComponentType.<Data>builder()
+            .codec(CODEC)
+            .packetCodec(PACKET_CODEC)
+            .build();
     }
 }

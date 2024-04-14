@@ -56,7 +56,7 @@ public class VitalityStickItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
-        Vita vita = CardinalComponentsTest.ITEM_VITA_LOOKUP.find(stack, null);
+        Vita vita = ItemVita.maybeGet(stack).orElseThrow();
         if (!world.isClient) {
             if (player.isSneaking()) {
                 Vita src = vita.getVitality() > 0 ? vita : Vita.get(player);
@@ -95,7 +95,7 @@ public class VitalityStickItem extends Item {
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity holder) {
         // The entity may not have the component, but the stack always does.
         Vita.KEY.maybeGet(target)
-                .ifPresent(v -> v.transferTo(Vita.get(stack), 1));
+                .ifPresent(src -> ItemVita.maybeGet(stack).ifPresent(dest -> src.transferTo(dest, 1)));
 
         AbstractTeam team = holder.getScoreboardTeam();
         if (team != null) {
@@ -113,7 +113,7 @@ public class VitalityStickItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         super.appendTooltip(stack, context, tooltip, type);
-        tooltip.add(Text.translatable("componenttest:tooltip.vitality", stack.getOrDefault(ItemVita.COMPONENT_TYPE, ItemVita.Data.EMPTY).vitality()));
+        tooltip.add(Text.translatable("componenttest:tooltip.vitality", ItemVita.getOrEmpty(stack).getVitality()));
         ClientPlayerEntity holder = MinecraftClient.getInstance().player;
         if (holder != null) {
             tooltip.add(Text.translatable("componenttest:tooltip.self_vitality", Vita.KEY.get(holder).getVitality()));

@@ -20,23 +20,20 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.api.v3.item;
+package org.ladysnake.cca.test.base;
 
-import net.minecraft.component.DataComponentType;
-import net.minecraft.util.Identifier;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.TransientComponent;
 
-/**
- * Allows registering migrations from {@linkplain org.ladysnake.cca.api.v3.component.Component CCA components} to {@linkplain net.minecraft.component.Component vanilla components}.
- */
-public interface ItemComponentMigrationRegistry {
-    /**
-     * Registers an item component migration from the specified {@link ComponentKey#getId() CCA Component ID} to an equivalent {@link DataComponentType}.
-     *
-     * <p>This hooks into the vanilla datafixing process and may therefore not correctly migrate data for stacks stored in modded containers.
-     *
-     * @param oldComponentId the item component ID from CCA days
-     * @param mcComponentType the new vanilla component type
-     */
-    void registerMigration(Identifier oldComponentId, DataComponentType<?> mcComponentType);
+public class EmptyVita implements Vita, TransientComponent {
+    public static final EmptyVita INSTANCE = new EmptyVita();
+
+    @Override
+    public int getVitality() {
+        return 0;
+    }
+
+    @Override
+    public void setVitality(int value) {
+        throw new UnsupportedOperationException();
+    }
 }
