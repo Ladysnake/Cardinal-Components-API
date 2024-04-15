@@ -26,6 +26,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.ladysnake.cca.api.v3.component.ComponentRegistry;
 import org.ladysnake.cca.internal.base.asm.StaticComponentLoadingException;
 
@@ -92,5 +93,9 @@ public final class ComponentsInternals {
                 LOGGER.warn("Failed to deserialize component: {} {}", cause, missedKeyId);
             }
         }
+    }
+
+    public static @NotNull String getClientOptionalModAdvice() {
+        return FabricLoader.getInstance().isDevelopmentEnvironment() ? "\n§eDEV ADVICE: If your mod is supposed to be client-optional, try overriding isSyncOptional() in your component." : "";
     }
 }

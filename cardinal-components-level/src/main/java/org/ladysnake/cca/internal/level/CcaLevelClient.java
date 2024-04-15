@@ -32,7 +32,9 @@ public final class CcaLevelClient {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsLevel.PACKET_ID,
-                (payload, ctx) -> payload.componentKey().maybeGet(Objects.requireNonNull(ctx.client().world).getLevelProperties())
+                (payload, ctx) -> payload.componentKey().flatMap(
+                    key -> key.maybeGet(Objects.requireNonNull(ctx.client().world).getLevelProperties())
+                )
             );
         }
     }

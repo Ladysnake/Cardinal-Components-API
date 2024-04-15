@@ -34,7 +34,9 @@ public final class CcaEntityClient {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsEntity.PACKET_ID,
-                (payload, ctx) -> payload.componentKey().maybeGet(Objects.requireNonNull(ctx.client().world).getEntityById(payload.targetData()))
+                (payload, ctx) -> payload.componentKey().flatMap(
+                    key -> key.maybeGet(Objects.requireNonNull(ctx.client().world).getEntityById(payload.targetData()))
+                )
             );
         }
         if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {

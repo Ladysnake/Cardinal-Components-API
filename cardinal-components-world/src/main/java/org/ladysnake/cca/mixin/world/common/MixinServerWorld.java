@@ -76,11 +76,12 @@ public abstract class MixinServerWorld extends MixinWorld {
     }
 
     @Override
-    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, RegistryByteBuf data) {
+    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
         return new ComponentUpdatePayload<>(
             CardinalComponentsWorld.PACKET_ID,
             Unit.INSTANCE,
-            key,
+            required,
+            key.getId(),
             data
         );
     }

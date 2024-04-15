@@ -87,11 +87,12 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Com
     }
 
     @Override
-    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, RegistryByteBuf data) {
+    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
         return new ComponentUpdatePayload<>(
             CardinalComponentsLevel.PACKET_ID,
             Unit.INSTANCE,
-            key,
+            required,
+            key.getId(),
             data
         );
     }

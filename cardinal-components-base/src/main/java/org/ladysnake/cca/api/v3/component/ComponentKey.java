@@ -31,6 +31,7 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -38,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.sync.ComponentPacketWriter;
 import org.ladysnake.cca.api.v3.component.sync.PlayerSyncPredicate;
+import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.ladysnake.cca.internal.base.asm.CcaBootstrap;
 
 import java.util.NoSuchElementException;
@@ -209,10 +211,17 @@ public abstract class ComponentKey<C extends Component> {
         if (predicate.shouldSyncWith(player)) {
             RegistryByteBuf buf = new RegistryByteBuf(Unpooled.buffer(), player.getServerWorld().getRegistryManager());
             writer.writeSyncPacket(buf, player);
-            CustomPayload payload = provider.toComponentPacket(this, buf);
+            CustomPayload payload = provider.toComponentPacket(this, !predicate.isSyncOptional(), buf);
 
             if (payload != null) {
-                ServerPlayNetworking.getSender(player).sendPacket(payload, PacketCallbacks.always(buf::release));
+                if (ServerPlayNetworking.canSend(player, payload.getId())) {
+                    ServerPlayNetworking.getSender(player).sendPacket(payload, PacketCallbacks.always(buf::release));
+                } else {
+                    if (!predicate.isSyncOptional()) {
+                        player.networkHandler.disconnect(Text.literal("This server requires Cardinal Components API (unhandled packet: " + payload.getId().id() + ")" + ComponentsInternals.getClientOptionalModAdvice()));
+                    }
+                    buf.release();
+                }
             } else {
                 buf.release();
             }

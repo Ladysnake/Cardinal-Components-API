@@ -77,6 +77,11 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
         }
 
         @Override
+        public boolean isSyncOptional() {
+            return true;
+        }
+
+        @Override
         public void syncWithAll(MinecraftServer server) {
             this.world.syncComponent(KEY);
         }

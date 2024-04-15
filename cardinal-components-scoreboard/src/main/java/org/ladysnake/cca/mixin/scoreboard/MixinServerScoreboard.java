@@ -67,11 +67,12 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
     }
 
     @Override
-    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, RegistryByteBuf data) {
+    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
         return new ComponentUpdatePayload<>(
             CardinalComponentsScoreboard.SCOREBOARD_PACKET_ID,
             Unit.INSTANCE,
-            key,
+            required,
+            key.getId(),
             data
         );
     }

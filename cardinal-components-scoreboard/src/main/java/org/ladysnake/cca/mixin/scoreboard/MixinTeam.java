@@ -75,11 +75,12 @@ public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
     }
 
     @Override
-    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, RegistryByteBuf data) {
+    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
         return new ComponentUpdatePayload<>(
             CardinalComponentsScoreboard.TEAM_PACKET_ID,
             this.getName(),
-            key,
+            required,
+            key.getId(),
             data
         );
     }

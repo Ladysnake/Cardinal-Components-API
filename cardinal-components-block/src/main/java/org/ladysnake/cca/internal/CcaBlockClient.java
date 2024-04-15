@@ -31,11 +31,11 @@ public class CcaBlockClient {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             CcaClientInternals.registerComponentSync(CardinalComponentsBlock.PACKET_ID,
-                (payload, ctx) -> payload.componentKey().maybeGet(payload.targetData().beType().get(
+                (payload, ctx) -> payload.componentKey().flatMap(key -> key.maybeGet(payload.targetData().beType().get(
                     ctx.client().world,
                     payload.targetData().bePos()
                 ))
-            );
+            ));
         }
         if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {
             ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register((be, world) -> ((ComponentProvider) be).getComponentContainer().onServerLoad());

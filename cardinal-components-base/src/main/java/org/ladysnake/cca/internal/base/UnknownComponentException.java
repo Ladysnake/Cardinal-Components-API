@@ -20,25 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.api.v3.item;
+package org.ladysnake.cca.internal.base;
 
-import net.minecraft.item.ItemStack;
-import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
-
-/**
- * Entrypoint getting invoked to register item component migrations.
- *
- * <p>The entrypoint is exposed as either {@code "cardinal-components"} or {@code "cardinal-components-item"} in the mod json and runs for any environment.
- * It usually executes right before the first {@link ItemStack} instance is created.
- *
- * @since 6.0.0
- */
-public interface ItemComponentInitializer extends ComponentRegistrationInitializer {
-    /**
-     * Called to register component migrations from CCA to {@link net.minecraft.component.DataComponentType}.
-     *
-     * @param registry an {@link ItemComponentMigrationRegistry} for component migrations
-     * @since 7.0.0
-     */
-    void registerItemComponentMigrations(ItemComponentMigrationRegistry registry);
+public class UnknownComponentException extends RuntimeException {
+    public UnknownComponentException(String message) {
+        super(message);
+    }
 }

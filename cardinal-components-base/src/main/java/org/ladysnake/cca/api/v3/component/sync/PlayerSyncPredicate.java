@@ -30,6 +30,14 @@ public interface PlayerSyncPredicate {
     @Contract(pure = true)
     boolean shouldSyncWith(ServerPlayerEntity player);
 
+    /**
+     * If this method returns {@code true} and a client cannot handle a sync packet, the sync will be skipped.
+     * Otherwise, a sync update will disconnect the client.
+     */
+    default boolean isSyncOptional() {
+        return false;
+    }
+
     static PlayerSyncPredicate all() {
         return p -> true;
     }

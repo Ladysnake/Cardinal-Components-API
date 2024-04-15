@@ -25,13 +25,19 @@ package org.ladysnake.cca.internal.base;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Identifier;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.ComponentRegistry;
+
+import java.util.Optional;
 
 public record ComponentUpdatePayload<T>(
     Id<ComponentUpdatePayload<T>> id,
     T targetData,
-    ComponentKey<?> componentKey,
+    boolean required,
+    Identifier componentKeyId,
     RegistryByteBuf buf
 ) implements CustomPayload {
     public static <T> CustomPayload.Id<ComponentUpdatePayload<T>> id(String path) {
@@ -43,13 +49,22 @@ public record ComponentUpdatePayload<T>(
     }
 
     public static <T> PacketCodec<RegistryByteBuf, ComponentUpdatePayload<T>> codec(Id<ComponentUpdatePayload<T>> id, PacketCodec<? super RegistryByteBuf, T> targetDataCodec) {
-        return org.ladysnake.cca.internal.base.MorePacketCodecs.tuple(
+        return PacketCodec.tuple(
             PacketCodec.unit(id), ComponentUpdatePayload::id,
             targetDataCodec, ComponentUpdatePayload::targetData,
-            ComponentKey.PACKET_CODEC, ComponentUpdatePayload::componentKey,
-            org.ladysnake.cca.internal.base.MorePacketCodecs.REG_BYTE_BUF, ComponentUpdatePayload::buf,
+            PacketCodecs.BOOL, ComponentUpdatePayload::required,
+            Identifier.PACKET_CODEC, ComponentUpdatePayload::componentKeyId,
+            MorePacketCodecs.REG_BYTE_BUF, ComponentUpdatePayload::buf,
             ComponentUpdatePayload::new
         );
+    }
+
+    public Optional<ComponentKey<?>> componentKey() {
+        ComponentKey<?> key = ComponentRegistry.get(this.componentKeyId());
+        if (key == null && this.required()) {
+            throw new UnknownComponentException("Unknown component " + this.componentKeyId());
+        }
+        return Optional.ofNullable(key);
     }
 
     @Override

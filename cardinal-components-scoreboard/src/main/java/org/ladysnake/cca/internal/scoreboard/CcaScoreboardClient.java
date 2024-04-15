@@ -32,11 +32,13 @@ public final class CcaScoreboardClient {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsScoreboard.TEAM_PACKET_ID,
-                (payload, ctx) -> payload.componentKey().maybeGet(Objects.requireNonNull(ctx.client().world).getScoreboard().getTeam(payload.targetData()))
-            );
+                (payload, ctx) -> payload.componentKey().flatMap(key -> key.maybeGet(Objects.requireNonNull(ctx.client().world).getScoreboard().getTeam(payload.targetData()))
+            ));
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsScoreboard.SCOREBOARD_PACKET_ID,
-                (payload, ctx) -> payload.componentKey().maybeGet(Objects.requireNonNull(ctx.client().world).getScoreboard())
+                (payload, ctx) -> payload.componentKey().flatMap(
+                    key -> key.maybeGet(Objects.requireNonNull(ctx.client().world).getScoreboard())
+                )
             );
         }
     }

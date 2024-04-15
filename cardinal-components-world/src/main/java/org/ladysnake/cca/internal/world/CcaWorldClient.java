@@ -30,7 +30,9 @@ public final class CcaWorldClient {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsWorld.PACKET_ID,
-                (payload, ctx) -> payload.componentKey().maybeGet(ctx.client().world)
+                (payload, ctx) -> payload.componentKey().flatMap(
+                    key -> key.maybeGet(ctx.client().world)
+                )
             );
         }
     }

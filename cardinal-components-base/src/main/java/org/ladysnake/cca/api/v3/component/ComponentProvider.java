@@ -26,11 +26,11 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.sync.PlayerSyncPredicate;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -64,13 +64,14 @@ public interface ComponentProvider extends ComponentAccess {
      *
      * <p>It is the responsibility of the caller to {@link ByteBuf#release() release} the buffer after this method returns.
      *
-     * @param key  the key describing the component being synchronized
-     * @param data the component's raw sync data
+     * @param key      the key describing the component being synchronized
+     * @param required {@code true} if attempting to sync a component key unknown to the client should disconnect it
+     * @param data     the component's raw sync data
      * @return a {@link ComponentUpdatePayload} that has all the information required to perform the component sync
      * @since 6.0.0
      */
     @Nullable
-    default <C extends AutoSyncedComponent> CustomPayload toComponentPacket(ComponentKey<? super C> key, RegistryByteBuf data) {
+    default <C extends AutoSyncedComponent> CustomPayload toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
         return null;
     }
 }

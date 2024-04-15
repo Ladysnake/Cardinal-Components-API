@@ -69,11 +69,12 @@ public abstract class MixinWorldChunk extends Chunk implements ComponentProvider
     }
 
     @Override
-    public @javax.annotation.Nullable <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, RegistryByteBuf data) {
+    public @Nullable <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
         return new ComponentUpdatePayload<>(
             CardinalComponentsChunk.PACKET_ID,
             this.getPos(),
-            key,
+            required,
+            key.getId(),
             data
         );
     }
