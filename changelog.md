@@ -7,6 +7,7 @@ Updated to 1.20.5
 This update introduces multiple breaking changes - a migration guide is available on [the Ladysnake website](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes).
 
 **Additions**
+- Added `C2SSelfMessagingComponent`, a new experimental utility interface to simplify client-to-server messaging on player components
 - Added `WorldComponentRegistry#registerFor` methods, allowing for dimension-specific world components
 - Scoreboard and team components now support client ticking
 

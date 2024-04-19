@@ -201,13 +201,13 @@ public abstract class ComponentKey<C extends Component> {
         if (predicate.shouldSyncWith(player)) {
             RegistryByteBuf buf = new RegistryByteBuf(Unpooled.buffer(), player.getServerWorld().getRegistryManager());
             writer.writeSyncPacket(buf, player);
-            CustomPayload payload = provider.toComponentPacket(this, !predicate.isSyncOptional(), buf);
+            CustomPayload payload = provider.toComponentPacket(this, predicate.isRequiredOnClient(), buf);
 
             if (payload != null) {
                 if (ServerPlayNetworking.canSend(player, payload.getId())) {
                     ServerPlayNetworking.getSender(player).sendPacket(payload, PacketCallbacks.always(buf::release));
                 } else {
-                    if (!predicate.isSyncOptional()) {
+                    if (predicate.isRequiredOnClient()) {
                         player.networkHandler.disconnect(Text.literal("This server requires Cardinal Components API (unhandled packet: " + payload.getId().id() + ")" + ComponentsInternals.getClientOptionalModAdvice()));
                     }
                     buf.release();

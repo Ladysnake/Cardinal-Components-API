@@ -94,7 +94,7 @@ public interface ComponentContainer extends NbtSerializable {
      *
      * @param component the component of which to look up the key
      * @return the found key, or {@code null} if the component is not part of this container
-     * @since 5.3.0
+     * @since 6.0.0
      */
     @Nullable
     @ApiStatus.Experimental

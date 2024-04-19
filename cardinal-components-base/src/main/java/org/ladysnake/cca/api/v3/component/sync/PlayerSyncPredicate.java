@@ -31,11 +31,11 @@ public interface PlayerSyncPredicate {
     boolean shouldSyncWith(ServerPlayerEntity player);
 
     /**
-     * If this method returns {@code true} and a client cannot handle a sync packet, the sync will be skipped.
-     * Otherwise, a sync update will disconnect the client.
+     * If this method returns {@code true} and a client cannot handle a sync packet, they will be disconnected.
+     * Otherwise, the sync will be skipped.
      */
-    default boolean isSyncOptional() {
-        return false;
+    default boolean isRequiredOnClient() {
+        return true;
     }
 
     static PlayerSyncPredicate all() {

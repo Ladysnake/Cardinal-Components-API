@@ -77,8 +77,8 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
         }
 
         @Override
-        public boolean isSyncOptional() {
-            return true;
+        public boolean isRequiredOnClient() {
+            return false;
         }
 
         @Override

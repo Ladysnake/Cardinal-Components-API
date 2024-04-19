@@ -96,6 +96,6 @@ public final class ComponentsInternals {
     }
 
     public static @NotNull String getClientOptionalModAdvice() {
-        return FabricLoader.getInstance().isDevelopmentEnvironment() ? "\n§eDEV ADVICE: If your mod is supposed to be client-optional, try overriding isSyncOptional() in your component." : "";
+        return FabricLoader.getInstance().isDevelopmentEnvironment() ? "\n§eDEV ADVICE: If your mod is supposed to be client-optional, try overriding isRequiredOnClient() in your component." : "";
     }
 }
