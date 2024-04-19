@@ -230,7 +230,7 @@ Do not forget to declare your component initializer as an entrypoint in your mod
 
 **quilt.mod.json** (if you use Quilt)
 
-```json
+```json5
 {
     "quilt_loader": {
         "entrypoints": {
@@ -241,7 +241,7 @@ Do not forget to declare your component initializer as an entrypoint in your mod
 ```
 
 **fabric.mod.json** (if you use Fabric)
-```json
+```json5
 {
     "entrypoints": {
         "cardinal-components": [
