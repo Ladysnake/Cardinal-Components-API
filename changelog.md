@@ -9,6 +9,7 @@ This update introduces multiple breaking changes - a migration guide is availabl
 **Additions**
 - Added a `PacketCodec` for component keys
 - Added `WorldComponentRegistry#registerFor` methods, allowing for dimension-specific world components
+- Scoreboard and team components now support client ticking
 
 **Changes**
 - Migrated all packages from `dev.onyxstudios` to `org.ladysnake`

@@ -147,8 +147,8 @@ class IncrementingIntComponent implements IntComponent, ServerTickingComponent {
 }
 ```
 
-*Serverside ticking is implemented for all providers except item stacks.
- Clientside ticking is only implemented for entities, block entities, and worlds.*
+*Serverside ticking is implemented for all providers.
+ Clientside ticking is only implemented for entities, block entities, worlds, and scoreboards/teams.*
 
 If you want your component to **be notified of its provider being loaded and unloaded**, typically for advanced setup or cleanup,
 you can add the [`ServerLoadAwareComponent`](./cardinal-components-base/src/main/java/org/ladysnake/cca/api/v3/component/load/ServerLoadAwareComponent.java)
@@ -200,7 +200,6 @@ The next step is to choose an identifier for your component, and to declare it a
 
 Components can be provided by objects of various classes, depending on which modules you installed.
 The most common providers are [entities](https://ladysnake.org/wiki/cardinal-components-api/modules/entity),
-[item stacks](https://ladysnake.org/wiki/cardinal-components-api/modules/entity),
 [worlds](https://ladysnake.org/wiki/cardinal-components-api/modules/world)
 and [chunks](https://ladysnake.org/wiki/cardinal-components-api/modules/chunk),
 but more are available.

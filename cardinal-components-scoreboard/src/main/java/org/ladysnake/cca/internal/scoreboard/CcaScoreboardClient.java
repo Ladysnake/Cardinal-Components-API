@@ -22,13 +22,28 @@
  */
 package org.ladysnake.cca.internal.scoreboard;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.Team;
 import org.ladysnake.cca.internal.base.CcaClientInternals;
 
 import java.util.Objects;
 
 public final class CcaScoreboardClient {
     public static void initClient() {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            ClientPlayNetworkHandler networkHandler = client.getNetworkHandler();
+            if (networkHandler != null) {
+                Scoreboard scoreboard = networkHandler.getScoreboard();
+                scoreboard.asComponentProvider().getComponentContainer().tickClientComponents();
+
+                for (Team team : scoreboard.getTeams()) {
+                    team.asComponentProvider().getComponentContainer().tickClientComponents();
+                }
+            }
+        });
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsScoreboard.TEAM_PACKET_ID,
