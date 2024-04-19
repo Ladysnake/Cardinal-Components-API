@@ -22,19 +22,12 @@
  */
 package org.ladysnake.cca.test.world;
 
-import net.minecraft.world.World;
-import org.ladysnake.cca.api.v3.world.WorldComponentFactoryRegistry;
-import org.ladysnake.cca.api.v3.world.WorldComponentInitializer;
-import org.ladysnake.cca.test.base.LoadAwareTestComponent;
-import org.ladysnake.cca.test.base.TickingTestComponent;
-import org.ladysnake.cca.test.base.Vita;
+import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
+import org.ladysnake.cca.test.base.BaseVita;
 
-public class CcaWorldTestMod implements WorldComponentInitializer {
+public class NetherVita extends BaseVita implements ServerTickingComponent {
     @Override
-    public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
-        registry.register(Vita.KEY, AmbientVita.WorldVita.class, AmbientVita.WorldVita::new);
-        registry.register(LoadAwareTestComponent.KEY, w -> new LoadAwareTestComponent());
-        registry.registerFor(World.NETHER, Vita.KEY, NetherVita.class, w -> new NetherVita());
-        registry.registerFor(World.END, TickingTestComponent.KEY, w -> new TickingTestComponent());
+    public void serverTick() {
+        this.setVitality(666);
     }
 }

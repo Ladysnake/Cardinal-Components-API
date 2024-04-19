@@ -25,7 +25,7 @@ package org.ladysnake.cca.mixin.world.common;
 import net.minecraft.world.World;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
-import org.ladysnake.cca.internal.world.StaticWorldComponentPlugin;
+import org.ladysnake.cca.internal.world.CardinalComponentsWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -42,7 +42,7 @@ public abstract class MixinWorld implements ComponentProvider {
 
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
-        this.components = StaticWorldComponentPlugin.componentContainerFactory.get().createContainer((World) (Object) this);
+        this.components = CardinalComponentsWorld.createComponents((World) (Object) this);
     }
 
     @Nonnull

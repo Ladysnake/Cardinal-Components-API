@@ -8,10 +8,11 @@ This update introduces multiple breaking changes - a migration guide is availabl
 
 **Additions**
 - Added a `PacketCodec` for component keys
+- Added `WorldComponentRegistry#registerFor` methods, allowing for dimension-specific world components
 
 **Changes**
-- Migrate all packages from `dev.onyxstudios` to `org.ladysnake`
-- Update documentation and licenses to reflect package change
+- Migrated all packages from `dev.onyxstudios` to `org.ladysnake`
+- Updated documentation and licenses to reflect package change
 - `RespawnCopyStrategy` now also applies on mob conversion
 
 **Removals**

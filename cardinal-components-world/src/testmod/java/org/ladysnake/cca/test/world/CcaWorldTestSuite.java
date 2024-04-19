@@ -25,8 +25,12 @@ package org.ladysnake.cca.test.world;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
+import net.minecraft.world.World;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
+import org.ladysnake.cca.test.base.Vita;
 import org.ladysnake.elmendorf.GameTestUtil;
+
+import java.util.Objects;
 
 public class CcaWorldTestSuite implements FabricGameTest {
     @GameTest(templateName = EMPTY_STRUCTURE)
@@ -36,5 +40,16 @@ public class CcaWorldTestSuite implements FabricGameTest {
             ctx.getWorld().getComponent(LoadAwareTestComponent.KEY).getLoadCounter() == 1
         );
         ctx.complete();
+    }
+
+    @GameTest(templateName = EMPTY_STRUCTURE)
+    public void worldSpecificComponentOverrides(TestContext ctx) {
+        ctx.waitAndRun(1, () -> {
+            GameTestUtil.assertTrue(
+                "Nether should have its own Vita implementation",
+                Vita.KEY.getNullable(Objects.requireNonNull(ctx.getWorld().getServer().getWorld(World.NETHER))) instanceof NetherVita v && v.getVitality() == 666
+            );
+            ctx.complete();
+        });
     }
 }
