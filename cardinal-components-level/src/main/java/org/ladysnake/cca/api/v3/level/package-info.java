@@ -21,7 +21,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /**
- * @deprecated level components are a legacy feature
+ * @deprecated level components are a legacy feature that has been superseded by scoreboard components
  */
 @Deprecated(since = "6.0.0")
 @MethodsReturnNonnullByDefault
