@@ -92,6 +92,7 @@ public abstract class MixinEntity implements ComponentProvider {
         return List.of();
     }
 
+    @SuppressWarnings("AddedMixinMembersNamePattern")   // it's okay, we have custom types in the descriptor
     @Override
     public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
         return new ComponentUpdatePayload<>(

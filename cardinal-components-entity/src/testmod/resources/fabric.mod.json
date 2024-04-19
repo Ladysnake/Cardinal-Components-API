@@ -9,6 +9,9 @@
         "main": [
           "org.ladysnake.cca.test.entity.CcaEntityTestMod"
         ],
+        "client": [
+          "org.ladysnake.cca.test.entity.CcaEntityTestClient"
+        ],
         "cardinal-components": [
           "org.ladysnake.cca.test.entity.CcaEntityTestMod"
         ],
