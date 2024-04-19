@@ -22,13 +22,10 @@
  */
 package org.ladysnake.cca.api.v3.component;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -56,13 +53,6 @@ import java.util.Optional;
  */
 @ApiStatus.NonExtendable
 public abstract class ComponentKey<C extends Component> {
-    public static final PacketCodec<ByteBuf, ComponentKey<? extends Component>> PACKET_CODEC = PacketCodecs.STRING.xmap(
-            id -> Objects.requireNonNull(
-                ComponentRegistry.get(new Identifier(id)),
-                "No component key with id " + id
-            ),
-            key -> key.getId().toString()
-    );
 
     public final Identifier getId() {
         return this.id;

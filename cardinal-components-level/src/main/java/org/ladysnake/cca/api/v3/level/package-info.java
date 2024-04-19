@@ -20,6 +20,11 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
+/**
+ * @deprecated level components are a legacy feature
+ */
+@Deprecated(since = "6.0.0")
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 package org.ladysnake.cca.api.v3.level;
