@@ -1,8 +1,3 @@
-## **The CCA Maven is moving!**
-
-**As Jfrog has ended their free service for OSS projects, we had to move the maven repository before the 1st of July 2023.
-See below for the new maven instructions - you will have to update your buildscripts with the new URL to fix dependency resolution failures.**
-
 <h1>
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="banner-white.svg">
