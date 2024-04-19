@@ -20,23 +20,21 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.api.v3.component.sync;
+package org.ladysnake.cca.test.entity;
 
-import net.minecraft.network.RegistryByteBuf;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.entity.mob.ShulkerEntity;
+import org.ladysnake.cca.api.v3.component.sync.C2SComponentPacketWriter;
+import org.ladysnake.cca.test.base.Vita;
 
-/**
- * @since 6.0.0
- */
-@ApiStatus.Experimental
-@FunctionalInterface
-public interface C2SComponentPacketWriter {
-    /**
-     * A no-op writer, for when simply sending an empty message is enough
-     */
-    C2SComponentPacketWriter EMPTY = buf -> {};
-
-    @Contract(mutates = "param")
-    void writeC2SPacket(RegistryByteBuf buf);
+public class CcaEntityTestClient implements ClientModInitializer {
+    @Override
+    public void onInitializeClient() {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.targetedEntity instanceof ShulkerEntity) {
+                ((PlayerVita) Vita.get(client.player)).sendC2SMessage(C2SComponentPacketWriter.EMPTY);
+            }
+        });
+    }
 }

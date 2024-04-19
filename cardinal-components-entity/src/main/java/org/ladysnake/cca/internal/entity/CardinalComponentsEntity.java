@@ -26,6 +26,7 @@ import com.mojang.datafixers.util.Unit;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
@@ -47,6 +48,7 @@ import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 import org.ladysnake.cca.api.v3.entity.TrackingStartCallback;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
+import org.ladysnake.cca.internal.base.MorePacketCodecs;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -61,7 +63,7 @@ public final class CardinalComponentsEntity {
      */
     public static final CustomPayload.Id<ComponentUpdatePayload<Integer>> PACKET_ID = CustomPayload.id("cardinal-components:entity_sync");
     /**
-     * {@link CustomPayloadC2SPacket} channel for C2S player component messages.
+     * {@link net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket} channel for C2S player component messages.
      *
      * <p> Packets emitted on this channel must begin with the {@link ComponentKey#getId() component's type} (as an Identifier).
      *
@@ -74,6 +76,7 @@ public final class CardinalComponentsEntity {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             ComponentUpdatePayload.register(PACKET_ID, PacketCodecs.VAR_INT);
+            PayloadTypeRegistry.playC2S().register(C2S_SELF_PACKET_ID, ComponentUpdatePayload.codec(C2S_SELF_PACKET_ID, MorePacketCodecs.EMPTY));
             PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
             TrackingStartCallback.EVENT.register(CardinalComponentsEntity::syncEntityComponents);
             ServerPlayNetworking.registerGlobalReceiver(CardinalComponentsEntity.C2S_SELF_PACKET_ID, (payload, ctx) -> {

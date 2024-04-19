@@ -28,10 +28,12 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.sync.PlayerSyncPredicate;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
+import org.ladysnake.cca.api.v3.entity.C2SSelfMessagingComponent;
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 import org.ladysnake.cca.test.base.BaseVita;
 import org.ladysnake.cca.test.base.CardinalGameTest;
@@ -40,7 +42,7 @@ import org.ladysnake.cca.test.base.Vita;
 /**
  * A Vita component attached to players, and automatically synchronized with their owner
  */
-public class PlayerVita extends EntityVita implements AutoSyncedComponent, ServerTickingComponent, RespawnableComponent<BaseVita> {
+public class PlayerVita extends EntityVita implements AutoSyncedComponent, ServerTickingComponent, RespawnableComponent<BaseVita>, C2SSelfMessagingComponent {
     public static final int INCREASE_VITA = 0b10;
     public static final int DECREASE_VITA = 0b100;
 
@@ -107,5 +109,10 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
         if (!lossless && !keepInventory) {
             this.vitality -= 5;
         }
+    }
+
+    @Override
+    public void handleC2SMessage(RegistryByteBuf buf) {
+        ((PlayerEntity) this.owner).sendMessage(Text.of("Sync!"), true);
     }
 }

@@ -20,23 +20,10 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.api.v3.component.sync;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+package org.ladysnake.cca.test.entity;
 
-import net.minecraft.network.RegistryByteBuf;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
+import org.ladysnake.cca.api.v3.util.MethodsReturnNonnullByDefault;
 
-/**
- * @since 6.0.0
- */
-@ApiStatus.Experimental
-@FunctionalInterface
-public interface C2SComponentPacketWriter {
-    /**
-     * A no-op writer, for when simply sending an empty message is enough
-     */
-    C2SComponentPacketWriter EMPTY = buf -> {};
-
-    @Contract(mutates = "param")
-    void writeC2SPacket(RegistryByteBuf buf);
-}
+import javax.annotation.ParametersAreNonnullByDefault;
