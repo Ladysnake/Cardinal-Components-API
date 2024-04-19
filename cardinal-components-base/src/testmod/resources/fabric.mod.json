@@ -7,8 +7,8 @@
     "version": "${version}",
     "entrypoints": {
         "fabric-gametest": [
-          "dev.onyxstudios.cca.internal.base.ComponentRegistryImplTest",
-          "dev.onyxstudios.cca.internal.base.QualifiedComponentFactoryTest"
+          "org.ladysnake.cca.internal.base.ComponentRegistryImplTest",
+          "org.ladysnake.cca.internal.base.QualifiedComponentFactoryTest"
         ]
     },
     "custom": {

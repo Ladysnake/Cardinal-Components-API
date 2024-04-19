@@ -1,6 +1,36 @@
+
+------------------------------------------------------
+Version 6.0.0
+------------------------------------------------------
+Updated to 1.20.5
+
+This update introduces multiple breaking changes - a migration guide is available on [the Ladysnake website](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes).
+
+**Additions**
+- Added `WorldComponentRegistry#registerFor` methods, allowing for dimension-specific world components
+- Scoreboard and team components now support client ticking
+
+**Changes**
+- Migrated all packages from `dev.onyxstudios` to `org.ladysnake`
+- Updated documentation and licenses to reflect package change
+- `RespawnCopyStrategy` now also applies on mob conversion
+- The `cardinal-components-level` is now deprecated, as it is redundant with the `cardinal-components-scoreboard` module
+  - Mods are encouraged to move to scoreboard components, which serve the same purpose of global data storage and have an API more consistent with other modules
+
+**Removals**
+- *Removed item components.* The `cardinal-components-item` module now contains an `ItemComponentMigrationRegistry`, which is used to help you migrate to vanilla components.
+- Removed `PlayerCopyCallback` - if you were using it, you can switch to `ServerPlayerEvents.COPY_FROM` from Fabric API
+
+------------------------------------------------------
+Version 5.4.0
+------------------------------------------------------
+Updated to 1.20.3
+
 ------------------------------------------------------
 Version 5.3.0
 ------------------------------------------------------
+Updated to 1.20.2
+
 **Additions**
 - Added load- and unload-aware components as an experimental feature
   - This can be used to implement advanced initialization and cleanup 🧽

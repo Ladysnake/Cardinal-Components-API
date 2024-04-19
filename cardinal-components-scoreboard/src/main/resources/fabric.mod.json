@@ -8,10 +8,10 @@
   "icon": "assets/cardinal-components-scoreboard/icon.png",
   "entrypoints": {
     "main": [
-      "dev.onyxstudios.cca.internal.scoreboard.CardinalComponentsScoreboard::init"
+      "org.ladysnake.cca.internal.scoreboard.CardinalComponentsScoreboard::init"
     ],
     "client": [
-      "dev.onyxstudios.cca.internal.scoreboard.CcaScoreboardClient::initClient"
+      "org.ladysnake.cca.internal.scoreboard.CcaScoreboardClient::initClient"
     ]
   },
   "custom": {
@@ -26,10 +26,10 @@
     },
     "loom:injected_interfaces": {
       "net/minecraft/class_269": [
-        "dev/onyxstudios/cca/api/v3/component/ComponentAccess"
+        "org/ladysnake/cca/api/v3/component/ComponentAccess"
       ],
       "net/minecraft/class_268": [
-        "dev/onyxstudios/cca/api/v3/component/ComponentAccess"
+        "org/ladysnake/cca/api/v3/component/ComponentAccess"
       ]
     }
   },
@@ -43,8 +43,8 @@
   ],
   "contact": {
     "homepage": "https://minecraft.curseforge.com/projects/318449",
-    "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
-    "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
+    "issues": "https://github.com/Ladysnake/Cardinal-Components-API/issues",
+    "sources": "https://github.com/Ladysnake/Cardinal-Components-API"
   },
   "license": "MIT",
   "mixins": [

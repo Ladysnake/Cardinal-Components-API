@@ -4,9 +4,8 @@ import net.fabricmc.loom.task.RemapJarTask
 import java.net.URI
 
 plugins {
-    id("fabric-loom") version "1.3-SNAPSHOT" apply false
-    id("io.github.juuxel.loom-quiltflower") version "1.6.0"
-    id("io.github.ladysnake.chenille") version "0.11.3"
+    id("fabric-loom") version "1.6-SNAPSHOT"
+    id("io.github.ladysnake.chenille") version "0.12.0"
     id("org.cadixdev.licenser") version "0.6.1"
 }
 
@@ -15,18 +14,17 @@ val fabricApiVersion: String = providers.gradleProperty("fabric_api_version").ge
 allprojects {
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
-    apply(plugin = "io.github.ladysnake.chenille")
-    apply(plugin = "org.cadixdev.licenser")
     apply(plugin = "fabric-loom")
+    apply(plugin = "io.github.ladysnake.chenille")
 
     chenille {
-        javaVersion = 17
+        javaVersion = 21
         license = "MIT"
         displayName = providers.gradleProperty("display_name").get()
         owners = providers.gradleProperty("owners").get()
     }
 
-    group = "dev.onyxstudios.cardinal-components-api"
+    group = "org.ladysnake.cardinal-components-api"
     version = providers.gradleProperty("mod_version").get()
 
     repositories {
@@ -35,8 +33,16 @@ allprojects {
             url = URI("https://maven.ladysnake.org/releases")
             content {
                 includeGroup("io.github.ladysnake")
+                includeGroup("org.ladysnake")
                 includeGroupByRegex("dev\\.emi.*")
                 includeGroupByRegex("dev\\.onyxstudios.*")
+            }
+        }
+        maven {
+            name = "Ladysnake Mods Snapshots"
+            url = URI("https://maven.ladysnake.org/snapshots")
+            content {
+                includeGroup("org.ladysnake")
             }
         }
         maven {
@@ -51,19 +57,16 @@ allprojects {
         mappings("net.fabricmc:yarn:${props["minecraft_version"]}+build.${props["yarn_mappings"]}:v2")
         modApi("net.fabricmc:fabric-loader:${props["loader_version"]}")
         modApi(fabricApi.module("fabric-api-base", fabricApiVersion))
+        modImplementation(fabricApi.module("fabric-entity-events-v1", fabricApiVersion))
         modImplementation(fabricApi.module("fabric-networking-api-v1", fabricApiVersion))
         modImplementation(fabricApi.module("fabric-lifecycle-events-v1", fabricApiVersion))
 
         modCompileOnly(fabricApi.module("fabric-gametest-api-v1", fabricApiVersion))
-        modLocalImplementation("io.github.ladysnake:elmendorf:${props["elmendorf_version"]}")
+        modLocalImplementation("org.ladysnake:elmendorf:${props["elmendorf_version"]}")
 
         compileOnly("com.google.code.findbugs:jsr305:3.0.2")
         compileOnly("com.demonwav.mcdev:annotations:1.0")
         compileOnly("org.jetbrains:annotations:24.0.1")
-    }
-
-    repositories {
-        mavenLocal()
     }
 
     tasks.processResources {
@@ -153,7 +156,7 @@ subprojects {
 
     extensions.configure(PublishingExtension::class.java) {
         publications {
-            create("relocation", MavenPublication::class.java) {
+            create("relocation1", MavenPublication::class.java) {
                 pom {
                     // Old artifact coordinates
                     groupId = "io.github.onyxstudios.Cardinal-Components-API"
@@ -161,7 +164,21 @@ subprojects {
                     distributionManagement {
                         relocation {
                             // New artifact coordinates
-                            groupId = "dev.onyxstudios.cardinal-components-api"
+                            groupId = "org.ladysnake.cardinal-components-api"
+                            message = "groupId has been changed"
+                        }
+                    }
+                }
+            }
+            create("relocation2", MavenPublication::class.java) {
+                pom {
+                    // Old artifact coordinates
+                    groupId = "dev.onyxstudios.cardinal-components-api"
+
+                    distributionManagement {
+                        relocation {
+                            // New artifact coordinates
+                            groupId = "org.ladysnake.cardinal-components-api"
                             message = "groupId has been changed"
                         }
                     }

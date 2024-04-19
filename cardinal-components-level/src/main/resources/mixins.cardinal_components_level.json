@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
-  "package": "dev.onyxstudios.cca.mixin.level",
+  "package": "org.ladysnake.cca.mixin.level",
   "client": [
     "client.MixinClientWorldProperties"
   ],

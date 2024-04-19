@@ -7,10 +7,10 @@
     "version": "${version}",
     "entrypoints": {
         "cardinal-components": [
-          "dev.onyxstudios.cca.test.scoreboard.CcaScoreboardTestMod"
+          "org.ladysnake.cca.test.scoreboard.CcaScoreboardTestMod"
         ],
         "fabric-gametest": [
-          "dev.onyxstudios.cca.test.scoreboard.CcaScoreboardTestSuite"
+          "org.ladysnake.cca.test.scoreboard.CcaScoreboardTestSuite"
         ]
     },
     "depends": {

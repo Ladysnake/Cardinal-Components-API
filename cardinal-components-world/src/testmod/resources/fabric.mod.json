@@ -7,10 +7,10 @@
     "version": "${version}",
     "entrypoints": {
         "cardinal-components": [
-          "dev.onyxstudios.cca.test.world.CcaWorldTestMod"
+          "org.ladysnake.cca.test.world.CcaWorldTestMod"
         ],
         "fabric-gametest": [
-          "dev.onyxstudios.cca.test.world.CcaWorldTestSuite"
+          "org.ladysnake.cca.test.world.CcaWorldTestSuite"
         ]
     },
     "depends": {

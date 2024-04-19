@@ -3,7 +3,7 @@
   "environment": "*",
   "id": "cardinal-components-item",
   "name": "Cardinal Components API (items)",
-  "description": "dynamically exposing components",
+  "description": "deprecated module",
   "icon": "assets/cardinal-components-item/icon.png",
   "version": "${version}",
   "custom": {
@@ -22,8 +22,10 @@
     "fabric-api-base": "*",
     "cardinal-components-base": "*"
   },
-  "conflicts": {
-    "optifabric": "*"
+  "entrypoints": {
+    "main": [
+      "org.ladysnake.cca.internal.item.StaticItemComponentPlugin::INSTANCE"
+    ]
   },
   "authors": [
     {
@@ -35,8 +37,8 @@
   ],
   "contact": {
     "homepage": "https://minecraft.curseforge.com/projects/318449",
-    "issues": "https://github.com/OnyxStudios/Cardinal-Components-API/issues",
-    "sources": "https://github.com/OnyxStudios/Cardinal-Components-API"
+    "issues": "https://github.com/Ladysnake/Cardinal-Components-API/issues",
+    "sources": "https://github.com/Ladysnake/Cardinal-Components-API"
   },
   "license": "MIT",
   "mixins": [
@@ -44,5 +46,6 @@
       "environment": "*",
       "config": "mixins.cardinal_components_item.json"
     }
-  ]
+  ],
+  "accessWidener": "cardinal-components-item.accesswidener"
 }

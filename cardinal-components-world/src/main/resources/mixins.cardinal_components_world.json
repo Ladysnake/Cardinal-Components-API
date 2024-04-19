@@ -1,17 +1,18 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "compatibilityLevel": "JAVA_8",
-    "package": "dev.onyxstudios.cca.mixin.world",
-    "mixins": [
-      "common.MixinPlayerManager",
-      "common.MixinServerWorld",
-      "common.MixinWorld"
-    ],
-    "client": [
-        "client.MixinClientWorld"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "package": "org.ladysnake.cca.mixin.world",
+  "mixins": [
+    "common.DataFixTypesMixin",
+    "common.MixinPlayerManager",
+    "common.MixinServerWorld",
+    "common.MixinWorld"
+  ],
+  "client": [
+    "client.MixinClientWorld"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }
