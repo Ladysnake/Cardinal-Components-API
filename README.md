@@ -1,3 +1,7 @@
+### **Cardinal Components 6.0 is out!**
+
+**See the [migration guide](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes) for detailed instructions on how to update your mod.**
+
 <h1>
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="banner-white.svg">
