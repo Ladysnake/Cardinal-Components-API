@@ -5,6 +5,10 @@ Updated to 1.20.5
 
 This update introduces multiple breaking changes - a migration guide is available on [the Ladysnake website](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes).
 
+### Beta 3
+**Fixes**
+- Fixed the most basic binary incompatibilities with mods compiled for beta 1
+
 ### Beta 2
 
 **Changes**
