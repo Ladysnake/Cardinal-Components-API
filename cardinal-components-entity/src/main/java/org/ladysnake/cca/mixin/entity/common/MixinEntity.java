@@ -26,6 +26,7 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
@@ -58,6 +59,8 @@ public abstract class MixinEntity implements ComponentProvider {
 
     @Shadow public abstract int getId();
 
+    @Shadow public abstract DynamicRegistryManager getRegistryManager();
+
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void initDataTracker(CallbackInfo ci) {
         this.components = CardinalEntityInternals.createEntityComponentContainer((Entity) (Object) this);
@@ -65,12 +68,12 @@ public abstract class MixinEntity implements ComponentProvider {
 
     @Inject(method = "writeNbt", at = @At("RETURN"))
     private void toTag(NbtCompound inputTag, CallbackInfoReturnable<NbtCompound> cir) {
-        this.components.toTag(cir.getReturnValue());
+        this.components.toTag(cir.getReturnValue(), getRegistryManager());
     }
 
     @Inject(method = "readNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
     private void fromTag(NbtCompound tag, CallbackInfo ci) {
-        this.components.fromTag(tag);
+        this.components.fromTag(tag, getRegistryManager());
     }
 
     @Nonnull

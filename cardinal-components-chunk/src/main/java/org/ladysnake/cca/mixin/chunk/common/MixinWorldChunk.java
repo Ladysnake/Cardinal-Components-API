@@ -81,6 +81,6 @@ public abstract class MixinWorldChunk extends Chunk implements ComponentProvider
 
     @Inject(method = "<init>(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/chunk/ProtoChunk;Lnet/minecraft/world/chunk/WorldChunk$EntityLoader;)V", at = @At("RETURN"))
     private void copyFromProto(ServerWorld world, ProtoChunk proto, WorldChunk.EntityLoader entityLoader, CallbackInfo ci) {
-        this.getComponentContainer().copyFrom(proto.asComponentProvider().getComponentContainer());
+        this.getComponentContainer().copyFrom(proto.asComponentProvider().getComponentContainer(), world.getRegistryManager());
     }
 }

@@ -5,6 +5,18 @@ Updated to 1.20.5
 
 This update introduces multiple breaking changes - a migration guide is available on [the Ladysnake website](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes).
 
+### Beta 2
+
+**Changes**
+- All the serialization methods now take an additional registry lookup argument
+  - [Relevant migration guide](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes#serialization)
+- Warning: due to the above change, level components may not be deserialized correctly if a mod calls `LevelProperties.readProperties` instead of `LevelStorage.parseSaveProperties`
+
+**Removals**
+- The deprecated `util` package in `cardinal-components-block` has been removed
+
+### Beta 1
+
 **Additions**
 - Added `C2SSelfMessagingComponent`, a new experimental utility interface to simplify client-to-server messaging on player components
 - Added `WorldComponentRegistry#registerFor` methods, allowing for dimension-specific world components

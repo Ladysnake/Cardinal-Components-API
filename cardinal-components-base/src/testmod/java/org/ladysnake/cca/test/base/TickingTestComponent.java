@@ -23,6 +23,7 @@
 package org.ladysnake.cca.test.base;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistry;
@@ -36,13 +37,13 @@ public class TickingTestComponent implements ServerTickingComponent, ClientTicki
     private int serverTicks;
 
     @Override
-    public void readFromNbt(NbtCompound tag) {
+    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         this.clientTicks = tag.getInt("clientTicks");
         this.serverTicks = tag.getInt("serverTicks");
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag) {
+    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         tag.putInt("clientTicks", this.clientTicks);
         tag.putInt("serverTicks", this.serverTicks);
     }

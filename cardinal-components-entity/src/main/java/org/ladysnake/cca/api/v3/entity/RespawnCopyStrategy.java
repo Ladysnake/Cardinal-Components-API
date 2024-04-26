@@ -24,6 +24,7 @@ package org.ladysnake.cca.api.v3.entity;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
 import org.ladysnake.cca.api.v3.component.Component;
@@ -49,7 +50,7 @@ public interface RespawnCopyStrategy<C extends Component> {
      * <p>This strategy is relevant for persistent metadata such as statistics, or knowledge the player
      * cannot lose.
      */
-    RespawnCopyStrategy<Component> ALWAYS_COPY = (from, to, lossless, keepInventory, sameCharacter) -> copy(from, to);
+    RespawnCopyStrategy<Component> ALWAYS_COPY = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> copy(from, to, registryLookup);
 
     /**
      * Always copy a component, unless the player is switching to another character.
@@ -58,9 +59,9 @@ public interface RespawnCopyStrategy<C extends Component> {
      * The difference becomes apparent with mods that let players have multiple bodies, or take
      * over the body of another player.
      */
-    RespawnCopyStrategy<Component> CHARACTER = (from, to, lossless, keepInventory, sameCharacter) -> {
+    RespawnCopyStrategy<Component> CHARACTER = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> {
         if (sameCharacter) {
-            copy(from, to);
+            copy(from, to, registryLookup);
         }
     };
 
@@ -69,9 +70,9 @@ public interface RespawnCopyStrategy<C extends Component> {
      *
      * <p>This strategy is relevant for any data storage tied to items or experience.
      */
-    RespawnCopyStrategy<Component> INVENTORY = (from, to, lossless, keepInventory, sameCharacter) -> {
+    RespawnCopyStrategy<Component> INVENTORY = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> {
         if (lossless || keepInventory) {
-            copy(from, to);
+            copy(from, to, registryLookup);
         }
     };
 
@@ -80,9 +81,9 @@ public interface RespawnCopyStrategy<C extends Component> {
      *
      * <p>This strategy is the default.
      */
-    RespawnCopyStrategy<Component> LOSSLESS_ONLY = (from, to, lossless, keepInventory, sameCharacter) -> {
+    RespawnCopyStrategy<Component> LOSSLESS_ONLY = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> {
         if (lossless) {
-            copy(from, to);
+            copy(from, to, registryLookup);
         }
     };
 
@@ -92,7 +93,7 @@ public interface RespawnCopyStrategy<C extends Component> {
      * <p>This strategy can be used when {@code RespawnCopyStrategy} does not offer enough context,
      * in which case {@link net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents#COPY_FROM} may be used directly.
      */
-    RespawnCopyStrategy<Component> NEVER_COPY = (from, to, lossless, keepInventory, sameCharacter) -> { };
+    RespawnCopyStrategy<Component> NEVER_COPY = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> { };
 
     /**
      * The event phase used by CCA to copy components
@@ -112,33 +113,34 @@ public interface RespawnCopyStrategy<C extends Component> {
     /**
      * Copies data from one component to the other.
      *
-     * <p> If {@code to} implements {@link CopyableComponent}, its {@link CopyableComponent#copyFrom(Component)}
+     * <p> If {@code to} implements {@link CopyableComponent}, its {@link CopyableComponent#copyFrom(Component, RegistryWrapper.WrapperLookup)}
      * method will be called, otherwise data will be copied using NBT serialization.
      *
      * @param from the component to copy data from
      * @param to   the component to copy data to
      * @param <C>  the common component type
      */
-    static <C extends Component> void copy(C from, C to) {
-        if (to instanceof CopyableComponent) {
-            CardinalEntityInternals.copyAsCopyable(from, (CopyableComponent<?>) to);
+    static <C extends Component> void copy(C from, C to, RegistryWrapper.WrapperLookup registryLookup) {
+        if (to instanceof CopyableComponent<?> copyable) {
+            CardinalEntityInternals.copyAsCopyable(from, copyable, registryLookup);
         } else {
             NbtCompound tag = new NbtCompound();
-            from.writeToNbt(tag);
-            to.readFromNbt(tag);
+            from.writeToNbt(tag, registryLookup);
+            to.readFromNbt(tag, registryLookup);
         }
     }
 
     /**
      * Copy data from a component to another as part of a player respawn.
      *
-     * @param from          the component to copy data from
-     * @param to            the component to copy data to
-     * @param lossless      {@code true} if the player is copied exactly, such as when coming back from the End
-     * @param keepInventory {@code true} if the player's inventory and XP are kept, such as when
-     *                      {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
-     * @param sameCharacter {@code true} if the player is not switching to an unrelated body.
-     *                      Can only be {@code false} with other mods installed.
+     * @param from           the component to copy data from
+     * @param to             the component to copy data to
+     * @param registryLookup used to decode registry data
+     * @param lossless       {@code true} if the player is copied exactly, such as when coming back from the End
+     * @param keepInventory  {@code true} if the player's inventory and XP are kept, such as when
+     *                       {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
+     * @param sameCharacter  {@code true} if the player is not switching to an unrelated body.
+     *                       Can only be {@code false} with other mods installed.
      */
-    void copyForRespawn(C from, C to, boolean lossless, boolean keepInventory, boolean sameCharacter);
+    void copyForRespawn(C from, C to, RegistryWrapper.WrapperLookup registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter);
 }

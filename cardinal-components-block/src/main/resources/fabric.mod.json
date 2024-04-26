@@ -35,7 +35,7 @@
     "fabric-api-base": "*",
     "fabric-api-lookup-api-v1": "*",
     "fabric-networking-api-v1": "*",
-    "cardinal-components-base": "*"
+    "cardinal-components-base": ">=6.0.0-beta.2"
   },
   "authors": [
     {

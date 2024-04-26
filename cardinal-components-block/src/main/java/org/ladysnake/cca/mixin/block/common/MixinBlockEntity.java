@@ -75,13 +75,13 @@ public abstract class MixinBlockEntity implements ComponentProvider {
     }
 
     @Inject(method = "createNbt", at = @At("RETURN"))
-    private void writeNbt(CallbackInfoReturnable<NbtCompound> cir) {
-        this.components.toTag(cir.getReturnValue());
+    private void writeNbt(RegistryWrapper.WrapperLookup registryLookup, CallbackInfoReturnable<NbtCompound> cir) {
+        this.components.toTag(cir.getReturnValue(), registryLookup);
     }
 
     @Inject(method = "read", at = @At(value = "RETURN"))
     private void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
-        this.components.fromTag(nbt);
+        this.components.fromTag(nbt, registryLookup);
     }
 
     @Nonnull

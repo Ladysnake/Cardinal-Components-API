@@ -23,7 +23,6 @@
 package org.ladysnake.cca.mixin.level.common;
 
 import com.mojang.datafixers.util.Unit;
-import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.entity.boss.dragon.EnderDragonFight;
 import net.minecraft.nbt.NbtCompound;
@@ -49,7 +48,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
@@ -65,14 +63,9 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Com
         this.components = StaticLevelComponentPlugin.createContainer(this);
     }
 
-    @Inject(method = "readProperties", at = @At("RETURN"))
-    private static <T> void readComponents(Dynamic<T> dynamic, LevelInfo info, LevelProperties.SpecialProperty specialProperty, GeneratorOptions generatorOptions, Lifecycle lifecycle, CallbackInfoReturnable<LevelProperties> cir) {
-        ((ComponentProvider) cir.getReturnValue()).getComponentContainer().fromDynamic(dynamic);
-    }
-
     @Inject(method = "updateProperties", at = @At("RETURN"))
-    private void writeComponents(DynamicRegistryManager tracker, NbtCompound data, NbtCompound player, CallbackInfo ci) {
-        this.components.toTag(data);
+    private void writeComponents(DynamicRegistryManager registryManager, NbtCompound data, NbtCompound player, CallbackInfo ci) {
+        this.components.toTag(data, registryManager);
     }
 
     @Nonnull

@@ -34,7 +34,7 @@ public class ComponentPersistentState extends PersistentState {
     public static Type<ComponentPersistentState> getType(ComponentContainer components) {
         return new Type<>(
             () -> new ComponentPersistentState(components),
-            (tag, w) -> ComponentPersistentState.fromNbt(components, tag),
+            (tag, registryLookup) -> ComponentPersistentState.fromNbt(components, tag, registryLookup),
             DataFixTypes.LEVEL
         );
     }
@@ -52,13 +52,13 @@ public class ComponentPersistentState extends PersistentState {
     }
 
     @Override
-    public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup w) {
-        return this.components.toTag(tag);
+    public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        return this.components.toTag(tag, registryLookup);
     }
 
-    public static ComponentPersistentState fromNbt(ComponentContainer components, NbtCompound tag) {
+    public static ComponentPersistentState fromNbt(ComponentContainer components, NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         ComponentPersistentState state = new ComponentPersistentState(components);
-        state.components.fromTag(tag);
+        state.components.fromTag(tag, registryLookup);
         return state;
     }
 }

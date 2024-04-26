@@ -23,6 +23,7 @@
 package org.ladysnake.cca.api.v3.component;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 
 /**
  * A component that can copy its data from another component of the same type.
@@ -34,12 +35,12 @@ public interface CopyableComponent<C extends Component> extends Component {
     /**
      * Copies the data from {@code other} into {@code this}.
      *
-     * @implSpec The default implementation {@linkplain #writeToNbt(NbtCompound) serializes}
-     * the component data to a {@link NbtCompound} and calls {@link #readFromNbt(NbtCompound)}.
+     * @implSpec The default implementation {@linkplain Component#writeToNbt(NbtCompound, RegistryWrapper.WrapperLookup) serializes}
+     * the component data to a {@link NbtCompound} and calls {@link Component#readFromNbt(NbtCompound, RegistryWrapper.WrapperLookup)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation assumes NBT consistency
      * between implementations, and is generally slower than a direct copy.
      * Implementing classes can nearly always provide a better implementation.
      */
-    void copyFrom(C other);
+    void copyFrom(C other, RegistryWrapper.WrapperLookup registryLookup);
 }

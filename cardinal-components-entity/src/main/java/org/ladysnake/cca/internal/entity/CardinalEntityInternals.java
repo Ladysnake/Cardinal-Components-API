@@ -24,13 +24,14 @@ package org.ladysnake.cca.internal.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.registry.RegistryWrapper;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
-import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
+import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 
 import java.util.HashMap;
@@ -98,23 +99,23 @@ public final class CardinalEntityInternals {
         return strat == null ? DEFAULT_COPY_STRATEGY : (RespawnCopyStrategy<? super C>) strat;
     }
 
-    private static void defaultCopyStrategy(Component from, Component to, boolean lossless, boolean keepInventory, boolean sameCharacter) {
+    private static void defaultCopyStrategy(Component from, Component to, RegistryWrapper.WrapperLookup registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
         if (to instanceof RespawnableComponent) {
-            playerComponentCopy(from, (RespawnableComponent<?>) to, lossless, keepInventory, sameCharacter);
+            playerComponentCopy(from, (RespawnableComponent<?>) to, registryLookup, lossless, keepInventory, sameCharacter);
         } else {
-            RespawnCopyStrategy.LOSSLESS_ONLY.copyForRespawn(from, to, lossless, keepInventory, sameCharacter);
+            RespawnCopyStrategy.LOSSLESS_ONLY.copyForRespawn(from, to, registryLookup, lossless, keepInventory, sameCharacter);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static <C extends Component> void playerComponentCopy(Component from, RespawnableComponent<C> to, boolean lossless, boolean keepInventory, boolean sameCharacter) {
+    private static <C extends Component> void playerComponentCopy(Component from, RespawnableComponent<C> to, RegistryWrapper.WrapperLookup registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
         if (to.shouldCopyForRespawn(lossless, keepInventory, sameCharacter)) {
-            to.copyForRespawn((C) from, lossless, keepInventory, sameCharacter);
+            to.copyForRespawn((C) from, registryLookup, lossless, keepInventory, sameCharacter);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <C extends Component> void copyAsCopyable(Component from, CopyableComponent<C> to) {
-        to.copyFrom((C) from);
+    public static <C extends Component> void copyAsCopyable(Component from, CopyableComponent<C> to, RegistryWrapper.WrapperLookup registryLookup) {
+        to.copyFrom((C) from, registryLookup);
     }
 }

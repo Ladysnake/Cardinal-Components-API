@@ -27,6 +27,7 @@ import com.demonwav.mcdev.annotations.Env;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Contract;
@@ -67,7 +68,7 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      * @param buf       the buffer to write the data to
      * @param recipient the player to which the packet will be sent
      * @implSpec The default implementation writes the whole NBT representation
-     * of this component to the buffer using {@link #writeToNbt(NbtCompound)}.
+     * of this component to the buffer using {@link Component#writeToNbt(NbtCompound, WrapperLookup)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation sends possibly hidden
      * information to clients, uses a wasteful data format, and does not support
@@ -81,7 +82,7 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
     @Override
     default void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity recipient) {
         NbtCompound tag = new NbtCompound();
-        this.writeToNbt(tag);
+        this.writeToNbt(tag, buf.getRegistryManager());
         buf.writeNbt(tag);
     }
 
@@ -89,7 +90,7 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      * Reads this component's data from {@code buf}.
      *
      * @implSpec The default implementation converts the buffer's content
-     * to a {@link NbtCompound} and calls {@link #readFromNbt(NbtCompound)}.
+     * to a {@link NbtCompound} and calls {@link Component#readFromNbt(NbtCompound, WrapperLookup)}.
      * @implNote any implementing class overriding {@link #writeSyncPacket(RegistryByteBuf, ServerPlayerEntity)}
      * such that it uses a different data format must override this method.
      * @see #writeSyncPacket(RegistryByteBuf, ServerPlayerEntity)
@@ -98,7 +99,7 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
     default void applySyncPacket(RegistryByteBuf buf) {
         NbtCompound tag = buf.readNbt();
         if (tag != null) {
-            this.readFromNbt(tag);
+            this.readFromNbt(tag, buf.getRegistryManager());
         }
     }
 }

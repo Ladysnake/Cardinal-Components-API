@@ -26,6 +26,14 @@
     "minecraft": ">=1.17-",
     "fabric-api-base": ">=0.1.2"
   },
+  "breaks": {
+    "cardinal-components-block": "<6.0.0-beta.2",
+    "cardinal-components-chunk": "<6.0.0-beta.2",
+    "cardinal-components-entity": "<6.0.0-beta.2",
+    "cardinal-components-level": "<6.0.0-beta.2",
+    "cardinal-components-scoreboard": "<6.0.0-beta.2",
+    "cardinal-components-world": "<6.0.0-beta.2"
+  },
   "authors": [
     {
       "name": "UpcraftLP",

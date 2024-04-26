@@ -27,6 +27,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
@@ -104,8 +105,8 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
     }
 
     @Override
-    public void copyForRespawn(@NotNull BaseVita original, boolean lossless, boolean keepInventory, boolean switchingCharacter) {
-        RespawnableComponent.super.copyForRespawn(original, lossless, keepInventory, switchingCharacter);
+    public void copyForRespawn(@NotNull BaseVita original, RegistryWrapper.WrapperLookup registryLookup, boolean lossless, boolean keepInventory, boolean switchingCharacter) {
+        RespawnableComponent.super.copyForRespawn(original, registryLookup, lossless, keepInventory, switchingCharacter);
         if (!lossless && !keepInventory) {
             this.vitality -= 5;
         }

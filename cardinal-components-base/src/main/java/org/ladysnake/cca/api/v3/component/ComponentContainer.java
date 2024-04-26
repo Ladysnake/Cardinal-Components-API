@@ -25,6 +25,7 @@ package org.ladysnake.cca.api.v3.component;
 import com.demonwav.mcdev.annotations.CheckEnv;
 import com.demonwav.mcdev.annotations.Env;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -60,7 +61,7 @@ public interface ComponentContainer extends NbtSerializable {
     boolean hasComponents();
 
     @Contract(mutates = "this")
-    void copyFrom(ComponentContainer other);
+    void copyFrom(ComponentContainer other, RegistryWrapper.WrapperLookup registryLookup);
 
     @AsmGeneratedCallback(ServerTickingComponent.class)
     void tickServerComponents();
@@ -110,23 +111,25 @@ public interface ComponentContainer extends NbtSerializable {
     /**
      * Reads this object's properties from a {@link NbtCompound}.
      *
-     * @param tag a {@code NbtCompound} on which this object's serializable data has been written
+     * @param tag            a {@code NbtCompound} on which this object's serializable data has been written
+     * @param registryLookup access to dynamic registry data
      * @implNote implementations must not assert that the data written on the tag corresponds to any
      * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
      * version. They should also store values into {@code tag} using only unique namespaced keys, as other
      * information may be stored in said tag.
      */
     @Contract(mutates = "this")
-    void fromTag(NbtCompound tag);
+    void fromTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
 
     /**
      * Writes this object's properties to a {@link NbtCompound}.
      *
-     * @param tag a {@code NbtCompound} on which to write this component's serializable data
+     * @param tag            a {@code NbtCompound} on which to write this component's serializable data
+     * @param registryLookup access to dynamic registry data
      * @return {@code tag} for easy chaining
      */
     @Contract(mutates = "param")
-    NbtCompound toTag(NbtCompound tag);
+    NbtCompound toTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
 
     /**
      * A factory for {@link ComponentContainer}s.

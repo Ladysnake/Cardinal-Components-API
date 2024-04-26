@@ -26,6 +26,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -51,17 +52,17 @@ public class VitaCompound implements AutoSyncedComponent {
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag) {
+    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         for (Map.Entry<Direction, SyncedVita> entry : this.storage.entrySet()) {
             if (tag.contains(entry.getKey().name(), NbtElement.COMPOUND_TYPE)) {
-                entry.getValue().readFromNbt(tag.getCompound(entry.getKey().name()));
+                entry.getValue().readFromNbt(tag.getCompound(entry.getKey().name()), registryLookup);
             }
         }
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag) {
-        storage.forEach((side, vita) -> tag.put(side.name(), Util.make(new NbtCompound(), vita::writeToNbt)));
+    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        storage.forEach((side, vita) -> tag.put(side.name(), Util.make(new NbtCompound(), tag1 -> vita.writeToNbt(tag1, registryLookup))));
     }
 
     @Override

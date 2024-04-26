@@ -23,6 +23,7 @@
 package org.ladysnake.cca.api.v3.entity;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.world.GameRules;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -49,22 +50,23 @@ public interface RespawnableComponent<C extends Component> extends Component, Co
     /**
      * Copy data from a component to another as part of a player respawn.
      *
-     * @param original      the component to copy data from
-     * @param lossless      {@code true} if the player is copied exactly, such as when coming back from the End
-     * @param keepInventory {@code true} if the player's inventory and XP are kept, such as when
-     *                      {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
-     * @param sameCharacter {@code true} if the player is not switching to an unrelated body.
-     *                      Can only be {@code false} with other mods installed.
-     * @implNote the default implementation delegates to {@link #copyFrom}
+     * @param original       the component to copy data from
+     * @param registryLookup access to dynamic registry data
+     * @param lossless       {@code true} if the player is copied exactly, such as when coming back from the End
+     * @param keepInventory  {@code true} if the player's inventory and XP are kept, such as when
+     *                       {@link GameRules#KEEP_INVENTORY} is enabled or the player is in spectator mode
+     * @param sameCharacter  {@code true} if the player is not switching to an unrelated body.
+     *                       Can only be {@code false} with other mods installed.
+     * @implNote the default implementation delegates to {@link CopyableComponent#copyFrom}
      */
-    default void copyForRespawn(C original, boolean lossless, boolean keepInventory, boolean sameCharacter) {
-        this.copyFrom(original);
+    default void copyForRespawn(C original, RegistryWrapper.WrapperLookup registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
+        this.copyFrom(original, registryLookup);
     }
 
     @Override
-    default void copyFrom(C other) {
+    default void copyFrom(C other, RegistryWrapper.WrapperLookup registryLookup) {
         NbtCompound tag = new NbtCompound();
-        other.writeToNbt(tag);
-        this.readFromNbt(tag);
+        other.writeToNbt(tag, registryLookup);
+        this.readFromNbt(tag, registryLookup);
     }
 }

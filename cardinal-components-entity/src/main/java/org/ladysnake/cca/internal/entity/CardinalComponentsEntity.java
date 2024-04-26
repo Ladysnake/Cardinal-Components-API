@@ -31,10 +31,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
@@ -67,7 +67,7 @@ public final class CardinalComponentsEntity {
      *
      * <p> Packets emitted on this channel must begin with the {@link ComponentKey#getId() component's type} (as an Identifier).
      *
-     * <p> Components synchronized through this channel will have {@linkplain org.ladysnake.cca.api.v3.entity.C2SSelfMessagingComponent#handleC2SMessage(PacketByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain org.ladysnake.cca.api.v3.entity.C2SSelfMessagingComponent#handleC2SMessage(net.minecraft.network.RegistryByteBuf)}
      * called on the game thread.
      */
     public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> C2S_SELF_PACKET_ID = CustomPayload.id("cardinal-components:player_message_c2s");
@@ -110,7 +110,7 @@ public final class CardinalComponentsEntity {
 
         for (ComponentKey<?> key : keys) {
             if (key.isProvidedBy(clone)) {
-                copyData(original, clone, false, keepInventory, key, true);
+                copyData(original, clone, original.getRegistryManager(), false, keepInventory, true, key);
             }
         }
     }
@@ -120,14 +120,14 @@ public final class CardinalComponentsEntity {
         Set<ComponentKey<?>> keys = ((ComponentProvider) original).getComponentContainer().keys();
 
         for (ComponentKey<?> key : keys) {
-            copyData(original, clone, lossless, keepInventory, key, !((SwitchablePlayerEntity) original).cca$isSwitchingCharacter());
+            copyData(original, clone, original.getRegistryManager(), lossless, keepInventory, !((SwitchablePlayerEntity) original).cca$isSwitchingCharacter(), key);
         }
     }
 
-    private static <C extends Component> void copyData(LivingEntity original, LivingEntity clone, boolean lossless, boolean keepInventory, ComponentKey<C> key, boolean sameCharacter) {
+    private static <C extends Component> void copyData(LivingEntity original, LivingEntity clone, RegistryWrapper.WrapperLookup registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter, ComponentKey<C> key) {
         C from = key.get(original);
         C to = key.get(clone);
-        RespawnCopyStrategy.get(key, original.getClass()).copyForRespawn(from, to, lossless, keepInventory, sameCharacter);
+        RespawnCopyStrategy.get(key, original.getClass()).copyForRespawn(from, to, registryLookup, lossless, keepInventory, sameCharacter);
     }
 
     private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {

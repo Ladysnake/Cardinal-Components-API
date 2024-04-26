@@ -36,7 +36,7 @@
   "depends": {
     "minecraft": ">=1.17-",
     "fabric-api-base": "*",
-    "cardinal-components-base": "*"
+    "cardinal-components-base": ">=6.0.0-beta.2"
   },
   "authors": [
     "Pyrofab"

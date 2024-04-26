@@ -24,6 +24,7 @@ package org.ladysnake.cca.internal.base;
 
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.test.GameTest;
 import net.minecraft.util.Identifier;
 import org.junit.Assert;
@@ -64,10 +65,10 @@ public class ComponentRegistryImplTest implements CardinalGameTest {
 
     public static class TestComponentNotItf implements Component {
         @Override
-        public void readFromNbt(NbtCompound tag) { }
+        public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) { }
 
         @Override
-        public void writeToNbt(NbtCompound tag) { throw new UnsupportedOperationException(); }
+        public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) { throw new UnsupportedOperationException(); }
     }
 
     interface TestComponentItf extends Component {}

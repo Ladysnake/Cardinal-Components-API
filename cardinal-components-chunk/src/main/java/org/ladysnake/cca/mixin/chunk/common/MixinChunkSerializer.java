@@ -41,12 +41,12 @@ public abstract class MixinChunkSerializer {
     private static void deserialize(ServerWorld world, PointOfInterestStorage pointOfInterestStorage, ChunkPos chunkPos, NbtCompound tag, CallbackInfoReturnable<ProtoChunk> cir) {
         ProtoChunk ret = cir.getReturnValue();
         Chunk chunk = ret instanceof WrapperProtoChunk ? ((WrapperProtoChunk) ret).getWrappedChunk() : ret;
-        chunk.asComponentProvider().getComponentContainer().fromTag(tag);
+        chunk.asComponentProvider().getComponentContainer().fromTag(tag, world.getRegistryManager());
     }
 
     @Inject(method = "serialize", at = @At("RETURN"))
     private static void serialize(ServerWorld world, Chunk chunk, CallbackInfoReturnable<NbtCompound> cir) {
         NbtCompound ret = cir.getReturnValue();
-        chunk.asComponentProvider().getComponentContainer().toTag(ret);
+        chunk.asComponentProvider().getComponentContainer().toTag(ret, world.getRegistryManager());
     }
 }
