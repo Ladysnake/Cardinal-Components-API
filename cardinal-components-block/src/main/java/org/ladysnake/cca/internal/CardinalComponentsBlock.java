@@ -32,6 +32,7 @@ import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
+import org.ladysnake.cca.internal.block.StaticBlockComponentPlugin;
 
 public class CardinalComponentsBlock {
 
@@ -63,5 +64,6 @@ public class CardinalComponentsBlock {
             ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((be, world) -> ((ComponentProvider) be).getComponentContainer().onServerLoad());
             ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((be, world) -> ((ComponentProvider) be).getComponentContainer().onServerUnload());
         }
+        StaticBlockComponentPlugin.INSTANCE.ensureInitialized();
     }
 }

@@ -78,5 +78,6 @@ public final class CardinalComponentsScoreboard {
             ServerLifecycleEvents.SERVER_STARTED.register((server) -> ((ComponentProvider) server.getScoreboard()).getComponentContainer().onServerLoad());
             ServerLifecycleEvents.SERVER_STOPPED.register((server) -> ((ComponentProvider) server.getScoreboard()).getComponentContainer().onServerUnload());
         }
+        StaticScoreboardComponentPlugin.INSTANCE.ensureInitialized();
     }
 }

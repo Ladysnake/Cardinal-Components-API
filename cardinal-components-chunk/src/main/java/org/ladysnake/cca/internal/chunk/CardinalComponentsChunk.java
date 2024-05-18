@@ -48,5 +48,6 @@ public final class CardinalComponentsChunk {
             ServerChunkEvents.CHUNK_LOAD.register((world, chunk) -> ((ComponentProvider) chunk).getComponentContainer().onServerLoad());
             ServerChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> ((ComponentProvider) chunk).getComponentContainer().onServerUnload());
         }
+        StaticChunkComponentPlugin.INSTANCE.ensureInitialized();
     }
 }

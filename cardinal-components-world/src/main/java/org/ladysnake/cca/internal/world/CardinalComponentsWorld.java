@@ -57,6 +57,7 @@ public final class CardinalComponentsWorld {
             ServerWorldEvents.LOAD.register((server, world) -> ((ComponentProvider) world).getComponentContainer().onServerLoad());
             ServerWorldEvents.UNLOAD.register((server, world) -> ((ComponentProvider) world).getComponentContainer().onServerUnload());
         }
+        StaticWorldComponentPlugin.INSTANCE.ensureInitialized();
     }
 
     public static ComponentContainer createComponents(World world) {

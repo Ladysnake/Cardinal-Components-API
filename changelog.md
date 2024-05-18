@@ -1,9 +1,14 @@
 ------------------------------------------------------
 Version 6.0.0
 ------------------------------------------------------
-Updated to 1.20.5
+Updated to 1.20.5/1.20.6
 
 This update introduces multiple breaking changes - a migration guide is available on [the Ladysnake website](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes).
+
+### Pre-Release 1
+**Changes**
+- Component registration now happens during mod init. This should fix some classloading-related issues, and make loading errors easier to diagnose.
+- The internal ASM generation systems have been partially rewritten (thanks lukebemish !)
 
 ### Beta 3
 **Fixes**

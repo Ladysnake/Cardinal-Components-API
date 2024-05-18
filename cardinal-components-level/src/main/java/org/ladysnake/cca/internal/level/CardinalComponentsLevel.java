@@ -56,6 +56,7 @@ public final class CardinalComponentsLevel {
                 });
             }
         }
+        StaticLevelComponentPlugin.INSTANCE.ensureInitialized();
     }
 
 }

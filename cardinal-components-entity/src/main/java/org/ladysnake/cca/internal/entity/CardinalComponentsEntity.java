@@ -103,6 +103,7 @@ public final class CardinalComponentsEntity {
         }
         ServerLivingEntityEvents.MOB_CONVERSION.register(RespawnCopyStrategy.EVENT_PHASE, CardinalComponentsEntity::copyData);
         ServerPlayerEvents.COPY_FROM.register(RespawnCopyStrategy.EVENT_PHASE, CardinalComponentsEntity::copyData);
+        StaticEntityComponentPlugin.INSTANCE.ensureInitialized();
     }
 
     private static void copyData(LivingEntity original, LivingEntity clone, boolean keepInventory) {

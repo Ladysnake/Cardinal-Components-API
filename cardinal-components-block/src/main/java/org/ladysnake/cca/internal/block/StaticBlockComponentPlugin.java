@@ -85,7 +85,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     }
 
     public boolean requiresStaticFactory(Class<? extends BlockEntity> entityClass) {
-        StaticBlockComponentPlugin.INSTANCE.ensureInitialized();
+        this.ensureInitialized();
 
         for (PredicatedComponentFactory<?> dynamicFactory : this.dynamicFactories) {
             dynamicFactory.tryRegister(entityClass);
@@ -95,7 +95,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     }
 
     public ComponentContainer.Factory<BlockEntity> buildDedicatedFactory(Class<? extends BlockEntity> entityClass) {
-        StaticBlockComponentPlugin.INSTANCE.ensureInitialized();
+        this.ensureInitialized();
 
         var compiled = new LinkedHashMap<>(this.beComponentFactories.getOrDefault(entityClass, Collections.emptyMap()));
         Class<? extends BlockEntity> type = entityClass;

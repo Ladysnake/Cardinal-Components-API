@@ -22,6 +22,7 @@
  */
 package org.ladysnake.cca.api.v3.entity;
 
+import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.Entity;
 import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
 
@@ -29,7 +30,7 @@ import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
  * Entrypoint getting invoked to register <em>static</em> entity component factories.
  *
  * <p>The entrypoint is exposed as {@code cardinal-components-entity} in the mod json and runs for any environment.
- * It usually executes right before the first {@link Entity} instance is created.
+ * It usually executes during {@linkplain ModInitializer mod init}, or right before the first {@link Entity} instance is created, whichever comes first.
  *
  * @since 2.4.0
  */
