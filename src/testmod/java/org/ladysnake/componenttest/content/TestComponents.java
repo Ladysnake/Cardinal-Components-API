@@ -76,7 +76,6 @@ public final class TestComponents implements
 
     @Override
     public void registerScoreboardComponentFactories(ScoreboardComponentFactoryRegistry registry) {
-        registry.registerScoreboardComponent(Vita.KEY, (scoreboard, server) -> new BaseVita());
         registry.registerTeamComponent(Vita.KEY, (t, sc, s) -> new TeamVita(t));
     }
 }

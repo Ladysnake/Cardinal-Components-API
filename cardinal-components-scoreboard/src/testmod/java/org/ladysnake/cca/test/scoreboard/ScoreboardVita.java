@@ -20,35 +20,32 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.api.v3.scoreboard;
+package org.ladysnake.cca.test.scoreboard;
 
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.server.MinecraftServer;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
-import org.ladysnake.cca.api.v3.component.Component;
-import org.ladysnake.cca.internal.base.asm.CalledByAsm;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.ladysnake.cca.test.base.SyncedVita;
 
-/**
- * A component factory for {@linkplain Scoreboard scoreboards}.
- *
- * <p>When invoked, the factory must return a {@link Component} of the right type.
- *
- * @since 2.7.10
- */
-@FunctionalInterface
-public interface ScoreboardComponentFactoryV2<C extends Component> {
-    /**
-     * Initialize components for the given scoreboard.
-     *
-     * <p>The component returned by this method will be available
-     * on the scoreboard as soon as all component factories have been invoked.
-     *
-     * @param scoreboard the scoreboard being constructed
-     * @param server     the server for which the scoreboard is being constructed, or
-     *                   {@code null} if the scoreboard is clientside
-     */
-    @CalledByAsm
-    @Contract(pure = true)
-    C createForScoreboard(Scoreboard scoreboard, @Nullable MinecraftServer server);
+public class ScoreboardVita extends SyncedVita {
+    public ScoreboardVita(Scoreboard owner) {
+        super(owner);
+    }
+
+    @Override
+    public void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity recipient) {
+        super.writeSyncPacket(buf, recipient);
+    }
+
+    @Override
+    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeToNbt(tag, registryLookup);
+    }
+
+    @Override
+    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readFromNbt(tag, registryLookup);
+    }
 }

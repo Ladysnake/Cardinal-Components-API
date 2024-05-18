@@ -25,10 +25,12 @@ package org.ladysnake.cca.test.scoreboard;
 import org.ladysnake.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
+import org.ladysnake.cca.test.base.Vita;
 
 public class CcaScoreboardTestMod implements ScoreboardComponentInitializer {
     @Override
     public void registerScoreboardComponentFactories(ScoreboardComponentFactoryRegistry registry) {
         registry.registerScoreboardComponent(LoadAwareTestComponent.KEY, (sb, server) -> new LoadAwareTestComponent());
+        registry.registerScoreboardComponent(Vita.KEY, (sb, server) -> new ScoreboardVita(sb));
     }
 }

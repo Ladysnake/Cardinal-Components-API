@@ -47,6 +47,8 @@ If you have questions or need help with this library, you can also join the [Lad
 
 ## Adding the API to your buildscript:
 
+*The following instructions are for versions 6.0 and up. For previous versions, refer to [this table on the website](https://ladysnake.org/wiki/cardinal-components-api/dev-install#previous-maven-coordinates).*
+
 Latest versions of Cardinal Components API are available on the Ladysnake maven:
 ```gradle
 repositories {

@@ -28,6 +28,7 @@ import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.Component;
+import org.ladysnake.cca.internal.base.asm.CalledByAsm;
 
 /**
  * A component factory for {@linkplain Team teams}.
@@ -49,6 +50,7 @@ public interface TeamComponentFactoryV2<C extends Component> {
      * @param server     the server for which the scoreboard is being constructed, or
      *                   {@code null} if the scoreboard is clientside
      */
+    @CalledByAsm
     @Contract(pure = true)
     C createForTeam(Team team, Scoreboard scoreboard, @Nullable MinecraftServer server);
 }
