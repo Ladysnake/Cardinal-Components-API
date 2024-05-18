@@ -137,7 +137,7 @@ public final class CcaBootstrap extends LazyDispatcher {
             /* generate the component type class */
 
             ClassNode componentTypeWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
-            String componentTypeName = CcaAsmHelper.getComponentTypeName(componentId);
+            String componentTypeName = CcaAsmHelper.STATIC_COMPONENT_TYPE+"Impl";
             componentTypeWriter.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, componentTypeName, null, CcaAsmHelper.COMPONENT_TYPE, null);
 
             MethodVisitor init = componentTypeWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", COMPONENT_TYPE_INIT_DESC, null, null);
@@ -160,7 +160,7 @@ public final class CcaBootstrap extends LazyDispatcher {
             get.visitInsn(Opcodes.ARETURN);
             get.visitEnd();
 
-            @SuppressWarnings("unchecked") Class<? extends ComponentKey<?>> ct = (Class<? extends ComponentKey<?>>) CcaAsmHelper.generateClass(componentTypeWriter);
+            @SuppressWarnings("unchecked") Class<? extends ComponentKey<?>> ct = (Class<? extends ComponentKey<?>>) CcaAsmHelper.generateClass(componentTypeWriter, true, null);
             generatedComponentTypes.put(componentId, ct);
         }
         return generatedComponentTypes;
@@ -188,7 +188,7 @@ public final class CcaBootstrap extends LazyDispatcher {
         }
 
         staticContainerWriter.visitEnd();
-        CcaAsmHelper.generateClass(staticContainerWriter);
+        CcaAsmHelper.generateClass(staticContainerWriter, false, null);
     }
 
 }

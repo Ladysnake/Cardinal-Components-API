@@ -38,6 +38,9 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -61,15 +64,14 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
      *
      * <p>The generated class has a single constructor, taking {@code eventCount} parameters of type {@link Event}.
      *
-     * @param implNameSuffix       a unique suffix for the generated class
      * @param containerFactoryType the factory interface that is to be implemented by the returned class
      * @param containerImpl        the type of containers that is to be instantiated by the generated factory
      * @param actualFactoryParams  the actual type of the arguments taken by the {@link ComponentContainer} constructor
      */
-    public static <I> Class<? extends I> spinContainerFactory(String implNameSuffix, Class<? super I> containerFactoryType, Class<? extends ComponentContainer> containerImpl, List<Class<?>> actualFactoryParams) throws IOException {
+    public static <I> Class<? extends I> spinContainerFactory(Class<? super I> containerFactoryType, Class<? extends ComponentContainer> containerImpl, List<Class<?>> actualFactoryParams) throws IOException {
         CcaBootstrap.INSTANCE.ensureInitialized();
+        MethodHandles.Lookup lookup = MethodHandles.lookup();
 
-        CcaAsmHelper.checkValidJavaIdentifier(implNameSuffix);
         Constructor<?>[] constructors = containerImpl.getConstructors();
 
         if (constructors.length != 1) {
@@ -99,39 +101,50 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
             }
         }
 
-        String containerCtorDesc = Type.getConstructorDescriptor(constructors[0]);
-        String containerImplName = Type.getInternalName(containerImpl);
         ClassNode containerFactoryWriter = new ClassNode(CcaAsmHelper.ASM_VERSION);
-        String factoryImplName = CcaAsmHelper.STATIC_CONTAINER_FACTORY + '_' + implNameSuffix;
-        containerFactoryWriter.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, factoryImplName, null, "java/lang/Object", new String[]{Type.getInternalName(containerFactoryType)});
+        String factoryImplName = CcaAsmHelper.STATIC_CONTAINER_FACTORY;
+        containerFactoryWriter.visit(Opcodes.V17, Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL, factoryImplName, null, "java/lang/Object", new String[]{Type.getInternalName(containerFactoryType)});
         MethodVisitor init = containerFactoryWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
         init.visitVarInsn(Opcodes.ALOAD, 0);
         init.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
         init.visitInsn(Opcodes.RETURN);
         init.visitEnd();
         MethodVisitor createContainer = containerFactoryWriter.visitMethod(Opcodes.ACC_PUBLIC, factorySam.getName(), Type.getMethodDescriptor(factorySam), null, null);
-        createContainer.visitTypeInsn(Opcodes.NEW, containerImplName);
-        createContainer.visitInsn(Opcodes.DUP);
-        // stack: container, container
+        // The JIT can inline this methodhandle as long as it's constant (psf field or LDC, we use LDC here)
+        Object constantClassData = CcaAsmHelper.constantClassData(MethodHandle.class);
+        createContainer.visitLdcInsn(constantClassData);
+        // stack: methodhandle
         for (int i = 0; i < actualFactoryParams.size(); i++) {
             createContainer.visitVarInsn(factoryArgs[i].getOpcode(Opcodes.ILOAD), i + 1);
             if (factoryArgs[i].getSort() == Type.OBJECT || factoryArgs[i].getSort() == Type.ARRAY) {
                 createContainer.visitTypeInsn(Opcodes.CHECKCAST, Type.getInternalName(actualFactoryParams.get(i)));
             }
         }
-        // stack: container, container, actualFactoryArgs...
-        createContainer.visitMethodInsn(Opcodes.INVOKESPECIAL, containerImplName, "<init>", containerCtorDesc, false);
+        // stack: methodhandle, actualFactoryArgs...
+        createContainer.visitMethodInsn(
+            Opcodes.INVOKEVIRTUAL,
+            Type.getInternalName(MethodHandle.class),
+            "invokeExact",
+            Type.getMethodDescriptor(factorySam),
+            false
+        );
         // stack: container
         createContainer.visitInsn(Opcodes.ARETURN);
         createContainer.visitEnd();
         containerFactoryWriter.visitEnd();
-        @SuppressWarnings("unchecked") Class<? extends I> ret = (Class<? extends I>) CcaAsmHelper.generateClass(containerFactoryWriter);
+        MethodHandle containerCtor;
+        try {
+            containerCtor = lookup.findConstructor(containerImpl, MethodType.methodType(void.class, factorySam.getParameterTypes())).asType(MethodType.methodType(factorySam.getReturnType(), factorySam.getParameterTypes()));
+        } catch (Throwable e) {
+            throw new RuntimeException("Could not find container constructor", e);
+        }
+        @SuppressWarnings("unchecked") Class<? extends I> ret = (Class<? extends I>) CcaAsmHelper.generateClass(containerFactoryWriter, true, containerCtor);
         return ret;
     }
 
     public static ComponentContainer createEmptyContainer() {
         try {
-            Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(Runnable.class, Collections.emptyMap(), "Empty");
+            Class<? extends ComponentContainer> containerCls = CcaAsmHelper.spinComponentContainer(Runnable.class, Collections.emptyMap());
             return containerCls.getConstructor().newInstance();
         } catch (IOException | ReflectiveOperationException e) {
             throw new StaticComponentLoadingException("Failed to generate empty component container", e);
