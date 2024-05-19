@@ -5,7 +5,7 @@ import java.net.URI
 
 plugins {
     id("fabric-loom") version "1.6-SNAPSHOT"
-    id("io.github.ladysnake.chenille") version "0.12.0"
+    id("io.github.ladysnake.chenille") version "0.12.2"
     id("org.cadixdev.licenser") version "0.6.1"
 }
 
