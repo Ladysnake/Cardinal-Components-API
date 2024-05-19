@@ -22,6 +22,8 @@
  */
 package org.ladysnake.cca.internal.base;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
@@ -42,27 +44,44 @@ import java.util.Properties;
 
 public final class ComponentsInternals {
     public static final Logger LOGGER = LogManager.getLogger("Cardinal Components API");
-    private static boolean logDeserializationWarnings = true;
+    private static final int DEFAULT_MAX_WARNINGS_PER_COMPONENT = 5;
+    private static final boolean DEFAULT_LOG_DESERIALIZATION_WARNINGS = true;
+    private static final int configVersion = 2;
+    private static boolean logDeserializationWarnings = DEFAULT_LOG_DESERIALIZATION_WARNINGS;
+    private static int maxWarningsPerComponent = DEFAULT_MAX_WARNINGS_PER_COMPONENT;
+    private static final Object2IntMap<String> warningCounts = new Object2IntOpenHashMap<>();
 
     public static void init() {
         Path path = FabricLoader.getInstance().getConfigDir().resolve("cardinal-components-api.properties");
         try(Reader reader = Files.newBufferedReader(path)) {
             Properties cfg = new Properties();
             cfg.load(reader);
-            logDeserializationWarnings = Boolean.parseBoolean(cfg.getProperty("log-deserialization-warnings", "true"));
-        } catch (IOException e) {
-            try {
-                Files.writeString(path, """
-                    # If set to false, warnings will not get logged when a component fails to be resolved (typically due to mods being removed)
-                    # Default value: true
-                    log-deserialization-warnings = true
-
-                    # Internal value, do not edit or your changes may be arbitrarily reset
-                    config-version = 1
-                    """);
-            } catch (IOException ex) {
-                LOGGER.error("Failed to write config file at {}", path);
+            if (Integer.parseInt(cfg.getProperty("config-version")) < configVersion) {
+                writeConfigFile(path);
+                cfg.clear();
             }
+            logDeserializationWarnings = Boolean.parseBoolean(cfg.getProperty("log-deserialization-warnings", String.valueOf(DEFAULT_LOG_DESERIALIZATION_WARNINGS)));
+            maxWarningsPerComponent = Integer.parseInt(cfg.getProperty("max-deserialization-warnings", String.valueOf(DEFAULT_MAX_WARNINGS_PER_COMPONENT)));
+        } catch (IOException e) {
+            writeConfigFile(path);
+        }
+    }
+
+    private static void writeConfigFile(Path path) {
+        try {
+            Files.writeString(path, """
+                # If set to false, warnings will not get logged when a component fails to be resolved (typically due to mods being removed)
+                # Default value: %1$s
+                log-deserialization-warnings = %1$s
+                # If log-deserialization-warnings is enabled, warnings will be printed at most *this number of times* for every component type
+                # Default value: %2$d
+                max-deserialization-warnings = %2$d
+
+                # Internal value, do not edit or your changes may be arbitrarily reset
+                config-version = %3$d
+                """.formatted(DEFAULT_LOG_DESERIALIZATION_WARNINGS, DEFAULT_MAX_WARNINGS_PER_COMPONENT, configVersion));
+        } catch (IOException ex) {
+            LOGGER.error("Failed to write config file at {}", path);
         }
     }
 
@@ -78,12 +97,16 @@ public final class ComponentsInternals {
     public static void logDeserializationWarnings(Collection<String> missedKeyIds) {
         if (logDeserializationWarnings) {
             for (String missedKeyId : missedKeyIds) {
-                Identifier id = Identifier.tryParse(missedKeyId);
-                String cause;
-                if (id == null) cause = "invalid identifier";
-                else if (ComponentRegistry.get(id) == null) cause = "unregistered key";
-                else cause = "provider does not have ";
-                LOGGER.warn("Failed to deserialize component: {} {}", cause, missedKeyId);
+                int warningCount = warningCounts.getInt(missedKeyId);
+                if (warningCount < maxWarningsPerComponent) {
+                    Identifier id = Identifier.tryParse(missedKeyId);
+                    String cause;
+                    if (id == null) cause = "invalid identifier";
+                    else if (ComponentRegistry.get(id) == null) cause = "unregistered key";
+                    else cause = "provider does not have ";
+                    LOGGER.warn("Failed to deserialize component: {} {}{}", cause, missedKeyId, warningCount + 1 >= maxWarningsPerComponent ? " (last warning for this component)" : "");
+                    warningCounts.put(missedKeyId, warningCount + 1);
+                }
             }
         }
     }

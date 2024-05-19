@@ -5,6 +5,11 @@ Updated to 1.20.5/1.20.6
 
 This update introduces multiple breaking changes - a migration guide is available on [the Ladysnake website](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes).
 
+### Pre-Release 3
+**Fixes**
+- Missing components (usually caused by removed mods) will no longer trigger a wall of warnings
+  - The number of warnings logged for each missing component type is configurable
+
 ### Pre-Release 2
 **Fixes**
 - The library no longer requires Loom 1.7-alpha to be used in dev workspaces

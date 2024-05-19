@@ -22,8 +22,8 @@
  */
 package org.ladysnake.cca.internal.base;
 
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
@@ -74,8 +74,8 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
      */
     @Override
     public void fromTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        if(tag.contains(NBT_KEY, NbtType.LIST)) {
-            NbtList componentList = tag.getList(NBT_KEY, NbtType.COMPOUND);
+        if(tag.contains(NBT_KEY, NbtElement.LIST_TYPE)) {
+            NbtList componentList = tag.getList(NBT_KEY, NbtElement.COMPOUND_TYPE);
             for (int i = 0; i < componentList.size(); i++) {
                 NbtCompound nbt = componentList.getCompound(i);
                 ComponentKey<?> type = ComponentRegistry.get(new Identifier(nbt.getString("componentId")));
@@ -86,13 +86,13 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
                     }
                 }
             }
-        } else if (tag.contains("cardinal_components", NbtType.COMPOUND)) {
+        } else if (tag.contains(NBT_KEY, NbtElement.COMPOUND_TYPE)) {
             NbtCompound componentMap = tag.getCompound(NBT_KEY);
 
             for (ComponentKey<?> key : this.keys()) {
                 String keyId = key.getId().toString();
 
-                if (componentMap.contains(keyId, NbtType.COMPOUND)) {
+                if (componentMap.contains(keyId, NbtElement.COMPOUND_TYPE)) {
                     Component component = key.getInternal(this);
                     assert component != null;
                     component.readFromNbt(componentMap.getCompound(keyId), registryLookup);

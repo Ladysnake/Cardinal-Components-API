@@ -23,6 +23,7 @@
 package org.ladysnake.cca.mixin.chunk.common;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.ChunkSerializer;
@@ -30,6 +31,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.WrapperProtoChunk;
 import net.minecraft.world.poi.PointOfInterestStorage;
+import org.ladysnake.cca.internal.base.AbstractComponentContainer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -42,6 +44,11 @@ public abstract class MixinChunkSerializer {
         ProtoChunk ret = cir.getReturnValue();
         Chunk chunk = ret instanceof WrapperProtoChunk ? ((WrapperProtoChunk) ret).getWrappedChunk() : ret;
         chunk.asComponentProvider().getComponentContainer().fromTag(tag, world.getRegistryManager());
+        // If components have been removed, we need to make the chunk save again
+        if (tag.contains(AbstractComponentContainer.NBT_KEY, NbtElement.COMPOUND_TYPE)) {
+            int remainingComponentCount = tag.getCompound(AbstractComponentContainer.NBT_KEY).getSize();
+            chunk.setNeedsSaving(remainingComponentCount > 0);
+        }
     }
 
     @Inject(method = "serialize", at = @At("RETURN"))
