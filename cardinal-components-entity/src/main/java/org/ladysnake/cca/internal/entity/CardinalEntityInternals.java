@@ -93,7 +93,7 @@ public final class CardinalEntityInternals {
         @Nullable RespawnCopyStrategy<?> strat = null;
         Class<?> c = entityClass;
         while (strat == null && LivingEntity.class.isAssignableFrom(c)) {
-            strat = respawnCopyStrategies.getOrDefault(type, Map.of()).get(entityClass);
+            strat = respawnCopyStrategies.getOrDefault(type, Map.of()).get(c);
             c = c.getSuperclass();
         }
         return strat == null ? DEFAULT_COPY_STRATEGY : (RespawnCopyStrategy<? super C>) strat;

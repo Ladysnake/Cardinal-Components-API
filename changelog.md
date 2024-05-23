@@ -5,6 +5,10 @@ Updated to 1.20.5/1.20.6
 
 This update introduces multiple breaking changes - a migration guide is available on [the Ladysnake website](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes).
 
+### Release Candidate 1
+**Fixes**
+- Fixed respawn copy strategies not being correctly registered for player entities
+
 ### Pre-Release 3
 **Fixes**
 - Missing components (usually caused by removed mods) will no longer trigger a wall of warnings
