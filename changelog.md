@@ -5,40 +5,6 @@ Updated to 1.20.5/1.20.6
 
 This update introduces multiple breaking changes - a migration guide is available on [the Ladysnake website](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes).
 
-### Release Candidate 1
-**Fixes**
-- Fixed respawn copy strategies not being correctly registered for player entities
-
-### Pre-Release 3
-**Fixes**
-- Missing components (usually caused by removed mods) will no longer trigger a wall of warnings
-  - The number of warnings logged for each missing component type is configurable
-
-### Pre-Release 2
-**Fixes**
-- The library no longer requires Loom 1.7-alpha to be used in dev workspaces
-
-### Pre-Release 1
-**Changes**
-- Component registration now happens during mod init. This should fix some classloading-related issues, and make loading errors easier to diagnose.
-- The internal ASM generation systems have been partially rewritten (thanks lukebemish !)
-
-### Beta 3
-**Fixes**
-- Fixed the most basic binary incompatibilities with mods compiled for beta 1
-
-### Beta 2
-
-**Changes**
-- All the serialization methods now take an additional registry lookup argument
-  - [Relevant migration guide](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes#serialization)
-- Warning: due to the above change, level components may not be deserialized correctly if a mod calls `LevelProperties.readProperties` instead of `LevelStorage.parseSaveProperties`
-
-**Removals**
-- The deprecated `util` package in `cardinal-components-block` has been removed
-
-### Beta 1
-
 **Additions**
 - Added `C2SSelfMessagingComponent`, a new experimental utility interface to simplify client-to-server messaging on player components
 - Added `WorldComponentRegistry#registerFor` methods, allowing for dimension-specific world components
@@ -48,12 +14,22 @@ This update introduces multiple breaking changes - a migration guide is availabl
 - Migrated all packages from `dev.onyxstudios` to `org.ladysnake`
 - Updated documentation and licenses to reflect package change
 - `RespawnCopyStrategy` now also applies on mob conversion
-- The `cardinal-components-level` is now deprecated, as it is redundant with the `cardinal-components-scoreboard` module
-  - Mods are encouraged to move to scoreboard components, which serve the same purpose of global data storage and have an API more consistent with other modules
+- The `cardinal-components-level` module is now deprecated, as it is redundant with the `cardinal-components-scoreboard` module
+    - Mods are encouraged to move to scoreboard components, which serve the same purpose of global data storage and have an API more consistent with other modules
+- Component registration now happens during mod init. This should fix some classloading-related issues, and make loading errors easier to diagnose.
+- The internal ASM generation systems have been partially rewritten (thanks lukebemish !)
+- All the serialization methods now take an additional registry lookup argument
+    - [Relevant migration guide](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes#serialization)
+- Warning: due to the above change, level components may not be deserialized correctly if a mod calls `LevelProperties.readProperties` instead of `LevelStorage.parseSaveProperties`
+
+**Fixes**
+- Missing components (usually caused by removed mods) will no longer trigger a wall of warnings
+    - The number of warnings logged for each missing component type is configurable
 
 **Removals**
 - *Removed item components.* The `cardinal-components-item` module now contains an `ItemComponentMigrationRegistry`, which is used to help you migrate to vanilla components.
 - Removed `PlayerCopyCallback` - if you were using it, you can switch to `ServerPlayerEvents.COPY_FROM` from Fabric API
+- The deprecated `util` package in `cardinal-components-block` has been removed
 
 ------------------------------------------------------
 Version 5.4.0

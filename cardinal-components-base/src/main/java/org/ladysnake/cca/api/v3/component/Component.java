@@ -22,17 +22,12 @@
  */
 package org.ladysnake.cca.api.v3.component;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import org.jetbrains.annotations.Contract;
 
 /**
  * The base interface for components.
- *
- * <p>This interface exposes basic methods for serializing components.
- * The {@link Object#equals(Object)} must additionally be overridden when attached to some providers
- * like {@link ItemStack}s.
  *
  * @since 2.7.0
  */
@@ -58,13 +53,4 @@ public interface Component {
      */
     @Contract(mutates = "param1")
     void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
-
-    /**
-     * Indicates whether some other object is "equal to" this component.
-     *
-     * <p> A well-defined equality is required by some modules, like {@code cardinal-components-item}.
-     *
-     * @see Object#equals(Object)
-     */
-    boolean equals(Object o);
 }
