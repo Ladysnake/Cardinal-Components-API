@@ -22,6 +22,7 @@
  */
 package org.ladysnake.cca.mixin.entity.common;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ConnectedClientData;
@@ -39,7 +40,7 @@ public abstract class MixinPlayerManager {
             method = "onPlayerConnect",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/ServerPlayerEntity;getStatusEffects()Ljava/util/Collection;"
+                    target = "Lnet/minecraft/server/PlayerManager;sendStatusEffects(Lnet/minecraft/server/network/ServerPlayerEntity;)V"
             )
     )
     private void onPlayerLogIn(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
@@ -58,7 +59,7 @@ public abstract class MixinPlayerManager {
             method = "respawnPlayer",
             at = @At("RETURN")
     )
-    private void respawnPlayer(ServerPlayerEntity player, boolean end, CallbackInfoReturnable<ServerPlayerEntity> cir) {
+    private void respawnPlayer(ServerPlayerEntity player, boolean alive, Entity.RemovalReason removalReason, CallbackInfoReturnable<ServerPlayerEntity> cir) {
         PlayerSyncCallback.EVENT.invoker().onPlayerSync(cir.getReturnValue());
     }
 }

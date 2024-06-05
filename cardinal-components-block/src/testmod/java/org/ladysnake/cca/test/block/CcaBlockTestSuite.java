@@ -94,7 +94,7 @@ public class CcaBlockTestSuite implements FabricGameTest {
         BlockPos pos = new BlockPos(1, 1, 1);
         ctx.setBlockState(pos, Blocks.END_PORTAL);
         ctx.addFinalTaskWithDuration(5, () -> {
-            int ticks = Objects.requireNonNull(ctx.getBlockEntity(pos)).getComponent(TickingTestComponent.KEY).serverTicks();
+            int ticks = TickingTestComponent.KEY.get(ctx.getBlockEntity(pos)).serverTicks();
             GameTestUtil.assertTrue("Component should tick 5 times", ticks == 5);
         });
     }

@@ -61,7 +61,7 @@ public final class CardinalComponentsEntity {
      * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryByteBuf)}
      * called on the game thread.
      */
-    public static final CustomPayload.Id<ComponentUpdatePayload<Integer>> PACKET_ID = CustomPayload.id("cardinal-components:entity_sync");
+    public static final CustomPayload.Id<ComponentUpdatePayload<Integer>> PACKET_ID = ComponentUpdatePayload.id("entity_sync");
     /**
      * {@link net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket} channel for C2S player component messages.
      *
@@ -70,7 +70,7 @@ public final class CardinalComponentsEntity {
      * <p> Components synchronized through this channel will have {@linkplain org.ladysnake.cca.api.v3.entity.C2SSelfMessagingComponent#handleC2SMessage(net.minecraft.network.RegistryByteBuf)}
      * called on the game thread.
      */
-    public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> C2S_SELF_PACKET_ID = CustomPayload.id("cardinal-components:player_message_c2s");
+    public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> C2S_SELF_PACKET_ID = ComponentUpdatePayload.id("player_message_c2s");
     private static final Set<Identifier> unknownC2SPlayerComponents = new HashSet<>();
 
     public static void init() {

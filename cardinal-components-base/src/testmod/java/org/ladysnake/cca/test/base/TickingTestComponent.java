@@ -31,7 +31,7 @@ import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 
 public class TickingTestComponent implements ServerTickingComponent, ClientTickingComponent {
-    public static final ComponentKey<TickingTestComponent> KEY = ComponentRegistry.getOrCreate(new Identifier("cca-base-test", "ticking"), TickingTestComponent.class);
+    public static final ComponentKey<TickingTestComponent> KEY = ComponentRegistry.getOrCreate(Identifier.of("cca-base-test", "ticking"), TickingTestComponent.class);
 
     private int clientTicks;
     private int serverTicks;

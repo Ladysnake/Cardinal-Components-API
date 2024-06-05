@@ -41,7 +41,7 @@ public record ComponentUpdatePayload<T>(
     RegistryByteBuf buf
 ) implements CustomPayload {
     public static <T> CustomPayload.Id<ComponentUpdatePayload<T>> id(String path) {
-        return CustomPayload.id("cardinal-components:" + path);
+        return new CustomPayload.Id<>(Identifier.of("cardinal-components", path));
     }
 
     public static <T> void register(Id<ComponentUpdatePayload<T>> id, PacketCodec<? super RegistryByteBuf, T> targetDataCodec) {

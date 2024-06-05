@@ -39,7 +39,7 @@ import org.ladysnake.cca.test.base.Vita;
 
 public class CcaBlockTestMod implements ModInitializer, BlockComponentInitializer {
     public static final String MOD_ID = "cca-block-test";
-    public static final BlockApiLookup<Vita, Direction> VITA_API_LOOKUP = BlockApiLookup.get(new Identifier(MOD_ID, "sided_vita"), Vita.class, Direction.class);
+    public static final BlockApiLookup<Vita, Direction> VITA_API_LOOKUP = BlockApiLookup.get(Identifier.of(MOD_ID, "sided_vita"), Vita.class, Direction.class);
 
     @Override
     public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {

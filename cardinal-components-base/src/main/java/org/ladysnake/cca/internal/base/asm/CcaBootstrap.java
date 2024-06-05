@@ -89,7 +89,7 @@ public final class CcaBootstrap extends LazyDispatcher {
                 if (metadata.containsCustomValue("cardinal-components")) {
                     try {
                         for (CustomValue value : metadata.getCustomValue("cardinal-components").getAsArray()) {
-                            staticComponentTypes.add(new Identifier(value.getAsString()));
+                            staticComponentTypes.add(Identifier.of(value.getAsString()));
                         }
                     } catch (ClassCastException | InvalidIdentifierException e) {
                         throw new StaticComponentLoadingException("Failed to load component ids declared by " + metadata.getName() + "(" + metadata.getId() + ")", e);

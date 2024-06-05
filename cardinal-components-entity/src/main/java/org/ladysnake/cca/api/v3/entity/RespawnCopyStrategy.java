@@ -101,7 +101,7 @@ public interface RespawnCopyStrategy<C extends Component> {
      * <p>Mods that depend on component data for their own copying logic can {@linkplain net.fabricmc.fabric.api.event.Event#addPhaseOrdering(Identifier, Identifier) add a phase ordering}
      * to run after CCA's listeners.
      */
-    Identifier EVENT_PHASE = new Identifier("cardinal-components", "component-copy");
+    Identifier EVENT_PHASE = Identifier.of("cardinal-components", "component-copy");
 
     /**
      * @param entityClass the class of the source entity being respawned or converted

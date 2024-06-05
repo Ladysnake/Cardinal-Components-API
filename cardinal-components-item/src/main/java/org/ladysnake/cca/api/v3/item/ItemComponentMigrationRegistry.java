@@ -22,7 +22,7 @@
  */
 package org.ladysnake.cca.api.v3.item;
 
-import net.minecraft.component.DataComponentType;
+import net.minecraft.component.ComponentType;
 import net.minecraft.util.Identifier;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 
@@ -31,12 +31,12 @@ import org.ladysnake.cca.api.v3.component.ComponentKey;
  */
 public interface ItemComponentMigrationRegistry {
     /**
-     * Registers an item component migration from the specified {@link ComponentKey#getId() CCA Component ID} to an equivalent {@link DataComponentType}.
+     * Registers an item component migration from the specified {@link ComponentKey#getId() CCA Component ID} to an equivalent {@link ComponentType}.
      *
      * <p>This hooks into the vanilla datafixing process and may therefore not correctly migrate data for stacks stored in modded containers.
      *
      * @param oldComponentId the item component ID from CCA days
      * @param mcComponentType the new vanilla component type
      */
-    void registerMigration(Identifier oldComponentId, DataComponentType<?> mcComponentType);
+    void registerMigration(Identifier oldComponentId, ComponentType<?> mcComponentType);
 }

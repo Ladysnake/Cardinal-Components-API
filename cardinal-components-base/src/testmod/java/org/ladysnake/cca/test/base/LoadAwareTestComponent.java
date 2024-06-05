@@ -30,7 +30,7 @@ import org.ladysnake.cca.api.v3.component.load.ServerLoadAwareComponent;
 import org.ladysnake.cca.api.v3.component.load.ServerUnloadAwareComponent;
 
 public class LoadAwareTestComponent implements TransientComponent, ServerLoadAwareComponent, ServerUnloadAwareComponent {
-    public static final ComponentKey<LoadAwareTestComponent> KEY = ComponentRegistry.getOrCreate(new Identifier("cca-base-test", "loading"), LoadAwareTestComponent.class);
+    public static final ComponentKey<LoadAwareTestComponent> KEY = ComponentRegistry.getOrCreate(Identifier.of("cca-base-test", "loading"), LoadAwareTestComponent.class);
 
     private int loadCounter = 0;
 

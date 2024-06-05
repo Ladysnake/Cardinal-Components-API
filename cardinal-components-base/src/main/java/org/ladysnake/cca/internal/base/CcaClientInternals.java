@@ -23,6 +23,7 @@
 package org.ladysnake.cca.internal.base;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.network.DisconnectionInfo;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.text.Text;
 import org.ladysnake.cca.api.v3.component.Component;
@@ -41,7 +42,7 @@ public final class CcaClientInternals {
                     }
                 });
             } catch (UnknownComponentException e) {
-                ctx.player().networkHandler.onDisconnected(Text.literal(e.getMessage() + "\n(you are probably missing a mod installed on the server)" + ComponentsInternals.getClientOptionalModAdvice()));
+                ctx.player().networkHandler.onDisconnected(new DisconnectionInfo(Text.literal(e.getMessage() + "\n(you are probably missing a mod installed on the server)" + ComponentsInternals.getClientOptionalModAdvice())));
             } finally {
                 payload.buf().release();
             }

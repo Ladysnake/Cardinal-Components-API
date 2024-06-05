@@ -31,6 +31,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.ChunkSerializer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.storage.StorageKey;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.TickingTestComponent;
 import org.ladysnake.cca.test.base.Vita;
@@ -43,7 +44,7 @@ public class CcaChunkTestSuite implements FabricGameTest {
         Chunk c = new WorldChunk(ctx.getWorld(), pos);
         c.getComponent(Vita.KEY).setVitality(42);
         NbtCompound nbt = ChunkSerializer.serialize(ctx.getWorld(), c);
-        Chunk c1 = ChunkSerializer.deserialize(ctx.getWorld(), ctx.getWorld().getPointOfInterestStorage(), pos, nbt);
+        Chunk c1 = ChunkSerializer.deserialize(ctx.getWorld(), ctx.getWorld().getPointOfInterestStorage(), new StorageKey("", ctx.getWorld().getRegistryKey(), ""), pos, nbt);
         GameTestUtil.assertTrue("Chunk component data should survive deserialization", c1.getComponent(Vita.KEY).getVitality() == 42);
         ctx.complete();
     }

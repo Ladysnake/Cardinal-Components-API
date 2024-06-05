@@ -25,7 +25,7 @@ package org.ladysnake.componenttest.content.vita;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
-import net.minecraft.component.DataComponentType;
+import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -48,10 +48,10 @@ public class ItemVita implements Vita, TransientComponent {
         return Optional.ofNullable(LOOKUP.find(stack, null));
     }
 
-    private final DataComponentType<ItemVita.Data> componentType;
+    private final ComponentType<ItemVita.Data> componentType;
     private final ItemStack stack;
 
-    public ItemVita(DataComponentType<ItemVita.Data> componentType, ItemStack stack) {
+    public ItemVita(ComponentType<ItemVita.Data> componentType, ItemStack stack) {
         this.componentType = componentType;
         this.stack = stack;
     }
@@ -70,11 +70,11 @@ public class ItemVita implements Vita, TransientComponent {
         public static final Data EMPTY = new Data(0);
         public static final Codec<Data> CODEC = Codec.INT.xmap(Data::new, Data::vitality);
         public static final PacketCodec<ByteBuf, Data> PACKET_CODEC = PacketCodecs.INTEGER.xmap(Data::new, Data::vitality);
-        public static final DataComponentType<Data> COMPONENT_TYPE = DataComponentType.<Data>builder()
+        public static final ComponentType<Data> COMPONENT_TYPE = ComponentType.<Data>builder()
             .codec(CODEC)
             .packetCodec(PACKET_CODEC)
             .build();
-        public static final DataComponentType<Data> ALT_COMPONENT_TYPE = DataComponentType.<Data>builder()
+        public static final ComponentType<Data> ALT_COMPONENT_TYPE = ComponentType.<Data>builder()
             .codec(CODEC)
             .packetCodec(PACKET_CODEC)
             .build();

@@ -82,7 +82,7 @@ public class CardinalComponentsTest {
             FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, VitalityZombieEntity::new).dimensions(EntityType.ZOMBIE.getDimensions()).build());
 
     public static Identifier id(String path) {
-        return new Identifier("componenttest", path);
+        return Identifier.of("componenttest", path);
     }
 
     public static void init() {
@@ -110,7 +110,7 @@ public class CardinalComponentsTest {
         } catch (IllegalStateException ignored) { }
 
         try {
-            ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("hi"), Vita.class);
+            ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.of("hi"), Vita.class);
             assert false : "Static components must be registered through mod metadata or plugin";
         } catch (IllegalStateException ignored) { }
 

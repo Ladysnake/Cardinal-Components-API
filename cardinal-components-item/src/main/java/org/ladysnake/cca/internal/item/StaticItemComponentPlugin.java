@@ -22,15 +22,13 @@
  */
 package org.ladysnake.cca.internal.item;
 
-import com.mojang.serialization.Dynamic;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.component.DataComponentType;
+import net.minecraft.component.ComponentType;
 import net.minecraft.datafixer.fix.ItemStackComponentizationFix;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import org.ladysnake.cca.api.v3.item.ItemComponentMigrationRegistry;
 import org.ladysnake.cca.api.v3.item.ItemComponentInitializer;
-import org.ladysnake.cca.internal.base.AbstractComponentContainer;
+import org.ladysnake.cca.api.v3.item.ItemComponentMigrationRegistry;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.ladysnake.cca.internal.base.asm.StaticComponentPluginBase;
 
@@ -42,17 +40,17 @@ public final class StaticItemComponentPlugin implements ItemComponentMigrationRe
 
     private StaticItemComponentPlugin() {}
 
-    private final Map<Identifier, DataComponentType<?>> migrations = new HashMap<>();
+    private final Map<Identifier, ComponentType<?>> migrations = new HashMap<>();
 
     @Override
-    public void registerMigration(Identifier oldComponentId, DataComponentType<?> mcComponentType) {
+    public void registerMigration(Identifier oldComponentId, ComponentType<?> mcComponentType) {
         if (this.migrations.put(oldComponentId, mcComponentType) != null) {
             ComponentsInternals.LOGGER.warn("[Cardinal-Components-API] Overwriting component migration for {}", oldComponentId);
         }
     }
 
     public void migrate(ItemStackComponentizationFix.StackData data) {
-        for (Map.Entry<Identifier, DataComponentType<?>> entry : migrations.entrySet()) {
+        for (Map.Entry<Identifier, ComponentType<?>> entry : migrations.entrySet()) {
             String oldComponentId = entry.getKey().toString();
             String mcComponentId = Registries.DATA_COMPONENT_TYPE.getKey(entry.getValue()).orElseThrow(
                 () -> new IllegalStateException("Registered migration for component " + oldComponentId + " towards unregistered item component type " + entry.getValue())

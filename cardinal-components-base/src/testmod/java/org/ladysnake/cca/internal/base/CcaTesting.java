@@ -27,8 +27,8 @@ import net.minecraft.util.Identifier;
 import java.util.List;
 
 public class CcaTesting {
-    public static final Identifier TEST_ID_1 = new Identifier("testmod:test");
-    public static final Identifier TEST_ID_2 = new Identifier("testmod:test_2");
-    public static final Identifier TEST_ID_3 = new Identifier("testmod:test_3");
+    public static final Identifier TEST_ID_1 = Identifier.of("testmod:test");
+    public static final Identifier TEST_ID_2 = Identifier.of("testmod:test_2");
+    public static final Identifier TEST_ID_3 = Identifier.of("testmod:test_3");
     public static final List<Identifier> ALL_TEST_IDS = List.of(TEST_ID_1, TEST_ID_2, TEST_ID_3);
 }

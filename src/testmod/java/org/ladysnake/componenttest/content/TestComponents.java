@@ -52,8 +52,8 @@ public final class TestComponents implements
     ItemComponentInitializer,
     ScoreboardComponentInitializer {
 
-    public static final Identifier CUSTOM_PROVIDER_1 = new Identifier("componenttest:custom/1");
-    public static final Identifier CUSTOM_PROVIDER_2 = new Identifier("componenttest:custom/2");
+    public static final Identifier CUSTOM_PROVIDER_1 = Identifier.of("componenttest:custom/1");
+    public static final Identifier CUSTOM_PROVIDER_2 = Identifier.of("componenttest:custom/2");
 
     public static final ComponentKey<Vita> ALT_VITA = ComponentRegistryV3.INSTANCE.getOrCreate(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
 

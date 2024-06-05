@@ -41,7 +41,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class VitaCompound implements AutoSyncedComponent {
-    public static final ComponentKey<VitaCompound> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier(CcaBlockTestMod.MOD_ID, "vita_compound"), VitaCompound.class);
+    public static final ComponentKey<VitaCompound> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.of(CcaBlockTestMod.MOD_ID, "vita_compound"), VitaCompound.class);
 
     private final Map<Direction, SyncedVita> storage = new EnumMap<>(Direction.class);
 

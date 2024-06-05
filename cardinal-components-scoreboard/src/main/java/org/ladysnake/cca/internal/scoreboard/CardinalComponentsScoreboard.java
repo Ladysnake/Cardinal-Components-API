@@ -44,14 +44,14 @@ public final class CardinalComponentsScoreboard {
      * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryByteBuf)}
      * called on the game thread.
      */
-    public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> SCOREBOARD_PACKET_ID = CustomPayload.id("cardinal-components:scoreboard_sync");
+    public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> SCOREBOARD_PACKET_ID = ComponentUpdatePayload.id("scoreboard_sync");
     /**
      * {@link CustomPayloadS2CPacket} channel for default team component synchronization.
      *
      * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryByteBuf)}
      * called on the game thread.
      */
-    public static final CustomPayload.Id<ComponentUpdatePayload<String>> TEAM_PACKET_ID = CustomPayload.id("cardinal-components:team_sync");
+    public static final CustomPayload.Id<ComponentUpdatePayload<String>> TEAM_PACKET_ID = ComponentUpdatePayload.id("team_sync");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {

@@ -59,6 +59,6 @@ public class CcaEntityTestMod implements ModInitializer, EntityComponentInitiali
 
     @Override
     public void onInitialize() {
-        Registry.register(Registries.ENTITY_TYPE, new Identifier("cca-entity-test", "test"), TEST_ENTITY);
+        Registry.register(Registries.ENTITY_TYPE, Identifier.of("cca-entity-test", "test"), TEST_ENTITY);
     }
 }

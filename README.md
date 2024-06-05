@@ -211,7 +211,7 @@ component** to some providers (here, to players and worlds):
 ```java
 public final class MyComponents implements EntityComponentInitializer, WorldComponentInitializer {
     public static final ComponentKey<IntComponent> MAGIK = 
-        ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("mymod:magik"), IntComponent.class);
+        ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.of("mymod:magik"), IntComponent.class);
         
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {

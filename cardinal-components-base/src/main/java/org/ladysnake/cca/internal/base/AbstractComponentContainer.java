@@ -78,7 +78,7 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
             NbtList componentList = tag.getList(NBT_KEY, NbtElement.COMPOUND_TYPE);
             for (int i = 0; i < componentList.size(); i++) {
                 NbtCompound nbt = componentList.getCompound(i);
-                ComponentKey<?> type = ComponentRegistry.get(new Identifier(nbt.getString("componentId")));
+                ComponentKey<?> type = ComponentRegistry.get(Identifier.of(nbt.getString("componentId")));
                 if (type != null) {
                     Component component = type.getInternal(this);
                     if (component != null) {

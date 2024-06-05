@@ -33,7 +33,7 @@ import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
 import org.ladysnake.cca.internal.base.MorePacketCodecs;
 
 public final class CardinalComponentsChunk {
-    public static final CustomPayload.Id<ComponentUpdatePayload<ChunkPos>> PACKET_ID = CustomPayload.id("cardinal-components:chunk_sync");
+    public static final CustomPayload.Id<ComponentUpdatePayload<ChunkPos>> PACKET_ID = ComponentUpdatePayload.id("chunk_sync");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {

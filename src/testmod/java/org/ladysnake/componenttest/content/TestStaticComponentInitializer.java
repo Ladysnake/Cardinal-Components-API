@@ -41,13 +41,13 @@ public final class TestStaticComponentInitializer implements StaticComponentInit
     public static final Logger LOGGER = LogManager.getLogger("Component Test Bootstrap");
 
     // note: the actual ComponentKey must not be registered in this class' <clinit>, to avoid circular initialization
-    public static final Identifier ALT_VITA_ID = new Identifier("componenttest", "alt-vita");
+    public static final Identifier ALT_VITA_ID = Identifier.of("componenttest", "alt-vita");
 
     @Override
     public Collection<Identifier> getSupportedComponentKeys() {
         List<Identifier> ret = new ArrayList<>(Collections.singleton(ALT_VITA_ID));
         for (int i = 0; i < 128; i++) {
-            ret.add(new Identifier("-.-", "-random/test." + i));
+            ret.add(Identifier.of("-.-", "-random/test." + i));
         }
         return ret;
     }
@@ -58,7 +58,7 @@ public final class TestStaticComponentInitializer implements StaticComponentInit
         LOGGER.info(ComponentRegistry.getOrCreate(ALT_VITA_ID, Vita.class));
         ComponentContainer.Factory.Builder<Void> builder = ComponentContainer.Factory.builder(Void.class);
         for (int i = 127; i >= 0; i--) {
-            builder.component(ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier("-.-", "-random/test." + i), Vita.class), v -> new BaseVita());
+            builder.component(ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.of("-.-", "-random/test." + i), Vita.class), v -> new BaseVita());
         }
         LOGGER.info(builder.build().createContainer(null));
     }
