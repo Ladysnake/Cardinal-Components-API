@@ -3,10 +3,12 @@
 **See the [migration guide](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-6-changes) for detailed instructions on how to update your mod.**
 
 <h1>
+  <a href="https://ladysnake.org/wiki/cardinal-components-api">
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="banner-white.svg">
         <img src="banner.svg" alt="Cardinal Components API">
     </picture> 
+  </a>
 </h1>
 
 A components API for Quilt and Fabric that is easy, modular, and extremely fast.
@@ -29,7 +31,7 @@ which would require re-implementing all that on a custom block or entity.
 
 **Cardinal Components API takes care of it all.**
 
-*Detailed information is available in [the website's **wiki**](https://ladysnake.org/wiki/cardinal-components-api/landing)*.
+*Detailed information is available in [the website's **wiki**](https://ladysnake.org/wiki/cardinal-components-api)*.
 The information below is a condensed form of the latter.  
 If you have questions or need help with this library, you can also join the [Ladysnake Discord](https://discord.ladysnake.org).
 
@@ -47,7 +49,10 @@ If you have questions or need help with this library, you can also join the [Lad
 
 ## Adding the API to your buildscript:
 
-*The following instructions are for versions 6.0 and up. For previous versions, refer to [this table on the website](https://ladysnake.org/wiki/cardinal-components-api/dev-install#previous-maven-coordinates).*
+*Check out **https://ladysnake.org/wiki/cardinal-components-api/dev-install** for up-to-date buildscript samples
+with `build.gradle`, `build.gradle.kts`, and  `libs.versions.toml`.*
+
+The following instructions apply to version 6.0.0 and up (Minecraft > 1.20.5).
 
 Latest versions of Cardinal Components API are available on the Ladysnake maven:
 ```gradle
@@ -70,15 +75,13 @@ dependencies {
 }
 ```
 
-Check out **https://ladysnake.org/wiki/cardinal-components-api/dev-install** for up-to-date buildscript samples
-with `build.gradle`, `build.gradle.kts`, and  `libs.versions.toml`.
-
 You can find the current version of the API in the [**releases**](https://github.com/Ladysnake/Cardinal-Components-API/releases) tab of the repository on Github.
 
 Cardinal Components API is split into several modules. To depend on the all-encompassing master jar, use the dependency string
 `org.ladysnake.cardinal-components-api:cardinal-components-api:<VERSION>`.
 That artifact brings every module to your dev env, but you often do not need all of them for a project.
-Also note that the maven version of the fat jar is actually empty, so you will have to require users to install it from curseforge or modrinth if you do not bundle all required modules.
+Also note that the maven version of the fat jar is actually empty, so you will have to require users to install it from
+a mod distribution platform like [Modrinth](https://modrinth.com/mod/cardinal-components-api) if you do not bundle all required modules.
 
 **[[List of individual module names and descriptions]](https://ladysnake.org/wiki/cardinal-components-api/landing#modules)**
 
