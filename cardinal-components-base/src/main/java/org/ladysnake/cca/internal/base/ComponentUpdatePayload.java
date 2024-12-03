@@ -52,7 +52,7 @@ public record ComponentUpdatePayload<T>(
         return PacketCodec.tuple(
             PacketCodec.unit(id), ComponentUpdatePayload::id,
             targetDataCodec, ComponentUpdatePayload::targetData,
-            PacketCodecs.BOOL, ComponentUpdatePayload::required,
+            PacketCodecs.BOOLEAN, ComponentUpdatePayload::required,
             Identifier.PACKET_CODEC, ComponentUpdatePayload::componentKeyId,
             MorePacketCodecs.REG_BYTE_BUF, ComponentUpdatePayload::buf,
             ComponentUpdatePayload::new
