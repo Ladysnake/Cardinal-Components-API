@@ -46,16 +46,22 @@ allprojects {
             }
         }
         maven {
-            name = "JitPack"
-            url = URI("https://jitpack.io")
+            name = "Shedaniel"
+            url = URI("https://maven.shedaniel.me")
+            content {
+                includeGroup("me.shedaniel.cloth")
+            }
         }
         maven {
             name = "Modrinth"
             url = URI("https://api.modrinth.com/maven")
+            content {
+                includeGroup("maven.modrinth")
+            }
         }
         maven {
-            name = "Shedaniel"
-            url = URI("https://maven.shedaniel.me")
+            name = "JitPack"
+            url = URI("https://jitpack.io")
         }
     }
 

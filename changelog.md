@@ -1,4 +1,11 @@
 ------------------------------------------------------
+Version 6.2.2
+------------------------------------------------------
+**Fixes**
+- Fixed an incompatibility between `cardinal-components-block` and Immersive Portals, which would cause desynchronization issues
+  for block entities seen through a portal *(thanks daimond113 !)*
+
+------------------------------------------------------
 Version 6.2.1
 ------------------------------------------------------
 **Fixes**
