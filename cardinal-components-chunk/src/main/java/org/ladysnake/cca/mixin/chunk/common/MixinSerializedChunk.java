@@ -51,8 +51,11 @@ public abstract class MixinSerializedChunk {
     private static void fromNbt(HeightLimitView world, DynamicRegistryManager registryManager, NbtCompound nbt, CallbackInfoReturnable<SerializedChunk> cir) {
         MixinSerializedChunk ret = (MixinSerializedChunk) (Object) cir.getReturnValue();
         if (ret != null) {
-            ret.cca$serializedComponents = new NbtCompound();
-            ret.cca$serializedComponents.put(AbstractComponentContainer.NBT_KEY, nbt.get(AbstractComponentContainer.NBT_KEY));
+            NbtElement nbtComponents = nbt.get(AbstractComponentContainer.NBT_KEY);
+            if (nbtComponents != null) {
+                ret.cca$serializedComponents = new NbtCompound();
+                ret.cca$serializedComponents.put(AbstractComponentContainer.NBT_KEY, nbtComponents);
+            }
         }
     }
 
@@ -84,8 +87,11 @@ public abstract class MixinSerializedChunk {
     @Inject(method = "serialize", at = @At("RETURN"))
     private void serialize(CallbackInfoReturnable<NbtCompound> cir) {
         if (cca$serializedComponents != null) {
-            NbtCompound ret = cir.getReturnValue();
-            ret.put(AbstractComponentContainer.NBT_KEY, cca$serializedComponents.get(AbstractComponentContainer.NBT_KEY));
+            NbtElement nbtComponents = cca$serializedComponents.get(AbstractComponentContainer.NBT_KEY);
+            if (nbtComponents != null) {
+                NbtCompound ret = cir.getReturnValue();
+                ret.put(AbstractComponentContainer.NBT_KEY, nbtComponents);
+            }
         }
     }
 }

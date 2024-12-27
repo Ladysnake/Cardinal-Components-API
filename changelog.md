@@ -1,4 +1,11 @@
 ------------------------------------------------------
+Version 6.2.1
+------------------------------------------------------
+**Fixes**
+- Fixed issue in chunk module causing save failures when no mod actually used said module
+  - apologies for the potential damage in world saves - remember to do regular backups when using mods, and especially when adding new mods or updating across Minecraft versions
+
+------------------------------------------------------
 Version 6.2.0
 ------------------------------------------------------
 Updated to 1.21.3
