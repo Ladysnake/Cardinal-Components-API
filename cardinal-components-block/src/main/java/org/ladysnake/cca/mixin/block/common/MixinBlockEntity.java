@@ -102,9 +102,14 @@ public abstract class MixinBlockEntity implements ComponentProvider {
 
     @Override
     public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
+        World world = this.getWorld();
+        if (world == null) {
+            return null;
+        }
+
         return new ComponentUpdatePayload<>(
             CardinalComponentsBlock.PACKET_ID,
-            new BlockEntityAddress(this.getType(), this.getPos()),
+            new BlockEntityAddress(this.getType(), this.getPos(), world.getRegistryKey()),
             required,
             key.getId(),
             data

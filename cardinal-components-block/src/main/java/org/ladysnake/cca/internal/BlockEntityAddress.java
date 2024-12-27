@@ -27,16 +27,21 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public record BlockEntityAddress(
     BlockEntityType<?> beType,
-    BlockPos bePos
+    BlockPos bePos,
+    RegistryKey<World> worldKey
 ) {
 
     public static final PacketCodec<RegistryByteBuf, BlockEntityAddress> CODEC = PacketCodec.tuple(
         PacketCodecs.entryOf(Registries.BLOCK_ENTITY_TYPE), BlockEntityAddress::beType,
         BlockPos.PACKET_CODEC, BlockEntityAddress::bePos,
+        RegistryKey.createPacketCodec(RegistryKeys.WORLD), BlockEntityAddress::worldKey,
         BlockEntityAddress::new
     );
 }

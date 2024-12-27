@@ -24,17 +24,37 @@ package org.ladysnake.cca.internal;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.world.World;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.internal.base.CcaClientInternals;
+import qouteall.imm_ptl.core.ClientWorldLoader;
+
+import java.util.Optional;
 
 public class CcaBlockClient {
+    private static boolean hasImmersivePortals = false;
+
     public static void initClient() {
+        hasImmersivePortals = FabricLoader.getInstance().isModLoaded("immersive_portals");
+
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             CcaClientInternals.registerComponentSync(CardinalComponentsBlock.PACKET_ID,
-                (payload, ctx) -> payload.componentKey().flatMap(key -> key.maybeGet(payload.targetData().beType().get(
-                    ctx.client().world,
-                    payload.targetData().bePos()
-                ))
+                (payload, ctx) -> payload.componentKey().flatMap(key -> {
+                    World world;
+                    if (hasImmersivePortals) {
+                        world = ClientWorldLoader.getOptionalWorld(payload.targetData().worldKey());
+                        if (world == null) {
+                            return Optional.empty();
+                        }
+                    } else {
+                        world = ctx.client().world;
+                    }
+
+                    return key.maybeGet(payload.targetData().beType().get(
+                        world,
+                        payload.targetData().bePos()
+                    ));
+                }
             ));
         }
         if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {

@@ -49,6 +49,14 @@ allprojects {
             name = "JitPack"
             url = URI("https://jitpack.io")
         }
+        maven {
+            name = "Modrinth"
+            url = URI("https://api.modrinth.com/maven")
+        }
+        maven {
+            name = "Shedaniel"
+            url = URI("https://maven.shedaniel.me")
+        }
     }
 
     dependencies {
