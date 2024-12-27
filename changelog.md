@@ -2,8 +2,14 @@
 Version 6.2.1
 ------------------------------------------------------
 **Fixes**
-- Fixed issue in chunk module causing save failures when no mod actually used said module
-  - apologies for the potential damage in world saves - remember to do regular backups when using mods, and especially when adding new mods or updating across Minecraft versions
+- Fixed issue in the `cardinal-components-chunk` module causing save failures when no mod actually used said module
+  - Unfortunately, any chunk in which the damage happened will be reset.
+    If you have a backup of your world, you should try loading that. Otherwise, I guess this is a reminder that regular backups
+    are critical, especially when adding new mods or updating across Minecraft versions.
+    In any case, my apologies for the damage and the delay in fixing the bug.  
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~ Pyrofab  
+  
+    PS: if you never got spammed by red popups saying "failed to save chunk", you are most likely unaffected by the issue.
 
 ------------------------------------------------------
 Version 6.2.0
