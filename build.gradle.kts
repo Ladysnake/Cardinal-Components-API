@@ -92,6 +92,11 @@ allprojects {
         enabled = false
     }
 
+    tasks.withType<JavaCompile>().configureEach {
+        options.encoding = "UTF-8"
+        options.release.set(chenille.javaVersion)
+    }
+
     tasks.jar {
         from(rootProject.file("LICENSE.md")) {
             rename { "LICENSE_${project.name.replace("-", "_")}"}
