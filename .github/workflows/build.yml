@@ -6,15 +6,13 @@
 name: build
 on: [pull_request, push]
 
+env:
+    JAVA_VERSION: 21
+
 jobs:
   build:
     strategy:
       matrix:
-        # Use these Java versions
-        java: [
-            17    # Minimum supported by Minecraft
-        ]
-        # and run on both Linux and Windows
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -24,10 +22,11 @@ jobs:
           fetch-depth: 0
       - name: validate gradle wrapper
         uses: gradle/actions/wrapper-validation@v4
-      - name: setup jdk ${{ matrix.java }}
+      - name: setup jdk ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ matrix.java }}
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
           cache: 'gradle'
       - name: make gradle wrapper executable
         if: ${{ runner.os != 'Windows' }}
@@ -35,7 +34,7 @@ jobs:
       - name: build
         run: ./gradlew build
       - name: capture build artifacts
-        if: ${{ runner.os == 'Linux' && matrix.java == '17' }} # Only upload artifacts built from latest java on one OS
+        if: ${{ runner.os == 'Linux' }} # Only upload artifacts on one OS
         uses: actions/upload-artifact@v4
         with:
           name: Artifacts
