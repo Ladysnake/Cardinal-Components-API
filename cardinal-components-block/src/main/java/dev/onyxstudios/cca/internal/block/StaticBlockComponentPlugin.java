@@ -40,6 +40,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,8 +64,10 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
 
     private final List<PredicatedComponentFactory<?>> dynamicFactories = new ArrayList<>();
     private final Map<Class<? extends BlockEntity>, Map<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<? extends BlockEntity, ?>>>> beComponentFactories = new Reference2ObjectOpenHashMap<>();
-    private final Set<Class<? extends BlockEntity>> clientTicking = new ReferenceOpenHashSet<>();
-    private final Set<Class<? extends BlockEntity>> serverTicking = new ReferenceOpenHashSet<>();
+    @VisibleForTesting
+    public final Set<Class<? extends BlockEntity>> clientTicking = new ReferenceOpenHashSet<>();
+    @VisibleForTesting
+    public final Set<Class<? extends BlockEntity>> serverTicking = new ReferenceOpenHashSet<>();
 
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getComponentTicker(World world, T be, @Nullable BlockEntityTicker<T> base) {
@@ -97,12 +100,12 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     public ComponentContainer.Factory<BlockEntity> buildDedicatedFactory(Class<? extends BlockEntity> entityClass) {
         StaticBlockComponentPlugin.INSTANCE.ensureInitialized();
 
-        var compiled = new LinkedHashMap<>(this.beComponentFactories.getOrDefault(entityClass, Collections.emptyMap()));
+        var compiled = new LinkedHashMap<>(this.beComponentFactories.getOrDefault(entityClass, Map.of()));
         Class<? extends BlockEntity> type = entityClass;
 
         while (type != BlockEntity.class) {
             type = type.getSuperclass().asSubclass(BlockEntity.class);
-            for (var e : this.beComponentFactories.getOrDefault(type, Collections.emptyMap()).entrySet()) {
+            for (var e : this.beComponentFactories.getOrDefault(type, Map.of()).entrySet()) {
                 compiled.putIfAbsent(e.getKey(), e.getValue());
             }
         }

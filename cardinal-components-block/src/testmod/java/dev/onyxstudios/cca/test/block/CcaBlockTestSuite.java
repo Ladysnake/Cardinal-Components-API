@@ -22,6 +22,7 @@
  */
 package dev.onyxstudios.cca.test.block;
 
+import dev.onyxstudios.cca.internal.block.StaticBlockComponentPlugin;
 import dev.onyxstudios.cca.test.base.LoadAwareTestComponent;
 import dev.onyxstudios.cca.test.base.TickingTestComponent;
 import dev.onyxstudios.cca.test.base.Vita;
@@ -39,6 +40,8 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BooleanSupplier;
 
 public class CcaBlockTestSuite implements FabricGameTest {
     @GameTest(templateName = EMPTY_STRUCTURE)
@@ -92,8 +95,17 @@ public class CcaBlockTestSuite implements FabricGameTest {
     @GameTest(templateName = EMPTY_STRUCTURE)
     public void beComponentsTick(TestContext ctx) {
         ctx.setBlockState(BlockPos.ORIGIN, Blocks.END_PORTAL);
+
+        var blockentity = ctx.getBlockEntity(BlockPos.ORIGIN);
+        GameTestUtil.assertTrue("Block entity should not be null", blockentity != null);
+        GameTestUtil.assertTrue("BlockEntity should have TickingTestComponent", TickingTestComponent.KEY.getNullable(blockentity) != null);
+        GameTestUtil.assertTrue("Class should be registered as server ticker", StaticBlockComponentPlugin.INSTANCE.serverTicking.contains(blockentity.getClass()));
+        GameTestUtil.assertTrue("Class should be registered as client ticker", StaticBlockComponentPlugin.INSTANCE.clientTicking.contains(blockentity.getClass()));
+
         ctx.waitAndRun(5, () -> {
-            int ticks = Objects.requireNonNull(ctx.getBlockEntity(BlockPos.ORIGIN)).getComponent(TickingTestComponent.KEY).serverTicks();
+            var blockentity2 = ctx.getBlockEntity(BlockPos.ORIGIN);
+            GameTestUtil.assertTrue("Block entity should still exist", blockentity2 != null);
+            int ticks = blockentity2.getComponent(TickingTestComponent.KEY).serverTicks();
             GameTestUtil.assertTrue("Component should tick 5 times", ticks == 5);
             ctx.complete();
         });
@@ -118,6 +130,37 @@ public class CcaBlockTestSuite implements FabricGameTest {
                 "Load counter should be decremented when the block entity leaves the world",
                 LoadAwareTestComponent.KEY.get(commandBlock).getLoadCounter() == 0
             );
+            ctx.complete();
+        });
+    }
+
+    @GameTest(templateName = EMPTY_STRUCTURE)
+    public void rootClassServerTicker(TestContext ctx) {
+        ctx.setBlockState(BlockPos.ORIGIN, Blocks.BARREL);
+
+        var blockentity = ctx.getBlockEntity(BlockPos.ORIGIN);
+        GameTestUtil.assertTrue("Block entity should not be null", blockentity != null);
+
+        GameTestUtil.assertTrue("Class should be registered as server ticker", StaticBlockComponentPlugin.INSTANCE.serverTicking.contains(blockentity.getClass()));
+        GameTestUtil.assertFalse("Class should NOT be registered as client ticker", StaticBlockComponentPlugin.INSTANCE.clientTicking.contains(blockentity.getClass()));
+
+        var component = GlobalTickingComponent.KEY.getNullable(blockentity);
+        GameTestUtil.assertTrue("Component should exist", component != null);
+
+        AtomicInteger flag = new AtomicInteger(0);
+        BooleanSupplier action = () -> {
+            flag.getAndIncrement();
+            return false;
+        };
+        component.setTickAction(action);
+        GameTestUtil.assertTrue("Tick action should be set", component.getTickAction().isPresent());
+
+        ctx.waitAndRun(5, () -> {
+            var blockentity2 = ctx.getBlockEntity(BlockPos.ORIGIN);
+            GameTestUtil.assertTrue("Block entity should still exist", blockentity2 != null);
+            GameTestUtil.assertTrue("Tick action should be cleared", blockentity2.getComponent(GlobalTickingComponent.KEY).getTickAction().isEmpty());
+            GameTestUtil.assertTrue("Tick action should have run exactly once", flag.get() == 1);
+
             ctx.complete();
         });
     }
