@@ -56,6 +56,10 @@ public final class CardinalBlockInternals {
             @SuppressWarnings("unchecked") var superclass = (Class<? extends BlockEntity>) entityClass.getSuperclass();
             assert BlockEntity.class.isAssignableFrom(superclass) : "requiresStaticFactory returned false on BlockEntity?";
             factory = /* recursive call */ getBeComponentFactory(superclass);
+
+            // if parent class needs to tick, this one does, too!
+            if(StaticBlockComponentPlugin.INSTANCE.clientTicking.contains(superclass)) StaticBlockComponentPlugin.INSTANCE.clientTicking.add(entityClass);
+            if(StaticBlockComponentPlugin.INSTANCE.serverTicking.contains(superclass)) StaticBlockComponentPlugin.INSTANCE.serverTicking.add(entityClass);
         }
         entityContainerFactories.put(entityClass, factory);
         return factory;
