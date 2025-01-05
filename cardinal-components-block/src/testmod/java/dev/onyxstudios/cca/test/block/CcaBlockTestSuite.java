@@ -44,44 +44,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 
 public class CcaBlockTestSuite implements FabricGameTest {
-    @GameTest(templateName = EMPTY_STRUCTURE)
-    public void beSerialize(TestContext ctx) {
+    @GameTest(templateName = EMPTY_STRUCTURE) public void beSerialize(TestContext ctx) {
         BlockPos pos = ctx.getAbsolutePos(BlockPos.ORIGIN);
-        BlockEntity be = Objects.requireNonNull(
-            BlockEntityType.END_GATEWAY.instantiate(
-                pos,
-                Blocks.END_GATEWAY.getDefaultState()
-            )
-        );
+        BlockEntity be = Objects.requireNonNull(BlockEntityType.END_GATEWAY.instantiate(pos, Blocks.END_GATEWAY.getDefaultState()));
         be.getComponent(Vita.KEY).setVitality(42);
         NbtCompound nbt = be.createNbt();
-        BlockEntity be1 = Objects.requireNonNull(
-            BlockEntityType.END_GATEWAY.instantiate(
-                pos, Blocks.END_GATEWAY.getDefaultState()
-            )
-        );
+        BlockEntity be1 = Objects.requireNonNull(BlockEntityType.END_GATEWAY.instantiate(pos, Blocks.END_GATEWAY.getDefaultState()));
         GameTestUtil.assertTrue("New BlockEntity should have values zeroed", be1.getComponent(Vita.KEY).getVitality() == 0);
         be1.readNbt(nbt);
         GameTestUtil.assertTrue("BlockEntity component data should survive deserialization", be1.getComponent(Vita.KEY).getVitality() == 42);
         ctx.complete();
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE)
-    public void canQueryThroughLookup(TestContext ctx) {
+    @GameTest(templateName = EMPTY_STRUCTURE) public void canQueryThroughLookup(TestContext ctx) {
         BlockPos pos = ctx.getAbsolutePos(BlockPos.ORIGIN);
-        BlockEntity be = Objects.requireNonNull(
-            BlockEntityType.END_GATEWAY.instantiate(
-                pos,
-                Blocks.END_GATEWAY.getDefaultState()
-            )
-        );
+        BlockEntity be = Objects.requireNonNull(BlockEntityType.END_GATEWAY.instantiate(pos, Blocks.END_GATEWAY.getDefaultState()));
         getVita(ctx, pos, be).setVitality(42);
         NbtCompound nbt = be.createNbt();
-        BlockEntity be1 = Objects.requireNonNull(
-            BlockEntityType.END_GATEWAY.instantiate(
-                pos, Blocks.END_GATEWAY.getDefaultState()
-            )
-        );
+        BlockEntity be1 = Objects.requireNonNull(BlockEntityType.END_GATEWAY.instantiate(pos, Blocks.END_GATEWAY.getDefaultState()));
         GameTestUtil.assertTrue("New BlockEntity should have values zeroed", getVita(ctx, pos, be1).getVitality() == 0);
         be1.readNbt(nbt);
         GameTestUtil.assertTrue("BlockEntity component data should survive deserialization", getVita(ctx, pos, be1).getVitality() == 42);
@@ -92,8 +72,7 @@ public class CcaBlockTestSuite implements FabricGameTest {
         return Objects.requireNonNull(CcaBlockTestMod.VITA_API_LOOKUP.find(ctx.getWorld(), pos, null, be, Direction.DOWN));
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE)
-    public void beComponentsTick(TestContext ctx) {
+    @GameTest(templateName = EMPTY_STRUCTURE) public void beComponentsTick(TestContext ctx) {
         ctx.setBlockState(BlockPos.ORIGIN, Blocks.END_PORTAL);
 
         var blockentity = ctx.getBlockEntity(BlockPos.ORIGIN);
@@ -111,31 +90,20 @@ public class CcaBlockTestSuite implements FabricGameTest {
         });
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE)
-    public void beComponentsLoadUnload(TestContext ctx) {
+    @GameTest(templateName = EMPTY_STRUCTURE) public void beComponentsLoadUnload(TestContext ctx) {
         BlockEntity firstCommandBlock = new CommandBlockBlockEntity(ctx.getAbsolutePos(BlockPos.ORIGIN), Blocks.CHAIN_COMMAND_BLOCK.getDefaultState());
-        GameTestUtil.assertTrue(
-            "Load counter should not be incremented until the block entity joins the world",
-            LoadAwareTestComponent.KEY.get(firstCommandBlock).getLoadCounter() == 0
-        );
+        GameTestUtil.assertTrue("Load counter should not be incremented until the block entity joins the world", LoadAwareTestComponent.KEY.get(firstCommandBlock).getLoadCounter() == 0);
         ctx.setBlockState(BlockPos.ORIGIN, Blocks.CHAIN_COMMAND_BLOCK);
         BlockEntity commandBlock = Objects.requireNonNull(ctx.getBlockEntity(BlockPos.ORIGIN));
-        GameTestUtil.assertTrue(
-            "Load counter should be incremented once when the block entity joins the world",
-            LoadAwareTestComponent.KEY.get(commandBlock).getLoadCounter() == 1
-        );
+        GameTestUtil.assertTrue("Load counter should be incremented once when the block entity joins the world", LoadAwareTestComponent.KEY.get(commandBlock).getLoadCounter() == 1);
         ctx.setBlockState(BlockPos.ORIGIN, Blocks.AIR);
         ctx.waitAndRun(1, () -> {
-            GameTestUtil.assertTrue(
-                "Load counter should be decremented when the block entity leaves the world",
-                LoadAwareTestComponent.KEY.get(commandBlock).getLoadCounter() == 0
-            );
+            GameTestUtil.assertTrue("Load counter should be decremented when the block entity leaves the world", LoadAwareTestComponent.KEY.get(commandBlock).getLoadCounter() == 0);
             ctx.complete();
         });
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE)
-    public void rootClassServerTicker(TestContext ctx) {
+    @GameTest(templateName = EMPTY_STRUCTURE) public void rootClassServerTicker(TestContext ctx) {
         ctx.setBlockState(BlockPos.ORIGIN, Blocks.BARREL);
 
         var blockentity = ctx.getBlockEntity(BlockPos.ORIGIN);
@@ -163,5 +131,24 @@ public class CcaBlockTestSuite implements FabricGameTest {
 
             ctx.complete();
         });
+    }
+
+    /**
+     * same as {@link CcaBlockTestSuite#rootClassServerTicker(TestContext)} but for a BlockEntity that has an explicit
+     * component registered, so that {@link StaticBlockComponentPlugin#requiresStaticFactory(Class)} returns true for
+     * the class itself rather than delegating to the parent class.
+     */
+    @GameTest(templateName = EMPTY_STRUCTURE)
+    public void rootClassServerTickerWithExplicitRegistration(TestContext ctx) {
+        ctx.setBlockState(BlockPos.ORIGIN, Blocks.COMMAND_BLOCK);
+
+        var blockentity = ctx.getBlockEntity(BlockPos.ORIGIN);
+        GameTestUtil.assertTrue("Block entity should not be null", blockentity != null);
+        GameTestUtil.assertTrue("Class should be registered as server ticker", StaticBlockComponentPlugin.INSTANCE.serverTicking.contains(blockentity.getClass()));
+
+        var component = GlobalTickingComponent.KEY.getNullable(blockentity);
+        GameTestUtil.assertTrue("Component should exist", component != null);
+
+        ctx.complete();
     }
 }
