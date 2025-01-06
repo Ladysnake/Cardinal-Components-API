@@ -122,6 +122,15 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         return builder.build();
     }
 
+    public void registerTickersFor(Class<? extends BlockEntity> entityClass, Class<? extends BlockEntity> parentClass) {
+        if(this.clientTicking.contains(parentClass)) {
+            this.clientTicking.add(entityClass);
+        }
+        if(this.serverTicking.contains(parentClass)) {
+            this.serverTicking.add(entityClass);
+        }
+    }
+
     private <C extends Component> void addToBuilder(ComponentContainer.Factory.Builder<BlockEntity> builder, Map.Entry<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<? extends BlockEntity, ?>>> entry) {
         @SuppressWarnings("unchecked") var key = (ComponentKey<C>) entry.getKey();
         @SuppressWarnings("unchecked") var factory = (ComponentFactory<BlockEntity, C>) entry.getValue().factory();

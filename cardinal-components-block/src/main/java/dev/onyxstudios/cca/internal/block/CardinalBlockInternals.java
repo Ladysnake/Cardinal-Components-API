@@ -58,8 +58,7 @@ public final class CardinalBlockInternals {
             factory = /* recursive call */ getBeComponentFactory(superclass);
 
             // if parent class needs to tick, this one does, too!
-            if(StaticBlockComponentPlugin.INSTANCE.clientTicking.contains(superclass)) StaticBlockComponentPlugin.INSTANCE.clientTicking.add(entityClass);
-            if(StaticBlockComponentPlugin.INSTANCE.serverTicking.contains(superclass)) StaticBlockComponentPlugin.INSTANCE.serverTicking.add(entityClass);
+            StaticBlockComponentPlugin.INSTANCE.registerTickersFor(entityClass, superclass);
         }
         entityContainerFactories.put(entityClass, factory);
         return factory;
