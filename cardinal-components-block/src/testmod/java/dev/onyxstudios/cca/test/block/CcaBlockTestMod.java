@@ -30,10 +30,7 @@ import dev.onyxstudios.cca.test.base.TickingTestComponent;
 import dev.onyxstudios.cca.test.base.Vita;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.CommandBlockBlockEntity;
-import net.minecraft.block.entity.EndGatewayBlockEntity;
-import net.minecraft.block.entity.EndPortalBlockEntity;
+import net.minecraft.block.entity.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 
@@ -46,6 +43,7 @@ public class CcaBlockTestMod implements ModInitializer, BlockComponentInitialize
         registry.registerFor(EndGatewayBlockEntity.class, VitaCompound.KEY, VitaCompound::new);
         registry.registerFor(EndPortalBlockEntity.class, TickingTestComponent.KEY, be -> new TickingTestComponent());
         registry.registerFor(CommandBlockBlockEntity.class, LoadAwareTestComponent.KEY, be -> new LoadAwareTestComponent());
+        registry.registerFor(BlockEntity.class, GlobalTickingComponent.KEY, GlobalTickingComponent::new);
     }
 
     @Override

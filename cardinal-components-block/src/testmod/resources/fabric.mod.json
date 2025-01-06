@@ -25,7 +25,8 @@
     "license": "MIT",
     "custom": {
         "cardinal-components": [
-          "cca-block-test:vita_compound"
+          "cca-block-test:vita_compound",
+          "cca-block-test:global_ticking_test"
         ]
     }
 }
