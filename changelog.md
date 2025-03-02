@@ -1,4 +1,12 @@
 ------------------------------------------------------
+Version 6.3.0-alpha.1+25w09b
+------------------------------------------------------
+Updated to 1.25 snapshot (25w09b)
+
+*Note: while this port does not incur breaking changes to the API, it does revamp internals, especially in the scoreboard module.
+Please report any issue you may find at https://github.com/Ladysnake/Cardinal-Components-API/issues.*
+
+------------------------------------------------------
 Version 6.2.2
 ------------------------------------------------------
 **Fixes**
