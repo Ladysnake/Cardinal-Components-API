@@ -22,10 +22,10 @@
  */
 package org.ladysnake.cca.internal.base;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-import net.minecraft.test.GameTest;
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import net.minecraft.test.TestContext;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.junit.Assert;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistry;
 import org.ladysnake.cca.internal.base.asm.StaticComponentLoadingException;
@@ -38,14 +38,15 @@ import java.util.Set;
 
 public class QualifiedComponentFactoryTest implements CardinalGameTest {
     @Override
-    public void tearDown() {
+    public void tearDown(TestContext ctx) {
+        ctx.complete();
         for (Identifier id : CcaTesting.ALL_TEST_IDS) {
             ComponentRegistryImpl.INSTANCE.clear(id);
         }
     }
 
-    @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-    public void sortKeepsOrderByDefault() {
+    @GameTest
+    public void sortKeepsOrderByDefault(TestContext ctx) {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
         var key2 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
@@ -54,58 +55,58 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key2.getComponentClass(), Set.of()));
         map.put(key3, new QualifiedComponentFactory<>(new Object(), key3.getComponentClass(), Set.of()));
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> sorted = QualifiedComponentFactory.sort(map);
-        Assert.assertNotSame(map, sorted);
-        Assert.assertEquals(List.copyOf(map.keySet()), List.copyOf(sorted.keySet()));
+        ctx.assertTrue("Sorted version should be its own instance", map != sorted);
+        ctx.assertEquals(List.copyOf(map.keySet()), List.copyOf(sorted.keySet()), Text.literal("Keys should stay the same"));
         map = new LinkedHashMap<>();
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
         map.put(key3, new QualifiedComponentFactory<>(new Object(), key3.getComponentClass(), Set.of()));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key2.getComponentClass(), Set.of()));
         sorted = QualifiedComponentFactory.sort(map);
-        Assert.assertNotSame(map, sorted);
-        Assert.assertEquals(List.copyOf(map.keySet()), List.copyOf(sorted.keySet()));
+        ctx.assertTrue("Sorted version should be its own instance", map != sorted);
+        ctx.assertEquals(List.copyOf(map.keySet()), List.copyOf(sorted.keySet()), Text.literal("Keys should stay the same"));
     }
 
-    @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-    public void sortThrowsOnUnsatisfiedDependency() {
+    @GameTest
+    public void sortThrowsOnUnsatisfiedDependency(TestContext ctx) {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
         var key2 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
-        Assert.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.checkDependenciesSatisfied(map));
+        ctx.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.checkDependenciesSatisfied(map));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
         QualifiedComponentFactory.checkDependenciesSatisfied(map);
     }
 
-    @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-    public void sortThrowsOnCircularDependency() {
+    @GameTest
+    public void sortThrowsOnCircularDependency(TestContext ctx) {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
         var key2 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
         var key3 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key1)));
-        Assert.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
+        ctx.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key1)));
-        Assert.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
+        ctx.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key3)));
         map.put(key3, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key1)));
-        Assert.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
+        ctx.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
         map.put(key3, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
         QualifiedComponentFactory.sort(map);
     }
 
-    @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-    public void sortRespectsDependencyOrdering() {
+    @GameTest
+    public void sortRespectsDependencyOrdering(TestContext ctx) {
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> map = new LinkedHashMap<>();
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
         var key2 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
         var key3 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key2.getComponentClass(), Set.of()));
-        Assert.assertEquals(List.of(key2, key1), List.copyOf(QualifiedComponentFactory.sort(map).keySet()));
+        ctx.assertEquals(List.of(key2, key1), List.copyOf(QualifiedComponentFactory.sort(map).keySet()), Text.literal("Sorted map should have correct key order"));
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2, key3)));
         map.put(key3, new QualifiedComponentFactory<>(new Object(), key3.getComponentClass(), Set.of(key2)));
-        Assert.assertEquals(List.of(key2, key3, key1), List.copyOf(QualifiedComponentFactory.sort(map).keySet()));
+        ctx.assertEquals(List.of(key2, key3, key1), List.copyOf(QualifiedComponentFactory.sort(map).keySet()), Text.literal("Sorted map should have correct key order"));
     }
 }

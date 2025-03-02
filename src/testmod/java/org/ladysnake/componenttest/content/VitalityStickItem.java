@@ -25,6 +25,7 @@ package org.ladysnake.componenttest.content;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -44,8 +45,8 @@ import org.ladysnake.cca.test.block.CcaBlockTestMod;
 import org.ladysnake.cca.test.world.AmbientVita;
 import org.ladysnake.componenttest.content.vita.ItemVita;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class VitalityStickItem extends Item {
     public VitalityStickItem(Settings settings) {
@@ -91,7 +92,7 @@ public class VitalityStickItem extends Item {
     }
 
     @Override
-    public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity holder) {
+    public void postHit(ItemStack stack, LivingEntity target, LivingEntity holder) {
         // The entity may not have the component, but the stack always does.
         Vita.KEY.maybeGet(target)
                 .ifPresent(src -> ItemVita.maybeGet(stack).ifPresent(dest -> src.transferTo(dest, 1)));
@@ -106,21 +107,20 @@ public class VitalityStickItem extends Item {
         }
 
         stack.damage(1, holder, EquipmentSlot.MAINHAND);
-        return true;
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
-        tooltip.add(Text.translatable("componenttest:tooltip.vitality", ItemVita.getOrEmpty(stack).getVitality()));
+    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
+        super.appendTooltip(stack, context, displayComponent, tooltip, type);
+        tooltip.accept(Text.translatable("componenttest:tooltip.vitality", ItemVita.getOrEmpty(stack).getVitality()));
         ClientPlayerEntity holder = MinecraftClient.getInstance().player;
         if (holder != null) {
-            tooltip.add(Text.translatable("componenttest:tooltip.self_vitality", Vita.KEY.get(holder).getVitality()));
+            tooltip.accept(Text.translatable("componenttest:tooltip.self_vitality", Vita.KEY.get(holder).getVitality()));
         }
     }
 
     @Override
-    public boolean canMine(BlockState block, World world, BlockPos pos, PlayerEntity player) {
-        return !player.isCreative();
+    public boolean canMine(ItemStack stack, BlockState state, World world, BlockPos pos, LivingEntity user) {
+        return !(user instanceof PlayerEntity player && player.isCreative());
     }
 }

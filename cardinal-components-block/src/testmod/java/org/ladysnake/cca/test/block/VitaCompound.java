@@ -24,7 +24,6 @@ package org.ladysnake.cca.test.block;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -54,9 +53,7 @@ public class VitaCompound implements AutoSyncedComponent {
     @Override
     public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         for (Map.Entry<Direction, SyncedVita> entry : this.storage.entrySet()) {
-            if (tag.contains(entry.getKey().name(), NbtElement.COMPOUND_TYPE)) {
-                entry.getValue().readFromNbt(tag.getCompound(entry.getKey().name()), registryLookup);
-            }
+            tag.getCompound(entry.getKey().name()).ifPresent(t -> entry.getValue().readFromNbt(t, registryLookup));
         }
     }
 

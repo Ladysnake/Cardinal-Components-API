@@ -23,7 +23,6 @@
 package org.ladysnake.cca.mixin.chunk.common;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
@@ -51,11 +50,7 @@ public abstract class MixinSerializedChunk {
     private static void fromNbt(HeightLimitView world, DynamicRegistryManager registryManager, NbtCompound nbt, CallbackInfoReturnable<SerializedChunk> cir) {
         MixinSerializedChunk ret = (MixinSerializedChunk) (Object) cir.getReturnValue();
         if (ret != null) {
-            NbtElement nbtComponents = nbt.get(AbstractComponentContainer.NBT_KEY);
-            if (nbtComponents != null) {
-                ret.cca$serializedComponents = new NbtCompound();
-                ret.cca$serializedComponents.put(AbstractComponentContainer.NBT_KEY, nbtComponents);
-            }
+            ret.cca$serializedComponents = nbt.getCompound(AbstractComponentContainer.NBT_KEY).orElse(null);
         }
     }
 
@@ -65,13 +60,10 @@ public abstract class MixinSerializedChunk {
         if (tag == null) return;
         ProtoChunk ret = cir.getReturnValue();
         Chunk chunk = ret instanceof WrapperProtoChunk ? ((WrapperProtoChunk) ret).getWrappedChunk() : ret;
-        chunk.asComponentProvider().getComponentContainer().fromTag(tag, world.getRegistryManager());
+        chunk.asComponentProvider().getComponentContainer().fromOrphanTag(tag, world.getRegistryManager());
         // If components have been removed, we need to make the chunk save again
-        if (tag.contains(AbstractComponentContainer.NBT_KEY, NbtElement.COMPOUND_TYPE)) {
-            int remainingComponentCount = tag.getCompound(AbstractComponentContainer.NBT_KEY).getSize();
-            if (remainingComponentCount > 0) {
-                chunk.markNeedsSaving();
-            }
+        if (tag.getSize() > 0) {
+            chunk.markNeedsSaving();
         }
     }
 
@@ -79,19 +71,14 @@ public abstract class MixinSerializedChunk {
     private static void fromChunk(ServerWorld world, Chunk chunk, CallbackInfoReturnable<SerializedChunk> cir) {
         MixinSerializedChunk ret = (MixinSerializedChunk) (Object) cir.getReturnValue();
         if (ret != null) {
-            ret.cca$serializedComponents = new NbtCompound();
-            chunk.asComponentProvider().getComponentContainer().toTag(ret.cca$serializedComponents, world.getRegistryManager());
+            ret.cca$serializedComponents = chunk.asComponentProvider().getComponentContainer().toOrphanTag(world.getRegistryManager());
         }
     }
 
     @Inject(method = "serialize", at = @At("RETURN"))
     private void serialize(CallbackInfoReturnable<NbtCompound> cir) {
         if (cca$serializedComponents != null) {
-            NbtElement nbtComponents = cca$serializedComponents.get(AbstractComponentContainer.NBT_KEY);
-            if (nbtComponents != null) {
-                NbtCompound ret = cir.getReturnValue();
-                ret.put(AbstractComponentContainer.NBT_KEY, nbtComponents);
-            }
+            cir.getReturnValue().put(AbstractComponentContainer.NBT_KEY, cca$serializedComponents);
         }
     }
 }

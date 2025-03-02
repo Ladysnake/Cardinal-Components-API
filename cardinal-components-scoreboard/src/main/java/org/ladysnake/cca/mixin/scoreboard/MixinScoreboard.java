@@ -24,13 +24,17 @@ package org.ladysnake.cca.mixin.scoreboard;
 
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ServerScoreboard;
+import net.minecraft.scoreboard.Team;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.ladysnake.cca.internal.scoreboard.CcaPackedState;
 import org.ladysnake.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nonnull;
@@ -46,6 +50,11 @@ public abstract class MixinScoreboard implements ComponentProvider {
         if (!((Object) this instanceof ServerScoreboard)) {
             this.components = StaticScoreboardComponentPlugin.scoreboardComponentsContainerFactory.get().create((Scoreboard) (Object) this, null);
         }
+    }
+
+    @ModifyVariable(method = "addTeam(Lnet/minecraft/scoreboard/Team$Packed;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/scoreboard/Team;setCollisionRule(Lnet/minecraft/scoreboard/AbstractTeam$CollisionRule;)V"))
+    protected Team unpackComponents(Team team, @Coerce CcaPackedState packedTeam) {
+        return team;
     }
 
     @Nonnull

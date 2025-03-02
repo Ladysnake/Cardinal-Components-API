@@ -39,7 +39,7 @@ public class VitalityZombieEntity extends ZombieEntity {
     public void tickMovement() {
         super.tickMovement();
         if (this.getWorld().isClient) {
-            this.getWorld().addParticle(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY() + 0.3D, this.getZ(), this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D);
+            this.getWorld().addParticleClient(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY() + 0.3D, this.getZ(), this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D);
         }
     }
 

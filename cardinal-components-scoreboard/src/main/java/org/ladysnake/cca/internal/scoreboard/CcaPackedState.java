@@ -20,21 +20,12 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.test.level;
+package org.ladysnake.cca.internal.scoreboard;
 
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.minecraft.test.TestContext;
-import net.minecraft.text.Text;
-import org.ladysnake.cca.test.base.TickingTestComponent;
+import net.minecraft.nbt.NbtCompound;
+import org.jetbrains.annotations.Nullable;
 
-public class CcaLevelTestSuite {
-    @GameTest
-    public void levelComponentsTick(TestContext ctx) {
-        int baseTicks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
-        ctx.waitAndRun(5, () -> {
-            int ticks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
-            ctx.assertEquals(baseTicks - ticks, 5, Text.literal("Component should tick 5 times -"));
-            ctx.complete();
-        });
-    }
+public interface CcaPackedState {
+    @Nullable NbtCompound cca$getSerializedComponents();
+    void cca$setSerializedComponents(@Nullable NbtCompound nbt);
 }

@@ -22,18 +22,61 @@
  */
 package org.ladysnake.cca.test.scoreboard;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-import net.minecraft.test.GameTest;
+import com.mojang.serialization.Codec;
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.scoreboard.ScoreboardState;
+import net.minecraft.scoreboard.ServerScoreboard;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.test.TestContext;
+import net.minecraft.text.Text;
+import net.minecraft.world.PersistentState;
+import org.ladysnake.cca.test.base.CardinalGameTest;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
-import org.ladysnake.elmendorf.GameTestUtil;
+import org.ladysnake.cca.test.base.Vita;
 
-public class CcaScoreboardTestSuite implements FabricGameTest {
-    @GameTest(templateName = EMPTY_STRUCTURE)
+public class CcaScoreboardTestSuite implements CardinalGameTest {
+
+    public static final String TEST_TEAM_NAME = "cca-team-test";
+
+    @GameTest
     public void serverLoadWorks(TestContext ctx) {
-        GameTestUtil.assertTrue(
-            "Load counter should be incremented once when the server gets loaded",
-            ctx.getWorld().getScoreboard().getComponent(LoadAwareTestComponent.KEY).getLoadCounter() == 1
+        ctx.assertEquals(
+            ctx.getWorld().getScoreboard().getComponent(LoadAwareTestComponent.KEY).getLoadCounter(), 1,
+            Text.literal("Load counter should be incremented once when the server gets loaded -")
+        );
+        ctx.complete();
+    }
+
+    @GameTest
+    public void componentSerializesCorrectly(TestContext ctx) {
+        ServerScoreboard scoreboard = ctx.getWorld().getScoreboard();
+        scoreboard.getComponent(Vita.KEY).setVitality(42);
+        Team testTeam = scoreboard.addTeam(TEST_TEAM_NAME);
+        testTeam.getComponent(Vita.KEY).setVitality(420);
+        PersistentState.Context persistentStateCtx = new PersistentState.Context(ctx.getWorld());
+        Codec<ScoreboardState> codec = ServerScoreboard.STATE_TYPE.codec().apply(persistentStateCtx);
+        var serializationResult = codec.encodeStart(NbtOps.INSTANCE, ServerScoreboard.STATE_TYPE.constructor().apply(persistentStateCtx));
+        ctx.assertTrue("Serialization should succeed", serializationResult.isSuccess());
+        scoreboard.getComponent(Vita.KEY).setVitality(0);
+        scoreboard.removeTeam(testTeam);
+        ctx.assertEquals(
+            0, scoreboard.getComponent(Vita.KEY).getVitality(),
+            Text.literal("reset vita")
+        );
+        ctx.assertTrue("Reset team should be null", scoreboard.getTeam(TEST_TEAM_NAME) == null);
+        var deserializationResult = codec.decode(NbtOps.INSTANCE, serializationResult.getOrThrow());
+        ctx.assertTrue("Deserialization should succeed", deserializationResult.isSuccess());
+        ctx.assertEquals(
+            42, scoreboard.getComponent(Vita.KEY).getVitality(),
+            Text.literal("deserialized vita")
+        );
+        Team deserializedTeam = scoreboard.getTeam(TEST_TEAM_NAME);
+        ctx.assertFalse("Deserialized team should not be null", deserializedTeam == null);
+        assert deserializedTeam != null;
+        ctx.assertEquals(
+            420, deserializedTeam.getComponent(Vita.KEY).getVitality(),
+            Text.literal("deserialized vita")
         );
         ctx.complete();
     }

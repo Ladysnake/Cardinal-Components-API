@@ -22,12 +22,12 @@
  */
 package org.ladysnake.cca.internal.base;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.test.GameTest;
+import net.minecraft.test.TestContext;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import org.junit.Assert;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.test.base.CardinalGameTest;
@@ -35,27 +35,28 @@ import org.ladysnake.cca.test.base.CardinalGameTest;
 public class ComponentRegistryImplTest implements CardinalGameTest {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-    public void checksRegisteredClasses() {
+    @GameTest
+    public void checksRegisteredClasses(TestContext ctx) {
         ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
-        Assert.assertThrows("Component class must extend Component", IllegalArgumentException.class, () -> registry.getOrCreate(CcaTesting.TEST_ID_1, (Class) TestNotComponentItf.class));
+        ctx.assertThrows("Component class must extend Component", IllegalArgumentException.class, () -> registry.getOrCreate(CcaTesting.TEST_ID_1, (Class) TestNotComponentItf.class));
         registry.getOrCreate(CcaTesting.TEST_ID_1, TestComponentNotItf.class);
         registry.getOrCreate(CcaTesting.TEST_ID_2, TestComponentItf.class);
     }
 
-    @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-    public void doesNotDuplicateComponentTypes() {
+    @GameTest
+    public void doesNotDuplicateComponentTypes(TestContext ctx) {
         ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
         Identifier id = CcaTesting.TEST_ID_1;
         ComponentKey<?> type = registry.getOrCreate(id, TestComponentItf.class);
-        Assert.assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf2.class));
-        Assert.assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf3.class));
-        Assert.assertEquals(type, registry.getOrCreate(id, TestComponentItf.class));
-        Assert.assertEquals(1, registry.stream().map(ComponentKey::getId).filter(CcaTesting.ALL_TEST_IDS::contains).count());
+        ctx.assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf2.class));
+        ctx.assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf3.class));
+        ctx.assertEquals(type, registry.getOrCreate(id, TestComponentItf.class), Text.literal("component key"));
+        ctx.assertEquals(1L, registry.stream().map(ComponentKey::getId).filter(CcaTesting.ALL_TEST_IDS::contains).count(), Text.literal("number of registrations"));
     }
 
     @Override
-    public void tearDown() {
+    public void tearDown(TestContext ctx) {
+        ctx.complete();
         for (Identifier id : CcaTesting.ALL_TEST_IDS) {
             ComponentRegistryImpl.INSTANCE.clear(id);
         }

@@ -32,6 +32,7 @@ import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
 import org.ladysnake.cca.internal.scoreboard.CardinalComponentsScoreboard;
+import org.ladysnake.cca.internal.scoreboard.CcaPackedState;
 import org.ladysnake.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,6 +41,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
 
@@ -61,6 +63,15 @@ public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
             this.scoreboard,
             this.scoreboard instanceof ServerScoreboardAccessor acc ? acc.getServer() : null
         );
+    }
+
+    @Inject(method = "pack", at = @At("RETURN"))
+    private void packComponents(CallbackInfoReturnable<CcaPackedState> cir) {
+        if (this.scoreboard instanceof ServerScoreboardAccessor serverScoreboard) {
+            cir.getReturnValue().cca$setSerializedComponents(
+                this.getComponentContainer().toOrphanTag(serverScoreboard.getServer().getRegistryManager())
+            );
+        }
     }
 
     @Nonnull

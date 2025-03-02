@@ -23,17 +23,14 @@
 package org.ladysnake.cca.internal.base;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
-import org.ladysnake.cca.api.v3.component.Component;
-import org.ladysnake.cca.api.v3.component.ComponentContainer;
-import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.component.ComponentRegistry;
-import org.ladysnake.cca.api.v3.component.CopyableComponent;
+import org.jetbrains.annotations.Nullable;
+import org.ladysnake.cca.api.v3.component.*;
 
 import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * Implementing class for {@link ComponentContainer}.
@@ -74,34 +71,44 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
      */
     @Override
     public void fromTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        if(tag.contains(NBT_KEY, NbtElement.LIST_TYPE)) {
-            NbtList componentList = tag.getList(NBT_KEY, NbtElement.COMPOUND_TYPE);
+        Optional<NbtList> list = tag.getList(NBT_KEY);
+        if(list.isPresent()) {
+            NbtList componentList = list.get();
             for (int i = 0; i < componentList.size(); i++) {
-                NbtCompound nbt = componentList.getCompound(i);
-                ComponentKey<?> type = ComponentRegistry.get(Identifier.of(nbt.getString("componentId")));
-                if (type != null) {
-                    Component component = type.getInternal(this);
+                NbtCompound nbt = componentList.getOrCreateCompound(i);
+                Optional<ComponentKey<?>> type = nbt.getString("componentId").map(Identifier::tryParse).map(ComponentRegistry::get);
+                if (type.isPresent()) {
+                    Component component = type.get().getInternal(this);
                     if (component != null) {
                         component.readFromNbt(nbt, registryLookup);
                     }
                 }
             }
-        } else if (tag.contains(NBT_KEY, NbtElement.COMPOUND_TYPE)) {
-            NbtCompound componentMap = tag.getCompound(NBT_KEY);
+        } else {
+            Optional<NbtCompound> compound = tag.getCompound(NBT_KEY);
 
-            for (ComponentKey<?> key : this.keys()) {
-                String keyId = key.getId().toString();
-
-                if (componentMap.contains(keyId, NbtElement.COMPOUND_TYPE)) {
-                    Component component = key.getInternal(this);
-                    assert component != null;
-                    component.readFromNbt(componentMap.getCompound(keyId), registryLookup);
-                    componentMap.remove(keyId);
-                }
+            if (compound.isPresent()) {
+                NbtCompound componentMap = compound.get();
+                fromOrphanTag(componentMap, registryLookup);
             }
-
-            ComponentsInternals.logDeserializationWarnings(componentMap.getKeys());
         }
+    }
+
+    @Override
+    public void fromOrphanTag(NbtCompound componentMap, RegistryWrapper.WrapperLookup registryLookup) {
+        for (ComponentKey<?> key : this.keys()) {
+            String keyId = key.getId().toString();
+
+            Optional<NbtCompound> componentNbt = componentMap.getCompound(keyId);
+            if (componentNbt.isPresent()) {
+                Component component = key.getInternal(this);
+                assert component != null;
+                component.readFromNbt(componentNbt.get(), registryLookup);
+                componentMap.remove(keyId);
+            }
+        }
+
+        ComponentsInternals.logDeserializationWarnings(componentMap.getKeys());
     }
 
     /**
@@ -117,25 +124,33 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
     @Override
     public NbtCompound toTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         if(this.hasComponents()) {
-            NbtCompound componentMap = null;
-            NbtCompound componentTag = new NbtCompound();
-
-            for (ComponentKey<?> type : this.keys()) {
-                Component component = type.getFromContainer(this);
-                component.writeToNbt(componentTag, registryLookup);
-
-                if (!componentTag.isEmpty()) {
-                    if (componentMap == null) {
-                        componentMap = new NbtCompound();
-                        tag.put(NBT_KEY, componentMap);
-                    }
-
-                    componentMap.put(type.getId().toString(), componentTag);
-                    componentTag = new NbtCompound();   // recycle tag objects if possible
-                }
+            NbtCompound componentMap = toOrphanTag(registryLookup);
+            if (componentMap != null) {
+                tag.put(NBT_KEY, componentMap);
             }
         }
         return tag;
+    }
+
+    @Override
+    public @Nullable NbtCompound toOrphanTag(RegistryWrapper.WrapperLookup registryLookup) {
+        NbtCompound componentMap = null;
+        NbtCompound componentTag = new NbtCompound();
+
+        for (ComponentKey<?> type : this.keys()) {
+            Component component = type.getFromContainer(this);
+            component.writeToNbt(componentTag, registryLookup);
+
+            if (!componentTag.isEmpty()) {
+                if (componentMap == null) {
+                    componentMap = new NbtCompound();
+                }
+
+                componentMap.put(type.getId().toString(), componentTag);
+                componentTag = new NbtCompound();   // recycle tag objects if possible
+            }
+        }
+        return componentMap;
     }
 
     @Override

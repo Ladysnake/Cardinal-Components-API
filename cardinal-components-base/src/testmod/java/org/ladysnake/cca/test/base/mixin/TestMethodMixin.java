@@ -20,21 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.test.level;
+package org.ladysnake.cca.test.base.mixin;
 
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.test.TestContext;
-import net.minecraft.text.Text;
-import org.ladysnake.cca.test.base.TickingTestComponent;
+import org.ladysnake.cca.test.base.CardinalGameTest;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
 
-public class CcaLevelTestSuite {
-    @GameTest
-    public void levelComponentsTick(TestContext ctx) {
-        int baseTicks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
-        ctx.waitAndRun(5, () -> {
-            int ticks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
-            ctx.assertEquals(baseTicks - ticks, 5, Text.literal("Component should tick 5 times -"));
-            ctx.complete();
-        });
+import java.lang.reflect.Method;
+
+@Mixin(targets = "net.fabricmc.fabric.impl.gametest.TestAnnotationLocator$TestMethod")
+public abstract class TestMethodMixin {
+    @WrapOperation(method = "lambda$testFunction$0", at = @At(value = "INVOKE", target = "Ljava/lang/reflect/Method;invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"), remap = false)
+    public Object invoke(Method instance, Object obj, Object[] args, Operation<Object> original) {
+        if (obj instanceof CardinalGameTest test) {
+            test.invokeTestMethod((TestContext) args[0], instance);
+            return null;
+        } else {
+            return original.call(instance, obj, args);
+        }
     }
 }

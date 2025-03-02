@@ -50,7 +50,7 @@ public class BaseVita implements Vita, Component, CopyableComponent<BaseVita> {
 
     @Override
     public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        this.vitality = tag.getInt("vitality");
+        this.vitality = tag.getInt("vitality", 0);
     }
 
     @Override

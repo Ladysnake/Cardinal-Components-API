@@ -25,19 +25,27 @@ package org.ladysnake.cca.internal.world;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
+import net.minecraft.world.PersistentStateType;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
 
 public class ComponentPersistentState extends PersistentState {
     public static final ThreadLocal<Boolean> LOADING = ThreadLocal.withInitial(() -> false);
-
-    public static Type<ComponentPersistentState> getType(ComponentContainer components) {
-        return new Type<>(
-            () -> new ComponentPersistentState(components),
-            (tag, registryLookup) -> ComponentPersistentState.fromNbt(components, tag, registryLookup),
-            DataFixTypes.LEVEL
-        );
-    }
+    private static final String PERSISTENT_STATE_KEY = "cardinal_world_components";
+    public static final PersistentStateType<ComponentPersistentState> STATE_TYPE = new PersistentStateType<>(
+        PERSISTENT_STATE_KEY,
+        (ctx) -> new ComponentPersistentState(((ComponentProvider) ctx.getWorldOrThrow()).getComponentContainer()),
+        (ctx) -> {
+            ServerWorld world = ctx.getWorldOrThrow();
+            return NbtCompound.CODEC.xmap(
+                nbt -> fromNbt(((ComponentProvider) world).getComponentContainer(), nbt, world.getRegistryManager()),
+                state -> state.writeNbt(new NbtCompound(), world.getRegistryManager())
+            );
+        },
+        DataFixTypes.LEVEL
+    );
 
     private final ComponentContainer components;
 
@@ -51,7 +59,6 @@ public class ComponentPersistentState extends PersistentState {
         return true;
     }
 
-    @Override
     public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         return this.components.toTag(tag, registryLookup);
     }

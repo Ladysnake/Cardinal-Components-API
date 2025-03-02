@@ -23,6 +23,7 @@
 package org.ladysnake.cca.mixin.scoreboard;
 
 import com.mojang.datafixers.util.Unit;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ServerScoreboard;
@@ -30,10 +31,12 @@ import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.scoreboard.TeamAddCallback;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
 import org.ladysnake.cca.internal.scoreboard.CardinalComponentsScoreboard;
+import org.ladysnake.cca.internal.scoreboard.CcaPackedState;
 import org.ladysnake.cca.internal.scoreboard.ScoreboardComponentContainerFactory;
 import org.ladysnake.cca.internal.scoreboard.StaticScoreboardComponentPlugin;
 import org.spongepowered.asm.mixin.Final;
@@ -55,6 +58,15 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
     @Shadow
     @Final
     private MinecraftServer server;
+
+    @Override
+    protected Team unpackComponents(Team team, CcaPackedState packedTeam) {
+        NbtCompound nbt = packedTeam.cca$getSerializedComponents();
+        if (nbt != null) {
+            ((ComponentProvider) team).getComponentContainer().fromOrphanTag(nbt, server.getRegistryManager());
+        }
+        return super.unpackComponents(team, packedTeam);
+    }
 
     @Override
     public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {

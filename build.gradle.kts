@@ -4,8 +4,8 @@ import net.fabricmc.loom.task.RemapJarTask
 import java.net.URI
 
 plugins {
-    id("fabric-loom") version "1.9-SNAPSHOT"
-    id("io.github.ladysnake.chenille") version "0.14.0"
+    id("fabric-loom") version "1.10-SNAPSHOT"
+    id("io.github.ladysnake.chenille") version "0.15.0"
     id("org.cadixdev.licenser") version "0.6.1"
 }
 

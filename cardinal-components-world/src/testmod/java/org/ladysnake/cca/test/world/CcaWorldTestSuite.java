@@ -22,32 +22,33 @@
  */
 package org.ladysnake.cca.test.world;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-import net.minecraft.test.GameTest;
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.test.TestContext;
+import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.Vita;
-import org.ladysnake.elmendorf.GameTestUtil;
 
 import java.util.Objects;
 
-public class CcaWorldTestSuite implements FabricGameTest {
-    @GameTest(templateName = EMPTY_STRUCTURE)
+public class CcaWorldTestSuite {
+    @GameTest
     public void worldLoadWorks(TestContext ctx) {
-        GameTestUtil.assertTrue(
-            "Load counter should be incremented once when the world gets loaded",
-            ctx.getWorld().getComponent(LoadAwareTestComponent.KEY).getLoadCounter() == 1
+        ctx.assertEquals(
+            1,
+            ctx.getWorld().getComponent(LoadAwareTestComponent.KEY).getLoadCounter(),
+            Text.literal("Load counter should be incremented once when the world gets loaded -")
         );
         ctx.complete();
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE)
+    @GameTest
     public void worldSpecificComponentOverrides(TestContext ctx) {
         ctx.waitAndRun(1, () -> {
-            GameTestUtil.assertTrue(
-                "Nether should have its own Vita implementation",
-                Vita.KEY.getNullable(Objects.requireNonNull(ctx.getWorld().getServer().getWorld(World.NETHER))) instanceof NetherVita v && v.getVitality() == 666
+            ctx.assertEquals(
+                666,
+                Vita.KEY.getNullable(Objects.requireNonNull(ctx.getWorld().getServer().getWorld(World.NETHER))) instanceof NetherVita v ? v.getVitality() : -1,
+                Text.literal("Nether should have its own Vita implementation -")
             );
             ctx.complete();
         });

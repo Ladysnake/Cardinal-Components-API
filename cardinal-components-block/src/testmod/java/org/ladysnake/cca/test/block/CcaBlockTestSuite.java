@@ -22,26 +22,26 @@
  */
 package org.ladysnake.cca.test.block;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
+import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.TickingTestComponent;
 import org.ladysnake.cca.test.base.Vita;
-import org.ladysnake.elmendorf.GameTestUtil;
 
 import java.util.Objects;
 
-public class CcaBlockTestSuite implements FabricGameTest {
-    @GameTest(templateName = EMPTY_STRUCTURE)
+public class CcaBlockTestSuite {
+    @GameTest
     public void beSerialize(TestContext ctx) {
         BlockPos pos = ctx.getAbsolutePos(BlockPos.ORIGIN);
         BlockEntity be = Objects.requireNonNull(
@@ -57,13 +57,13 @@ public class CcaBlockTestSuite implements FabricGameTest {
                 pos, Blocks.END_GATEWAY.getDefaultState()
             )
         );
-        GameTestUtil.assertTrue("New BlockEntity should have values zeroed", be1.getComponent(Vita.KEY).getVitality() == 0);
+        ctx.assertEquals(0, be1.getComponent(Vita.KEY).getVitality(), Text.literal("New BlockEntity should have values zeroed -"));
         be1.read(nbt, ctx.getWorld().getRegistryManager());
-        GameTestUtil.assertTrue("BlockEntity component data should survive deserialization", be1.getComponent(Vita.KEY).getVitality() == 42);
+        ctx.assertEquals(42, be1.getComponent(Vita.KEY).getVitality(), Text.literal("BlockEntity component data should survive deserialization -"));
         ctx.complete();
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE)
+    @GameTest
     public void canQueryThroughLookup(TestContext ctx) {
         BlockPos pos = ctx.getAbsolutePos(BlockPos.ORIGIN);
         BlockEntity be = Objects.requireNonNull(
@@ -79,9 +79,9 @@ public class CcaBlockTestSuite implements FabricGameTest {
                 pos, Blocks.END_GATEWAY.getDefaultState()
             )
         );
-        GameTestUtil.assertTrue("New BlockEntity should have values zeroed", getVita(ctx, pos, be1).getVitality() == 0);
+        ctx.assertEquals(0, getVita(ctx, pos, be1).getVitality(), Text.literal("New BlockEntity should have values zeroed -"));
         be1.read(nbt, ctx.getWorld().getRegistryManager());
-        GameTestUtil.assertTrue("BlockEntity component data should survive deserialization", getVita(ctx, pos, be1).getVitality() == 42);
+        ctx.assertEquals(42, getVita(ctx, pos, be1).getVitality(), Text.literal("BlockEntity component data should survive deserialization -"));
         ctx.complete();
     }
 
@@ -89,35 +89,35 @@ public class CcaBlockTestSuite implements FabricGameTest {
         return Objects.requireNonNull(CcaBlockTestMod.VITA_API_LOOKUP.find(ctx.getWorld(), pos, null, be, Direction.DOWN));
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE)
+    @GameTest
     public void beComponentsTick(TestContext ctx) {
         BlockPos pos = new BlockPos(1, 1, 1);
         ctx.setBlockState(pos, Blocks.END_PORTAL);
         ctx.addFinalTaskWithDuration(5, () -> {
-            int ticks = TickingTestComponent.KEY.get(ctx.getBlockEntity(pos)).serverTicks();
-            GameTestUtil.assertTrue("Component should tick 5 times", ticks == 5);
+            int ticks = TickingTestComponent.KEY.get(ctx.getBlockEntity(pos, EndPortalBlockEntity.class)).serverTicks();
+            ctx.assertEquals(5, ticks, Text.literal("Component should tick 5 times -"));
         });
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE)
+    @GameTest
     public void beComponentsLoadUnload(TestContext ctx) {
         BlockPos pos = new BlockPos(1, 1, 1);
         BlockEntity firstCommandBlock = new CommandBlockBlockEntity(ctx.getAbsolutePos(pos), Blocks.CHAIN_COMMAND_BLOCK.getDefaultState());
-        GameTestUtil.assertTrue(
-            "Load counter should not be incremented until the block entity joins the world",
-            LoadAwareTestComponent.KEY.get(firstCommandBlock).getLoadCounter() == 0
+        ctx.assertEquals(
+            0, LoadAwareTestComponent.KEY.get(firstCommandBlock).getLoadCounter(),
+            Text.literal("Load counter should not be incremented until the block entity joins the world -")
         );
         ctx.setBlockState(pos, Blocks.CHAIN_COMMAND_BLOCK);
-        BlockEntity commandBlock = Objects.requireNonNull(ctx.getBlockEntity(pos));
-        GameTestUtil.assertTrue(
-            "Load counter should be incremented once when the block entity joins the world",
-            LoadAwareTestComponent.KEY.get(commandBlock).getLoadCounter() == 1
+        BlockEntity commandBlock = ctx.getBlockEntity(pos, CommandBlockBlockEntity.class);
+        ctx.assertEquals(
+            1, LoadAwareTestComponent.KEY.get(commandBlock).getLoadCounter(),
+            Text.literal("Load counter should be incremented once when the block entity joins the world -")
         );
         ctx.setBlockState(pos, Blocks.AIR);
         ctx.waitAndRun(1, () -> {
-            GameTestUtil.assertTrue(
-                "Load counter should be decremented when the block entity leaves the world",
-                LoadAwareTestComponent.KEY.get(commandBlock).getLoadCounter() == 0
+            ctx.assertEquals(
+                0, LoadAwareTestComponent.KEY.get(commandBlock).getLoadCounter(),
+                Text.literal("Load counter should be decremented when the block entity leaves the world -")
             );
             ctx.complete();
         });

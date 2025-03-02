@@ -22,18 +22,16 @@
  */
 package org.ladysnake.cca.mixin.scoreboard;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardState;
-import net.minecraft.scoreboard.Team;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.ladysnake.cca.internal.scoreboard.CcaPackedState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -44,41 +42,20 @@ public abstract class MixinScoreboardState {
     @Shadow
     private Scoreboard scoreboard;
 
-    @Inject(method = "writeNbt", at = @At("RETURN"))
-    private void saveComponents(NbtCompound tag, RegistryWrapper.WrapperLookup registries, CallbackInfoReturnable<NbtCompound> cir) {
-        ((ComponentProvider) this.scoreboard).getComponentContainer().toTag(tag, registries);
+    @Inject(method = "unpack", at = @At("RETURN"))
+    private void unpackComponents(@Coerce CcaPackedState packed, CallbackInfo ci) {
+        NbtCompound nbt = packed.cca$getSerializedComponents();
+        if (nbt != null && this.scoreboard instanceof ServerScoreboardAccessor serverScoreboard) {
+            ((ComponentProvider) this.scoreboard).getComponentContainer().fromOrphanTag(nbt, serverScoreboard.getServer().getRegistryManager());
+        }
     }
 
-    @Inject(method = "readNbt", at = @At("RETURN"))
-    private void loadComponents(NbtCompound tag, RegistryWrapper.WrapperLookup registries, CallbackInfoReturnable<ScoreboardState> cir) {
-        ((ComponentProvider) this.scoreboard).getComponentContainer().fromTag(tag, registries);
-    }
-
-    @Inject(
-        method = "readTeamsNbt",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/scoreboard/ScoreboardState;readTeamPlayersNbt(Lnet/minecraft/scoreboard/Team;Lnet/minecraft/nbt/NbtList;)V",
-            shift = At.Shift.AFTER
-        )
-    )
-    private void loadTeamComponents(NbtList nbt, RegistryWrapper.WrapperLookup registries, CallbackInfo ci, @Local NbtCompound teamData, @Local Team team) {
-        ((ComponentProvider) team).getComponentContainer().fromTag(teamData, registries);
-    }
-
-    @Inject(
-        method = "teamsToNbt",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/scoreboard/Team;getPlayerList()Ljava/util/Collection;"
-        )
-    )
-    private void saveTeamComponents(
-        RegistryWrapper.WrapperLookup registries,
-        CallbackInfoReturnable<NbtList> cir,
-        @Local Team team,
-        @Local NbtCompound teamData
-    ) {
-        ((ComponentProvider) team).getComponentContainer().toTag(teamData, registries);
+    @Inject(method = "pack", at = @At("RETURN"))
+    private void packComponents(CallbackInfoReturnable<CcaPackedState> cir) {
+        if (this.scoreboard instanceof ServerScoreboardAccessor serverScoreboard) {
+            cir.getReturnValue().cca$setSerializedComponents(
+                ((ComponentProvider) this.scoreboard).getComponentContainer().toOrphanTag(serverScoreboard.getServer().getRegistryManager())
+            );
+        }
     }
 }

@@ -24,7 +24,10 @@
     "depends": {
         "fabric-api-base": "*"
     },
-    "authors": [
+  "mixins": [
+    "mixins.cardinal_components_base_test.json"
+  ],
+  "authors": [
         "Pyrofab"
     ],
     "license": "MIT"

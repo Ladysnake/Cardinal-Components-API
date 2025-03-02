@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "package": "org.ladysnake.cca.test.base.mixin",
+  "mixins": [
+    "TestAnnotationLocatorMixin",
+    "TestMethodMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

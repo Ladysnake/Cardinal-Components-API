@@ -38,8 +38,8 @@ public class TickingTestComponent implements ServerTickingComponent, ClientTicki
 
     @Override
     public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        this.clientTicks = tag.getInt("clientTicks");
-        this.serverTicks = tag.getInt("serverTicks");
+        this.clientTicks = tag.getInt("clientTicks", 0);
+        this.serverTicks = tag.getInt("serverTicks", 0);
     }
 
     @Override

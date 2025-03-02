@@ -121,6 +121,9 @@ public interface ComponentContainer extends NbtSerializable {
     @Contract(mutates = "this")
     void fromTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
 
+    @Contract(mutates = "this")
+    void fromOrphanTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
+
     /**
      * Writes this object's properties to a {@link NbtCompound}.
      *
@@ -128,8 +131,10 @@ public interface ComponentContainer extends NbtSerializable {
      * @param registryLookup access to dynamic registry data
      * @return {@code tag} for easy chaining
      */
-    @Contract(mutates = "param")
+    @Contract(mutates = "param1")
     NbtCompound toTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
+
+    @Nullable NbtCompound toOrphanTag(RegistryWrapper.WrapperLookup registryLookup);
 
     /**
      * A factory for {@link ComponentContainer}s.

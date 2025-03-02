@@ -22,7 +22,7 @@
  */
 package org.ladysnake.cca.test.entity;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.entity.Bucketable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -35,17 +35,16 @@ import net.minecraft.item.EntityBucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
+import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.Vita;
-import org.ladysnake.elmendorf.GameTestUtil;
 
-public class CcaEntityTestSuite implements FabricGameTest {
-    @GameTest(templateName = EMPTY_STRUCTURE)
+public class CcaEntityTestSuite {
+    @GameTest
     public void bucketableWorks(TestContext ctx) {
         ServerPlayerEntity player = ctx.spawnServerPlayer(1, 0, 1);
         player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
@@ -57,44 +56,47 @@ public class CcaEntityTestSuite implements FabricGameTest {
         ctx.expectEntityWithDataEnd(pos, EntityType.AXOLOTL, a -> a.getComponent(Vita.KEY).getVitality(), 3);
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE)
+    @GameTest
     public void loadEventsWork(TestContext ctx) {
         ShulkerEntity shulker = new ShulkerEntity(EntityType.SHULKER, ctx.getWorld());
         Vec3d vec3d = ctx.getAbsolute(new Vec3d(1, 0, 1));
         shulker.refreshPositionAndAngles(vec3d.x, vec3d.y, vec3d.z, shulker.getYaw(), shulker.getPitch());
-        GameTestUtil.assertTrue(
-            "Load counter should not be incremented until the entity joins the world",
-            LoadAwareTestComponent.KEY.get(shulker).getLoadCounter() == 0
+        ctx.assertEquals(
+            0, LoadAwareTestComponent.KEY.get(shulker).getLoadCounter(),
+            Text.literal("Load counter should not be incremented until the entity joins the world -")
         );
         ctx.getWorld().spawnEntity(shulker);
-        GameTestUtil.assertTrue(
-            "Load counter should be incremented once when the entity joins the world",
-            LoadAwareTestComponent.KEY.get(shulker).getLoadCounter() == 1
+        ctx.assertEquals(
+            1, LoadAwareTestComponent.KEY.get(shulker).getLoadCounter(),
+            Text.literal("Load counter should be incremented once when the entity joins the world -")
         );
         shulker.remove(Entity.RemovalReason.DISCARDED);
         ctx.waitAndRun(1, () -> {
-            GameTestUtil.assertTrue(
-                "Load counter should be decremented when the entity leaves the world",
-                LoadAwareTestComponent.KEY.get(shulker).getLoadCounter() == 0
+            ctx.assertEquals(
+                0,
+                LoadAwareTestComponent.KEY.get(shulker).getLoadCounter(),
+                Text.literal("Load counter should be decremented when the entity leaves the world -")
             );
             ctx.complete();
         });
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE)
+    @GameTest
     public void moddedEntitiesWork(TestContext ctx) {
         ctx.spawnEntity(CcaEntityTestMod.TEST_ENTITY, 0, 0, 0);
         ctx.complete();
     }
 
-    @GameTest(templateName = EMPTY_STRUCTURE)
+    @GameTest
     public void respawnHappensOnConversion(TestContext ctx) {
         CamelEntity camel = ctx.spawnEntity(EntityType.CAMEL, 0, 0, 0);
         CowEntity cow = camel.convertTo(EntityType.COW, EntityConversionContext.create(camel, true, true), e -> {});
         assert cow != null;
-        GameTestUtil.assertTrue("Component data should transfer according to RespawnCopyStrategy", Vita.get(cow).getVitality() == CcaEntityTestMod.CAMEL_BASE_VITA);
+        ctx.assertEquals(
+            CcaEntityTestMod.CAMEL_BASE_VITA, Vita.get(cow).getVitality(),
+            Text.literal("Component data should transfer according to RespawnCopyStrategy -"));
         CatEntity cat = cow.convertTo(EntityType.CAT, EntityConversionContext.create(camel, true, true), e -> {});
-        GameTestUtil.assertTrue("Component data should not transfer by default", Vita.get(cat).getVitality() < CcaEntityTestMod.NATURAL_VITA_CEILING);
+        ctx.assertTrue("Component data should not transfer by default", Vita.get(cat).getVitality() < CcaEntityTestMod.NATURAL_VITA_CEILING);
         ctx.complete();
     }
 }

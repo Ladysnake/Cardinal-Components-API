@@ -22,29 +22,26 @@
  */
 package org.ladysnake.cca.test.base;
 
-import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
-import net.minecraft.test.GameTestException;
 import net.minecraft.test.TestContext;
+import net.minecraft.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public interface CardinalGameTest extends FabricGameTest {
+public interface CardinalGameTest {
     Logger LOGGER = LogManager.getLogger();
 
-    @Override
     default void invokeTestMethod(TestContext context, Method method) {
         try {
             this.setUp();
-            if (method.getParameterCount() > 1) {
-                method.invoke(this, context);
-            } else {
+            if (method.getParameterCount() == 0) {
                 method.invoke(this);
                 context.complete();
+            } else {
+                method.invoke(this, context);
             }
-            this.tearDown();
         } catch (Throwable e) {
             String message;
             Throwable cause;
@@ -56,7 +53,9 @@ public interface CardinalGameTest extends FabricGameTest {
                 cause = e;
             }
             LOGGER.error("Failed test", cause);
-            throw new GameTestException(message);
+            throw context.createError(Text.literal(message));
+        } finally {
+            this.tearDown(context);
         }
     }
 
@@ -64,7 +63,7 @@ public interface CardinalGameTest extends FabricGameTest {
 
     }
 
-    default void tearDown() {
+    default void tearDown(TestContext ctx) {
 
     }
 }

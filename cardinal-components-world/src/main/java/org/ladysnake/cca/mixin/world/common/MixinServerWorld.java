@@ -34,7 +34,6 @@ import org.ladysnake.cca.internal.world.CardinalComponentsWorld;
 import org.ladysnake.cca.internal.world.ComponentPersistentState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -49,17 +48,11 @@ public abstract class MixinServerWorld extends MixinWorld {
     @Shadow
     public abstract List<ServerPlayerEntity> getPlayers();
 
-    @Unique
-    private static final String PERSISTENT_STATE_KEY = "cardinal_world_components";
-
     @Inject(at = @At("RETURN"), method = "<init>*")
     private void constructor(CallbackInfo ci) {
         try {
             ComponentPersistentState.LOADING.set(true);
-            this.getPersistentStateManager().getOrCreate(
-                ComponentPersistentState.getType(this.components),
-                PERSISTENT_STATE_KEY
-            );
+            this.getPersistentStateManager().getOrCreate(ComponentPersistentState.STATE_TYPE);
         } finally {
             ComponentPersistentState.LOADING.set(false);
         }
