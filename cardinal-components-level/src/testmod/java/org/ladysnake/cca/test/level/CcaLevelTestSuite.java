@@ -33,7 +33,7 @@ public class CcaLevelTestSuite {
         int baseTicks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
         ctx.waitAndRun(5, () -> {
             int ticks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
-            ctx.assertEquals(baseTicks - ticks, 5, Text.literal("Component should tick 5 times -"));
+            ctx.assertEquals(5, ticks - baseTicks, Text.literal("Component should tick 5 times -"));
             ctx.complete();
         });
     }

@@ -75,7 +75,7 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
         if(list.isPresent()) {
             NbtList componentList = list.get();
             for (int i = 0; i < componentList.size(); i++) {
-                NbtCompound nbt = componentList.getOrCreateCompound(i);
+                NbtCompound nbt = componentList.getCompoundOrEmpty(i);
                 Optional<ComponentKey<?>> type = nbt.getString("componentId").map(Identifier::tryParse).map(ComponentRegistry::get);
                 if (type.isPresent()) {
                     Component component = type.get().getInternal(this);
