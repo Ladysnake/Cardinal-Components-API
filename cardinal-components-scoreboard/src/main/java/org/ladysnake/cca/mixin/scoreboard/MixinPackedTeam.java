@@ -37,24 +37,25 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 @Mixin(Team.Packed.class)
 public abstract class MixinPackedTeam implements CcaPackedState {
     @Unique
-    private @Nullable NbtCompound cca$serializedComponents;
+    private Optional<NbtCompound> cca$serializedComponents;
 
     @Override
     public @Nullable NbtCompound cca$getSerializedComponents() {
-        return this.cca$serializedComponents;
+        return this.cca$serializedComponents.orElse(null);
     }
 
     @Override
     public void cca$setSerializedComponents(@Nullable NbtCompound nbt) {
-        this.cca$serializedComponents = nbt;
+        this.cca$serializedComponents = Optional.ofNullable(nbt);
     }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/codecs/RecordCodecBuilder;create(Ljava/util/function/Function;)Lcom/mojang/serialization/Codec;"))
+    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/codecs/RecordCodecBuilder;create(Ljava/util/function/Function;)Lcom/mojang/serialization/Codec;", remap = false))
     private static Codec<Team.Packed> wrapCodec(Function<RecordCodecBuilder.Instance<Team.Packed>, ? extends App<RecordCodecBuilder.Mu<Team.Packed>, Team.Packed>> builder, Operation<Codec<Team.Packed>> original) {
         Codec<Team.Packed> baseCodec = original.call(builder);
         MapCodec<Team.Packed> baseMapCodec = baseCodec instanceof MapCodec.MapCodecCodec<Team.Packed>(
@@ -62,7 +63,7 @@ public abstract class MixinPackedTeam implements CcaPackedState {
         ) ? codec : MapCodec.assumeMapUnsafe(baseCodec);
         return RecordCodecBuilder.create(instance -> instance.group(
             baseMapCodec.forGetter(state -> state),
-            NbtCompound.CODEC.fieldOf(AbstractComponentContainer.NBT_KEY).forGetter(state -> ((MixinPackedTeam) (Object) state).cca$serializedComponents)
+            NbtCompound.CODEC.optionalFieldOf(AbstractComponentContainer.NBT_KEY).forGetter(state -> ((MixinPackedTeam) (Object) state).cca$serializedComponents)
         ).apply(instance, (packed, nbtCompound) -> {
             ((MixinPackedTeam) (Object) packed).cca$serializedComponents = nbtCompound;
             return packed;
