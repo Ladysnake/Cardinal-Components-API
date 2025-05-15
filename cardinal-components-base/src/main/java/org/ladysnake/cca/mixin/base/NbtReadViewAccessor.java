@@ -23,34 +23,12 @@
 package org.ladysnake.cca.mixin.base;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import org.ladysnake.cca.api.v3.component.Component;
+import net.minecraft.storage.NbtReadView;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(Component.class)
-public interface ComponentMixin {
-    @Unique
-    void readFromNbt(NbtCompound tag);
-    @Unique
-    void writeToNbt(NbtCompound tag);
-
-    /**
-     * @author Pyrofab
-     * @reason binary compatibility with mods released for beta.1
-     */
-    @Overwrite
-    default void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        readFromNbt(tag);
-    }
-
-    /**
-     * @author Pyrofab
-     * @reason binary compatibility with mods released for beta.1
-     */
-    @Overwrite
-    default void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        writeToNbt(tag);
-    }
+@Mixin(NbtReadView.class)
+public interface NbtReadViewAccessor {
+    @Accessor
+    NbtCompound getNbt();
 }
