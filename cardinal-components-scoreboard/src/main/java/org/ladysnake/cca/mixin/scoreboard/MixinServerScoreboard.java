@@ -30,11 +30,14 @@ import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.util.ErrorReporter;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.scoreboard.TeamAddCallback;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
+import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.ladysnake.cca.internal.scoreboard.CardinalComponentsScoreboard;
 import org.ladysnake.cca.internal.scoreboard.CcaPackedState;
 import org.ladysnake.cca.internal.scoreboard.ScoreboardComponentContainerFactory;
@@ -63,7 +66,9 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
     protected Team unpackComponents(Team team, CcaPackedState packedTeam) {
         NbtCompound nbt = packedTeam.cca$getSerializedComponents();
         if (nbt != null) {
-            ((ComponentProvider) team).getComponentContainer().fromOrphanTag(nbt, server.getRegistryManager());
+            try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
+                ((ComponentProvider) team).getComponentContainer().readOrphanData(NbtReadView.create(errorReporter, server.getRegistryManager(), nbt));
+            }
         }
         return super.unpackComponents(team, packedTeam);
     }

@@ -29,8 +29,10 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.block.entity.EndPortalBlockEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.storage.NbtReadView;
 import net.minecraft.test.TestContext;
 import net.minecraft.text.Text;
+import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
@@ -58,9 +60,17 @@ public class CcaBlockTestSuite {
             )
         );
         ctx.assertEquals(0, be1.getComponent(Vita.KEY).getVitality(), Text.literal("New BlockEntity should have values zeroed -"));
-        be1.read(nbt, ctx.getWorld().getRegistryManager());
+        readBeData(ctx, be1, nbt);
         ctx.assertEquals(42, be1.getComponent(Vita.KEY).getVitality(), Text.literal("BlockEntity component data should survive deserialization -"));
         ctx.complete();
+    }
+
+    private static void readBeData(TestContext ctx, BlockEntity blockEntity, NbtCompound nbt) {
+        ErrorReporter.Impl errorReporter = new ErrorReporter.Impl(blockEntity.getReporterContext());
+        blockEntity.read(NbtReadView.create(errorReporter, ctx.getWorld().getRegistryManager(), nbt));
+        if (!errorReporter.isEmpty()) {
+            ctx.throwGameTestException(Text.literal(errorReporter.getErrorsAsLongString()));
+        }
     }
 
     @GameTest
@@ -80,7 +90,7 @@ public class CcaBlockTestSuite {
             )
         );
         ctx.assertEquals(0, getVita(ctx, pos, be1).getVitality(), Text.literal("New BlockEntity should have values zeroed -"));
-        be1.read(nbt, ctx.getWorld().getRegistryManager());
+        readBeData(ctx, be1, nbt);
         ctx.assertEquals(42, getVita(ctx, pos, be1).getVitality(), Text.literal("BlockEntity component data should survive deserialization -"));
         ctx.complete();
     }

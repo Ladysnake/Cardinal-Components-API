@@ -23,13 +23,16 @@
 package org.ladysnake.cca.api.v3.entity;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.storage.NbtWriteView;
+import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
+import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.ladysnake.cca.internal.entity.CardinalEntityInternals;
 
 /**
@@ -124,9 +127,11 @@ public interface RespawnCopyStrategy<C extends Component> {
         if (to instanceof CopyableComponent<?> copyable) {
             CardinalEntityInternals.copyAsCopyable(from, copyable, registryLookup);
         } else {
-            NbtCompound tag = new NbtCompound();
-            from.writeToNbt(tag, registryLookup);
-            to.readFromNbt(tag, registryLookup);
+            try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
+                NbtWriteView writeView = NbtWriteView.create(errorReporter, registryLookup);
+                from.writeData(writeView);
+                to.readData(NbtReadView.create(errorReporter, registryLookup, writeView.getNbt()));
+            }
         }
     }
 

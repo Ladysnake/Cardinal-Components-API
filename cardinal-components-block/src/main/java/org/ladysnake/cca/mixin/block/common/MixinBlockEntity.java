@@ -26,10 +26,10 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
@@ -46,7 +46,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -74,14 +73,14 @@ public abstract class MixinBlockEntity implements ComponentProvider {
         this.components = CardinalBlockInternals.createComponents((BlockEntity) (Object) this);
     }
 
-    @Inject(method = "createNbt", at = @At("RETURN"))
-    private void writeNbt(RegistryWrapper.WrapperLookup registryLookup, CallbackInfoReturnable<NbtCompound> cir) {
-        this.components.toTag(cir.getReturnValue(), registryLookup);
+    @Inject(method = {"writeDataWithoutId", "writeComponentlessData"}, at = @At("RETURN"))
+    private void writeNbt(WriteView data, CallbackInfo ci) {
+        this.components.writeData(data);
     }
 
     @Inject(method = "read", at = @At(value = "RETURN"))
-    private void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup, CallbackInfo ci) {
-        this.components.fromTag(nbt, registryLookup);
+    private void readNbt(ReadView view, CallbackInfo ci) {
+        this.components.readData(view);
     }
 
     @Nonnull
@@ -101,7 +100,7 @@ public abstract class MixinBlockEntity implements ComponentProvider {
     }
 
     @Override
-    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
+    public <C extends AutoSyncedComponent> @Nullable ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
         World world = this.getWorld();
         if (world == null) {
             return null;

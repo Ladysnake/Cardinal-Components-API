@@ -22,8 +22,9 @@
  */
 package org.ladysnake.cca.test.base;
 
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
 
@@ -49,13 +50,13 @@ public class BaseVita implements Vita, Component, CopyableComponent<BaseVita> {
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        this.vitality = tag.getInt("vitality", 0);
+    public void readData(ReadView readView) {
+        this.vitality = readView.getInt("vitality", this.vitality);
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        tag.putInt("vitality", this.vitality);
+    public void writeData(WriteView writeView) {
+        writeView.putInt("vitality", this.vitality);
     }
 
     @Override

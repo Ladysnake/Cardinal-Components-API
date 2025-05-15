@@ -25,6 +25,8 @@ package org.ladysnake.cca.api.v3.component;
 import net.fabricmc.api.EnvType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -111,28 +113,28 @@ public interface ComponentContainer extends NbtSerializable {
     /**
      * Reads this object's properties from a {@link NbtCompound}.
      *
-     * @param tag            a {@code NbtCompound} on which this object's serializable data has been written
-     * @param registryLookup access to dynamic registry data
+     * @param readView a {@code NbtCompound} on which this object's serializable data has been written
      * @implNote implementations must not assert that the data written on the tag corresponds to any
      * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
      * version. They should also store values into {@code tag} using only unique namespaced keys, as other
      * information may be stored in said tag.
      */
     @Contract(mutates = "this")
-    void fromTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
+    void readData(ReadView readView);
 
     @Contract(mutates = "this")
-    void fromOrphanTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
+    void readOrphanData(ReadView readView);
 
     /**
      * Writes this object's properties to a {@link NbtCompound}.
      *
-     * @param tag            a {@code NbtCompound} on which to write this component's serializable data
-     * @param registryLookup access to dynamic registry data
-     * @return {@code tag} for easy chaining
+     * @param writeView a {@code NbtCompound} on which to write this component's serializable data
      */
     @Contract(mutates = "param1")
-    NbtCompound toTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
+    void writeData(WriteView writeView);
+
+    @Contract(mutates = "param1")
+    void writeOrphanData(WriteView writeView);
 
     @Nullable NbtCompound toOrphanTag(RegistryWrapper.WrapperLookup registryLookup);
 

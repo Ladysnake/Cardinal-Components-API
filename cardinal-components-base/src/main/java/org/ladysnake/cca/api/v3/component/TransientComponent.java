@@ -22,8 +22,8 @@
  */
 package org.ladysnake.cca.api.v3.component;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -31,12 +31,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface TransientComponent extends Component {
     @Override
-    default void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+    default void readData(ReadView readView) {
         // Nothing to read
     }
 
     @Override
-    default void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+    default void writeData(WriteView writeView) {
         // Nothing to write
     }
 

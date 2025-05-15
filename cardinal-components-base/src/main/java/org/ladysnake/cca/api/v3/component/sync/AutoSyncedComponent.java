@@ -26,13 +26,16 @@ import net.fabricmc.api.EnvType;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.storage.NbtWriteView;
+import net.minecraft.util.ErrorReporter;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Contract;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.util.CheckEnvironment;
+import org.ladysnake.cca.internal.base.ComponentsInternals;
 
 /**
  * A {@link Component} implementing this interface will have its data automatically
@@ -68,7 +71,7 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      * @param buf       the buffer to write the data to
      * @param recipient the player to which the packet will be sent
      * @implSpec The default implementation writes the whole NBT representation
-     * of this component to the buffer using {@link Component#writeToNbt(NbtCompound, WrapperLookup)}.
+     * of this component to the buffer using {@link Component#writeData(net.minecraft.storage.WriteView)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation sends possibly hidden
      * information to clients, uses a wasteful data format, and does not support
@@ -81,16 +84,18 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
     @Contract(mutates = "param1")
     @Override
     default void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity recipient) {
-        NbtCompound tag = new NbtCompound();
-        this.writeToNbt(tag, buf.getRegistryManager());
-        buf.writeNbt(tag);
+        try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
+            NbtWriteView writeView = NbtWriteView.create(errorReporter, buf.getRegistryManager());
+            this.writeData(writeView);
+            buf.writeNbt(writeView.getNbt());
+        }
     }
 
     /**
      * Reads this component's data from {@code buf}.
      *
      * @implSpec The default implementation converts the buffer's content
-     * to a {@link NbtCompound} and calls {@link Component#readFromNbt(NbtCompound, WrapperLookup)}.
+     * to a {@link NbtCompound} and calls {@link Component#readData(net.minecraft.storage.ReadView)}.
      * @implNote any implementing class overriding {@link #writeSyncPacket(RegistryByteBuf, ServerPlayerEntity)}
      * such that it uses a different data format must override this method.
      * @see #writeSyncPacket(RegistryByteBuf, ServerPlayerEntity)
@@ -99,7 +104,9 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
     default void applySyncPacket(RegistryByteBuf buf) {
         NbtCompound tag = buf.readNbt();
         if (tag != null) {
-            this.readFromNbt(tag, buf.getRegistryManager());
+            try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
+                this.readData(NbtReadView.create(errorReporter, buf.getRegistryManager(), tag));
+            }
         }
     }
 }

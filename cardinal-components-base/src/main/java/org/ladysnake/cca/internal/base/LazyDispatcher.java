@@ -48,7 +48,7 @@ public abstract class LazyDispatcher {
                         this.postInit();
                     } catch (Throwable t) {
                         this.state = State.ERRED;
-                        ComponentsInternals.LOGGER.fatal("[Cardinal Components API] Initialization failed: ", t);
+                        ComponentsInternals.LOGGER.error("[Cardinal Components API] Initialization failed: ", t);
                         throw t;
                     }
                 }

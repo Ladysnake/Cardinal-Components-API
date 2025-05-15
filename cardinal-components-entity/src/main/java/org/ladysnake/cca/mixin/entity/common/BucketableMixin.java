@@ -25,20 +25,34 @@ package org.ladysnake.cca.mixin.entity.common;
 import net.minecraft.entity.Bucketable;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.util.ErrorReporter;
+import org.ladysnake.cca.internal.base.AbstractComponentContainer;
+import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Optional;
+
 @Mixin(Bucketable.class)
 public interface BucketableMixin {
     @Inject(method = "method_57302", at = @At("RETURN"))
     private static void writeComponentsToStack(MobEntity mobEntity, NbtCompound nbtCompound, CallbackInfo ci) {
-        mobEntity.asComponentProvider().getComponentContainer().toTag(nbtCompound, mobEntity.getRegistryManager());
+        NbtCompound nbt = mobEntity.asComponentProvider().getComponentContainer().toOrphanTag(mobEntity.getRegistryManager());
+        if (nbt != null) {
+            nbtCompound.put(AbstractComponentContainer.NBT_KEY, nbt);
+        }
     }
 
     @Inject(method = "copyDataFromNbt(Lnet/minecraft/entity/mob/MobEntity;Lnet/minecraft/nbt/NbtCompound;)V", at = @At("RETURN"))
     private static void readComponentsFromStack(MobEntity entity, NbtCompound nbt, CallbackInfo ci) {
-        entity.asComponentProvider().getComponentContainer().fromTag(nbt, entity.getRegistryManager());
+        Optional<NbtCompound> componentsNbt = nbt.getCompound(AbstractComponentContainer.NBT_KEY);
+        if (componentsNbt.isPresent()) {
+            try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
+                entity.asComponentProvider().getComponentContainer().readOrphanData(NbtReadView.create(errorReporter, entity.getRegistryManager(), componentsNbt.get()));
+            }
+        }
     }
 }

@@ -28,7 +28,10 @@ import net.minecraft.entity.boss.dragon.EnderDragonFight;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.NbtWriteView;
+import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.gen.GeneratorOptions;
@@ -40,7 +43,9 @@ import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
+import org.ladysnake.cca.internal.base.AbstractComponentContainer;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
+import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.ladysnake.cca.internal.level.CardinalComponentsLevel;
 import org.ladysnake.cca.internal.level.StaticLevelComponentPlugin;
 import org.spongepowered.asm.mixin.Mixin;
@@ -59,13 +64,19 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Com
     private ComponentContainer components;
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/NbtCompound;ZLnet/minecraft/util/math/BlockPos;FJJIIIZIZZZLnet/minecraft/world/border/WorldBorder$Properties;IILjava/util/UUID;Ljava/util/Set;Ljava/util/Set;Lnet/minecraft/world/timer/Timer;Lnet/minecraft/nbt/NbtCompound;Lnet/minecraft/entity/boss/dragon/EnderDragonFight$Data;Lnet/minecraft/world/level/LevelInfo;Lnet/minecraft/world/gen/GeneratorOptions;Lnet/minecraft/world/level/LevelProperties$SpecialProperty;Lcom/mojang/serialization/Lifecycle;)V", at = @At("RETURN"))
-    private void initComponents(NbtCompound playerData, boolean modded, BlockPos spawnPos, float spawnAngle, long time, long timeOfDay, int version, int clearWeatherTime, int rainTime, boolean raining, int thunderTime, boolean thundering, boolean initialized, boolean difficultyLocked, WorldBorder.Properties worldBorder, int wanderingTraderSpawnDelay, int wanderingTraderSpawnChance, UUID wanderingTraderId, Set serverBrands, Set removedFeatures, Timer scheduledEvents, NbtCompound customBossEvents, EnderDragonFight.Data dragonFight, LevelInfo levelInfo, GeneratorOptions generatorOptions, LevelProperties.SpecialProperty specialProperty, Lifecycle lifecycle, CallbackInfo ci)  {
+    private void initComponents(NbtCompound playerData, boolean modded, BlockPos spawnPos, float spawnAngle, long time, long timeOfDay, int version, int clearWeatherTime, int rainTime, boolean raining, int thunderTime, boolean thundering, boolean initialized, boolean difficultyLocked, WorldBorder.Properties worldBorder, int wanderingTraderSpawnDelay, int wanderingTraderSpawnChance, UUID wanderingTraderId, Set<String> serverBrands, Set<String> removedFeatures, Timer<MinecraftServer> scheduledEvents, NbtCompound customBossEvents, EnderDragonFight.Data dragonFight, LevelInfo levelInfo, GeneratorOptions generatorOptions, LevelProperties.SpecialProperty specialProperty, Lifecycle lifecycle, CallbackInfo ci)  {
         this.components = StaticLevelComponentPlugin.createContainer(this);
     }
 
     @Inject(method = "updateProperties", at = @At("RETURN"))
     private void writeComponents(DynamicRegistryManager registryManager, NbtCompound data, NbtCompound player, CallbackInfo ci) {
-        this.components.toTag(data, registryManager);
+        try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
+            NbtWriteView writeView = NbtWriteView.create(errorReporter, registryManager);
+            this.components.writeOrphanData(writeView);
+            if (!writeView.isEmpty()) {
+                data.put(AbstractComponentContainer.NBT_KEY, writeView.getNbt());
+            }
+        }
     }
 
     @Nonnull

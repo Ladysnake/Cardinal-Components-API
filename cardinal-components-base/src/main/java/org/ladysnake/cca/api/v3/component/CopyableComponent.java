@@ -35,8 +35,8 @@ public interface CopyableComponent<C extends Component> extends Component {
     /**
      * Copies the data from {@code other} into {@code this}.
      *
-     * @implSpec The default implementation {@linkplain Component#writeToNbt(NbtCompound, RegistryWrapper.WrapperLookup) serializes}
-     * the component data to a {@link NbtCompound} and calls {@link Component#readFromNbt(NbtCompound, RegistryWrapper.WrapperLookup)}.
+     * @implSpec The default implementation {@linkplain Component#writeData(net.minecraft.storage.WriteView) serializes}
+     * the component data to a {@link NbtCompound} and calls {@link Component#readData(net.minecraft.storage.ReadView)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation assumes NBT consistency
      * between implementations, and is generally slower than a direct copy.

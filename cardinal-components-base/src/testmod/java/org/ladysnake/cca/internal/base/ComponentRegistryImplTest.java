@@ -23,8 +23,8 @@
 package org.ladysnake.cca.internal.base;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.test.TestContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -66,10 +66,10 @@ public class ComponentRegistryImplTest implements CardinalGameTest {
 
     public static class TestComponentNotItf implements Component {
         @Override
-        public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) { }
+        public void readData(ReadView readView) { }
 
         @Override
-        public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) { throw new UnsupportedOperationException(); }
+        public void writeData(WriteView writeView) { throw new UnsupportedOperationException(); }
     }
 
     interface TestComponentItf extends Component {}

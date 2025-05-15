@@ -23,7 +23,8 @@
 package org.ladysnake.cca.api.v3.component;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import org.jetbrains.annotations.Contract;
 
 /**
@@ -36,21 +37,19 @@ public interface Component {
     /**
      * Reads this component's properties from a {@link NbtCompound}.
      *
-     * @param tag            a {@code NbtCompound} on which this component's serializable data has been written
-     * @param registryLookup access to dynamic registry data
+     * @param readView a {@code NbtCompound} on which this component's serializable data has been written
      * @implNote implementations should not assert that the data written on the tag corresponds to any
      * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
      * version.
      */
     @Contract(mutates = "this")
-    void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
+    void readData(ReadView readView);
 
     /**
      * Writes this component's properties to a {@link NbtCompound}.
      *
-     * @param tag            a {@code NbtCompound} on which to write this component's serializable data
-     * @param registryLookup access to dynamic registry data
+     * @param writeView a {@code NbtCompound} on which to write this component's serializable data
      */
     @Contract(mutates = "param1")
-    void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
+    void writeData(WriteView writeView);
 }

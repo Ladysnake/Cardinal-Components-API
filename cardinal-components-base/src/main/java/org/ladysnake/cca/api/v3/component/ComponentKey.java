@@ -200,7 +200,7 @@ public abstract class ComponentKey<C extends Component> {
     @ApiStatus.Experimental
     public void syncWith(ServerPlayerEntity player, ComponentProvider provider, ComponentPacketWriter writer, PlayerSyncPredicate predicate) {
         if (predicate.shouldSyncWith(player)) {
-            RegistryByteBuf buf = new RegistryByteBuf(Unpooled.buffer(), player.getServerWorld().getRegistryManager());
+            RegistryByteBuf buf = new RegistryByteBuf(Unpooled.buffer(), player.getWorld().getRegistryManager());
             writer.writeSyncPacket(buf, player);
             CustomPayload payload = provider.toComponentPacket(this, predicate.isRequiredOnClient(), buf);
 

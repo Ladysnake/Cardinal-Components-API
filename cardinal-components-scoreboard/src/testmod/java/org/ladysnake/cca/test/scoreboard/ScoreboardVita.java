@@ -22,11 +22,11 @@
  */
 package org.ladysnake.cca.test.scoreboard;
 
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import org.ladysnake.cca.test.base.SyncedVita;
 
 public class ScoreboardVita extends SyncedVita {
@@ -40,12 +40,12 @@ public class ScoreboardVita extends SyncedVita {
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeToNbt(tag, registryLookup);
+    public void writeData(WriteView writeView) {
+        super.writeData(writeView);
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readFromNbt(tag, registryLookup);
+    public void readData(ReadView readView) {
+        super.readData(readView);
     }
 }

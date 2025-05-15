@@ -26,10 +26,14 @@ import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.util.ErrorReporter;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateType;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.ladysnake.cca.internal.base.AbstractComponentContainer;
+import org.ladysnake.cca.internal.base.ComponentsInternals;
 
 public class ComponentPersistentState extends PersistentState {
     public static final ThreadLocal<Boolean> LOADING = ThreadLocal.withInitial(() -> false);
@@ -60,12 +64,18 @@ public class ComponentPersistentState extends PersistentState {
     }
 
     public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        return this.components.toTag(tag, registryLookup);
+        var componentsNbt = this.components.toOrphanTag(registryLookup);
+        if (componentsNbt != null) {
+            tag.put(AbstractComponentContainer.NBT_KEY, componentsNbt);
+        }
+        return tag;
     }
 
     public static ComponentPersistentState fromNbt(ComponentContainer components, NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         ComponentPersistentState state = new ComponentPersistentState(components);
-        state.components.fromTag(tag, registryLookup);
+        try (var errorReporter = new ErrorReporter.Logging(() -> "World", ComponentsInternals.LOGGER)) {
+            state.components.readData(NbtReadView.create(errorReporter, registryLookup, tag));
+        }
         return state;
     }
 }

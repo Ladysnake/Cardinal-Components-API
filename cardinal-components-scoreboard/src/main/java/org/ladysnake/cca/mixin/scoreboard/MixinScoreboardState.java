@@ -25,7 +25,10 @@ package org.ladysnake.cca.mixin.scoreboard;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardState;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.util.ErrorReporter;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.ladysnake.cca.internal.scoreboard.CcaPackedState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -46,7 +49,9 @@ public abstract class MixinScoreboardState {
     private void unpackComponents(@Coerce CcaPackedState packed, CallbackInfo ci) {
         NbtCompound nbt = packed.cca$getSerializedComponents();
         if (nbt != null && this.scoreboard instanceof ServerScoreboardAccessor serverScoreboard) {
-            ((ComponentProvider) this.scoreboard).getComponentContainer().fromOrphanTag(nbt, serverScoreboard.getServer().getRegistryManager());
+            try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
+                ((ComponentProvider) this.scoreboard).getComponentContainer().readOrphanData(NbtReadView.create(errorReporter, serverScoreboard.getServer().getRegistryManager(), nbt));
+            }
         }
     }
 

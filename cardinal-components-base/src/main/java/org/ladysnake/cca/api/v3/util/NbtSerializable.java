@@ -22,10 +22,9 @@
  */
 package org.ladysnake.cca.api.v3.util;
 
-import com.mojang.serialization.Dynamic;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
@@ -34,33 +33,20 @@ public interface NbtSerializable {
     /**
      * Reads this object's properties from a {@link NbtCompound}.
      *
-     * @param tag            a {@code NbtCompound} on which this object's serializable data has been written
-     * @param registryLookup access to dynamic registry data
+     * @param readView a {@code NbtCompound} on which this object's serializable data has been written
      * @implNote implementations must not assert that the data written on the tag corresponds to any
      * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
      * version. They should also store values into {@code tag} using only unique namespaced keys, as other
      * information may be stored in said tag.
      */
     @Contract(mutates = "this")
-    void fromTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
+    void readData(ReadView readView);
 
     /**
      * Writes this object's properties to a {@link NbtCompound}.
      *
-     * @param tag            a {@code NbtCompound} on which to write this component's serializable data
-     * @param registryLookup access to dynamic registry data
-     * @return {@code tag} for easy chaining
+     * @param writeView a {@code NbtCompound} on which to write this component's serializable data
      */
     @Contract(mutates = "param")
-    NbtCompound toTag(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup);
-
-    @Contract(mutates = "this")
-    default void fromDynamic(Dynamic<?> dynamic, RegistryWrapper.WrapperLookup registryLookup) {
-        this.fromTag((NbtCompound) dynamic.convert(NbtOps.INSTANCE).getValue(), registryLookup);
-    }
-
-    @Contract(pure = true)
-    default <T> Dynamic<T> toDynamic(Dynamic<T> dynamic, RegistryWrapper.WrapperLookup wrapperLookup) {
-        return dynamic.convert(NbtOps.INSTANCE).map(tag -> this.toTag((NbtCompound)tag, wrapperLookup)).convert(dynamic.getOps());
-    }
+    void writeData(WriteView writeView);
 }

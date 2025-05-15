@@ -22,13 +22,16 @@
  */
 package org.ladysnake.cca.api.v3.entity;
 
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.storage.NbtWriteView;
+import net.minecraft.util.ErrorReporter;
 import net.minecraft.world.GameRules;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
+import org.ladysnake.cca.internal.base.ComponentsInternals;
 
 @ApiStatus.Experimental
 public interface RespawnableComponent<C extends Component> extends Component, CopyableComponent<C> {
@@ -65,8 +68,11 @@ public interface RespawnableComponent<C extends Component> extends Component, Co
 
     @Override
     default void copyFrom(C other, RegistryWrapper.WrapperLookup registryLookup) {
-        NbtCompound tag = new NbtCompound();
-        other.writeToNbt(tag, registryLookup);
-        this.readFromNbt(tag, registryLookup);
+        try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
+            NbtWriteView writeView = NbtWriteView.create(errorReporter, registryLookup);
+            other.writeData(writeView);
+            this.readData(NbtReadView.create(errorReporter, registryLookup, writeView.getNbt()));
+        }
+
     }
 }

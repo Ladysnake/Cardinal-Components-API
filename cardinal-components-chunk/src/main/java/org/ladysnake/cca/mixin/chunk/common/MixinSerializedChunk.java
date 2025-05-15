@@ -25,6 +25,8 @@ package org.ladysnake.cca.mixin.chunk.common;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.NbtReadView;
+import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.chunk.Chunk;
@@ -35,6 +37,7 @@ import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.storage.StorageKey;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.internal.base.AbstractComponentContainer;
+import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -60,7 +63,9 @@ public abstract class MixinSerializedChunk {
         if (tag == null) return;
         ProtoChunk ret = cir.getReturnValue();
         Chunk chunk = ret instanceof WrapperProtoChunk ? ((WrapperProtoChunk) ret).getWrappedChunk() : ret;
-        chunk.asComponentProvider().getComponentContainer().fromOrphanTag(tag, world.getRegistryManager());
+        try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
+            chunk.asComponentProvider().getComponentContainer().readOrphanData(NbtReadView.create(errorReporter, world.getRegistryManager(), tag));
+        }
         // If components have been removed, we need to make the chunk save again
         if (tag.getSize() > 0) {
             chunk.markNeedsSaving();

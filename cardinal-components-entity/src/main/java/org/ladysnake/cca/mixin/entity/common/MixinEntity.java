@@ -24,10 +24,11 @@ package org.ladysnake.cca.mixin.entity.common;
 
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.world.World;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -42,7 +43,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
@@ -66,14 +66,14 @@ public abstract class MixinEntity implements ComponentProvider {
         this.components = CardinalEntityInternals.createEntityComponentContainer((Entity) (Object) this);
     }
 
-    @Inject(method = "writeNbt", at = @At("RETURN"))
-    private void toTag(NbtCompound inputTag, CallbackInfoReturnable<NbtCompound> cir) {
-        this.components.toTag(cir.getReturnValue(), getRegistryManager());
+    @Inject(method = "writeData", at = @At("RETURN"))
+    private void toTag(WriteView view, CallbackInfo ci) {
+        this.components.writeData(view);
     }
 
-    @Inject(method = "readNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
-    private void fromTag(NbtCompound tag, CallbackInfo ci) {
-        this.components.fromTag(tag, getRegistryManager());
+    @Inject(method = "readData", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomData(Lnet/minecraft/storage/ReadView;)V", shift = At.Shift.AFTER))
+    private void fromTag(ReadView view, CallbackInfo ci) {
+        this.components.readData(view);
     }
 
     @Nonnull

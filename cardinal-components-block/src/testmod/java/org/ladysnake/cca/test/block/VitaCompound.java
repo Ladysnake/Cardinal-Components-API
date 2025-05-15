@@ -23,12 +23,11 @@
 package org.ladysnake.cca.test.block;
 
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.Direction;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
@@ -51,15 +50,15 @@ public class VitaCompound implements AutoSyncedComponent {
     }
 
     @Override
-    public void readFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+    public void readData(ReadView readView) {
         for (Map.Entry<Direction, SyncedVita> entry : this.storage.entrySet()) {
-            tag.getCompound(entry.getKey().name()).ifPresent(t -> entry.getValue().readFromNbt(t, registryLookup));
+            readView.getOptionalReadView(entry.getKey().name()).ifPresent(t -> entry.getValue().readData(t));
         }
     }
 
     @Override
-    public void writeToNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-        storage.forEach((side, vita) -> tag.put(side.name(), Util.make(new NbtCompound(), tag1 -> vita.writeToNbt(tag1, registryLookup))));
+    public void writeData(WriteView writeView) {
+        storage.forEach((side, vita) -> vita.writeData(writeView.get(side.name())));
     }
 
     @Override
