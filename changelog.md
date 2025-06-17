@@ -1,7 +1,7 @@
 ------------------------------------------------------
-Version 7.0.0-alpha.1+25w20a
+Version 7.0.0-beta.1
 ------------------------------------------------------
-Updated to 1.25.6 snapshot (25w20a)
+Updated to 1.25.6
 
 **Changes**
 - NBT serialization now all goes through the new `ReadView` and `WriteView` interfaces
