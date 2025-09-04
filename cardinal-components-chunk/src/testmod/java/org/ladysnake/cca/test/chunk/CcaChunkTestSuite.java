@@ -43,7 +43,7 @@ public class CcaChunkTestSuite {
         Chunk c = new WorldChunk(ctx.getWorld(), pos);
         c.getComponent(Vita.KEY).setVitality(42);
         NbtCompound nbt = SerializedChunk.fromChunk(ctx.getWorld(), c).serialize();
-        Chunk c1 = SerializedChunk.fromNbt(ctx.getWorld(), ctx.getWorld().getRegistryManager(), nbt)
+        Chunk c1 = SerializedChunk.fromNbt(ctx.getWorld(), ctx.getWorld().getPalettesFactory(), nbt)
             .convert(ctx.getWorld(), ctx.getWorld().getPointOfInterestStorage(), new StorageKey("", ctx.getWorld().getRegistryKey(), ""), pos);
         ctx.assertEquals(42, c1.getComponent(Vita.KEY).getVitality(), Text.literal("Chunk component data should survive deserialization -"));
         ctx.complete();

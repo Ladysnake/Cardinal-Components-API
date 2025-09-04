@@ -57,7 +57,7 @@ public class VitalityStickItem extends Item {
     public ActionResult use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
         Vita vita = ItemVita.maybeGet(stack).orElseThrow();
-        if (!world.isClient) {
+        if (!world.isClient()) {
             if (player.isSneaking()) {
                 Vita src = vita.getVitality() > 0 ? vita : Vita.get(player);
                 AmbientVita worldVita = (AmbientVita) Vita.get(
@@ -77,7 +77,7 @@ public class VitalityStickItem extends Item {
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         // only on client side, to confirm that sync works
-        if (context.getWorld().isClient && context.getPlayer() != null) {
+        if (context.getWorld().isClient() && context.getPlayer() != null) {
             Vita vita = CcaBlockTestMod.VITA_API_LOOKUP.find(
                 context.getWorld(),
                 context.getBlockPos(),

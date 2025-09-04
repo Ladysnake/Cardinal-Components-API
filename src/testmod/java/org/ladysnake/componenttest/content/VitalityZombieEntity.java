@@ -24,6 +24,7 @@ package org.ladysnake.componenttest.content;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.particle.DragonBreathParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.world.World;
 import org.ladysnake.cca.test.entity.EntityVita;
@@ -38,8 +39,8 @@ public class VitalityZombieEntity extends ZombieEntity {
     @Override
     public void tickMovement() {
         super.tickMovement();
-        if (this.getWorld().isClient) {
-            this.getWorld().addParticleClient(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY() + 0.3D, this.getZ(), this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D);
+        if (this.getEntityWorld().isClient()) {
+            this.getEntityWorld().addParticleClient(DragonBreathParticleEffect.of(ParticleTypes.DRAGON_BREATH, 1), this.getX(), this.getY() + 0.3D, this.getZ(), this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D);
         }
     }
 

@@ -25,10 +25,12 @@ package org.ladysnake.cca.mixin.entity.common;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.ladysnake.cca.internal.entity.SwitchablePlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class MixinServerPlayerEntity implements SwitchablePlayerEntity {
-    private transient boolean switchingCharacter = false;
+    @Unique
+    private boolean switchingCharacter = false;
 
     @Override
     public void cca$markAsSwitchingCharacter() {

@@ -93,7 +93,7 @@ public abstract class MixinBlockEntity implements ComponentProvider {
     public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
         World world = this.getWorld();
 
-        if (world != null && !world.isClient) {
+        if (world != null && !world.isClient()) {
             return PlayerLookup.tracking((BlockEntity) (Object) this);
         }
         return List.of();
