@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
+            filter: 'blob:none'
       - name: validate gradle wrapper
         uses: gradle/actions/wrapper-validation@v4
       - name: setup jdk
