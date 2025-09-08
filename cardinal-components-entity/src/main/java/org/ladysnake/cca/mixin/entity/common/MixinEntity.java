@@ -25,7 +25,6 @@ package org.ladysnake.cca.mixin.entity.common;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
@@ -59,8 +58,6 @@ public abstract class MixinEntity implements ComponentProvider {
 
     @Shadow public abstract int getId();
 
-    @Shadow public abstract DynamicRegistryManager getRegistryManager();
-
     @Inject(method = "<init>*", at = @At("RETURN"))
     private void initDataTracker(CallbackInfo ci) {
         this.components = CardinalEntityInternals.createEntityComponentContainer((Entity) (Object) this);
@@ -85,7 +82,7 @@ public abstract class MixinEntity implements ComponentProvider {
     @Override
     public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
         Entity holder = (Entity) (Object) this;
-        if (!this.world.isClient) {
+        if (!this.world.isClient()) {
             Deque<ServerPlayerEntity> watchers = new ArrayDeque<>(PlayerLookup.tracking(holder));
             if (holder instanceof ServerPlayerEntity player && player.networkHandler != null) {
                 watchers.addFirst(player);

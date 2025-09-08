@@ -43,7 +43,6 @@ public class VitalityCondenser extends Block {
         super(settings);
     }
 
-    @SuppressWarnings("deprecation")
     @ApiStatus.OverrideOnly
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
@@ -53,7 +52,7 @@ public class VitalityCondenser extends Block {
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         // only on client side, to confirm that sync works
-        if (world.isClient) {
+        if (world.isClient()) {
             player.sendMessage(Text.translatable("componenttest:action.chunk_vitality",
                 Objects.requireNonNull(CcaBlockTestMod.VITA_API_LOOKUP.find(world, pos, state, null, hit.getSide())).getVitality()), true);
         }

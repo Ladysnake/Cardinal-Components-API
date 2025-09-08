@@ -23,13 +23,13 @@
 package org.ladysnake.cca.mixin.chunk.common;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.NbtReadView;
 import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.PalettesFactory;
 import net.minecraft.world.chunk.ProtoChunk;
 import net.minecraft.world.chunk.SerializedChunk;
 import net.minecraft.world.chunk.WrapperProtoChunk;
@@ -50,7 +50,7 @@ public abstract class MixinSerializedChunk {
     private @Nullable NbtCompound cca$serializedComponents;
 
     @Inject(method = "fromNbt", at = @At("RETURN"))
-    private static void fromNbt(HeightLimitView world, DynamicRegistryManager registryManager, NbtCompound nbt, CallbackInfoReturnable<SerializedChunk> cir) {
+    private static void fromNbt(HeightLimitView world, PalettesFactory palettesFactory, NbtCompound nbt, CallbackInfoReturnable<SerializedChunk> cir) {
         MixinSerializedChunk ret = (MixinSerializedChunk) (Object) cir.getReturnValue();
         if (ret != null) {
             ret.cca$serializedComponents = nbt.getCompound(AbstractComponentContainer.NBT_KEY).orElse(null);
