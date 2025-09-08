@@ -40,6 +40,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameMode;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.Vita;
 
@@ -47,6 +48,7 @@ public class CcaEntityTestSuite {
     @GameTest
     public void bucketableWorks(TestContext ctx) {
         ServerPlayerEntity player = ctx.spawnServerPlayer(1, 0, 1);
+        player.interactionManager.changeGameMode(GameMode.SURVIVAL);
         player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
         BlockPos pos = new BlockPos(2, 0, 2);
         var axolotl = ctx.spawnMob(EntityType.AXOLOTL, pos);
