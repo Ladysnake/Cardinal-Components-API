@@ -1,0 +1,10 @@
+{
+  "componenttest:tooltip.vitality": "Vitalidad almacenada: %d",
+  "componenttest:tooltip.vitality.native": "Vitalidad inherente: %d",
+  "componenttest:tooltip.self_vitality": "Tu vitalidad: %d",
+  "componenttest:title.world_vitality": "Vitalidad actual: %d + %d",
+  "componenttest:action.chunk_vitality": "Vitalidad del chunk: %d",
+  "componenttest:action.block_vitality": "Vitalidad del bloque: %d",
+  "componenttest:item_group": "Prueba de CCA",
+  "item.componenttest.vita_stick": "Bastón de Vita"
+}
