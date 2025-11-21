@@ -72,7 +72,9 @@ public abstract class MixinServerWorld extends MixinWorld {
 
     @Override
     public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
-        return this.getPlayers();
+        // Need to copy the player list because it might be modified off-thread
+        // https://github.com/Ladysnake/Cardinal-Components-API/issues/221
+        return List.copyOf(this.getPlayers());
     }
 
     @Override
