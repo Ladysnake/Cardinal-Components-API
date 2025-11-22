@@ -2,8 +2,8 @@
 Version 6.1.3
 ------------------------------------------------------
 **Fixes**
-- Fixed rare ConcurrentModificationException during sync
-- Fixed 
+- Fixed rare ConcurrentModificationException during sync (thanks Up!)
+- Fixed crash on dedicated servers when a player lacking a required mod depending on CCA attempts to log in
 
 ------------------------------------------------------
 Version 6.1.2
