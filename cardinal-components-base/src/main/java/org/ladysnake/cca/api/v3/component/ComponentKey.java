@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.server.ServerTask;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -208,7 +209,11 @@ public abstract class ComponentKey<C extends Component> {
                     ServerPlayNetworking.getSender(player).sendPacket(payload, PacketCallbacks.always(buf::release));
                 } else {
                     if (predicate.isRequiredOnClient()) {
-                        player.networkHandler.disconnect(Text.literal("This server requires Cardinal Components API (unhandled packet: " + payload.getId().id() + ")" + ComponentsInternals.getClientOptionalModAdvice()));
+                        player.getEntityWorld().getServer().execute(new ServerTask(0, () ->
+                            player.networkHandler.disconnect(Text.literal(
+                                "This server requires Cardinal Components API (unhandled packet: " + payload.getId().id() + ")"
+                                    + ComponentsInternals.getClientOptionalModAdvice()))
+                        ));
                     }
                     buf.release();
                 }
