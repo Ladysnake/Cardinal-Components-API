@@ -209,10 +209,13 @@ public abstract class ComponentKey<C extends Component> {
                     ServerPlayNetworking.getSender(player).sendPacket(payload, PacketCallbacks.always(buf::release));
                 } else {
                     if (predicate.isRequiredOnClient()) {
-                        player.getEntityWorld().getServer().execute(new ServerTask(0, () ->
-                            player.networkHandler.disconnect(Text.literal(
-                                "This server requires Cardinal Components API (unhandled packet: " + payload.getId().id() + ")"
-                                    + ComponentsInternals.getClientOptionalModAdvice()))
+                        player.getEntityWorld().getServer().send(new ServerTask(0, () -> {
+                            if (!player.isDisconnected()) {
+                                player.networkHandler.disconnect(Text.literal(
+                                    "This server requires Cardinal Components API (unhandled packet: " + payload.getId().id() + ")"
+                                        + ComponentsInternals.getClientOptionalModAdvice()));
+                            }
+                        }
                         ));
                     }
                     buf.release();
