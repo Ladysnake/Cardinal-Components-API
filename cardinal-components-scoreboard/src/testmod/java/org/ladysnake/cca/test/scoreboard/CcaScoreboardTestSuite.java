@@ -22,15 +22,12 @@
  */
 package org.ladysnake.cca.test.scoreboard;
 
-import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.scoreboard.ScoreboardState;
 import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.test.TestContext;
 import net.minecraft.text.Text;
-import net.minecraft.world.PersistentState;
 import org.ladysnake.cca.test.base.CardinalGameTest;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.Vita;
@@ -54,10 +51,8 @@ public class CcaScoreboardTestSuite implements CardinalGameTest {
         scoreboard.getComponent(Vita.KEY).setVitality(42);
         Team testTeam = scoreboard.addTeam(TEST_TEAM_NAME);
         testTeam.getComponent(Vita.KEY).setVitality(420);
-        PersistentState.Context persistentStateCtx = new PersistentState.Context(ctx.getWorld());
-        Codec<ScoreboardState> codec = ServerScoreboard.STATE_TYPE.codec().apply(persistentStateCtx);
-        var serializationResult = codec.encodeStart(NbtOps.INSTANCE, ServerScoreboard.STATE_TYPE.constructor().apply(persistentStateCtx));
-        ctx.assertTrue("Serialization should succeed", serializationResult.isSuccess());
+        ScoreboardState state = ScoreboardState.TYPE.constructor().get();
+        scoreboard.writeTo(state);
         scoreboard.getComponent(Vita.KEY).setVitality(0);
         scoreboard.removeTeam(testTeam);
         ctx.assertEquals(
@@ -65,8 +60,7 @@ public class CcaScoreboardTestSuite implements CardinalGameTest {
             Text.literal("reset vita")
         );
         ctx.assertTrue("Reset team should be null", scoreboard.getTeam(TEST_TEAM_NAME) == null);
-        var deserializationResult = codec.decode(NbtOps.INSTANCE, serializationResult.getOrThrow());
-        ctx.assertTrue("Deserialization should succeed", deserializationResult.isSuccess());
+        scoreboard.read(state.getPackedState());
         ctx.assertEquals(
             42, scoreboard.getComponent(Vita.KEY).getVitality(),
             Text.literal("deserialized vita")

@@ -39,7 +39,7 @@ import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.GameRules;
+import net.minecraft.world.rule.GameRules;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
@@ -119,7 +119,7 @@ public final class CardinalComponentsEntity {
     }
 
     private static void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless) {
-        boolean keepInventory = original.getEntityWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || clone.isSpectator();
+        boolean keepInventory = original.getEntityWorld().getGameRules().getValue(GameRules.KEEP_INVENTORY) || clone.isSpectator();
         Set<ComponentKey<?>> keys = ((ComponentProvider) original).getComponentContainer().keys();
 
         for (ComponentKey<?> key : keys) {

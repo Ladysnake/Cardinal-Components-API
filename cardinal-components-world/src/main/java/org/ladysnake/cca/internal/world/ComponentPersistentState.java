@@ -25,31 +25,28 @@ package org.ladysnake.cca.internal.world;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.NbtReadView;
 import net.minecraft.util.ErrorReporter;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateType;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
-import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.internal.base.AbstractComponentContainer;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 
 public class ComponentPersistentState extends PersistentState {
     public static final ThreadLocal<Boolean> LOADING = ThreadLocal.withInitial(() -> false);
     private static final String PERSISTENT_STATE_KEY = "cardinal_world_components";
-    public static final PersistentStateType<ComponentPersistentState> STATE_TYPE = new PersistentStateType<>(
-        PERSISTENT_STATE_KEY,
-        (ctx) -> new ComponentPersistentState(((ComponentProvider) ctx.getWorldOrThrow()).getComponentContainer()),
-        (ctx) -> {
-            ServerWorld world = ctx.getWorldOrThrow();
-            return NbtCompound.CODEC.xmap(
-                nbt -> fromNbt(((ComponentProvider) world).getComponentContainer(), nbt, world.getRegistryManager()),
-                state -> state.writeNbt(new NbtCompound(), world.getRegistryManager())
-            );
-        },
-        DataFixTypes.LEVEL
-    );
+    public static PersistentStateType<ComponentPersistentState> stateType(ComponentContainer components, RegistryWrapper.WrapperLookup registries) {
+        return new PersistentStateType<>(
+            PERSISTENT_STATE_KEY,
+            () -> new ComponentPersistentState(components),
+            NbtCompound.CODEC.xmap(
+                nbt -> fromNbt(components, nbt, registries),
+                state -> state.writeNbt(new NbtCompound(), registries)
+            ),
+            DataFixTypes.LEVEL
+        );
+    }
 
     private final ComponentContainer components;
 

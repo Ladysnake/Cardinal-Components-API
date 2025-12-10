@@ -43,7 +43,7 @@ import java.util.function.Function;
 @Mixin(ScoreboardState.Packed.class)
 public abstract class MixinPackedScoreboardState implements CcaPackedState {
     @Unique
-    private Optional<NbtCompound> cca$serializedComponents;
+    private Optional<NbtCompound> cca$serializedComponents = Optional.empty();
 
     @Override
     public @Nullable NbtCompound cca$getSerializedComponents() {

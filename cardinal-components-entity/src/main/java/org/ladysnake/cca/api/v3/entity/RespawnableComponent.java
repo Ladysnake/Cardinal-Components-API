@@ -26,7 +26,7 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.storage.NbtReadView;
 import net.minecraft.storage.NbtWriteView;
 import net.minecraft.util.ErrorReporter;
-import net.minecraft.world.GameRules;
+import net.minecraft.world.rule.GameRules;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.ladysnake.cca.api.v3.component.Component;

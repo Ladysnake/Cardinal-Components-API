@@ -26,6 +26,7 @@ import com.mojang.datafixers.util.Unit;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.ScoreboardState;
 import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
@@ -34,6 +35,7 @@ import net.minecraft.storage.NbtReadView;
 import net.minecraft.util.ErrorReporter;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.ladysnake.cca.api.v3.component.TransientComponent;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.scoreboard.TeamAddCallback;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
@@ -48,6 +50,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
@@ -61,6 +64,9 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
     @Shadow
     @Final
     private MinecraftServer server;
+
+    @Shadow
+    private boolean dirty;
 
     @Override
     protected Team unpackComponents(Team team, CcaPackedState packedTeam) {
@@ -102,5 +108,36 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
     @Inject(method = "updateScoreboardTeamAndPlayers", at = @At("RETURN"))
     private void syncTeamComponents(Team team, CallbackInfo ci) {
         TeamAddCallback.EVENT.invoker().onTeamAdded(team);
+    }
+
+    @Inject(method = "writeTo", at = @At("HEAD"))
+    private void setDirty(ScoreboardState state, CallbackInfo ci) {
+        if (components.hasComponents()) {
+            for (var component : components.keys()) {
+                if (!(component instanceof TransientComponent)) {
+                    dirty = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    @ModifyArg(method = "writeTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/scoreboard/ScoreboardState;set(Lnet/minecraft/scoreboard/ScoreboardState$Packed;)V"))
+    private ScoreboardState.Packed writeComponents(ScoreboardState.Packed packed) {
+        ((CcaPackedState) (Object) packed).cca$setSerializedComponents(
+            components.toOrphanTag(server.getRegistryManager())
+        );
+
+        return packed;
+    }
+
+    @Inject(method = "read", at = @At("RETURN"))
+    private void readComponents(ScoreboardState.Packed packed, CallbackInfo ci) {
+        NbtCompound nbt = ((CcaPackedState) (Object) packed).cca$getSerializedComponents();
+        if (nbt != null) {
+            try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
+                components.readOrphanData(NbtReadView.create(errorReporter, server.getRegistryManager(), nbt));
+            }
+        }
     }
 }

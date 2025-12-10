@@ -52,7 +52,7 @@ public abstract class MixinServerWorld extends MixinWorld {
     private void constructor(CallbackInfo ci) {
         try {
             ComponentPersistentState.LOADING.set(true);
-            this.getPersistentStateManager().getOrCreate(ComponentPersistentState.STATE_TYPE);
+            this.getPersistentStateManager().getOrCreate(ComponentPersistentState.stateType(components, getRegistryManager()));
         } finally {
             ComponentPersistentState.LOADING.set(false);
         }
