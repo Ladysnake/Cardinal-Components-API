@@ -38,6 +38,7 @@ import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 import org.ladysnake.cca.test.base.BaseVita;
+import org.ladysnake.cca.test.base.Energy;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.Vita;
 
@@ -57,6 +58,13 @@ public class CcaEntityTestMod implements ModInitializer, EntityComponentInitiali
         registry.beginRegistration(PlayerEntity.class, Vita.KEY).impl(PlayerVita.class).end(PlayerVita::new);
         registry.beginRegistration(CamelEntity.class, Vita.KEY).impl(EntityVita.class).respawnStrategy(RespawnCopyStrategy.ALWAYS_COPY).end(owner -> new EntityVita(owner, CAMEL_BASE_VITA));
         registry.beginRegistration(ShulkerEntity.class, LoadAwareTestComponent.KEY).impl(LoadAwareTestComponent.class).end(e -> new LoadAwareTestComponent());
+        registry.beginImmutableRegistration(PlayerEntity.class, Energy.KEY)
+            .onServerTick(PlayerEnergy::onServerTick)
+            .onClientTick(PlayerEnergy::onClientTick)
+            .onServerLoad(PlayerEnergy::onServerLoad)
+            .onClientLoad(PlayerEnergy::onClientLoad)
+            .respawnStrategy(RespawnCopyStrategy.INVENTORY)
+            .end($ -> new Energy(0));
     }
 
     @Override

@@ -19,7 +19,10 @@
             "testmod:test",
             "testmod:test_2",
             "testmod:test_3"
-        ]
+        ],
+      "cardinal-components-immutable": [
+        "cca-base-test:energy"
+      ]
     },
     "depends": {
         "fabric-api-base": "*"

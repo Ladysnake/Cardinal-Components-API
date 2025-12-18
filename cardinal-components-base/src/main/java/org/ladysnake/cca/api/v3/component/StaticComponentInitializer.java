@@ -48,6 +48,10 @@ public interface StaticComponentInitializer {
         return Collections.emptySet();
     }
 
+    default Collection<Identifier> getSupportedImmutableComponentKeys() {
+        return Collections.emptySet();
+    }
+
     /**
      * Called when static component bootstrap is finished.
      *

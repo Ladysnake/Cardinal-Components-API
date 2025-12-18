@@ -22,12 +22,18 @@
  */
 package org.ladysnake.cca.api.v3.component;
 
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.ladysnake.cca.api.v3.component.immutable.ImmutableComponent;
+import org.ladysnake.cca.api.v3.component.immutable.ImmutableComponentKey;
 import org.ladysnake.cca.internal.base.ComponentRegistryImpl;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -79,6 +85,8 @@ public interface ComponentRegistryV3 {
      * mods can interact with a well-defined API rather than directly accessing internals.
      */
     <C extends Component> ComponentKey<C> getOrCreate(Identifier componentId, Class<C> componentClass);
+
+    <C extends ImmutableComponent> ImmutableComponentKey<C> getOrCreateImmutable(Identifier componentId, Class<C> componentClass, @org.jetbrains.annotations.Nullable MapCodec<C> mapCodec, @org.jetbrains.annotations.Nullable PacketCodec<RegistryByteBuf, C> packetCodec);
 
     /**
      * Directly retrieves a ComponentKey using its id.
