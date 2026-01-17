@@ -5,8 +5,7 @@ import java.net.URI
 
 plugins {
     id("fabric-loom") version "1.13.3"
-    id("io.github.ladysnake.chenille") version "0.15.0"
-    id("org.cadixdev.licenser") version "0.6.1"
+    id("io.github.ladysnake.chenille") version "0.16.1"
 }
 
 val fabricApiVersion: String = providers.gradleProperty("fabric_api_version").get()
