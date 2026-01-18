@@ -20,21 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.world.common;
+package org.ladysnake.cca.mixin.level.common;
 
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import org.ladysnake.cca.api.v3.world.WorldSyncCallback;
+import net.minecraft.world.level.storage.DerivedLevelData;
+import net.minecraft.world.level.storage.ServerLevelData;
+import org.ladysnake.cca.api.v3.component.ComponentContainer;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(PlayerManager.class)
-public abstract class MixinPlayerManager {
-    @Inject(method = "sendWorldInfo", at = @At("RETURN"))
-    private void sendWorldInfo(ServerPlayerEntity player, ServerWorld world, CallbackInfo ci) {
-        WorldSyncCallback.EVENT.invoker().onPlayerStartTracking(player, world);
+import javax.annotation.Nonnull;
+
+@Mixin(DerivedLevelData.class)
+public abstract class MixinDerivedLevelData implements ComponentProvider {
+
+    @Shadow @Final private ServerLevelData wrapped;
+
+    @Nonnull
+    @Override
+    public ComponentContainer getComponentContainer() {
+        return this.wrapped.asComponentProvider().getComponentContainer();
     }
 }

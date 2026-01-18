@@ -22,37 +22,37 @@
  */
 package org.ladysnake.cca.test.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.world.World;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class TestEntity extends Entity {
-    public TestEntity(EntityType<?> type, World world) {
+    public TestEntity(EntityType<?> type, Level world) {
         super(type, world);
     }
 
     @Override
-    protected void initDataTracker(DataTracker.Builder builder) {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
 
     }
 
     @Override
-    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel world, DamageSource source, float amount) {
         return false;
     }
 
     @Override
-    protected void readCustomData(ReadView nbt) {
+    protected void readAdditionalSaveData(ValueInput nbt) {
 
     }
 
     @Override
-    protected void writeCustomData(WriteView nbt) {
+    protected void addAdditionalSaveData(ValueOutput nbt) {
 
     }
 }

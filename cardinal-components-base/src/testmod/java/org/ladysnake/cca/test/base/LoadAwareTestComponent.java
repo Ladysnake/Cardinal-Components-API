@@ -22,7 +22,7 @@
  */
 package org.ladysnake.cca.test.base;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistry;
 import org.ladysnake.cca.api.v3.component.TransientComponent;
@@ -30,7 +30,7 @@ import org.ladysnake.cca.api.v3.component.load.ServerLoadAwareComponent;
 import org.ladysnake.cca.api.v3.component.load.ServerUnloadAwareComponent;
 
 public class LoadAwareTestComponent implements TransientComponent, ServerLoadAwareComponent, ServerUnloadAwareComponent {
-    public static final ComponentKey<LoadAwareTestComponent> KEY = ComponentRegistry.getOrCreate(Identifier.of("cca-base-test", "loading"), LoadAwareTestComponent.class);
+    public static final ComponentKey<LoadAwareTestComponent> KEY = ComponentRegistry.getOrCreate(Identifier.fromNamespaceAndPath("cca-base-test", "loading"), LoadAwareTestComponent.class);
 
     private int loadCounter = 0;
 

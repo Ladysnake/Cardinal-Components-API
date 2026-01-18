@@ -22,9 +22,9 @@
  */
 package org.ladysnake.cca.mixin.scoreboard;
 
-import net.minecraft.scoreboard.ServerScoreboard;
-import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerScoreboard;
+import net.minecraft.world.scores.PlayerTeam;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,12 +37,12 @@ import java.util.function.BooleanSupplier;
 public abstract class MixinMinecraftServer {
     @Shadow public abstract ServerScoreboard getScoreboard();
 
-    @Inject(at = @At("TAIL"), method = "tick")
+    @Inject(at = @At("TAIL"), method = "tickServer")
     private void onEndTick(BooleanSupplier shouldKeepTicking, CallbackInfo info) {
         ServerScoreboard scoreboard = this.getScoreboard();
         scoreboard.asComponentProvider().getComponentContainer().tickServerComponents();
 
-        for (Team team : scoreboard.getTeams()) {
+        for (PlayerTeam team : scoreboard.getPlayerTeams()) {
             team.asComponentProvider().getComponentContainer().tickServerComponents();
         }
     }

@@ -20,27 +20,38 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.entity.common;
+package org.ladysnake.cca.mixin.world.common;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.server.network.EntityTrackerEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.ladysnake.cca.api.v3.entity.TrackingStartCallback;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.level.Level;
+import org.ladysnake.cca.api.v3.component.ComponentContainer;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.ladysnake.cca.internal.world.CardinalComponentsWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(EntityTrackerEntry.class)
-public abstract class MixinEntityTrackerEntry {
-    @Shadow
-    @Final
-    private Entity entity;
+import javax.annotation.Nonnull;
 
-    @Inject(method = "startTracking", at = @At("RETURN"))
-    private void onStartedTracking(ServerPlayerEntity player, CallbackInfo ci) {
-        TrackingStartCallback.EVENT.invoker().onPlayerStartTracking(player, this.entity);
+@Mixin(Level.class)
+public abstract class MixinLevel implements ComponentProvider {
+
+    @Shadow public abstract RegistryAccess registryAccess();
+
+    @Unique
+    protected ComponentContainer components;
+
+    @Inject(method = "<init>*", at = @At("RETURN"))
+    private void initComponents(CallbackInfo ci) {
+        this.components = CardinalComponentsWorld.createComponents((Level) (Object) this);
+    }
+
+    @Nonnull
+    @Override
+    public ComponentContainer getComponentContainer() {
+        return this.components;
     }
 }

@@ -20,21 +20,21 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.world.client;
+package org.ladysnake.cca.mixin.scoreboard;
 
-import net.minecraft.client.world.ClientWorld;
-import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import net.minecraft.server.ServerScoreboard;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import org.ladysnake.cca.api.v3.scoreboard.ScoreboardSyncCallback;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.function.BooleanSupplier;
-
-@Mixin(ClientWorld.class)
-public abstract class MixinClientWorld {
-    @Inject(method = "tick", at = @At("RETURN"))
-    private void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-        ((ComponentProvider) this).getComponentContainer().tickClientComponents();
+@Mixin(PlayerList.class)
+public abstract class MixinPlayerList {
+    @Inject(method = "updateEntireScoreboard", at = @At("RETURN"))
+    private void syncTeamComponents(ServerScoreboard scoreboard, ServerPlayer player, CallbackInfo ci) {
+        ScoreboardSyncCallback.EVENT.invoker().onScoreboardSync(player, scoreboard);
     }
 }

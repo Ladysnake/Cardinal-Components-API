@@ -22,8 +22,8 @@
  */
 package org.ladysnake.cca.mixin.scoreboard;
 
-import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerScoreboard;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 

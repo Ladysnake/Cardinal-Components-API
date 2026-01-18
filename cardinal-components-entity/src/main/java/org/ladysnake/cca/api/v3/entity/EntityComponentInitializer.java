@@ -23,7 +23,7 @@
 package org.ladysnake.cca.api.v3.entity;
 
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
 
 /**

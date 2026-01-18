@@ -23,9 +23,9 @@
 package org.ladysnake.cca.api.v3.block;
 
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -113,7 +113,7 @@ public final class BlockComponents {
      *
      * <p>This method should be preferred to other overloads as it is more performant than the more generic alternatives.
      * If the component is not {@linkplain BlockComponentFactoryRegistry#registerFor(Class, ComponentKey, ComponentFactory)  attached}
-     * to one of the {@code types}, calling {@link BlockApiLookup#find(World, BlockPos, Object)}
+     * to one of the {@code types}, calling {@link BlockApiLookup#find(Level, BlockPos, Object)}
      * on the corresponding block will throw a {@link NoSuchElementException}.
      *
      * @see #exposeApi(ComponentKey, BlockApiLookup, BiFunction)

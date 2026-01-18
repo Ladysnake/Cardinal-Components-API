@@ -22,9 +22,9 @@
  */
 package org.ladysnake.cca.internal.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
@@ -99,7 +99,7 @@ public final class CardinalEntityInternals {
         return strat == null ? DEFAULT_COPY_STRATEGY : (RespawnCopyStrategy<? super C>) strat;
     }
 
-    private static void defaultCopyStrategy(Component from, Component to, RegistryWrapper.WrapperLookup registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
+    private static void defaultCopyStrategy(Component from, Component to, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
         if (to instanceof RespawnableComponent) {
             playerComponentCopy(from, (RespawnableComponent<?>) to, registryLookup, lossless, keepInventory, sameCharacter);
         } else {
@@ -108,14 +108,14 @@ public final class CardinalEntityInternals {
     }
 
     @SuppressWarnings("unchecked")
-    private static <C extends Component> void playerComponentCopy(Component from, RespawnableComponent<C> to, RegistryWrapper.WrapperLookup registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
+    private static <C extends Component> void playerComponentCopy(Component from, RespawnableComponent<C> to, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
         if (to.shouldCopyForRespawn(lossless, keepInventory, sameCharacter)) {
             to.copyForRespawn((C) from, registryLookup, lossless, keepInventory, sameCharacter);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <C extends Component> void copyAsCopyable(Component from, CopyableComponent<C> to, RegistryWrapper.WrapperLookup registryLookup) {
+    public static <C extends Component> void copyAsCopyable(Component from, CopyableComponent<C> to, HolderLookup.Provider registryLookup) {
         to.copyFrom((C) from, registryLookup);
     }
 }

@@ -23,15 +23,15 @@
 package org.ladysnake.cca.mixin.block.common;
 
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
@@ -55,10 +55,10 @@ import java.util.List;
 public abstract class MixinBlockEntity implements ComponentProvider {
     @Shadow
     @Nullable
-    public abstract World getWorld();
+    public abstract Level getLevel();
 
     @Shadow
-    public abstract BlockPos getPos();
+    public abstract BlockPos getBlockPos();
 
     @Shadow
     public abstract BlockEntityType<?> getType();
@@ -73,13 +73,13 @@ public abstract class MixinBlockEntity implements ComponentProvider {
         this.components = CardinalBlockInternals.createComponents((BlockEntity) (Object) this);
     }
 
-    @Inject(method = {"writeDataWithoutId", "writeComponentlessData"}, at = @At("RETURN"))
-    private void writeNbt(WriteView data, CallbackInfo ci) {
+    @Inject(method = {"saveWithoutMetadata", "saveCustomOnly"}, at = @At("RETURN"))
+    private void writeNbt(ValueOutput data, CallbackInfo ci) {
         this.components.writeData(data);
     }
 
-    @Inject(method = "read", at = @At(value = "RETURN"))
-    private void readNbt(ReadView view, CallbackInfo ci) {
+    @Inject(method = "loadWithComponents", at = @At(value = "RETURN"))
+    private void readNbt(ValueInput view, CallbackInfo ci) {
         this.components.readData(view);
     }
 
@@ -90,25 +90,25 @@ public abstract class MixinBlockEntity implements ComponentProvider {
     }
 
     @Override
-    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
-        World world = this.getWorld();
+    public Iterable<ServerPlayer> getRecipientsForComponentSync() {
+        Level world = this.getLevel();
 
-        if (world != null && !world.isClient()) {
+        if (world != null && !world.isClientSide()) {
             return PlayerLookup.tracking((BlockEntity) (Object) this);
         }
         return List.of();
     }
 
     @Override
-    public <C extends AutoSyncedComponent> @Nullable ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
-        World world = this.getWorld();
+    public <C extends AutoSyncedComponent> @Nullable ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryFriendlyByteBuf data) {
+        Level world = this.getLevel();
         if (world == null) {
             return null;
         }
 
         return new ComponentUpdatePayload<>(
             CardinalComponentsBlock.PACKET_ID,
-            new BlockEntityAddress(this.getType(), this.getPos(), world.getRegistryKey()),
+            new BlockEntityAddress(this.getType(), this.getBlockPos(), world.dimension()),
             required,
             key.getId(),
             data

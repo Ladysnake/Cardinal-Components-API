@@ -22,16 +22,17 @@
  */
 package org.ladysnake.componenttest.content;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.ApiStatus;
 import org.ladysnake.cca.test.base.Vita;
 import org.ladysnake.cca.test.block.CcaBlockTestMod;
@@ -39,23 +40,23 @@ import org.ladysnake.cca.test.block.CcaBlockTestMod;
 import java.util.Objects;
 
 public class VitalityCondenser extends Block {
-    public VitalityCondenser(Settings settings) {
+    public VitalityCondenser(Properties settings) {
         super(settings);
     }
 
     @ApiStatus.OverrideOnly
     @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
+    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource rand) {
         Vita.get(world).transferTo(Vita.get(world.getChunk(pos)), 1);
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         // only on client side, to confirm that sync works
-        if (world.isClient()) {
-            player.sendMessage(Text.translatable("componenttest:action.chunk_vitality",
-                Objects.requireNonNull(CcaBlockTestMod.VITA_API_LOOKUP.find(world, pos, state, null, hit.getSide())).getVitality()), true);
+        if (world.isClientSide()) {
+            player.displayClientMessage(Component.translatable("componenttest:action.chunk_vitality",
+                Objects.requireNonNull(CcaBlockTestMod.VITA_API_LOOKUP.find(world, pos, state, null, hit.getDirection())).getVitality()), true);
         }
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 }

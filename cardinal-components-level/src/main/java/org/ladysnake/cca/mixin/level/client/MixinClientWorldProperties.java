@@ -22,9 +22,9 @@
  */
 package org.ladysnake.cca.mixin.level.client;
 
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.MutableWorldProperties;
+import net.minecraft.world.level.storage.WritableLevelData;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.internal.level.StaticLevelComponentPlugin;
@@ -36,8 +36,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nonnull;
 
-@Mixin(ClientWorld.Properties.class)
-public abstract class MixinClientWorldProperties implements MutableWorldProperties, ComponentProvider {
+@Mixin(ClientLevel.ClientLevelData.class)
+public abstract class MixinClientWorldProperties implements WritableLevelData, ComponentProvider {
     @Unique
     private ComponentContainer components;
 

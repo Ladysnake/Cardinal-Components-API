@@ -23,17 +23,17 @@
 package org.ladysnake.cca.test.entity;
 
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.entity.passive.CamelEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.animal.camel.Camel;
+import net.minecraft.world.entity.monster.Shulker;
+import net.minecraft.world.entity.player.Player;
 import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
@@ -42,8 +42,8 @@ import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.Vita;
 
 public class CcaEntityTestMod implements ModInitializer, EntityComponentInitializer {
-    public static final RegistryKey<EntityType<?>> TEST_ENTITY_ID = RegistryKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of("cca-entity-test", "test"));
-    public static final EntityType<TestEntity> TEST_ENTITY = EntityType.Builder.create(TestEntity::new, SpawnGroup.MISC).build(TEST_ENTITY_ID);
+    public static final ResourceKey<EntityType<?>> TEST_ENTITY_ID = ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath("cca-entity-test", "test"));
+    public static final EntityType<TestEntity> TEST_ENTITY = EntityType.Builder.of(TestEntity::new, MobCategory.MISC).build(TEST_ENTITY_ID);
     public static final int NATURAL_VITA_CEILING = 10;
     public static final int CAMEL_BASE_VITA = 50;
 
@@ -54,13 +54,13 @@ public class CcaEntityTestMod implements ModInitializer, EntityComponentInitiali
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerFor(LivingEntity.class, Vita.KEY, CcaEntityTestMod::createForEntity);
-        registry.beginRegistration(PlayerEntity.class, Vita.KEY).impl(PlayerVita.class).end(PlayerVita::new);
-        registry.beginRegistration(CamelEntity.class, Vita.KEY).impl(EntityVita.class).respawnStrategy(RespawnCopyStrategy.ALWAYS_COPY).end(owner -> new EntityVita(owner, CAMEL_BASE_VITA));
-        registry.beginRegistration(ShulkerEntity.class, LoadAwareTestComponent.KEY).impl(LoadAwareTestComponent.class).end(e -> new LoadAwareTestComponent());
+        registry.beginRegistration(Player.class, Vita.KEY).impl(PlayerVita.class).end(PlayerVita::new);
+        registry.beginRegistration(Camel.class, Vita.KEY).impl(EntityVita.class).respawnStrategy(RespawnCopyStrategy.ALWAYS_COPY).end(owner -> new EntityVita(owner, CAMEL_BASE_VITA));
+        registry.beginRegistration(Shulker.class, LoadAwareTestComponent.KEY).impl(LoadAwareTestComponent.class).end(e -> new LoadAwareTestComponent());
     }
 
     @Override
     public void onInitialize() {
-        Registry.register(Registries.ENTITY_TYPE, TEST_ENTITY_ID, TEST_ENTITY);
+        Registry.register(BuiltInRegistries.ENTITY_TYPE, TEST_ENTITY_ID, TEST_ENTITY);
     }
 }

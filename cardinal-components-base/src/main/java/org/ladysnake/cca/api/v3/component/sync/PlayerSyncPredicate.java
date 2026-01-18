@@ -22,13 +22,13 @@
  */
 package org.ladysnake.cca.api.v3.component.sync;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Contract;
 
 public interface PlayerSyncPredicate {
     @Contract(pure = true)
-    boolean shouldSyncWith(ServerPlayerEntity player);
+    boolean shouldSyncWith(ServerPlayer player);
 
     /**
      * If this method returns {@code true} and a client cannot handle a sync packet, they will be disconnected.
@@ -42,7 +42,7 @@ public interface PlayerSyncPredicate {
         return p -> true;
     }
 
-    static PlayerSyncPredicate only(PlayerEntity player) {
+    static PlayerSyncPredicate only(Player player) {
         return p -> p == player;
     }
 }

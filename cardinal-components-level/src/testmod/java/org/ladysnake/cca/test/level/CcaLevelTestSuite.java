@@ -23,18 +23,18 @@
 package org.ladysnake.cca.test.level;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.minecraft.test.TestContext;
-import net.minecraft.text.Text;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import org.ladysnake.cca.test.base.TickingTestComponent;
 
 public class CcaLevelTestSuite {
     @GameTest
-    public void levelComponentsTick(TestContext ctx) {
-        int baseTicks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
-        ctx.waitAndRun(5, () -> {
-            int ticks = ctx.getWorld().getLevelProperties().getComponent(TickingTestComponent.KEY).serverTicks();
-            ctx.assertEquals(5, ticks - baseTicks, Text.literal("Component should tick 5 times -"));
-            ctx.complete();
+    public void levelComponentsTick(GameTestHelper ctx) {
+        int baseTicks = ctx.getLevel().getLevelData().getComponent(TickingTestComponent.KEY).serverTicks();
+        ctx.runAfterDelay(5, () -> {
+            int ticks = ctx.getLevel().getLevelData().getComponent(TickingTestComponent.KEY).serverTicks();
+            ctx.assertValueEqual(5, ticks - baseTicks, Component.literal("Component should tick 5 times -"));
+            ctx.succeed();
         });
     }
 }

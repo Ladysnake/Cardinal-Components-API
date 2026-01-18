@@ -20,26 +20,20 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.level.common;
+package org.ladysnake.cca.mixin.block.common;
 
-import net.minecraft.world.level.ServerWorldProperties;
-import net.minecraft.world.level.UnmodifiableLevelProperties;
-import org.ladysnake.cca.api.v3.component.ComponentContainer;
-import org.ladysnake.cca.api.v3.component.ComponentProvider;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.entity.CommandBlockEntity;
+import org.ladysnake.cca.api.v3.block.BlockEntitySyncCallback;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nonnull;
-
-@Mixin(UnmodifiableLevelProperties.class)
-public abstract class MixinUnmodifiableLevelProperties implements ComponentProvider {
-
-    @Shadow @Final private ServerWorldProperties worldProperties;
-
-    @Nonnull
-    @Override
-    public ComponentContainer getComponentContainer() {
-        return this.worldProperties.asComponentProvider().getComponentContainer();
+@Mixin(ServerPlayer.class)
+public abstract class MixinServerPlayer {
+    @Inject(method = "openCommandBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket;create(Lnet/minecraft/world/level/block/entity/BlockEntity;Ljava/util/function/BiFunction;)Lnet/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket;"))
+    private void syncBlockEntity(CommandBlockEntity commandBlock, CallbackInfo ci) {
+        BlockEntitySyncCallback.EVENT.invoker().onBlockEntitySync((ServerPlayer)(Object) this, commandBlock);
     }
 }

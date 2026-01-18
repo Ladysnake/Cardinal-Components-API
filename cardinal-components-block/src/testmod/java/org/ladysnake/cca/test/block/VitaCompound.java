@@ -22,13 +22,9 @@
  */
 package org.ladysnake.cca.test.block;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
@@ -39,7 +35,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class VitaCompound implements AutoSyncedComponent {
-    public static final ComponentKey<VitaCompound> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.of(CcaBlockTestMod.MOD_ID, "vita_compound"), VitaCompound.class);
+    public static final ComponentKey<VitaCompound> KEY = ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.fromNamespaceAndPath(CcaBlockTestMod.MOD_ID, "vita_compound"), VitaCompound.class);
 
     private final Map<Direction, SyncedVita> storage = new EnumMap<>(Direction.class);
 

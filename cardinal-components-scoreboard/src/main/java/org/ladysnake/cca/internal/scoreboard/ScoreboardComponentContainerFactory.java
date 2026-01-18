@@ -22,8 +22,8 @@
  */
 package org.ladysnake.cca.internal.scoreboard;
 
-import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.scores.Scoreboard;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 

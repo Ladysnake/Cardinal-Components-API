@@ -20,24 +20,13 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.chunk.common;
+package org.ladysnake.cca.mixin.level.common;
 
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.chunk.WrapperProtoChunk;
-import org.ladysnake.cca.api.v3.component.ComponentContainer;
+import net.minecraft.world.level.storage.LevelData;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(WrapperProtoChunk.class)
-public abstract class MixinWrapperProtoChunk implements ComponentProvider {
-    @Shadow
-    @Final
-    private WorldChunk wrapped;
+@Mixin(LevelData.class)
+public interface MixinLevelData extends ComponentProvider {
 
-    @Override
-    public ComponentContainer getComponentContainer() {
-        return this.wrapped.asComponentProvider().getComponentContainer();
-    }
 }

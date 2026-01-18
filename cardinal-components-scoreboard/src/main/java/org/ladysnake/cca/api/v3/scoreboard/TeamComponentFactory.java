@@ -22,15 +22,15 @@
  */
 package org.ladysnake.cca.api.v3.scoreboard;
 
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.Component;
 
 /**
- * A component factory for {@linkplain Team teams}.
+ * A component factory for {@linkplain PlayerTeam teams}.
  *
  * <p>When invoked, the factory must return a {@link Component} of the right type.
  *
@@ -39,7 +39,7 @@ import org.ladysnake.cca.api.v3.component.Component;
 @FunctionalInterface
 public interface TeamComponentFactory<C extends Component> extends TeamComponentFactoryV2<C> {
     @Override
-    default C createForTeam(Team team, Scoreboard scoreboard, @Nullable MinecraftServer server) {
+    default C createForTeam(PlayerTeam team, Scoreboard scoreboard, @Nullable MinecraftServer server) {
         return this.createForTeam(team);
     }
 
@@ -52,5 +52,5 @@ public interface TeamComponentFactory<C extends Component> extends TeamComponent
      * @param team      the team being constructed
      */
     @Contract(pure = true)
-    C createForTeam(Team team);
+    C createForTeam(PlayerTeam team);
 }

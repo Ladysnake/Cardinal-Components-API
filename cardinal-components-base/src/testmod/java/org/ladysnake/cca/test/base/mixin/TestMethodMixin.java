@@ -24,7 +24,7 @@ package org.ladysnake.cca.test.base.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.test.TestContext;
+import net.minecraft.gametest.framework.GameTestHelper;
 import org.ladysnake.cca.test.base.CardinalGameTest;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -36,7 +36,7 @@ public abstract class TestMethodMixin {
     @WrapOperation(method = "lambda$testFunction$0", at = @At(value = "INVOKE", target = "Ljava/lang/reflect/Method;invoke(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;"), remap = false)
     public Object invoke(Method instance, Object obj, Object[] args, Operation<Object> original) {
         if (obj instanceof CardinalGameTest test) {
-            test.invokeTestMethod((TestContext) args[0], instance);
+            test.invokeTestMethod((GameTestHelper) args[0], instance);
             return null;
         } else {
             return original.call(instance, obj, args);

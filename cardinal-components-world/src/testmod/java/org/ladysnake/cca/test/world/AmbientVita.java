@@ -22,13 +22,13 @@
  */
 package org.ladysnake.cca.test.world;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
 import org.ladysnake.cca.test.base.BaseVita;
@@ -42,21 +42,21 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
     public abstract void syncWithAll(MinecraftServer server);
 
     @Override
-    public void applySyncPacket(RegistryByteBuf buf) {
+    public void applySyncPacket(RegistryFriendlyByteBuf buf) {
         int vita = buf.readInt();
         this.setVitality(vita);
-        World world = Objects.requireNonNull(MinecraftClient.getInstance().player).getEntityWorld();
+        Level world = Objects.requireNonNull(Minecraft.getInstance().player).level();
         // Very bad shortcut to get a dimension's name
-        Text worldName = Text.literal(
-            Objects.requireNonNull(world.getRegistryKey() == World.OVERWORLD ? "Overworld" : "Alien World")
+        Component worldName = Component.literal(
+            Objects.requireNonNull(world.dimension() == Level.OVERWORLD ? "Overworld" : "Alien World")
         );
-        Text worldVita = Text.translatable(
+        Component worldVita = Component.translatable(
                 "componenttest:title.world_vitality",
                 Vita.get(world).getVitality(),
-                Vita.get(world.getLevelProperties()).getVitality()
+                Vita.get(world.getLevelData()).getVitality()
         );
-        InGameHud inGameHud = MinecraftClient.getInstance().inGameHud;
-        inGameHud.setTitleTicks(-1, -1, -1);
+        Gui inGameHud = Minecraft.getInstance().gui;
+        inGameHud.setTimes(-1, -1, -1);
         inGameHud.setTitle(worldName);
         inGameHud.setSubtitle(worldVita);
     }
@@ -65,14 +65,14 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
      * proper implementation of {@code writeToPacket}, writes a single int instead of a whole tag
      */
     @Override
-    public void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity player) {
+    public void writeSyncPacket(RegistryFriendlyByteBuf buf, ServerPlayer player) {
         buf.writeInt(this.getVitality());
     }
 
     public static class WorldVita extends AmbientVita implements ClientTickingComponent {
-        private final World world;
+        private final Level world;
 
-        public WorldVita(World world) {
+        public WorldVita(Level world) {
             this.world = world;
         }
 
@@ -88,7 +88,7 @@ public abstract class AmbientVita extends BaseVita implements AutoSyncedComponen
 
         @Override
         public void clientTick() {
-            if (this.world.getTime() % 2400 == 0) {
+            if (this.world.getGameTime() % 2400 == 0) {
                 CardinalGameTest.LOGGER.info("The world still runs, and is now worth {}", this.vitality);
             }
         }

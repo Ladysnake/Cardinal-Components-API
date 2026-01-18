@@ -22,14 +22,14 @@
  */
 package org.ladysnake.cca.test.chunk;
 
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.test.base.BaseVita;
 
 public class ChunkVita extends BaseVita implements AutoSyncedComponent {
-    private final Chunk owner;
+    private final ChunkAccess owner;
 
-    public ChunkVita(Chunk owner) {
+    public ChunkVita(ChunkAccess owner) {
         this.owner = owner;
     }
 
@@ -37,6 +37,6 @@ public class ChunkVita extends BaseVita implements AutoSyncedComponent {
     public void setVitality(int value) {
         super.setVitality(value);
         this.owner.syncComponent(KEY);
-        this.owner.markNeedsSaving();
+        this.owner.markUnsaved();
     }
 }

@@ -23,14 +23,14 @@
 package org.ladysnake.cca.api.v3.chunk;
 
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
 
 /**
  * Entrypoint getting invoked to register <em>static</em> chunk component factories.
  *
  * <p>The entrypoint is exposed as either {@code "cardinal-components"} or {@code "cardinal-components-chunk"} in the mod json and runs for any environment.
- * It usually executes during {@linkplain ModInitializer mod init}, or right before the first {@link Chunk} instance is created, whichever comes first.
+ * It usually executes during {@linkplain ModInitializer mod init}, or right before the first {@link ChunkAccess} instance is created, whichever comes first.
  *
  * @since 2.4.0
  */

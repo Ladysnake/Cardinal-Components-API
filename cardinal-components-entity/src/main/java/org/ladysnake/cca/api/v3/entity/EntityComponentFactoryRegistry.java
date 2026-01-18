@@ -22,8 +22,8 @@
  */
 package org.ladysnake.cca.api.v3.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.ApiStatus;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
@@ -74,17 +74,17 @@ public interface EntityComponentFactoryRegistry {
     <C extends Component, E extends Entity> Registration<C, E> beginRegistration(Class<E> target, ComponentKey<C> key);
 
     /**
-     * Registers a {@link ComponentFactory} for all {@link PlayerEntity} instances.
+     * Registers a {@link ComponentFactory} for all {@link Player} instances.
      *
      * @param key     the key of components to attach
      * @param factory the factory to use to create components of the given key
      * @throws NullPointerException if any of the arguments is {@code null}
      * @since 2.6
      */
-    <C extends RespawnableComponent<? super C>> void registerForPlayers(ComponentKey<? super C> key, ComponentFactory<PlayerEntity, C> factory);
+    <C extends RespawnableComponent<? super C>> void registerForPlayers(ComponentKey<? super C> key, ComponentFactory<Player, C> factory);
 
     /**
-     * Registers a {@link ComponentFactory} for all {@link PlayerEntity} instances, with a specific {@link RespawnCopyStrategy}.
+     * Registers a {@link ComponentFactory} for all {@link Player} instances, with a specific {@link RespawnCopyStrategy}.
      *
      * @param key     the key of components to attach
      * @param factory the factory to use to create components of the given key
@@ -96,7 +96,7 @@ public interface EntityComponentFactoryRegistry {
      * @see Registration#respawnStrategy(RespawnCopyStrategy)
      * @since 2.5.1
      */
-    <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, ComponentFactory<PlayerEntity, P> factory, RespawnCopyStrategy<? super P> respawnStrategy);
+    <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, ComponentFactory<Player, P> factory, RespawnCopyStrategy<? super P> respawnStrategy);
 
     interface Registration<C extends Component, E extends Entity> {
         /**

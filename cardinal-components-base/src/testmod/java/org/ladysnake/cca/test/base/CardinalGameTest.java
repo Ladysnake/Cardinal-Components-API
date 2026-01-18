@@ -22,8 +22,8 @@
  */
 package org.ladysnake.cca.test.base;
 
-import net.minecraft.test.TestContext;
-import net.minecraft.text.Text;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,12 +33,12 @@ import java.lang.reflect.Method;
 public interface CardinalGameTest {
     Logger LOGGER = LogManager.getLogger();
 
-    default void invokeTestMethod(TestContext context, Method method) {
+    default void invokeTestMethod(GameTestHelper context, Method method) {
         try {
             this.setUp();
             if (method.getParameterCount() == 0) {
                 method.invoke(this);
-                context.complete();
+                context.succeed();
             } else {
                 method.invoke(this, context);
             }
@@ -53,7 +53,7 @@ public interface CardinalGameTest {
                 cause = e;
             }
             LOGGER.error("Failed test", cause);
-            throw context.createError(Text.literal(message));
+            throw context.assertionException(Component.literal(message));
         } finally {
             this.tearDown(context);
         }
@@ -63,7 +63,7 @@ public interface CardinalGameTest {
 
     }
 
-    default void tearDown(TestContext ctx) {
+    default void tearDown(GameTestHelper ctx) {
 
     }
 }

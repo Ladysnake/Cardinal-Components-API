@@ -23,12 +23,12 @@
 package org.ladysnake.cca.mixin.entity.common;
 
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.minecraft.entity.Entity;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.world.World;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
@@ -54,7 +54,7 @@ public abstract class MixinEntity implements ComponentProvider {
     private ComponentContainer components;
 
     @Shadow
-    private World world;
+    private Level level;
 
     @Shadow public abstract int getId();
 
@@ -63,13 +63,13 @@ public abstract class MixinEntity implements ComponentProvider {
         this.components = CardinalEntityInternals.createEntityComponentContainer((Entity) (Object) this);
     }
 
-    @Inject(method = "writeData", at = @At("RETURN"))
-    private void toTag(WriteView view, CallbackInfo ci) {
+    @Inject(method = "saveWithoutId", at = @At("RETURN"))
+    private void toTag(ValueOutput view, CallbackInfo ci) {
         this.components.writeData(view);
     }
 
-    @Inject(method = "readData", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomData(Lnet/minecraft/storage/ReadView;)V", shift = At.Shift.AFTER))
-    private void fromTag(ReadView view, CallbackInfo ci) {
+    @Inject(method = "load", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;readAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueInput;)V", shift = At.Shift.AFTER))
+    private void fromTag(ValueInput view, CallbackInfo ci) {
         this.components.readData(view);
     }
 
@@ -80,11 +80,11 @@ public abstract class MixinEntity implements ComponentProvider {
     }
 
     @Override
-    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
+    public Iterable<ServerPlayer> getRecipientsForComponentSync() {
         Entity holder = (Entity) (Object) this;
-        if (!this.world.isClient()) {
-            Deque<ServerPlayerEntity> watchers = new ArrayDeque<>(PlayerLookup.tracking(holder));
-            if (holder instanceof ServerPlayerEntity player && player.networkHandler != null) {
+        if (!this.level.isClientSide()) {
+            Deque<ServerPlayer> watchers = new ArrayDeque<>(PlayerLookup.tracking(holder));
+            if (holder instanceof ServerPlayer player && player.connection != null) {
                 watchers.addFirst(player);
             }
             return watchers;
@@ -94,7 +94,7 @@ public abstract class MixinEntity implements ComponentProvider {
 
     @SuppressWarnings("AddedMixinMembersNamePattern")   // it's okay, we have custom types in the descriptor
     @Override
-    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
+    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryFriendlyByteBuf data) {
         return new ComponentUpdatePayload<>(
             CardinalComponentsEntity.PACKET_ID,
             this.getId(),

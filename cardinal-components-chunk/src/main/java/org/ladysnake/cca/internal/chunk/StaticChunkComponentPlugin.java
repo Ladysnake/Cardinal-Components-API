@@ -24,7 +24,7 @@ package org.ladysnake.cca.internal.chunk;
 
 import com.google.common.base.Suppliers;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import org.ladysnake.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.chunk.ChunkComponentInitializer;
 import org.ladysnake.cca.api.v3.component.Component;
@@ -36,17 +36,17 @@ import org.ladysnake.cca.internal.base.asm.StaticComponentPluginBase;
 import java.util.Collection;
 import java.util.function.Supplier;
 
-public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<Chunk, ChunkComponentInitializer> implements ChunkComponentFactoryRegistry {
+public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<ChunkAccess, ChunkComponentInitializer> implements ChunkComponentFactoryRegistry {
     public static final StaticChunkComponentPlugin INSTANCE = new StaticChunkComponentPlugin();
-    private static final Supplier<ComponentContainer.Factory<Chunk>> componentsContainerFactory
+    private static final Supplier<ComponentContainer.Factory<ChunkAccess>> componentsContainerFactory
         = Suppliers.memoize(INSTANCE::buildContainerFactory);
 
-    public static ComponentContainer createContainer(Chunk chunk) {
+    public static ComponentContainer createContainer(ChunkAccess chunk) {
         return componentsContainerFactory.get().createContainer(chunk);
     }
 
     private StaticChunkComponentPlugin() {
-        super("loading a chunk", Chunk.class);
+        super("loading a chunk", ChunkAccess.class);
     }
 
     @Override
@@ -60,12 +60,12 @@ public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<C> type, ComponentFactory<Chunk, ? extends C> factory) {
+    public <C extends Component> void register(ComponentKey<C> type, ComponentFactory<ChunkAccess, ? extends C> factory) {
         this.register(type, type.getComponentClass(), factory);
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<Chunk, ? extends C> factory) {
+    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<ChunkAccess, ? extends C> factory) {
         this.checkLoading(ChunkComponentFactoryRegistry.class, "register");
         super.register(type, factory);
     }

@@ -22,26 +22,26 @@
  */
 package org.ladysnake.cca.internal;
 
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public record BlockEntityAddress(
-    BlockEntityType<?> beType,
-    BlockPos bePos,
-    RegistryKey<World> worldKey
+        BlockEntityType<?> beType,
+        BlockPos bePos,
+        ResourceKey<Level> worldKey
 ) {
 
-    public static final PacketCodec<RegistryByteBuf, BlockEntityAddress> CODEC = PacketCodec.tuple(
-        PacketCodecs.entryOf(Registries.BLOCK_ENTITY_TYPE), BlockEntityAddress::beType,
-        BlockPos.PACKET_CODEC, BlockEntityAddress::bePos,
-        RegistryKey.createPacketCodec(RegistryKeys.WORLD), BlockEntityAddress::worldKey,
+    public static final StreamCodec<RegistryFriendlyByteBuf, BlockEntityAddress> CODEC = StreamCodec.composite(
+        ByteBufCodecs.idMapper(BuiltInRegistries.BLOCK_ENTITY_TYPE), BlockEntityAddress::beType,
+        BlockPos.STREAM_CODEC, BlockEntityAddress::bePos,
+        ResourceKey.streamCodec(Registries.DIMENSION), BlockEntityAddress::worldKey,
         BlockEntityAddress::new
     );
 }

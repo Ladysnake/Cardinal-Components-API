@@ -24,7 +24,7 @@ package org.ladysnake.cca.internal;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.internal.base.CcaClientInternals;
 import qouteall.imm_ptl.core.ClientWorldLoader;
@@ -40,17 +40,17 @@ public class CcaBlockClient {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             CcaClientInternals.registerComponentSync(CardinalComponentsBlock.PACKET_ID,
                 (payload, ctx) -> payload.componentKey().flatMap(key -> {
-                    World world;
+                    Level world;
                     if (hasImmersivePortals) {
                         world = ClientWorldLoader.getOptionalWorld(payload.targetData().worldKey());
                         if (world == null) {
                             return Optional.empty();
                         }
                     } else {
-                        world = ctx.client().world;
+                        world = ctx.client().level;
                     }
 
-                    return key.maybeGet(payload.targetData().beType().get(
+                    return key.maybeGet(payload.targetData().beType().getBlockEntity(
                         world,
                         payload.targetData().bePos()
                     ));

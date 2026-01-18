@@ -23,7 +23,7 @@
 package org.ladysnake.cca.mixin.level.common;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.SaveProperties;
+import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,10 +34,10 @@ import java.util.function.BooleanSupplier;
 
 @Mixin(MinecraftServer.class)
 public abstract class MixinMinecraftServer {
-    @Shadow public abstract SaveProperties getSaveProperties();
+    @Shadow public abstract WorldData getWorldData();
 
-    @Inject(at = @At("TAIL"), method = "tick")
+    @Inject(at = @At("TAIL"), method = "tickServer")
     private void onEndTick(BooleanSupplier shouldKeepTicking, CallbackInfo info) {
-        this.getSaveProperties().getMainWorldProperties().asComponentProvider().getComponentContainer().tickServerComponents();
+        this.getWorldData().overworldData().asComponentProvider().getComponentContainer().tickServerComponents();
     }
 }

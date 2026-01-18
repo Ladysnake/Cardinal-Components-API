@@ -24,8 +24,8 @@ package org.ladysnake.cca.api.v3.scoreboard;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.scores.Scoreboard;
 
 /**
  * The callback interface for receiving scoreboard synchronization events.
@@ -41,5 +41,5 @@ public interface ScoreboardSyncCallback {
     /**
      * Called when a team's data is sent to a player
      */
-    void onScoreboardSync(ServerPlayerEntity player, Scoreboard scoreboard);
+    void onScoreboardSync(ServerPlayer player, Scoreboard scoreboard);
 }

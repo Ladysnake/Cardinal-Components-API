@@ -29,7 +29,7 @@ import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
  * Entrypoint getting invoked to register <em>static</em> team component factories.
  *
  * <p>The entrypoint is exposed as either {@code "cardinal-components"} or {@code "cardinal-components-scoreboard"} in the mod json and runs for any environment.
- * It usually executes during {@linkplain ModInitializer mod init}, or right before the first {@link net.minecraft.scoreboard.Scoreboard} instance is created, whichever comes first.
+ * It usually executes during {@linkplain ModInitializer mod init}, or right before the first {@link net.minecraft.world.scores.Scoreboard} instance is created, whichever comes first.
  *
  * @since 2.4.2
  */

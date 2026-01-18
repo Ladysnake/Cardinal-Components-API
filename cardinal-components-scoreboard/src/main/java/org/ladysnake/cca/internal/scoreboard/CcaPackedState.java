@@ -22,10 +22,10 @@
  */
 package org.ladysnake.cca.internal.scoreboard;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.Nullable;
 
 public interface CcaPackedState {
-    @Nullable NbtCompound cca$getSerializedComponents();
-    void cca$setSerializedComponents(@Nullable NbtCompound nbt);
+    @Nullable CompoundTag cca$getSerializedComponents();
+    void cca$setSerializedComponents(@Nullable CompoundTag nbt);
 }

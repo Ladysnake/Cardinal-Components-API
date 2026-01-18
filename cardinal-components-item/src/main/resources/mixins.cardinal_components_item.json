@@ -2,9 +2,9 @@
   "required": true,
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
-  "package": "org.ladysnake.cca.mixin.item",
+  "package": "org.ladysnake.cca.mixin.item.common",
   "mixins": [
-    "common.MixinItemStackComponentizationFix"
+    "MixinItemStackComponentizationFix"
   ],
   "injectors": {
     "defaultRequire": 1

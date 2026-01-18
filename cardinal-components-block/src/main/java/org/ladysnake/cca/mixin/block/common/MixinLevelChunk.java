@@ -20,22 +20,30 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.scoreboard;
+package org.ladysnake.cca.mixin.block.common;
 
-import net.minecraft.scoreboard.ScoreboardState;
-import net.minecraft.world.PersistentState;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.chunk.LevelChunk;
+import org.jetbrains.annotations.Nullable;
+import org.ladysnake.cca.internal.block.StaticBlockComponentPlugin;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Mixin(PersistentState.class)
-public abstract class MixinPersistentState {
-    @Inject(method = "isDirty", at = @At("RETURN"), cancellable = true)
-    private void forceDirty(CallbackInfoReturnable<Boolean> cir) {
-        //noinspection ConstantConditions
-        if (!cir.getReturnValueZ() && (Object) this instanceof ScoreboardState) {
-            cir.setReturnValue(true);
-        }
+@Mixin(LevelChunk.class)
+public abstract class MixinLevelChunk {
+
+    @Shadow
+    @Final
+    Level level;
+
+    @Nullable
+    @ModifyVariable(method = "updateBlockEntityTicker", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/level/block/state/BlockState;getBlockEntityTicker(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/entity/BlockEntityType;)Lnet/minecraft/world/level/block/entity/BlockEntityTicker;"))
+    private <T extends BlockEntity> BlockEntityTicker<T> getBlockEntityTicker(BlockEntityTicker<T> base, T blockEntity) {
+        return StaticBlockComponentPlugin.INSTANCE.getComponentTicker(this.level, blockEntity, base);
     }
 }

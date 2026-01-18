@@ -31,7 +31,7 @@ public final class CcaWorldClient {
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsWorld.PACKET_ID,
                 (payload, ctx) -> payload.componentKey().flatMap(
-                    key -> key.maybeGet(ctx.client().world)
+                    key -> key.maybeGet(ctx.client().level)
                 )
             );
         }

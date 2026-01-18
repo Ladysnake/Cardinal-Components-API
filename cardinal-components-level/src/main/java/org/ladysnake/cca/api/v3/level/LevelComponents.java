@@ -23,8 +23,8 @@
 package org.ladysnake.cca.api.v3.level;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.WorldProperties;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.storage.LevelData;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
@@ -34,11 +34,11 @@ import org.ladysnake.cca.api.v3.component.sync.PlayerSyncPredicate;
 import java.util.NoSuchElementException;
 
 /**
- * Static helper methods for components attached to {@link WorldProperties}
+ * Static helper methods for components attached to {@link LevelData}
  */
 public final class LevelComponents {
     /**
-     * Attempts to synchronize the component attached to the main {@link WorldProperties} of the given {@link MinecraftServer}.
+     * Attempts to synchronize the component attached to the main {@link LevelData} of the given {@link MinecraftServer}.
      *
      * <p>This method has no visible effect if the component associated with the key
      * does not implement an adequate synchronization interface.
@@ -46,14 +46,14 @@ public final class LevelComponents {
      * @throws NoSuchElementException if the provider does not provide this type of component
      */
     public static void sync(ComponentKey<?> key, MinecraftServer server) {
-        WorldProperties props = server.getSaveProperties().getMainWorldProperties();
-        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+        LevelData props = server.getWorldData().overworldData();
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             key.syncWith(player, props.asComponentProvider());
         }
     }
 
     /**
-     * Attempts to synchronize the component attached to the main {@link WorldProperties} of the given {@link MinecraftServer}.
+     * Attempts to synchronize the component attached to the main {@link LevelData} of the given {@link MinecraftServer}.
      *
      * <p>This method has no visible effect if the component associated with the key
      * does not implement an adequate synchronization interface.
@@ -62,17 +62,17 @@ public final class LevelComponents {
      * @throws NoSuchElementException if the provider does not provide this type of component
      */
     public static void sync(ComponentKey<?> key, MinecraftServer server, ComponentPacketWriter packetWriter) {
-        WorldProperties props = server.getSaveProperties().getMainWorldProperties();
+        LevelData props = server.getWorldData().overworldData();
         Component c = key.get(props);
         if (c instanceof AutoSyncedComponent sc) {
-            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 key.syncWith(player, props.asComponentProvider(), packetWriter, sc);
             }
         }
     }
 
     /**
-     * Attempts to synchronize the component attached to the main {@link WorldProperties} of the given {@link MinecraftServer}.
+     * Attempts to synchronize the component attached to the main {@link LevelData} of the given {@link MinecraftServer}.
      *
      * <p>This method has no visible effect if the component associated with the key
      * does not implement an adequate synchronization interface.
@@ -82,8 +82,8 @@ public final class LevelComponents {
      * @throws NoSuchElementException if the provider does not provide this type of component
      */
     public static void sync(ComponentKey<?> key, MinecraftServer server, ComponentPacketWriter packetWriter, PlayerSyncPredicate predicate) {
-        WorldProperties props = server.getSaveProperties().getMainWorldProperties();
-        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+        LevelData props = server.getWorldData().overworldData();
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             key.syncWith(player, props.asComponentProvider(), packetWriter, predicate);
         }
     }

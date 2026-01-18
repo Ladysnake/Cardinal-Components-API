@@ -20,21 +20,36 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.scoreboard;
+package org.ladysnake.cca.mixin.chunk.common;
 
-import net.minecraft.scoreboard.ServerScoreboard;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.ladysnake.cca.api.v3.scoreboard.ScoreboardSyncCallback;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.PalettedContainerFactory;
+import net.minecraft.world.level.chunk.UpgradeData;
+import net.minecraft.world.level.levelgen.blending.BlendingData;
+import org.ladysnake.cca.api.v3.component.ComponentContainer;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.ladysnake.cca.internal.chunk.StaticChunkComponentPlugin;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(PlayerManager.class)
-public abstract class MixinPlayerManager {
-    @Inject(method = "sendScoreboard", at = @At("RETURN"))
-    private void syncTeamComponents(ServerScoreboard scoreboard, ServerPlayerEntity player, CallbackInfo ci) {
-        ScoreboardSyncCallback.EVENT.invoker().onScoreboardSync(player, scoreboard);
+@Mixin(ChunkAccess.class)
+public abstract class MixinChunkAccess implements ComponentProvider {
+    @Unique
+    private ComponentContainer components;
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void initComponents(ChunkPos pos, UpgradeData upgradeData, LevelHeightAccessor heightLimitView, PalettedContainerFactory palettesFactory, long inhabitedTime, LevelChunkSection[] sectionArray, BlendingData blendingData, CallbackInfo ci) {
+        this.components = StaticChunkComponentPlugin.createContainer((ChunkAccess) (Object) this);
+    }
+
+    @Override
+    public ComponentContainer getComponentContainer() {
+        return this.components;
     }
 }

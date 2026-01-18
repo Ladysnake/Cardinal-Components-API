@@ -24,12 +24,12 @@ package org.ladysnake.cca.test.block;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.CommandBlockBlockEntity;
-import net.minecraft.block.entity.EndGatewayBlockEntity;
-import net.minecraft.block.entity.EndPortalBlockEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.CommandBlockEntity;
+import net.minecraft.world.level.block.entity.TheEndGatewayBlockEntity;
+import net.minecraft.world.level.block.entity.TheEndPortalBlockEntity;
 import org.ladysnake.cca.api.v3.block.BlockComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.block.BlockComponentInitializer;
 import org.ladysnake.cca.api.v3.block.BlockComponents;
@@ -39,13 +39,13 @@ import org.ladysnake.cca.test.base.Vita;
 
 public class CcaBlockTestMod implements ModInitializer, BlockComponentInitializer {
     public static final String MOD_ID = "cca-block-test";
-    public static final BlockApiLookup<Vita, Direction> VITA_API_LOOKUP = BlockApiLookup.get(Identifier.of(MOD_ID, "sided_vita"), Vita.class, Direction.class);
+    public static final BlockApiLookup<Vita, Direction> VITA_API_LOOKUP = BlockApiLookup.get(Identifier.fromNamespaceAndPath(MOD_ID, "sided_vita"), Vita.class, Direction.class);
 
     @Override
     public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
-        registry.registerFor(EndGatewayBlockEntity.class, VitaCompound.KEY, VitaCompound::new);
-        registry.registerFor(EndPortalBlockEntity.class, TickingTestComponent.KEY, be -> new TickingTestComponent());
-        registry.registerFor(CommandBlockBlockEntity.class, LoadAwareTestComponent.KEY, be -> new LoadAwareTestComponent());
+        registry.registerFor(TheEndGatewayBlockEntity.class, VitaCompound.KEY, VitaCompound::new);
+        registry.registerFor(TheEndPortalBlockEntity.class, TickingTestComponent.KEY, be -> new TickingTestComponent());
+        registry.registerFor(CommandBlockEntity.class, LoadAwareTestComponent.KEY, be -> new LoadAwareTestComponent());
     }
 
     @Override

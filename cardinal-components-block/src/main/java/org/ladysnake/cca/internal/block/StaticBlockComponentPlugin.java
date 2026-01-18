@@ -24,9 +24,9 @@ package org.ladysnake.cca.internal.block;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.block.BlockComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.block.BlockComponentInitializer;
@@ -67,14 +67,14 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     private final Set<Class<? extends BlockEntity>> serverTicking = new ReferenceOpenHashSet<>();
 
     @Nullable
-    public <T extends BlockEntity> BlockEntityTicker<T> getComponentTicker(World world, T be, @Nullable BlockEntityTicker<T> base) {
-        if (world.isClient() && this.clientTicking.contains(be.getClass())) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getComponentTicker(Level world, T be, @Nullable BlockEntityTicker<T> base) {
+        if (world.isClientSide() && this.clientTicking.contains(be.getClass())) {
             if (base == null) return (w, pos, state, blockEntity) -> blockEntity.asComponentProvider().getComponentContainer().tickClientComponents();
             return (w, pos, state, blockEntity) -> {
                 blockEntity.asComponentProvider().getComponentContainer().tickClientComponents();
                 base.tick(w, pos, state, blockEntity);
             };
-        } else if (!world.isClient() && this.serverTicking.contains(be.getClass())) {
+        } else if (!world.isClientSide() && this.serverTicking.contains(be.getClass())) {
             if (base == null) return (w, pos, state, blockEntity) -> blockEntity.asComponentProvider().getComponentContainer().tickServerComponents();
             return (w, pos, state, blockEntity) -> {
                 blockEntity.asComponentProvider().getComponentContainer().tickServerComponents();

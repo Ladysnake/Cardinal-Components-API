@@ -24,7 +24,7 @@ package org.ladysnake.cca.api.v3.entity;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * The callback interface for receiving player synchronization events.
@@ -40,5 +40,5 @@ public interface PlayerSyncCallback {
     /**
      * Called when a player eg. joins the server or changes dimension, can be used to synchronize the player's own data
      */
-    void onPlayerSync(ServerPlayerEntity player);
+    void onPlayerSync(ServerPlayer player);
 }

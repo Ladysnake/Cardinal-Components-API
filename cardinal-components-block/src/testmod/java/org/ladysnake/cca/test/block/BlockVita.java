@@ -22,8 +22,8 @@
  */
 package org.ladysnake.cca.test.block;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 import org.ladysnake.cca.test.base.BaseVita;
@@ -43,8 +43,8 @@ public class BlockVita extends BaseVita implements AutoSyncedComponent, ServerTi
 
     @Override
     public void serverTick() {
-        World world = this.owner.getWorld();
-        if (world != null && world.getTime() % 3 == 0) {
+        Level world = this.owner.getLevel();
+        if (world != null && world.getGameTime() % 3 == 0) {
             this.setVitality(this.getVitality() + 1);
         }
     }

@@ -25,10 +25,10 @@ package org.ladysnake.cca.internal.scoreboard;
 import com.mojang.datafixers.util.Unit;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.scores.PlayerTeam;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
@@ -39,30 +39,30 @@ import org.ladysnake.cca.internal.base.MorePacketCodecs;
 
 public final class CardinalComponentsScoreboard {
     /**
-     * {@link CustomPayloadS2CPacket} channel for default scoreboard component synchronization.
+     * {@link ClientboundCustomPayloadPacket} channel for default scoreboard component synchronization.
      *
-     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryFriendlyByteBuf)}
      * called on the game thread.
      */
-    public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> SCOREBOARD_PACKET_ID = ComponentUpdatePayload.id("scoreboard_sync");
+    public static final CustomPacketPayload.Type<ComponentUpdatePayload<Unit>> SCOREBOARD_PACKET_ID = ComponentUpdatePayload.id("scoreboard_sync");
     /**
-     * {@link CustomPayloadS2CPacket} channel for default team component synchronization.
+     * {@link ClientboundCustomPayloadPacket} channel for default team component synchronization.
      *
-     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryFriendlyByteBuf)}
      * called on the game thread.
      */
-    public static final CustomPayload.Id<ComponentUpdatePayload<String>> TEAM_PACKET_ID = ComponentUpdatePayload.id("team_sync");
+    public static final CustomPacketPayload.Type<ComponentUpdatePayload<String>> TEAM_PACKET_ID = ComponentUpdatePayload.id("team_sync");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             ComponentUpdatePayload.register(SCOREBOARD_PACKET_ID, MorePacketCodecs.EMPTY);
-            ComponentUpdatePayload.register(TEAM_PACKET_ID, PacketCodecs.STRING);
+            ComponentUpdatePayload.register(TEAM_PACKET_ID, ByteBufCodecs.STRING_UTF8);
             ScoreboardSyncCallback.EVENT.register((player, tracked) -> {
                 for (ComponentKey<?> key : tracked.asComponentProvider().getComponentContainer().keys()) {
                     key.syncWith(player, tracked.asComponentProvider());
                 }
 
-                for (Team team : tracked.getTeams()) {
+                for (PlayerTeam team : tracked.getPlayerTeams()) {
                     for (ComponentKey<?> key : team.asComponentProvider().getComponentContainer().keys()) {
                         key.syncWith(player, team.asComponentProvider());
                     }

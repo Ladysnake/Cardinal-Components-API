@@ -23,10 +23,10 @@
 package org.ladysnake.cca.mixin.world.common;
 
 import com.mojang.datafixers.util.Unit;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.PersistentStateManager;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
@@ -41,18 +41,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-@Mixin(ServerWorld.class)
-public abstract class MixinServerWorld extends MixinWorld {
-    @Shadow public abstract PersistentStateManager getPersistentStateManager();
+@Mixin(ServerLevel.class)
+public abstract class MixinServerLevel extends MixinLevel {
+    @Shadow public abstract DimensionDataStorage getDataStorage();
 
     @Shadow
-    public abstract List<ServerPlayerEntity> getPlayers();
+    public abstract List<ServerPlayer> players();
 
     @Inject(at = @At("RETURN"), method = "<init>*")
     private void constructor(CallbackInfo ci) {
         try {
             ComponentPersistentState.LOADING.set(true);
-            this.getPersistentStateManager().getOrCreate(ComponentPersistentState.stateType(components, getRegistryManager()));
+            this.getDataStorage().computeIfAbsent(ComponentPersistentState.stateType(components, registryAccess()));
         } finally {
             ComponentPersistentState.LOADING.set(false);
         }
@@ -64,12 +64,12 @@ public abstract class MixinServerWorld extends MixinWorld {
     }
 
     @Override
-    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
-        return this.getPlayers();
+    public Iterable<ServerPlayer> getRecipientsForComponentSync() {
+        return this.players();
     }
 
     @Override
-    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
+    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryFriendlyByteBuf data) {
         return new ComponentUpdatePayload<>(
             CardinalComponentsWorld.PACKET_ID,
             Unit.INSTANCE,

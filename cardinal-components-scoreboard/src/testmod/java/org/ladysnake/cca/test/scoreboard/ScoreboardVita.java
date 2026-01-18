@@ -22,11 +22,11 @@
  */
 package org.ladysnake.cca.test.scoreboard;
 
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.scores.Scoreboard;
 import org.ladysnake.cca.test.base.SyncedVita;
 
 public class ScoreboardVita extends SyncedVita {
@@ -35,17 +35,17 @@ public class ScoreboardVita extends SyncedVita {
     }
 
     @Override
-    public void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity recipient) {
+    public void writeSyncPacket(RegistryFriendlyByteBuf buf, ServerPlayer recipient) {
         super.writeSyncPacket(buf, recipient);
     }
 
     @Override
-    public void writeData(WriteView writeView) {
+    public void writeData(ValueOutput writeView) {
         super.writeData(writeView);
     }
 
     @Override
-    public void readData(ReadView readView) {
+    public void readData(ValueInput readView) {
         super.readData(readView);
     }
 }

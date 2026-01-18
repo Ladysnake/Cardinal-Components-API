@@ -22,8 +22,8 @@
  */
 package org.ladysnake.cca.api.v3.component;
 
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -31,12 +31,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface TransientComponent extends Component {
     @Override
-    default void readData(ReadView readView) {
+    default void readData(ValueInput readView) {
         // Nothing to read
     }
 
     @Override
-    default void writeData(WriteView writeView) {
+    default void writeData(ValueOutput writeView) {
         // Nothing to write
     }
 

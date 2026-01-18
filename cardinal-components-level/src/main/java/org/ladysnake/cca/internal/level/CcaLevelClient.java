@@ -33,7 +33,7 @@ public final class CcaLevelClient {
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsLevel.PACKET_ID,
                 (payload, ctx) -> payload.componentKey().flatMap(
-                    key -> key.maybeGet(Objects.requireNonNull(ctx.client().world).getLevelProperties())
+                    key -> key.maybeGet(Objects.requireNonNull(ctx.client().level).getLevelData())
                 )
             );
         }

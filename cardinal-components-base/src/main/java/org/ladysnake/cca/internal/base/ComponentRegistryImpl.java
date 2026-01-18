@@ -24,7 +24,7 @@ package org.ladysnake.cca.internal.base;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;

@@ -20,25 +20,26 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.chunk.common;
+package org.ladysnake.cca.mixin.entity.client;
 
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.EmptyChunk;
-import net.minecraft.world.chunk.WorldChunk;
-import org.jetbrains.annotations.NotNull;
-import org.ladysnake.cca.api.v3.component.ComponentContainer;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.Entity;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(EmptyChunk.class)
-public abstract class MixinEmptyChunk extends WorldChunk implements ComponentProvider {
-    public MixinEmptyChunk(World world, ChunkPos pos) {
-        super(world, pos);
+@Mixin(ClientLevel.class)
+public abstract class MixinClientLevel {
+
+    @Inject(method = "tickNonPassenger", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V", shift = At.Shift.AFTER))
+    private void tick(Entity entity, CallbackInfo ci) {
+        ((ComponentProvider) entity).getComponentContainer().tickClientComponents();
     }
 
-    @Override
-    public @NotNull ComponentContainer getComponentContainer() {
-        return ComponentContainer.EMPTY;
+    @Inject(method = "tickPassenger", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;rideTick()V", shift = At.Shift.AFTER))
+    private void tickRiding(Entity vehicle, Entity passenger, CallbackInfo ci) {
+        ((ComponentProvider) passenger).getComponentContainer().tickClientComponents();
     }
 }

@@ -23,11 +23,11 @@
 package org.ladysnake.cca.test.scoreboard;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.minecraft.scoreboard.ScoreboardState;
-import net.minecraft.scoreboard.ServerScoreboard;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.test.TestContext;
-import net.minecraft.text.Text;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.ServerScoreboard;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.ScoreboardSaveData;
 import org.ladysnake.cca.test.base.CardinalGameTest;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.Vita;
@@ -37,41 +37,41 @@ public class CcaScoreboardTestSuite implements CardinalGameTest {
     public static final String TEST_TEAM_NAME = "cca-team-test";
 
     @GameTest
-    public void serverLoadWorks(TestContext ctx) {
-        ctx.assertEquals(
-            ctx.getWorld().getScoreboard().getComponent(LoadAwareTestComponent.KEY).getLoadCounter(), 1,
-            Text.literal("Load counter should be incremented once when the server gets loaded -")
+    public void serverLoadWorks(GameTestHelper ctx) {
+        ctx.assertValueEqual(
+            ctx.getLevel().getScoreboard().getComponent(LoadAwareTestComponent.KEY).getLoadCounter(), 1,
+            Component.literal("Load counter should be incremented once when the server gets loaded -")
         );
-        ctx.complete();
+        ctx.succeed();
     }
 
     @GameTest
-    public void componentSerializesCorrectly(TestContext ctx) {
-        ServerScoreboard scoreboard = ctx.getWorld().getScoreboard();
+    public void componentSerializesCorrectly(GameTestHelper ctx) {
+        ServerScoreboard scoreboard = ctx.getLevel().getScoreboard();
         scoreboard.getComponent(Vita.KEY).setVitality(42);
-        Team testTeam = scoreboard.addTeam(TEST_TEAM_NAME);
+        PlayerTeam testTeam = scoreboard.addPlayerTeam(TEST_TEAM_NAME);
         testTeam.getComponent(Vita.KEY).setVitality(420);
-        ScoreboardState state = ScoreboardState.TYPE.constructor().get();
-        scoreboard.writeTo(state);
+        ScoreboardSaveData state = ScoreboardSaveData.TYPE.constructor().get();
+        scoreboard.storeToSaveDataIfDirty(state);
         scoreboard.getComponent(Vita.KEY).setVitality(0);
-        scoreboard.removeTeam(testTeam);
-        ctx.assertEquals(
+        scoreboard.removePlayerTeam(testTeam);
+        ctx.assertValueEqual(
             0, scoreboard.getComponent(Vita.KEY).getVitality(),
-            Text.literal("reset vita")
+            Component.literal("reset vita")
         );
-        ctx.assertTrue("Reset team should be null", scoreboard.getTeam(TEST_TEAM_NAME) == null);
-        scoreboard.read(state.getPackedState());
-        ctx.assertEquals(
+        ctx.assertTrue("Reset team should be null", scoreboard.getPlayerTeam(TEST_TEAM_NAME) == null);
+        scoreboard.load(state.getData());
+        ctx.assertValueEqual(
             42, scoreboard.getComponent(Vita.KEY).getVitality(),
-            Text.literal("deserialized vita")
+            Component.literal("deserialized vita")
         );
-        Team deserializedTeam = scoreboard.getTeam(TEST_TEAM_NAME);
+        PlayerTeam deserializedTeam = scoreboard.getPlayerTeam(TEST_TEAM_NAME);
         ctx.assertFalse("Deserialized team should not be null", deserializedTeam == null);
         assert deserializedTeam != null;
-        ctx.assertEquals(
+        ctx.assertValueEqual(
             420, deserializedTeam.getComponent(Vita.KEY).getVitality(),
-            Text.literal("deserialized vita")
+            Component.literal("deserialized vita")
         );
-        ctx.complete();
+        ctx.succeed();
     }
 }

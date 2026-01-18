@@ -29,17 +29,17 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.conversion.EntityConversionContext;
-import net.minecraft.entity.conversion.EntityConversionType;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.rule.GameRules;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.ConversionParams;
+import net.minecraft.world.entity.ConversionType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.gamerules.GameRules;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
@@ -58,26 +58,26 @@ import java.util.Set;
 
 public final class CardinalComponentsEntity {
     /**
-     * {@link CustomPayloadS2CPacket} channel for default entity component synchronization.
+     * {@link ClientboundCustomPayloadPacket} channel for default entity component synchronization.
      *
-     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryFriendlyByteBuf)}
      * called on the game thread.
      */
-    public static final CustomPayload.Id<ComponentUpdatePayload<Integer>> PACKET_ID = ComponentUpdatePayload.id("entity_sync");
+    public static final CustomPacketPayload.Type<ComponentUpdatePayload<Integer>> PACKET_ID = ComponentUpdatePayload.id("entity_sync");
     /**
-     * {@link net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket} channel for C2S player component messages.
+     * {@link net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket} channel for C2S player component messages.
      *
      * <p> Packets emitted on this channel must begin with the {@link ComponentKey#getId() component's type} (as an Identifier).
      *
-     * <p> Components synchronized through this channel will have {@linkplain org.ladysnake.cca.api.v3.entity.C2SSelfMessagingComponent#handleC2SMessage(net.minecraft.network.RegistryByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain org.ladysnake.cca.api.v3.entity.C2SSelfMessagingComponent#handleC2SMessage(net.minecraft.network.RegistryFriendlyByteBuf)}
      * called on the game thread.
      */
-    public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> C2S_SELF_PACKET_ID = ComponentUpdatePayload.id("player_message_c2s");
+    public static final CustomPacketPayload.Type<ComponentUpdatePayload<Unit>> C2S_SELF_PACKET_ID = ComponentUpdatePayload.id("player_message_c2s");
     private static final Set<Identifier> unknownC2SPlayerComponents = new HashSet<>();
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
-            ComponentUpdatePayload.register(PACKET_ID, PacketCodecs.VAR_INT);
+            ComponentUpdatePayload.register(PACKET_ID, ByteBufCodecs.VAR_INT);
             PayloadTypeRegistry.playC2S().register(C2S_SELF_PACKET_ID, ComponentUpdatePayload.codec(C2S_SELF_PACKET_ID, MorePacketCodecs.EMPTY));
             PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
             TrackingStartCallback.EVENT.register(CardinalComponentsEntity::syncEntityComponents);
@@ -108,32 +108,32 @@ public final class CardinalComponentsEntity {
         StaticEntityComponentPlugin.INSTANCE.ensureInitialized();
     }
 
-    private static void copyData(LivingEntity original, LivingEntity clone, EntityConversionContext context) {
+    private static void copyData(LivingEntity original, LivingEntity clone, ConversionParams context) {
         Set<ComponentKey<?>> keys = ((ComponentProvider) original).getComponentContainer().keys();
 
         for (ComponentKey<?> key : keys) {
             if (key.isProvidedBy(clone)) {
-                copyData(original, clone, original.getRegistryManager(), false, context.keepEquipment(), context.type() == EntityConversionType.SINGLE, key);
+                copyData(original, clone, original.registryAccess(), false, context.keepEquipment(), context.type() == ConversionType.SINGLE, key);
             }
         }
     }
 
-    private static void copyData(ServerPlayerEntity original, ServerPlayerEntity clone, boolean lossless) {
-        boolean keepInventory = original.getEntityWorld().getGameRules().getValue(GameRules.KEEP_INVENTORY) || clone.isSpectator();
+    private static void copyData(ServerPlayer original, ServerPlayer clone, boolean lossless) {
+        boolean keepInventory = original.level().getGameRules().get(GameRules.KEEP_INVENTORY) || clone.isSpectator();
         Set<ComponentKey<?>> keys = ((ComponentProvider) original).getComponentContainer().keys();
 
         for (ComponentKey<?> key : keys) {
-            copyData(original, clone, original.getRegistryManager(), lossless, keepInventory, !((SwitchablePlayerEntity) original).cca$isSwitchingCharacter(), key);
+            copyData(original, clone, original.registryAccess(), lossless, keepInventory, !((SwitchablePlayerEntity) original).cca$isSwitchingCharacter(), key);
         }
     }
 
-    private static <C extends Component> void copyData(LivingEntity original, LivingEntity clone, RegistryWrapper.WrapperLookup registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter, ComponentKey<C> key) {
+    private static <C extends Component> void copyData(LivingEntity original, LivingEntity clone, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter, ComponentKey<C> key) {
         C from = key.get(original);
         C to = key.get(clone);
         RespawnCopyStrategy.get(key, original.getClass()).copyForRespawn(from, to, registryLookup, lossless, keepInventory, sameCharacter);
     }
 
-    private static void syncEntityComponents(ServerPlayerEntity player, Entity tracked) {
+    private static void syncEntityComponents(ServerPlayer player, Entity tracked) {
         ComponentProvider provider = (ComponentProvider) tracked;
 
         for (ComponentKey<?> key : provider.getComponentContainer().keys()) {

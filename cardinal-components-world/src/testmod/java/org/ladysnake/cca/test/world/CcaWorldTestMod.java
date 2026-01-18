@@ -22,7 +22,7 @@
  */
 package org.ladysnake.cca.test.world;
 
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import org.ladysnake.cca.api.v3.world.WorldComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.world.WorldComponentInitializer;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
@@ -34,7 +34,7 @@ public class CcaWorldTestMod implements WorldComponentInitializer {
     public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
         registry.register(Vita.KEY, AmbientVita.WorldVita.class, AmbientVita.WorldVita::new);
         registry.register(LoadAwareTestComponent.KEY, w -> new LoadAwareTestComponent());
-        registry.registerFor(World.NETHER, Vita.KEY, NetherVita.class, w -> new NetherVita());
-        registry.registerFor(World.END, TickingTestComponent.KEY, w -> new TickingTestComponent());
+        registry.registerFor(Level.NETHER, Vita.KEY, NetherVita.class, w -> new NetherVita());
+        registry.registerFor(Level.END, TickingTestComponent.KEY, w -> new TickingTestComponent());
     }
 }

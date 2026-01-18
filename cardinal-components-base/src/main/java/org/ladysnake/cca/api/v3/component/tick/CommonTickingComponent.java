@@ -22,7 +22,7 @@
  */
 package org.ladysnake.cca.api.v3.component.tick;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 
 /**

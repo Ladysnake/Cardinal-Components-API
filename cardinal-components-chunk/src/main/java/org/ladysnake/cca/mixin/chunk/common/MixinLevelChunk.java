@@ -23,19 +23,19 @@
 package org.ladysnake.cca.mixin.chunk.common;
 
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.HeightLimitView;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.PalettesFactory;
-import net.minecraft.world.chunk.ProtoChunk;
-import net.minecraft.world.chunk.UpgradeData;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.gen.chunk.BlendingData;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.PalettedContainerFactory;
+import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.chunk.UpgradeData;
+import net.minecraft.world.level.levelgen.blending.BlendingData;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
@@ -50,25 +50,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-@Mixin(WorldChunk.class)
-public abstract class MixinWorldChunk extends Chunk implements ComponentProvider {
-    public MixinWorldChunk(ChunkPos pos, UpgradeData upgradeData, HeightLimitView heightLimitView, PalettesFactory palettesFactory, long inhabitedTime, @Nullable ChunkSection[] sectionArray, @Nullable BlendingData blendingData) {
+@Mixin(LevelChunk.class)
+public abstract class MixinLevelChunk extends ChunkAccess implements ComponentProvider {
+    public MixinLevelChunk(ChunkPos pos, UpgradeData upgradeData, LevelHeightAccessor heightLimitView, PalettedContainerFactory palettesFactory, long inhabitedTime, @Nullable LevelChunkSection[] sectionArray, @Nullable BlendingData blendingData) {
         super(pos, upgradeData, heightLimitView, palettesFactory, inhabitedTime, sectionArray, blendingData);
     }
 
     @Shadow
-    public abstract World getWorld();
+    public abstract Level getLevel();
 
     @Override
-    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
-        if (!this.getWorld().isClient()) {
-            return PlayerLookup.tracking((ServerWorld) this.getWorld(), this.getPos());
+    public Iterable<ServerPlayer> getRecipientsForComponentSync() {
+        if (!this.getLevel().isClientSide()) {
+            return PlayerLookup.tracking((ServerLevel) this.getLevel(), this.getPos());
         }
         return List.of();
     }
 
     @Override
-    public @Nullable <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
+    public @Nullable <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryFriendlyByteBuf data) {
         return new ComponentUpdatePayload<>(
             CardinalComponentsChunk.PACKET_ID,
             this.getPos(),
@@ -78,8 +78,8 @@ public abstract class MixinWorldChunk extends Chunk implements ComponentProvider
         );
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/chunk/ProtoChunk;Lnet/minecraft/world/chunk/WorldChunk$EntityLoader;)V", at = @At("RETURN"))
-    private void copyFromProto(ServerWorld world, ProtoChunk proto, WorldChunk.EntityLoader entityLoader, CallbackInfo ci) {
-        this.getComponentContainer().copyFrom(proto.asComponentProvider().getComponentContainer(), world.getRegistryManager());
+    @Inject(method = "<init>(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ProtoChunk;Lnet/minecraft/world/level/chunk/LevelChunk$PostLoadProcessor;)V", at = @At("RETURN"))
+    private void copyFromProto(ServerLevel world, ProtoChunk proto, LevelChunk.PostLoadProcessor entityLoader, CallbackInfo ci) {
+        this.getComponentContainer().copyFrom(proto.asComponentProvider().getComponentContainer(), world.registryAccess());
     }
 }

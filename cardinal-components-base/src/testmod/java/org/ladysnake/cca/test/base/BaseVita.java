@@ -22,9 +22,9 @@
  */
 package org.ladysnake.cca.test.base;
 
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
 
@@ -50,17 +50,17 @@ public class BaseVita implements Vita, Component, CopyableComponent<BaseVita> {
     }
 
     @Override
-    public void readData(ReadView readView) {
-        this.vitality = readView.getInt("vitality", this.vitality);
+    public void readData(ValueInput readView) {
+        this.vitality = readView.getIntOr("vitality", this.vitality);
     }
 
     @Override
-    public void writeData(WriteView writeView) {
+    public void writeData(ValueOutput writeView) {
         writeView.putInt("vitality", this.vitality);
     }
 
     @Override
-    public void copyFrom(BaseVita other, RegistryWrapper.WrapperLookup registryLookup) {
+    public void copyFrom(BaseVita other, HolderLookup.Provider registryLookup) {
         this.vitality = other.getVitality();
     }
 

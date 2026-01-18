@@ -6,13 +6,13 @@
   "mixins": [
     "common.BucketableMixin",
     "common.MixinEntity",
-    "common.MixinEntityTrackerEntry",
-    "common.MixinPlayerManager",
-    "common.MixinServerPlayerEntity",
-    "common.MixinServerWorld"
+    "common.MixinPlayerList",
+    "common.MixinServerEntity",
+    "common.MixinServerLevel",
+    "common.MixinServerPlayer"
   ],
   "client": [
-    "client.MixinClientWorld"
+    "client.MixinClientLevel"
   ],
   "injectors": {
     "defaultRequire": 1

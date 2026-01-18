@@ -20,26 +20,25 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.entity.client;
+package org.ladysnake.cca.mixin.block.common;
 
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.network.PlayerChunkSender;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
+import org.ladysnake.cca.api.v3.block.BlockEntitySyncCallback;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientWorld.class)
-public abstract class MixinClientWorld {
-
-    @Inject(method = "tickEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tick()V", shift = At.Shift.AFTER))
-    private void tick(Entity entity, CallbackInfo ci) {
-        ((ComponentProvider) entity).getComponentContainer().tickClientComponents();
-    }
-
-    @Inject(method = "tickPassenger", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tickRiding()V", shift = At.Shift.AFTER))
-    private void tickRiding(Entity vehicle, Entity passenger, CallbackInfo ci) {
-        ((ComponentProvider) passenger).getComponentContainer().tickClientComponents();
+@Mixin(PlayerChunkSender.class)
+public abstract class MixinPlayerChunkSender {
+    @Inject(method = "sendChunk", at = @At("RETURN"))
+    private static void sendChunkDataPackets(ServerGamePacketListenerImpl handler, ServerLevel world, LevelChunk chunk, CallbackInfo ci) {
+        for (BlockEntity be : chunk.getBlockEntities().values()) {
+            BlockEntitySyncCallback.EVENT.invoker().onBlockEntitySync(handler.player, be);
+        }
     }
 }

@@ -24,8 +24,8 @@ package org.ladysnake.cca.api.v3.world;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Callback interface to receive world synchronization events.
@@ -41,5 +41,5 @@ public interface WorldSyncCallback {
     /**
      * Called when a player starts tracking a world (eg. by joining it).
      */
-    void onPlayerStartTracking(ServerPlayerEntity player, ServerWorld world);
+    void onPlayerStartTracking(ServerPlayer player, ServerLevel world);
 }

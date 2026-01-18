@@ -22,28 +22,28 @@
  */
 package org.ladysnake.componenttest.content.vita;
 
-import net.minecraft.scoreboard.Team;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.scores.PlayerTeam;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.test.base.SyncedVita;
 import org.ladysnake.cca.test.base.Vita;
 
 public class TeamVita extends SyncedVita implements AutoSyncedComponent {
-    private final Team team;
+    private final PlayerTeam team;
 
-    public TeamVita(Team team) {
+    public TeamVita(PlayerTeam team) {
         super(team);
         this.team = team;
     }
 
     @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player) {
-        return player.getScoreboardTeam() == this.team;
+    public boolean shouldSyncWith(ServerPlayer player) {
+        return player.getTeam() == this.team;
     }
 
     @Override
     public int getVitality() {
-        return super.getVitality() + this.team.getPlayerList().size();
+        return super.getVitality() + this.team.getPlayers().size();
     }
 
     @Override

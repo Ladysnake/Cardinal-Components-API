@@ -24,9 +24,9 @@ package org.ladysnake.cca.internal.scoreboard;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
 import org.ladysnake.cca.internal.base.CcaClientInternals;
 
 import java.util.Objects;
@@ -34,12 +34,12 @@ import java.util.Objects;
 public final class CcaScoreboardClient {
     public static void initClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            ClientPlayNetworkHandler networkHandler = client.getNetworkHandler();
+            ClientPacketListener networkHandler = client.getConnection();
             if (networkHandler != null) {
-                Scoreboard scoreboard = networkHandler.getScoreboard();
+                Scoreboard scoreboard = networkHandler.scoreboard();
                 scoreboard.asComponentProvider().getComponentContainer().tickClientComponents();
 
-                for (Team team : scoreboard.getTeams()) {
+                for (PlayerTeam team : scoreboard.getPlayerTeams()) {
                     team.asComponentProvider().getComponentContainer().tickClientComponents();
                 }
             }
@@ -47,12 +47,12 @@ public final class CcaScoreboardClient {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsScoreboard.TEAM_PACKET_ID,
-                (payload, ctx) -> payload.componentKey().flatMap(key -> key.maybeGet(Objects.requireNonNull(ctx.client().world).getScoreboard().getTeam(payload.targetData()))
+                (payload, ctx) -> payload.componentKey().flatMap(key -> key.maybeGet(Objects.requireNonNull(ctx.client().level).getScoreboard().getPlayerTeam(payload.targetData()))
             ));
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsScoreboard.SCOREBOARD_PACKET_ID,
                 (payload, ctx) -> payload.componentKey().flatMap(
-                    key -> key.maybeGet(Objects.requireNonNull(ctx.client().world).getScoreboard())
+                    key -> key.maybeGet(Objects.requireNonNull(ctx.client().level).getScoreboard())
                 )
             );
         }

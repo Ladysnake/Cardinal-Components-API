@@ -22,8 +22,8 @@
  */
 package org.ladysnake.cca.mixin.block.common;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.server.world.ChunkHolder;
+import net.minecraft.server.level.ChunkHolder;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.ladysnake.cca.api.v3.block.BlockEntitySyncAroundCallback;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(ChunkHolder.class)
 public abstract class MixinChunkHolder {
-    @ModifyVariable(method = "sendBlockEntityUpdatePacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;toUpdatePacket()Lnet/minecraft/network/packet/Packet;"))
+    @ModifyVariable(method = "broadcastBlockEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/BlockEntity;getUpdatePacket()Lnet/minecraft/network/protocol/Packet;"))
     private BlockEntity sendBlockEntityUpdate(BlockEntity be) {
         BlockEntitySyncAroundCallback.EVENT.invoker().onBlockEntitySync(be);
         return be;

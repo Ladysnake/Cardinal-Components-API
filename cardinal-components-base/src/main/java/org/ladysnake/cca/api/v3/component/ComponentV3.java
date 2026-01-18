@@ -22,7 +22,7 @@
  */
 package org.ladysnake.cca.api.v3.component;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * The base interface for components.

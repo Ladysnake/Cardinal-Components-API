@@ -22,10 +22,10 @@
  */
 package org.ladysnake.cca.mixin.scoreboard;
 
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
@@ -45,8 +45,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nonnull;
 
-@Mixin(Team.class)
-public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
+@Mixin(PlayerTeam.class)
+public abstract class MixinPlayerTeam implements ComponentProvider, PlayerTeamAccessor {
     @Shadow
     public abstract String getName();
 
@@ -59,7 +59,7 @@ public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initComponents(CallbackInfo ci) {
         this.components = StaticScoreboardComponentPlugin.teamComponentsContainerFactory.get().create(
-            (Team) (Object) this,
+            (PlayerTeam) (Object) this,
             this.scoreboard,
             this.scoreboard instanceof ServerScoreboardAccessor acc ? acc.getServer() : null
         );
@@ -69,7 +69,7 @@ public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
     private void packComponents(CallbackInfoReturnable<CcaPackedState> cir) {
         if (this.scoreboard instanceof ServerScoreboardAccessor serverScoreboard) {
             cir.getReturnValue().cca$setSerializedComponents(
-                this.getComponentContainer().toOrphanTag(serverScoreboard.getServer().getRegistryManager())
+                this.getComponentContainer().toOrphanTag(serverScoreboard.getServer().registryAccess())
             );
         }
     }
@@ -81,12 +81,12 @@ public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
     }
 
     @Override
-    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
+    public Iterable<ServerPlayer> getRecipientsForComponentSync() {
         return this.scoreboard.asComponentProvider().getRecipientsForComponentSync();
     }
 
     @Override
-    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
+    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryFriendlyByteBuf data) {
         return new ComponentUpdatePayload<>(
             CardinalComponentsScoreboard.TEAM_PACKET_ID,
             this.getName(),

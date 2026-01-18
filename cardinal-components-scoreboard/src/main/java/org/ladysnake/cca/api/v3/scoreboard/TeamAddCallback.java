@@ -24,7 +24,7 @@ package org.ladysnake.cca.api.v3.scoreboard;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.world.scores.PlayerTeam;
 
 /**
  * The callback interface for receiving global team synchronization events.
@@ -40,5 +40,5 @@ public interface TeamAddCallback {
     /**
      * Called when a team's data is sent to all players
      */
-    void onTeamAdded(Team team);
+    void onTeamAdded(PlayerTeam team);
 }

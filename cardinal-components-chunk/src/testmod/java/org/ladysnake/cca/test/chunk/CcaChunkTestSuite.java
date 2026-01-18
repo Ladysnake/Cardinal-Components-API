@@ -23,51 +23,51 @@
 package org.ladysnake.cca.test.chunk;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.test.TestContext;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.SerializedChunk;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.storage.StorageKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
+import net.minecraft.world.level.chunk.storage.SerializableChunkData;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.TickingTestComponent;
 import org.ladysnake.cca.test.base.Vita;
 
 public class CcaChunkTestSuite {
     @GameTest
-    public void chunksSerialize(TestContext ctx) {
-        ChunkPos pos = new ChunkPos(ctx.getAbsolutePos(new BlockPos(1, 0, 1)));
-        Chunk c = new WorldChunk(ctx.getWorld(), pos);
+    public void chunksSerialize(GameTestHelper ctx) {
+        ChunkPos pos = new ChunkPos(ctx.absolutePos(new BlockPos(1, 0, 1)));
+        ChunkAccess c = new LevelChunk(ctx.getLevel(), pos);
         c.getComponent(Vita.KEY).setVitality(42);
-        NbtCompound nbt = SerializedChunk.fromChunk(ctx.getWorld(), c).serialize();
-        Chunk c1 = SerializedChunk.fromNbt(ctx.getWorld(), ctx.getWorld().getPalettesFactory(), nbt)
-            .convert(ctx.getWorld(), ctx.getWorld().getPointOfInterestStorage(), new StorageKey("", ctx.getWorld().getRegistryKey(), ""), pos);
-        ctx.assertEquals(42, c1.getComponent(Vita.KEY).getVitality(), Text.literal("Chunk component data should survive deserialization -"));
-        ctx.complete();
+        CompoundTag nbt = SerializableChunkData.copyOf(ctx.getLevel(), c).write();
+        ChunkAccess c1 = SerializableChunkData.parse(ctx.getLevel(), ctx.getLevel().palettedContainerFactory(), nbt)
+            .read(ctx.getLevel(), ctx.getLevel().getPoiManager(), new RegionStorageInfo("", ctx.getLevel().dimension(), ""), pos);
+        ctx.assertValueEqual(42, c1.getComponent(Vita.KEY).getVitality(), Component.literal("Chunk component data should survive deserialization -"));
+        ctx.succeed();
     }
 
     @GameTest
-    public void chunksTick(TestContext ctx) {
+    public void chunksTick(GameTestHelper ctx) {
         ctx.spawnServerPlayer(0, 0, 0);    // Ensure chunk gets ticked
-        int baseTicks = ctx.getWorld().getChunk(ctx.getAbsolutePos(BlockPos.ORIGIN)).getComponent(TickingTestComponent.KEY).serverTicks();
-        ctx.waitAndRun(5, () -> {
-            int ticks = ctx.getWorld().getChunk(ctx.getAbsolutePos(BlockPos.ORIGIN)).getComponent(TickingTestComponent.KEY).serverTicks();
-            ctx.assertEquals(5, ticks - baseTicks, Text.literal("Component should tick 5 times -"));
-            ctx.complete();
+        int baseTicks = ctx.getLevel().getChunk(ctx.absolutePos(BlockPos.ZERO)).getComponent(TickingTestComponent.KEY).serverTicks();
+        ctx.runAfterDelay(5, () -> {
+            int ticks = ctx.getLevel().getChunk(ctx.absolutePos(BlockPos.ZERO)).getComponent(TickingTestComponent.KEY).serverTicks();
+            ctx.assertValueEqual(5, ticks - baseTicks, Component.literal("Component should tick 5 times -"));
+            ctx.succeed();
         });
     }
 
     @GameTest
-    public void chunksLoadUnload(TestContext ctx) {
+    public void chunksLoadUnload(GameTestHelper ctx) {
         ctx.spawnServerPlayer(0, 0, 0);    // Ensure chunk gets ticked
-        ctx.assertEquals(
+        ctx.assertValueEqual(
             1,
-            ctx.getWorld().getChunk(ctx.getAbsolutePos(BlockPos.ORIGIN)).getComponent(LoadAwareTestComponent.KEY).getLoadCounter(),
-            Text.literal("Load counter should be incremented once when the chunk is added to the world -")
+            ctx.getLevel().getChunk(ctx.absolutePos(BlockPos.ZERO)).getComponent(LoadAwareTestComponent.KEY).getLoadCounter(),
+            Component.literal("Load counter should be incremented once when the chunk is added to the world -")
         );
-        ctx.complete();
+        ctx.succeed();
     }
 }

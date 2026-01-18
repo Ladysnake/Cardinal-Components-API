@@ -22,25 +22,25 @@
  */
 package org.ladysnake.componenttest.content;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.particle.DragonBreathParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.PowerParticleOption;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.level.Level;
 import org.ladysnake.cca.test.entity.EntityVita;
 
 import javax.annotation.Nonnull;
 
-public class VitalityZombieEntity extends ZombieEntity {
-    public VitalityZombieEntity(EntityType<? extends ZombieEntity> type, World world) {
+public class VitalityZombieEntity extends Zombie {
+    public VitalityZombieEntity(EntityType<? extends Zombie> type, Level world) {
         super(type, world);
     }
 
     @Override
-    public void tickMovement() {
-        super.tickMovement();
-        if (this.getEntityWorld().isClient()) {
-            this.getEntityWorld().addParticleClient(DragonBreathParticleEffect.of(ParticleTypes.DRAGON_BREATH, 1), this.getX(), this.getY() + 0.3D, this.getZ(), this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D);
+    public void aiStep() {
+        super.aiStep();
+        if (this.level().isClientSide()) {
+            this.level().addParticle(PowerParticleOption.create(ParticleTypes.DRAGON_BREATH, 1), this.getX(), this.getY() + 0.3D, this.getZ(), this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D, this.random.nextGaussian() * 0.05D);
         }
     }
 

@@ -24,7 +24,7 @@ package org.ladysnake.cca.internal.level;
 
 import com.google.common.base.Suppliers;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
-import net.minecraft.world.WorldProperties;
+import net.minecraft.world.level.storage.LevelData;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
@@ -36,17 +36,17 @@ import org.ladysnake.cca.internal.base.asm.StaticComponentPluginBase;
 import java.util.Collection;
 import java.util.function.Supplier;
 
-public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<WorldProperties, LevelComponentInitializer> implements LevelComponentFactoryRegistry {
+public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<LevelData, LevelComponentInitializer> implements LevelComponentFactoryRegistry {
     public static final StaticLevelComponentPlugin INSTANCE = new StaticLevelComponentPlugin();
-    public static final Supplier<ComponentContainer.Factory<WorldProperties>> componentContainerFactory
+    public static final Supplier<ComponentContainer.Factory<LevelData>> componentContainerFactory
         = Suppliers.memoize(INSTANCE::buildContainerFactory);
 
-    public static ComponentContainer createContainer(WorldProperties properties) {
+    public static ComponentContainer createContainer(LevelData properties) {
         return componentContainerFactory.get().createContainer(properties);
     }
 
     private StaticLevelComponentPlugin() {
-        super("loading a world save", WorldProperties.class);
+        super("loading a world save", LevelData.class);
     }
 
     @Override
@@ -60,13 +60,13 @@ public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<C> type, ComponentFactory<WorldProperties, ? extends C> factory) {
+    public <C extends Component> void register(ComponentKey<C> type, ComponentFactory<LevelData, ? extends C> factory) {
         this.checkLoading(LevelComponentFactoryRegistry.class, "register");
         super.register(type, factory);
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<WorldProperties, ? extends C> factory) {
+    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<LevelData, ? extends C> factory) {
         this.checkLoading(LevelComponentFactoryRegistry.class, "register");
         super.register(type, impl, factory);
     }

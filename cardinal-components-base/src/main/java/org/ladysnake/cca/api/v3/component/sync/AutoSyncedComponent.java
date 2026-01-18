@@ -23,14 +23,14 @@
 package org.ladysnake.cca.api.v3.component.sync;
 
 import net.fabricmc.api.EnvType;
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
 import org.jetbrains.annotations.Contract;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -54,7 +54,7 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      * {@code false} otherwise
      */
     @Override
-    default boolean shouldSyncWith(ServerPlayerEntity player) {
+    default boolean shouldSyncWith(ServerPlayer player) {
         return true;
     }
 
@@ -66,12 +66,12 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      * A {@code syncOp} value of {@code 0} triggers the base full synchronization behaviour.
      * Other values have a meaning specific to the component implementation.
      * Typical uses of this parameter include limiting the amount of data being synced (eg. by identifying a
-     * specific field to write), or triggering different events on the client (similar to {@link World#sendEntityStatus(Entity, byte)})
+     * specific field to write), or triggering different events on the client (similar to {@link Level#broadcastEntityEvent(Entity, byte)})
      *
      * @param buf       the buffer to write the data to
      * @param recipient the player to which the packet will be sent
      * @implSpec The default implementation writes the whole NBT representation
-     * of this component to the buffer using {@link Component#writeData(net.minecraft.storage.WriteView)}.
+     * of this component to the buffer using {@link Component#writeData(net.minecraft.world.level.storage.ValueOutput)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation sends possibly hidden
      * information to clients, uses a wasteful data format, and does not support
@@ -79,15 +79,15 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      * nearly always provide a better implementation.
      * @see ComponentKey#sync(Object)
      * @see ComponentKey#sync(Object, ComponentPacketWriter)
-     * @see #applySyncPacket(RegistryByteBuf)
+     * @see #applySyncPacket(RegistryFriendlyByteBuf)
      */
     @Contract(mutates = "param1")
     @Override
-    default void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity recipient) {
-        try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
-            NbtWriteView writeView = NbtWriteView.create(errorReporter, buf.getRegistryManager());
+    default void writeSyncPacket(RegistryFriendlyByteBuf buf, ServerPlayer recipient) {
+        try (var errorReporter = new ProblemReporter.ScopedCollector(ComponentsInternals.LOGGER)) {
+            TagValueOutput writeView = TagValueOutput.createWithContext(errorReporter, buf.registryAccess());
             this.writeData(writeView);
-            buf.writeNbt(writeView.getNbt());
+            buf.writeNbt(writeView.buildResult());
         }
     }
 
@@ -95,17 +95,17 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      * Reads this component's data from {@code buf}.
      *
      * @implSpec The default implementation converts the buffer's content
-     * to a {@link NbtCompound} and calls {@link Component#readData(net.minecraft.storage.ReadView)}.
-     * @implNote any implementing class overriding {@link #writeSyncPacket(RegistryByteBuf, ServerPlayerEntity)}
+     * to a {@link CompoundTag} and calls {@link Component#readData(net.minecraft.world.level.storage.ValueInput)}.
+     * @implNote any implementing class overriding {@link #writeSyncPacket(RegistryFriendlyByteBuf, ServerPlayer)}
      * such that it uses a different data format must override this method.
-     * @see #writeSyncPacket(RegistryByteBuf, ServerPlayerEntity)
+     * @see #writeSyncPacket(RegistryFriendlyByteBuf, ServerPlayer)
      */
     @CheckEnvironment(EnvType.CLIENT)
-    default void applySyncPacket(RegistryByteBuf buf) {
-        NbtCompound tag = buf.readNbt();
+    default void applySyncPacket(RegistryFriendlyByteBuf buf) {
+        CompoundTag tag = buf.readNbt();
         if (tag != null) {
-            try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
-                this.readData(NbtReadView.create(errorReporter, buf.getRegistryManager(), tag));
+            try (var errorReporter = new ProblemReporter.ScopedCollector(ComponentsInternals.LOGGER)) {
+                this.readData(TagValueInput.create(errorReporter, buf.registryAccess(), tag));
             }
         }
     }

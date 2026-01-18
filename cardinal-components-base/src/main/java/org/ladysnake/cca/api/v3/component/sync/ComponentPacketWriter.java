@@ -22,12 +22,12 @@
  */
 package org.ladysnake.cca.api.v3.component.sync;
 
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Contract;
 
 @FunctionalInterface
 public interface ComponentPacketWriter {
     @Contract(mutates = "param1")
-    void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity recipient);
+    void writeSyncPacket(RegistryFriendlyByteBuf buf, ServerPlayer recipient);
 }

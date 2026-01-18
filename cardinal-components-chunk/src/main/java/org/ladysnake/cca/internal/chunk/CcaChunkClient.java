@@ -34,7 +34,7 @@ public class CcaChunkClient {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsChunk.PACKET_ID,
-                (payload, ctx) -> payload.componentKey().flatMap(key -> key.maybeGet(Objects.requireNonNull(ctx.client().world).getChunk(
+                (payload, ctx) -> payload.componentKey().flatMap(key -> key.maybeGet(Objects.requireNonNull(ctx.client().level).getChunk(
                     payload.targetData().x,
                     payload.targetData().z
                 ))

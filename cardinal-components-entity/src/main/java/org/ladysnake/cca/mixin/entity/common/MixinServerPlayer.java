@@ -20,30 +20,25 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.block.common;
+package org.ladysnake.cca.mixin.entity.common;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
-import org.jetbrains.annotations.Nullable;
-import org.ladysnake.cca.internal.block.StaticBlockComponentPlugin;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.server.level.ServerPlayer;
+import org.ladysnake.cca.internal.entity.SwitchablePlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.Unique;
 
-@Mixin(WorldChunk.class)
-public abstract class MixinWorldChunk {
+@Mixin(ServerPlayer.class)
+public abstract class MixinServerPlayer implements SwitchablePlayerEntity {
+    @Unique
+    private boolean switchingCharacter = false;
 
-    @Shadow
-    @Final
-    World world;
+    @Override
+    public void cca$markAsSwitchingCharacter() {
+        this.switchingCharacter = true;
+    }
 
-    @Nullable
-    @ModifyVariable(method = "updateTicker", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/block/BlockState;getBlockEntityTicker(Lnet/minecraft/world/World;Lnet/minecraft/block/entity/BlockEntityType;)Lnet/minecraft/block/entity/BlockEntityTicker;"))
-    private <T extends BlockEntity> BlockEntityTicker<T> getBlockEntityTicker(BlockEntityTicker<T> base, T blockEntity) {
-        return StaticBlockComponentPlugin.INSTANCE.getComponentTicker(this.world, blockEntity, base);
+    @Override
+    public boolean cca$isSwitchingCharacter() {
+        return this.switchingCharacter;
     }
 }

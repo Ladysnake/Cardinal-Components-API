@@ -20,15 +20,24 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.scoreboard;
+package org.ladysnake.cca.mixin.chunk.common;
 
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.world.level.chunk.ImposterProtoChunk;
+import net.minecraft.world.level.chunk.LevelChunk;
+import org.ladysnake.cca.api.v3.component.ComponentContainer;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(Team.class)
-public interface TeamAccessor {
-    @Accessor
-    Scoreboard getScoreboard();
+@Mixin(ImposterProtoChunk.class)
+public abstract class MixinImposterProtoChunk implements ComponentProvider {
+    @Shadow
+    @Final
+    private LevelChunk wrapped;
+
+    @Override
+    public ComponentContainer getComponentContainer() {
+        return this.wrapped.asComponentProvider().getComponentContainer();
+    }
 }

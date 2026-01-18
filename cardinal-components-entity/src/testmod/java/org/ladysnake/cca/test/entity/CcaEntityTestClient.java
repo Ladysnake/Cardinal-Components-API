@@ -24,7 +24,7 @@ package org.ladysnake.cca.test.entity;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.entity.mob.ShulkerEntity;
+import net.minecraft.world.entity.monster.Shulker;
 import org.ladysnake.cca.api.v3.component.sync.C2SComponentPacketWriter;
 import org.ladysnake.cca.test.base.Vita;
 
@@ -32,7 +32,7 @@ public class CcaEntityTestClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client.targetedEntity instanceof ShulkerEntity) {
+            if (client.crosshairPickEntity instanceof Shulker) {
                 ((PlayerVita) Vita.get(client.player)).sendC2SMessage(C2SComponentPacketWriter.EMPTY);
             }
         });

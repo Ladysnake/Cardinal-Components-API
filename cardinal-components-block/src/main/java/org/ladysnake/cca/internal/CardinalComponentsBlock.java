@@ -24,8 +24,8 @@ package org.ladysnake.cca.internal;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.ladysnake.cca.api.v3.block.BlockEntitySyncAroundCallback;
 import org.ladysnake.cca.api.v3.block.BlockEntitySyncCallback;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -37,12 +37,12 @@ import org.ladysnake.cca.internal.block.StaticBlockComponentPlugin;
 public class CardinalComponentsBlock {
 
     /**
-     * {@link CustomPayloadS2CPacket} channel for default block entity component synchronization.
+     * {@link ClientboundCustomPayloadPacket} channel for default block entity component synchronization.
      *
-     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryFriendlyByteBuf)}
      * called on the game thread.
      */
-    public static final CustomPayload.Id<ComponentUpdatePayload<BlockEntityAddress>> PACKET_ID = ComponentUpdatePayload.id("block_entity_sync");
+    public static final CustomPacketPayload.Type<ComponentUpdatePayload<BlockEntityAddress>> PACKET_ID = ComponentUpdatePayload.id("block_entity_sync");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {

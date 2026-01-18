@@ -23,10 +23,10 @@
 package org.ladysnake.cca.api.v3.component;
 
 import net.fabricmc.api.EnvType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -63,7 +63,7 @@ public interface ComponentContainer extends NbtSerializable {
     boolean hasComponents();
 
     @Contract(mutates = "this")
-    void copyFrom(ComponentContainer other, RegistryWrapper.WrapperLookup registryLookup);
+    void copyFrom(ComponentContainer other, HolderLookup.Provider registryLookup);
 
     @AsmGeneratedCallback(ServerTickingComponent.class)
     void tickServerComponents();
@@ -111,7 +111,7 @@ public interface ComponentContainer extends NbtSerializable {
     }
 
     /**
-     * Reads this object's properties from a {@link NbtCompound}.
+     * Reads this object's properties from a {@link CompoundTag}.
      *
      * @param readView a {@code NbtCompound} on which this object's serializable data has been written
      * @implNote implementations must not assert that the data written on the tag corresponds to any
@@ -120,23 +120,23 @@ public interface ComponentContainer extends NbtSerializable {
      * information may be stored in said tag.
      */
     @Contract(mutates = "this")
-    void readData(ReadView readView);
+    void readData(ValueInput readView);
 
     @Contract(mutates = "this")
-    void readOrphanData(ReadView readView);
+    void readOrphanData(ValueInput readView);
 
     /**
-     * Writes this object's properties to a {@link NbtCompound}.
+     * Writes this object's properties to a {@link CompoundTag}.
      *
      * @param writeView a {@code NbtCompound} on which to write this component's serializable data
      */
     @Contract(mutates = "param1")
-    void writeData(WriteView writeView);
+    void writeData(ValueOutput writeView);
 
     @Contract(mutates = "param1")
-    void writeOrphanData(WriteView writeView);
+    void writeOrphanData(ValueOutput writeView);
 
-    @Nullable NbtCompound toOrphanTag(RegistryWrapper.WrapperLookup registryLookup);
+    @Nullable CompoundTag toOrphanTag(HolderLookup.Provider registryLookup);
 
     /**
      * A factory for {@link ComponentContainer}s.

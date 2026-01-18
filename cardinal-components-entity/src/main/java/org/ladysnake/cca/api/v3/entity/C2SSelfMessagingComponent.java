@@ -27,9 +27,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.PacketCallbacks;
-import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketSendListener;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.jetbrains.annotations.ApiStatus;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -54,7 +54,7 @@ public interface C2SSelfMessagingComponent extends Component {
      *
      * @param buf the buffer containing the data as written in {@link #sendC2SMessage}
      */
-    void handleC2SMessage(RegistryByteBuf buf);
+    void handleC2SMessage(RegistryFriendlyByteBuf buf);
 
     /**
      * Produces and sends a C2S update packet using the given information
@@ -67,7 +67,7 @@ public interface C2SSelfMessagingComponent extends Component {
      */
     @CheckEnvironment(EnvType.CLIENT)
     default void sendC2SMessage(C2SComponentPacketWriter writer) {
-        ComponentProvider provider = (ComponentProvider) Objects.requireNonNull(MinecraftClient.getInstance().player);
+        ComponentProvider provider = (ComponentProvider) Objects.requireNonNull(Minecraft.getInstance().player);
         ComponentKey<?> key = Objects.requireNonNull(provider.getComponentContainer().getKey(this));
         sendC2SMessage(key, writer);
     }
@@ -81,8 +81,8 @@ public interface C2SSelfMessagingComponent extends Component {
     @CheckEnvironment(EnvType.CLIENT)
     static void sendC2SMessage(ComponentKey<?> key, C2SComponentPacketWriter writer) {
         PacketSender sender = ClientPlayNetworking.getSender(); // checks that the player is in game
-        RegistryByteBuf buf = new RegistryByteBuf(PacketByteBufs.create(), Objects.requireNonNull(MinecraftClient.getInstance().getNetworkHandler()).getRegistryManager());
+        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(PacketByteBufs.create(), Objects.requireNonNull(Minecraft.getInstance().getConnection()).registryAccess());
         writer.writeC2SPacket(buf);
-        sender.sendPacket(new ComponentUpdatePayload<>(CardinalComponentsEntity.C2S_SELF_PACKET_ID, Unit.INSTANCE, true, key.getId(), buf), PacketCallbacks.always(buf::release));
+        sender.sendPacket(new ComponentUpdatePayload<>(CardinalComponentsEntity.C2S_SELF_PACKET_ID, Unit.INSTANCE, true, key.getId(), buf), PacketSendListener.thenRun(buf::release));
     }
 }

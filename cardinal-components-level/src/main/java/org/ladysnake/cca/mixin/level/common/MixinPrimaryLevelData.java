@@ -24,20 +24,19 @@ package org.ladysnake.cca.mixin.level.common;
 
 import com.mojang.datafixers.util.Unit;
 import com.mojang.serialization.Lifecycle;
-import net.minecraft.entity.boss.dragon.EnderDragonFight;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldProperties;
-import net.minecraft.world.gen.GeneratorOptions;
-import net.minecraft.world.level.LevelInfo;
-import net.minecraft.world.level.LevelProperties;
-import net.minecraft.world.level.ServerWorldProperties;
-import net.minecraft.world.timer.Timer;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.LevelSettings;
+import net.minecraft.world.level.dimension.end.EndDragonFight;
+import net.minecraft.world.level.levelgen.WorldOptions;
+import net.minecraft.world.level.storage.LevelData.RespawnData;
+import net.minecraft.world.level.storage.PrimaryLevelData;
+import net.minecraft.world.level.storage.ServerLevelData;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.timers.TimerQueue;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
@@ -58,23 +57,23 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-@Mixin(LevelProperties.class)
-public abstract class MixinLevelProperties implements ServerWorldProperties, ComponentProvider {
+@Mixin(PrimaryLevelData.class)
+public abstract class MixinPrimaryLevelData implements ServerLevelData, ComponentProvider {
     @Unique
     private ComponentContainer components;
 
-    @Inject(method = "<init>(Lnet/minecraft/nbt/NbtCompound;ZLnet/minecraft/world/WorldProperties$SpawnPoint;JJIIIZIZZZLjava/util/Optional;IILjava/util/UUID;Ljava/util/Set;Ljava/util/Set;Lnet/minecraft/world/timer/Timer;Lnet/minecraft/nbt/NbtCompound;Lnet/minecraft/entity/boss/dragon/EnderDragonFight$Data;Lnet/minecraft/world/level/LevelInfo;Lnet/minecraft/world/gen/GeneratorOptions;Lnet/minecraft/world/level/LevelProperties$SpecialProperty;Lcom/mojang/serialization/Lifecycle;)V", at = @At("RETURN"))
-    private void initComponents(NbtCompound playerData, boolean modded, SpawnPoint spawnPoint, long time, long timeOfDay, int version, int clearWeatherTime, int rainTime, boolean raining, int thunderTime, boolean thundering, boolean initialized, boolean difficultyLocked, Optional worldBorder, int wanderingTraderSpawnDelay, int wanderingTraderSpawnChance, UUID wanderingTraderId, Set serverBrands, Set removedFeatures, Timer scheduledEvents, NbtCompound customBossEvents, EnderDragonFight.Data dragonFight, LevelInfo levelInfo, GeneratorOptions generatorOptions, LevelProperties.SpecialProperty specialProperty, Lifecycle lifecycle, CallbackInfo ci)  {
+    @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;ZLnet/minecraft/world/level/storage/LevelData$RespawnData;JJIIIZIZZZLjava/util/Optional;IILjava/util/UUID;Ljava/util/Set;Ljava/util/Set;Lnet/minecraft/world/level/timers/TimerQueue;Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/dimension/end/EndDragonFight$Data;Lnet/minecraft/world/level/LevelSettings;Lnet/minecraft/world/level/levelgen/WorldOptions;Lnet/minecraft/world/level/storage/PrimaryLevelData$SpecialWorldProperty;Lcom/mojang/serialization/Lifecycle;)V", at = @At("RETURN"))
+    private void initComponents(CompoundTag playerData, boolean modded, RespawnData spawnPoint, long time, long timeOfDay, int version, int clearWeatherTime, int rainTime, boolean raining, int thunderTime, boolean thundering, boolean initialized, boolean difficultyLocked, Optional worldBorder, int wanderingTraderSpawnDelay, int wanderingTraderSpawnChance, UUID wanderingTraderId, Set serverBrands, Set removedFeatures, TimerQueue scheduledEvents, CompoundTag customBossEvents, EndDragonFight.Data dragonFight, LevelSettings levelInfo, WorldOptions generatorOptions, PrimaryLevelData.SpecialWorldProperty specialProperty, Lifecycle lifecycle, CallbackInfo ci)  {
         this.components = StaticLevelComponentPlugin.createContainer(this);
     }
 
-    @Inject(method = "updateProperties", at = @At("RETURN"))
-    private void writeComponents(DynamicRegistryManager registryManager, NbtCompound data, NbtCompound player, CallbackInfo ci) {
-        try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
-            NbtWriteView writeView = NbtWriteView.create(errorReporter, registryManager);
+    @Inject(method = "setTagData", at = @At("RETURN"))
+    private void writeComponents(RegistryAccess registryManager, CompoundTag data, CompoundTag player, CallbackInfo ci) {
+        try (var errorReporter = new ProblemReporter.ScopedCollector(ComponentsInternals.LOGGER)) {
+            TagValueOutput writeView = TagValueOutput.createWithContext(errorReporter, registryManager);
             this.components.writeOrphanData(writeView);
             if (!writeView.isEmpty()) {
-                data.put(AbstractComponentContainer.NBT_KEY, writeView.getNbt());
+                data.put(AbstractComponentContainer.NBT_KEY, writeView.buildResult());
             }
         }
     }
@@ -86,12 +85,12 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Com
     }
 
     @Override
-    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
+    public Iterable<ServerPlayer> getRecipientsForComponentSync() {
         throw new UnsupportedOperationException("Please call LevelComponents#sync(MinecraftServer) instead of ComponentKey#sync");
     }
 
     @Override
-    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
+    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryFriendlyByteBuf data) {
         return new ComponentUpdatePayload<>(
             CardinalComponentsLevel.PACKET_ID,
             Unit.INSTANCE,

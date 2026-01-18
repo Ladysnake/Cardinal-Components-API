@@ -7,13 +7,13 @@
     "MixinMinecraftServer",
     "MixinPackedScoreboardState",
     "MixinPackedTeam",
-    "MixinPersistentState",
-    "MixinPlayerManager",
+    "MixinPlayerList",
+    "MixinPlayerTeam",
+    "MixinSavedData",
     "MixinScoreboard",
     "MixinServerScoreboard",
-    "MixinTeam",
-    "ServerScoreboardAccessor",
-    "TeamAccessor"
+    "PlayerTeamAccessor",
+    "ServerScoreboardAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

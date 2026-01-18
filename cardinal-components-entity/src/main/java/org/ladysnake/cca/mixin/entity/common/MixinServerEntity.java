@@ -22,23 +22,25 @@
  */
 package org.ladysnake.cca.mixin.entity.common;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.ladysnake.cca.internal.entity.SwitchablePlayerEntity;
+import net.minecraft.server.level.ServerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import org.ladysnake.cca.api.v3.entity.TrackingStartCallback;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ServerPlayerEntity.class)
-public abstract class MixinServerPlayerEntity implements SwitchablePlayerEntity {
-    @Unique
-    private boolean switchingCharacter = false;
+@Mixin(ServerEntity.class)
+public abstract class MixinServerEntity {
+    @Shadow
+    @Final
+    private Entity entity;
 
-    @Override
-    public void cca$markAsSwitchingCharacter() {
-        this.switchingCharacter = true;
-    }
-
-    @Override
-    public boolean cca$isSwitchingCharacter() {
-        return this.switchingCharacter;
+    @Inject(method = "addPairing", at = @At("RETURN"))
+    private void onStartedTracking(ServerPlayer player, CallbackInfo ci) {
+        TrackingStartCallback.EVENT.invoker().onPlayerStartTracking(player, this.entity);
     }
 }

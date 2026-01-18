@@ -22,13 +22,13 @@
  */
 package org.ladysnake.cca.api.v3.entity;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.rule.GameRules;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
@@ -104,7 +104,7 @@ public interface RespawnCopyStrategy<C extends Component> {
      * <p>Mods that depend on component data for their own copying logic can {@linkplain net.fabricmc.fabric.api.event.Event#addPhaseOrdering(Identifier, Identifier) add a phase ordering}
      * to run after CCA's listeners.
      */
-    Identifier EVENT_PHASE = Identifier.of("cardinal-components", "component-copy");
+    Identifier EVENT_PHASE = Identifier.fromNamespaceAndPath("cardinal-components", "component-copy");
 
     /**
      * @param entityClass the class of the source entity being respawned or converted
@@ -116,21 +116,21 @@ public interface RespawnCopyStrategy<C extends Component> {
     /**
      * Copies data from one component to the other.
      *
-     * <p> If {@code to} implements {@link CopyableComponent}, its {@link CopyableComponent#copyFrom(Component, RegistryWrapper.WrapperLookup)}
+     * <p> If {@code to} implements {@link CopyableComponent}, its {@link CopyableComponent#copyFrom(Component, HolderLookup.Provider)}
      * method will be called, otherwise data will be copied using NBT serialization.
      *
      * @param from the component to copy data from
      * @param to   the component to copy data to
      * @param <C>  the common component type
      */
-    static <C extends Component> void copy(C from, C to, RegistryWrapper.WrapperLookup registryLookup) {
+    static <C extends Component> void copy(C from, C to, HolderLookup.Provider registryLookup) {
         if (to instanceof CopyableComponent<?> copyable) {
             CardinalEntityInternals.copyAsCopyable(from, copyable, registryLookup);
         } else {
-            try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
-                NbtWriteView writeView = NbtWriteView.create(errorReporter, registryLookup);
+            try (var errorReporter = new ProblemReporter.ScopedCollector(ComponentsInternals.LOGGER)) {
+                TagValueOutput writeView = TagValueOutput.createWithContext(errorReporter, registryLookup);
                 from.writeData(writeView);
-                to.readData(NbtReadView.create(errorReporter, registryLookup, writeView.getNbt()));
+                to.readData(TagValueInput.create(errorReporter, registryLookup, writeView.buildResult()));
             }
         }
     }
@@ -147,5 +147,5 @@ public interface RespawnCopyStrategy<C extends Component> {
      * @param sameCharacter  {@code true} if the player is not switching to an unrelated body.
      *                       Can only be {@code false} with other mods installed.
      */
-    void copyForRespawn(C from, C to, RegistryWrapper.WrapperLookup registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter);
+    void copyForRespawn(C from, C to, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter);
 }

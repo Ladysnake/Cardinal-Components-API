@@ -28,8 +28,8 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.scoreboard.ScoreboardState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.scores.ScoreboardSaveData;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.internal.base.AbstractComponentContainer;
 import org.ladysnake.cca.internal.scoreboard.CcaPackedState;
@@ -40,30 +40,30 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Mixin(ScoreboardState.Packed.class)
+@Mixin(ScoreboardSaveData.Packed.class)
 public abstract class MixinPackedScoreboardState implements CcaPackedState {
     @Unique
-    private Optional<NbtCompound> cca$serializedComponents = Optional.empty();
+    private Optional<CompoundTag> cca$serializedComponents = Optional.empty();
 
     @Override
-    public @Nullable NbtCompound cca$getSerializedComponents() {
+    public @Nullable CompoundTag cca$getSerializedComponents() {
         return this.cca$serializedComponents.orElse(null);
     }
 
     @Override
-    public void cca$setSerializedComponents(@Nullable NbtCompound nbt) {
+    public void cca$setSerializedComponents(@Nullable CompoundTag nbt) {
         this.cca$serializedComponents = Optional.ofNullable(nbt);
     }
 
     @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/codecs/RecordCodecBuilder;create(Ljava/util/function/Function;)Lcom/mojang/serialization/Codec;", remap = false))
-    private static Codec<ScoreboardState.Packed> wrapCodec(Function<RecordCodecBuilder.Instance<ScoreboardState.Packed>, ? extends App<RecordCodecBuilder.Mu<ScoreboardState.Packed>, ScoreboardState.Packed>> builder, Operation<Codec<ScoreboardState.Packed>> original) {
-        Codec<ScoreboardState.Packed> baseCodec = original.call(builder);
-        MapCodec<ScoreboardState.Packed> baseMapCodec = baseCodec instanceof MapCodec.MapCodecCodec<ScoreboardState.Packed>(
-            MapCodec<ScoreboardState.Packed> codec
+    private static Codec<ScoreboardSaveData.Packed> wrapCodec(Function<RecordCodecBuilder.Instance<ScoreboardSaveData.Packed>, ? extends App<RecordCodecBuilder.Mu<ScoreboardSaveData.Packed>, ScoreboardSaveData.Packed>> builder, Operation<Codec<ScoreboardSaveData.Packed>> original) {
+        Codec<ScoreboardSaveData.Packed> baseCodec = original.call(builder);
+        MapCodec<ScoreboardSaveData.Packed> baseMapCodec = baseCodec instanceof MapCodec.MapCodecCodec<ScoreboardSaveData.Packed>(
+            MapCodec<ScoreboardSaveData.Packed> codec
         ) ? codec : MapCodec.assumeMapUnsafe(baseCodec);
         return RecordCodecBuilder.create(instance -> instance.group(
             baseMapCodec.forGetter(state -> state),
-            NbtCompound.CODEC.optionalFieldOf(AbstractComponentContainer.NBT_KEY).forGetter(state -> ((MixinPackedScoreboardState) (Object) state).cca$serializedComponents)
+            CompoundTag.CODEC.optionalFieldOf(AbstractComponentContainer.NBT_KEY).forGetter(state -> ((MixinPackedScoreboardState) (Object) state).cca$serializedComponents)
         ).apply(instance, (packed, nbtCompound) -> {
             ((MixinPackedScoreboardState) (Object) packed).cca$serializedComponents = nbtCompound;
             return packed;

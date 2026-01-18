@@ -20,20 +20,22 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.block.common;
+package org.ladysnake.cca.mixin.scoreboard;
 
-import net.minecraft.block.entity.CommandBlockBlockEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.ladysnake.cca.api.v3.block.BlockEntitySyncCallback;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.scores.ScoreboardSaveData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(ServerPlayerEntity.class)
-public abstract class MixinServerPlayerEntity {
-    @Inject(method = "openCommandBlockScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/s2c/play/BlockEntityUpdateS2CPacket;create(Lnet/minecraft/block/entity/BlockEntity;Ljava/util/function/BiFunction;)Lnet/minecraft/network/packet/s2c/play/BlockEntityUpdateS2CPacket;"))
-    private void syncBlockEntity(CommandBlockBlockEntity commandBlock, CallbackInfo ci) {
-        BlockEntitySyncCallback.EVENT.invoker().onBlockEntitySync((ServerPlayerEntity)(Object) this, commandBlock);
+@Mixin(SavedData.class)
+public abstract class MixinSavedData {
+    @Inject(method = "isDirty", at = @At("RETURN"), cancellable = true)
+    private void forceDirty(CallbackInfoReturnable<Boolean> cir) {
+        //noinspection ConstantConditions
+        if (!cir.getReturnValueZ() && (Object) this instanceof ScoreboardSaveData) {
+            cir.setReturnValue(true);
+        }
     }
 }

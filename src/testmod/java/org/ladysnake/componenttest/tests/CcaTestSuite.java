@@ -23,32 +23,32 @@
 package org.ladysnake.componenttest.tests;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.test.TestContext;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.ladysnake.cca.api.v3.component.ComponentAccess;
 
 public final class CcaTestSuite {
     @GameTest
-    public void interfacesGetInjected(TestContext context) {
+    public void interfacesGetInjected(GameTestHelper context) {
         // CCA Block
-        context.setBlockState(1, 0, 2, Blocks.CHEST);
+        context.setBlock(1, 0, 2, Blocks.CHEST);
         checkContainer(context, context.getBlockEntity(new BlockPos(1, 0, 2), ChestBlockEntity.class));
         // CCA Chunk
-        checkContainer(context, context.getWorld().getChunk(context.getAbsolutePos(BlockPos.ORIGIN)));
+        checkContainer(context, context.getLevel().getChunk(context.absolutePos(BlockPos.ZERO)));
         // CCA Entity
-        checkContainer(context, context.spawnMob(EntityType.AXOLOTL, 1, 0, 1));
+        checkContainer(context, context.spawnWithNoFreeWill(EntityType.AXOLOTL, 1, 0, 1));
         // CCA Level
-        checkContainer(context, context.getWorld().getLevelProperties());
+        checkContainer(context, context.getLevel().getLevelData());
         // CCA Scoreboard
-        checkContainer(context, context.getWorld().getScoreboard());
-        checkContainer(context, context.getWorld().getScoreboard().addTeam("testX"));
-        context.complete();
+        checkContainer(context, context.getLevel().getScoreboard());
+        checkContainer(context, context.getLevel().getScoreboard().addPlayerTeam("testX"));
+        context.succeed();
     }
 
-    private void checkContainer(TestContext ctx, Object provider) {
+    private void checkContainer(GameTestHelper ctx, Object provider) {
         //noinspection ConstantConditions
         ctx.assertTrue(provider + " should correctly implement ComponentProvider", ((ComponentAccess) provider).asComponentProvider().getComponentContainer() != null);
     }

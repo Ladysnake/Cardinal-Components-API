@@ -5,12 +5,12 @@
   "package": "org.ladysnake.cca.mixin.world",
   "mixins": [
     "common.DataFixTypesMixin",
-    "common.MixinPlayerManager",
-    "common.MixinServerWorld",
-    "common.MixinWorld"
+    "common.MixinLevel",
+    "common.MixinPlayerList",
+    "common.MixinServerLevel"
   ],
   "client": [
-    "client.MixinClientWorld"
+    "client.MixinClientLevel"
   ],
   "injectors": {
     "defaultRequire": 1

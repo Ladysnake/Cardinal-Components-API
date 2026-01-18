@@ -24,8 +24,8 @@ package org.ladysnake.cca.api.v3.block;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * The callback interface for receiving {@link BlockEntity} synchronization events.
@@ -41,5 +41,5 @@ public interface BlockEntitySyncCallback {
     /**
      * Called when a {@link BlockEntity}'s data is sent to a player
      */
-    void onBlockEntitySync(ServerPlayerEntity player, BlockEntity blockEntity);
+    void onBlockEntitySync(ServerPlayer player, BlockEntity blockEntity);
 }

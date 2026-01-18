@@ -28,8 +28,8 @@ import com.mojang.datafixers.kinds.App;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.scores.PlayerTeam;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.internal.base.AbstractComponentContainer;
 import org.ladysnake.cca.internal.scoreboard.CcaPackedState;
@@ -40,30 +40,30 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Mixin(Team.Packed.class)
+@Mixin(PlayerTeam.Packed.class)
 public abstract class MixinPackedTeam implements CcaPackedState {
     @Unique
-    private Optional<NbtCompound> cca$serializedComponents;
+    private Optional<CompoundTag> cca$serializedComponents;
 
     @Override
-    public @Nullable NbtCompound cca$getSerializedComponents() {
+    public @Nullable CompoundTag cca$getSerializedComponents() {
         return this.cca$serializedComponents.orElse(null);
     }
 
     @Override
-    public void cca$setSerializedComponents(@Nullable NbtCompound nbt) {
+    public void cca$setSerializedComponents(@Nullable CompoundTag nbt) {
         this.cca$serializedComponents = Optional.ofNullable(nbt);
     }
 
     @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/codecs/RecordCodecBuilder;create(Ljava/util/function/Function;)Lcom/mojang/serialization/Codec;", remap = false))
-    private static Codec<Team.Packed> wrapCodec(Function<RecordCodecBuilder.Instance<Team.Packed>, ? extends App<RecordCodecBuilder.Mu<Team.Packed>, Team.Packed>> builder, Operation<Codec<Team.Packed>> original) {
-        Codec<Team.Packed> baseCodec = original.call(builder);
-        MapCodec<Team.Packed> baseMapCodec = baseCodec instanceof MapCodec.MapCodecCodec<Team.Packed>(
-            MapCodec<Team.Packed> codec
+    private static Codec<PlayerTeam.Packed> wrapCodec(Function<RecordCodecBuilder.Instance<PlayerTeam.Packed>, ? extends App<RecordCodecBuilder.Mu<PlayerTeam.Packed>, PlayerTeam.Packed>> builder, Operation<Codec<PlayerTeam.Packed>> original) {
+        Codec<PlayerTeam.Packed> baseCodec = original.call(builder);
+        MapCodec<PlayerTeam.Packed> baseMapCodec = baseCodec instanceof MapCodec.MapCodecCodec<PlayerTeam.Packed>(
+            MapCodec<PlayerTeam.Packed> codec
         ) ? codec : MapCodec.assumeMapUnsafe(baseCodec);
         return RecordCodecBuilder.create(instance -> instance.group(
             baseMapCodec.forGetter(state -> state),
-            NbtCompound.CODEC.optionalFieldOf(AbstractComponentContainer.NBT_KEY).forGetter(state -> ((MixinPackedTeam) (Object) state).cca$serializedComponents)
+            CompoundTag.CODEC.optionalFieldOf(AbstractComponentContainer.NBT_KEY).forGetter(state -> ((MixinPackedTeam) (Object) state).cca$serializedComponents)
         ).apply(instance, (packed, nbtCompound) -> {
             ((MixinPackedTeam) (Object) packed).cca$serializedComponents = nbtCompound;
             return packed;

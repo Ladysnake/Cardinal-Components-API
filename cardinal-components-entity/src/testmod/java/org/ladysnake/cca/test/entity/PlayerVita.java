@@ -22,14 +22,14 @@
  */
 package org.ladysnake.cca.test.entity;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.sync.PlayerSyncPredicate;
@@ -47,7 +47,7 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
     public static final int INCREASE_VITA = 0b10;
     public static final int DECREASE_VITA = 0b100;
 
-    public PlayerVita(PlayerEntity owner) {
+    public PlayerVita(Player owner) {
         super(owner, 0);
     }
 
@@ -62,22 +62,22 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
 
     @Override
     public void serverTick() {
-        if (this.owner.age % 1200 == 0) {
+        if (this.owner.tickCount % 1200 == 0) {
             CardinalGameTest.LOGGER.info("{} is still alive", this.owner);
         }
     }
 
     @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player) {
+    public boolean shouldSyncWith(ServerPlayer player) {
         return player == this.owner;
     }
 
     @Override
-    public void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity recipient) {
+    public void writeSyncPacket(RegistryFriendlyByteBuf buf, ServerPlayer recipient) {
         this.writeSyncPacket(buf, recipient, 0);
     }
 
-    private void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient, int increase) {
+    private void writeSyncPacket(FriendlyByteBuf buf, ServerPlayer recipient, int increase) {
         boolean fullSync = recipient == this.owner;
         int flags = (fullSync ? 1 : 0) | (increase > 0 ? INCREASE_VITA : increase < 0 ? DECREASE_VITA : 0);
         buf.writeByte(flags);
@@ -87,15 +87,15 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
     }
 
     @Override
-    public void applySyncPacket(RegistryByteBuf buf) {
+    public void applySyncPacket(RegistryFriendlyByteBuf buf) {
         int flags = buf.readByte();
         if ((flags & 1) != 0) {
             this.vitality = buf.readVarInt();
         }
         if ((flags & INCREASE_VITA) != 0) {
-            MinecraftClient.getInstance().particleManager.addEmitter(this.owner, ParticleTypes.TOTEM_OF_UNDYING, 30);
+            Minecraft.getInstance().particleEngine.createTrackingEmitter(this.owner, ParticleTypes.TOTEM_OF_UNDYING, 30);
         } else if ((flags & DECREASE_VITA) != 0) {
-            MinecraftClient.getInstance().particleManager.addEmitter(this.owner, ParticleTypes.ASH, 30);
+            Minecraft.getInstance().particleEngine.createTrackingEmitter(this.owner, ParticleTypes.ASH, 30);
         }
     }
 
@@ -105,7 +105,7 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
     }
 
     @Override
-    public void copyForRespawn(@NotNull BaseVita original, RegistryWrapper.WrapperLookup registryLookup, boolean lossless, boolean keepInventory, boolean switchingCharacter) {
+    public void copyForRespawn(@NotNull BaseVita original, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean switchingCharacter) {
         RespawnableComponent.super.copyForRespawn(original, registryLookup, lossless, keepInventory, switchingCharacter);
         if (!lossless && !keepInventory) {
             this.vitality -= 5;
@@ -113,7 +113,7 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
     }
 
     @Override
-    public void handleC2SMessage(RegistryByteBuf buf) {
-        ((PlayerEntity) this.owner).sendMessage(Text.of("Sync!"), true);
+    public void handleC2SMessage(RegistryFriendlyByteBuf buf) {
+        ((Player) this.owner).displayClientMessage(Component.nullToEmpty("Sync!"), true);
     }
 }

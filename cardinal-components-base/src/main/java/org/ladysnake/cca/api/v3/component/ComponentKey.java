@@ -25,12 +25,12 @@ package org.ladysnake.cca.api.v3.component;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.PacketCallbacks;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.PacketSendListener;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -174,7 +174,7 @@ public abstract class ComponentKey<C extends Component> {
      * @see ComponentAccess#syncComponent(ComponentKey, ComponentPacketWriter, PlayerSyncPredicate)
      */
     public void sync(Object provider, ComponentPacketWriter packetWriter, PlayerSyncPredicate predicate) {
-        for (ServerPlayerEntity player : ((ComponentProvider) provider).getRecipientsForComponentSync()) {
+        for (ServerPlayer player : ((ComponentProvider) provider).getRecipientsForComponentSync()) {
             this.syncWith(player, (ComponentProvider) provider, packetWriter, predicate);
         }
     }
@@ -191,28 +191,28 @@ public abstract class ComponentKey<C extends Component> {
      * @throws ClassCastException     if <code>provider</code> does not implement {@link ComponentProvider}
      */
     @ApiStatus.Experimental
-    public void syncWith(ServerPlayerEntity player, ComponentProvider provider) {
+    public void syncWith(ServerPlayer player, ComponentProvider provider) {
         if (this.get(provider) instanceof AutoSyncedComponent synced) {
             this.syncWith(player, provider, synced, synced);
         }
     }
 
     @ApiStatus.Experimental
-    public void syncWith(ServerPlayerEntity player, ComponentProvider provider, ComponentPacketWriter writer, PlayerSyncPredicate predicate) {
+    public void syncWith(ServerPlayer player, ComponentProvider provider, ComponentPacketWriter writer, PlayerSyncPredicate predicate) {
         if (predicate.shouldSyncWith(player)) {
-            RegistryByteBuf buf = new RegistryByteBuf(Unpooled.buffer(), player.getEntityWorld().getRegistryManager());
+            RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), player.level().registryAccess());
             writer.writeSyncPacket(buf, player);
-            CustomPayload payload = provider.toComponentPacket(this, predicate.isRequiredOnClient(), buf);
+            CustomPacketPayload payload = provider.toComponentPacket(this, predicate.isRequiredOnClient(), buf);
 
             if (payload != null) {
-                if (ServerPlayNetworking.canSend(player, payload.getId())) {
-                    ServerPlayNetworking.getSender(player).sendPacket(payload, PacketCallbacks.always(buf::release));
+                if (ServerPlayNetworking.canSend(player, payload.type())) {
+                    ServerPlayNetworking.getSender(player).sendPacket(payload, PacketSendListener.thenRun(buf::release));
                 } else {
                     if (predicate.isRequiredOnClient()) {
                         String specificMod = FabricLoader.getInstance().getModContainer(this.id.getNamespace()).map(c -> c.getMetadata().getName() + " and ").orElse("");
-                        player.networkHandler.disconnect(Text.literal(
+                        player.connection.disconnect(Component.literal(
                             "This server requires " + specificMod + "Cardinal Components API " +
-                                "(unhandled packet: " + payload.getId().id() + ")" +
+                                "(unhandled packet: " + payload.type().id() + ")" +
                                 ComponentsInternals.getClientOptionalModAdvice()));
                     }
                     buf.release();

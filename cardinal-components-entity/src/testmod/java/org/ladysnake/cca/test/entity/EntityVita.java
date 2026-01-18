@@ -22,9 +22,9 @@
  */
 package org.ladysnake.cca.test.entity;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 import org.ladysnake.cca.test.base.BaseVita;
 
 public class EntityVita extends BaseVita {
@@ -38,11 +38,11 @@ public class EntityVita extends BaseVita {
     @Override
     public void setVitality(int value) {
         super.setVitality(value);
-        if (!this.owner.getEntityWorld().isClient()) {
+        if (!this.owner.level().isClientSide()) {
             if (this.getVitality() == 0) {
-                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 4000));
+                this.owner.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 4000));
             } else if (this.getVitality() > 10) {
-                this.owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1000));
+                this.owner.addEffect(new MobEffectInstance(MobEffects.SPEED, 1000));
             }
         }
     }

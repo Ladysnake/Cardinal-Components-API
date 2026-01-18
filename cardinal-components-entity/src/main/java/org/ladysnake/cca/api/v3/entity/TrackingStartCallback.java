@@ -24,8 +24,8 @@ package org.ladysnake.cca.api.v3.entity;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
 @FunctionalInterface
 public interface TrackingStartCallback {
@@ -35,5 +35,5 @@ public interface TrackingStartCallback {
         }
     });
 
-    void onPlayerStartTracking(ServerPlayerEntity player, Entity entity);
+    void onPlayerStartTracking(ServerPlayer player, Entity entity);
 }

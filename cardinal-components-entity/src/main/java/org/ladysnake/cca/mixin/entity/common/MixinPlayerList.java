@@ -22,11 +22,11 @@
  */
 package org.ladysnake.cca.mixin.entity.common;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ConnectedClientData;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.network.Connection;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.entity.Entity;
 import org.ladysnake.cca.api.v3.entity.PlayerSyncCallback;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,32 +34,32 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(PlayerManager.class)
-public abstract class MixinPlayerManager {
+@Mixin(PlayerList.class)
+public abstract class MixinPlayerList {
     @Inject(
-            method = "onPlayerConnect",
+            method = "placeNewPlayer",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/PlayerManager;sendStatusEffects(Lnet/minecraft/server/network/ServerPlayerEntity;)V"
+                    target = "Lnet/minecraft/server/players/PlayerList;sendActivePlayerEffects(Lnet/minecraft/server/level/ServerPlayer;)V"
             )
     )
-    private void onPlayerLogIn(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
+    private void onPlayerLogIn(Connection connection, ServerPlayer player, CommonListenerCookie clientData, CallbackInfo ci) {
         PlayerSyncCallback.EVENT.invoker().onPlayerSync(player);
     }
 
     @Inject(
-        method = "sendPlayerStatus",
+        method = "sendAllPlayerInfo",
         at = @At("RETURN")
     )
-    private void sendPlayerStatus(ServerPlayerEntity player, CallbackInfo info) {
+    private void sendPlayerStatus(ServerPlayer player, CallbackInfo info) {
         PlayerSyncCallback.EVENT.invoker().onPlayerSync(player);
     }
 
     @Inject(
-            method = "respawnPlayer",
+            method = "respawn",
             at = @At("RETURN")
     )
-    private void respawnPlayer(ServerPlayerEntity player, boolean alive, Entity.RemovalReason removalReason, CallbackInfoReturnable<ServerPlayerEntity> cir) {
+    private void respawnPlayer(ServerPlayer player, boolean alive, Entity.RemovalReason removalReason, CallbackInfoReturnable<ServerPlayer> cir) {
         PlayerSyncCallback.EVENT.invoker().onPlayerSync(cir.getReturnValue());
     }
 }

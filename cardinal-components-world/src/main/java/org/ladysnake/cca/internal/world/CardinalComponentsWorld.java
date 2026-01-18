@@ -25,9 +25,9 @@ package org.ladysnake.cca.internal.world;
 import com.mojang.datafixers.util.Unit;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -40,8 +40,8 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 public final class CardinalComponentsWorld {
-    public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> PACKET_ID = ComponentUpdatePayload.id("world_sync");
-    private static final Map<@Nullable RegistryKey<World>, ComponentContainer.Factory<World>> worldContainerFactories = new IdentityHashMap<>();
+    public static final CustomPacketPayload.Type<ComponentUpdatePayload<Unit>> PACKET_ID = ComponentUpdatePayload.id("world_sync");
+    private static final Map<@Nullable ResourceKey<Level>, ComponentContainer.Factory<Level>> worldContainerFactories = new IdentityHashMap<>();
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
@@ -60,17 +60,17 @@ public final class CardinalComponentsWorld {
         StaticWorldComponentPlugin.INSTANCE.ensureInitialized();
     }
 
-    public static ComponentContainer createComponents(World world) {
+    public static ComponentContainer createComponents(Level world) {
         return worldContainerFactories.computeIfAbsent(
-            world.getRegistryKey(),
+            world.dimension(),
             CardinalComponentsWorld::getWorldComponentFactory
         ).createContainer(world);
     }
 
 
-    private static synchronized ComponentContainer.Factory<World> getWorldComponentFactory(RegistryKey<World> dimensionKey) {
+    private static synchronized ComponentContainer.Factory<Level> getWorldComponentFactory(ResourceKey<Level> dimensionKey) {
         // need to check again despite synchronization, because the factory may have been generated while waiting from createComponents
-        ComponentContainer.Factory<World> existing = worldContainerFactories.get(dimensionKey);
+        ComponentContainer.Factory<Level> existing = worldContainerFactories.get(dimensionKey);
         if (existing != null) return existing;
 
         if (StaticWorldComponentPlugin.INSTANCE.requiresStaticFactory(dimensionKey)) {

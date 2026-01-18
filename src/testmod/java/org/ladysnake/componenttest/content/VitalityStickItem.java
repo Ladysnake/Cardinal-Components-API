@@ -22,24 +22,26 @@
  */
 package org.ladysnake.componenttest.content;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.scoreboard.AbstractTeam;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.Item.TooltipContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.scores.Team;
 import org.ladysnake.cca.test.base.Vita;
 import org.ladysnake.cca.test.block.CcaBlockTestMod;
 import org.ladysnake.cca.test.world.AmbientVita;
@@ -49,78 +51,78 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class VitalityStickItem extends Item {
-    public VitalityStickItem(Settings settings) {
+    public VitalityStickItem(Properties settings) {
         super(settings);
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getStackInHand(hand);
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
         Vita vita = ItemVita.maybeGet(stack).orElseThrow();
-        if (!world.isClient()) {
-            if (player.isSneaking()) {
+        if (!world.isClientSide()) {
+            if (player.isShiftKeyDown()) {
                 Vita src = vita.getVitality() > 0 ? vita : Vita.get(player);
                 AmbientVita worldVita = (AmbientVita) Vita.get(
                         world.random.nextInt(10) == 0
-                                ? world.getLevelProperties()
+                                ? world.getLevelData()
                                 : world
                 );
                 src.transferTo(worldVita, 1);
-                worldVita.syncWithAll(((ServerWorld)world).getServer());
+                worldVita.syncWithAll(((ServerLevel)world).getServer());
             } else if (vita.getVitality() > 0) {
                 vita.transferTo(Vita.get(player), vita.getVitality());
             }
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
+    public InteractionResult useOn(UseOnContext context) {
         // only on client side, to confirm that sync works
-        if (context.getWorld().isClient() && context.getPlayer() != null) {
+        if (context.getLevel().isClientSide() && context.getPlayer() != null) {
             Vita vita = CcaBlockTestMod.VITA_API_LOOKUP.find(
-                context.getWorld(),
-                context.getBlockPos(),
-                context.getSide()
+                context.getLevel(),
+                context.getClickedPos(),
+                context.getClickedFace()
             );
             if (vita != null) {
-                context.getPlayer().sendMessage(Text.translatable("componenttest:action.block_vitality",
+                context.getPlayer().displayClientMessage(Component.translatable("componenttest:action.block_vitality",
                     vita.getVitality()), true);
             }
         }
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void postHit(ItemStack stack, LivingEntity target, LivingEntity holder) {
+    public void hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity holder) {
         // The entity may not have the component, but the stack always does.
         Vita.KEY.maybeGet(target)
                 .ifPresent(src -> ItemVita.maybeGet(stack).ifPresent(dest -> src.transferTo(dest, 1)));
 
-        AbstractTeam team = holder.getScoreboardTeam();
+        Team team = holder.getTeam();
         if (team != null) {
-            Optional<Vita> vita = Vita.KEY.maybeGet(target.getScoreboardTeam());
+            Optional<Vita> vita = Vita.KEY.maybeGet(target.getTeam());
             if (vita.isEmpty()) {
                 vita = Vita.KEY.maybeGet(target);
             }
             vita.ifPresent(v -> v.transferTo(Vita.get(team), 1));
         }
 
-        stack.damage(1, holder, EquipmentSlot.MAINHAND);
+        stack.hurtAndBreak(1, holder, EquipmentSlot.MAINHAND);
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, displayComponent, tooltip, type);
-        tooltip.accept(Text.translatable("componenttest:tooltip.vitality", ItemVita.getOrEmpty(stack).getVitality()));
-        ClientPlayerEntity holder = MinecraftClient.getInstance().player;
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> tooltip, TooltipFlag type) {
+        super.appendHoverText(stack, context, displayComponent, tooltip, type);
+        tooltip.accept(Component.translatable("componenttest:tooltip.vitality", ItemVita.getOrEmpty(stack).getVitality()));
+        LocalPlayer holder = Minecraft.getInstance().player;
         if (holder != null) {
-            tooltip.accept(Text.translatable("componenttest:tooltip.self_vitality", Vita.KEY.get(holder).getVitality()));
+            tooltip.accept(Component.translatable("componenttest:tooltip.self_vitality", Vita.KEY.get(holder).getVitality()));
         }
     }
 
     @Override
-    public boolean canMine(ItemStack stack, BlockState state, World world, BlockPos pos, LivingEntity user) {
-        return !(user instanceof PlayerEntity player && player.isCreative());
+    public boolean canDestroyBlock(ItemStack stack, BlockState state, Level world, BlockPos pos, LivingEntity user) {
+        return !(user instanceof Player player && player.isCreative());
     }
 }

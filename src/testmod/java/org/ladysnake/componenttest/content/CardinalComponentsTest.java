@@ -26,27 +26,25 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 import org.ladysnake.cca.internal.base.GenericContainerBuilder;
@@ -62,50 +60,50 @@ import java.util.UUID;
 
 public class CardinalComponentsTest {
 
-    public static final RegistryKey<ItemGroup> ITEM_GROUP_KEY = RegistryKey.of(RegistryKeys.ITEM_GROUP, id("ccagroup"));
+    public static final ResourceKey<CreativeModeTab> ITEM_GROUP_KEY = ResourceKey.create(Registries.CREATIVE_MODE_TAB, id("ccagroup"));
 
-    public static final ItemGroup ITEM_GROUP = FabricItemGroup.builder()
-        .displayName(Text.translatable("componenttest:item_group"))
+    public static final CreativeModeTab ITEM_GROUP = FabricItemGroup.builder()
+        .title(Component.translatable("componenttest:item_group"))
         .icon(() -> new ItemStack(Items.COBBLESTONE))
         .build();
 
     public static final Logger LOGGER = LogManager.getLogger("Component Test");
 
-    public static final RegistryKey<Item> VITA_STICK_ID = RegistryKey.of(RegistryKeys.ITEM, id("vita_stick"));
+    public static final ResourceKey<Item> VITA_STICK_ID = ResourceKey.create(Registries.ITEM, id("vita_stick"));
     // inline self component callback registration
-    public static final VitalityStickItem VITALITY_STICK = Registry.register(Registries.ITEM, VITA_STICK_ID,
-            new VitalityStickItem(new Item.Settings().maxDamage(50).registryKey(VITA_STICK_ID)));
+    public static final VitalityStickItem VITALITY_STICK = Registry.register(BuiltInRegistries.ITEM, VITA_STICK_ID,
+            new VitalityStickItem(new Item.Properties().durability(50).setId(VITA_STICK_ID)));
 
-    public static final RegistryKey<Block> VITALITY_CONDENSER_ID = RegistryKey.of(RegistryKeys.BLOCK, id("vita_condenser"));
-    public static final VitalityCondenser VITALITY_CONDENSER = Registry.register(Registries.BLOCK, VITALITY_CONDENSER_ID,
-        new VitalityCondenser(AbstractBlock.Settings.copy(Blocks.STONE).registryKey(VITALITY_CONDENSER_ID).dropsNothing().luminance(s -> 5).ticksRandomly()));
+    public static final ResourceKey<Block> VITALITY_CONDENSER_ID = ResourceKey.create(Registries.BLOCK, id("vita_condenser"));
+    public static final VitalityCondenser VITALITY_CONDENSER = Registry.register(BuiltInRegistries.BLOCK, VITALITY_CONDENSER_ID,
+        new VitalityCondenser(net.minecraft.world.level.block.state.BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).setId(VITALITY_CONDENSER_ID).noLootTable().lightLevel(s -> 5).randomTicks()));
 
-    public static final RegistryKey<EntityType<?>> VITALITY_ZOMBIE_ID = RegistryKey.of(RegistryKeys.ENTITY_TYPE, id("vita_zombie"));
-    public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(Registries.ENTITY_TYPE, VITALITY_ZOMBIE_ID,
-            EntityType.Builder.create(VitalityZombieEntity::new, SpawnGroup.MONSTER)
-                .dimensions(EntityType.ZOMBIE.getDimensions().width(), EntityType.ZOMBIE.getDimensions().height())
+    public static final ResourceKey<EntityType<?>> VITALITY_ZOMBIE_ID = ResourceKey.create(Registries.ENTITY_TYPE, id("vita_zombie"));
+    public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(BuiltInRegistries.ENTITY_TYPE, VITALITY_ZOMBIE_ID,
+            EntityType.Builder.of(VitalityZombieEntity::new, MobCategory.MONSTER)
+                .sized(EntityType.ZOMBIE.getDimensions().width(), EntityType.ZOMBIE.getDimensions().height())
                 .build(VITALITY_ZOMBIE_ID));
 
     public static Identifier id(String path) {
-        return Identifier.of("componenttest", path);
+        return Identifier.fromNamespaceAndPath("componenttest", path);
     }
 
     public static void init() {
         LOGGER.info("Hello, Components!");
 
-        Registry.register(Registries.ITEM_GROUP, ITEM_GROUP_KEY, ITEM_GROUP);
-        Registry.register(Registries.DATA_COMPONENT_TYPE, id("vita"), ItemVita.Data.COMPONENT_TYPE);
-        Registry.register(Registries.DATA_COMPONENT_TYPE, id("alt_vita"), ItemVita.Data.ALT_COMPONENT_TYPE);
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ITEM_GROUP_KEY, ITEM_GROUP);
+        Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, id("vita"), ItemVita.Data.COMPONENT_TYPE);
+        Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, id("alt_vita"), ItemVita.Data.ALT_COMPONENT_TYPE);
 
         CommandRegistrationCallback.EVENT.register((dispatcher, reg, dedicated) -> VitaCommand.register(dispatcher));
 
-        FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, ZombieEntity.createZombieAttributes());
+        FabricDefaultAttributeRegistry.register(VITALITY_ZOMBIE, Zombie.createAttributes());
         ItemVita.LOOKUP.registerForItems((stack, ctx) -> new ItemVita(ItemVita.Data.COMPONENT_TYPE, stack), VITALITY_STICK);
 
         ComponentContainer.Factory.Builder<Integer> factoryBuilder = ComponentContainer.Factory.builder(Integer.class)
             .component(Vita.KEY, BaseVita::new);
         ComponentContainer.Factory<Integer> containerFactory = factoryBuilder.build();
-        ItemGroupEvents.modifyEntriesEvent(CardinalComponentsTest.ITEM_GROUP_KEY).register(entries -> entries.add(CardinalComponentsTest.VITALITY_STICK));
+        ItemGroupEvents.modifyEntriesEvent(CardinalComponentsTest.ITEM_GROUP_KEY).register(entries -> entries.accept(CardinalComponentsTest.VITALITY_STICK));
         LOGGER.info(containerFactory.createContainer(3));
         LOGGER.info(containerFactory.createContainer(5));
         try {
@@ -114,14 +112,14 @@ public class CardinalComponentsTest {
         } catch (IllegalStateException ignored) { }
 
         try {
-            ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.of("hi"), Vita.class);
+            ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.parse("hi"), Vita.class);
             assert false : "Static components must be registered through mod metadata or plugin";
         } catch (IllegalStateException ignored) { }
 
         LOGGER.info(new GenericContainerBuilder<>(
             TestComponentFactory.class,
             TestContainerFactory.class,
-            List.of(UUID.class, PlayerEntity.class),
+            List.of(UUID.class, Player.class),
             (u, p) -> ComponentContainer.EMPTY
         ).build().create(UUID.randomUUID(), null));
 
@@ -129,7 +127,7 @@ public class CardinalComponentsTest {
             LOGGER.info(new GenericContainerBuilder<>(
                 TestComponentFactory.class,
                 TestContainerFactory.class,
-                List.of(UUID.class, PlayerEntity.class),
+                List.of(UUID.class, Player.class),
                 (u, p) -> ComponentContainer.EMPTY
             ).build().create(UUID.randomUUID(), null));
             assert false : "Only one factory should be created for any given provider type";
@@ -143,10 +141,10 @@ public class CardinalComponentsTest {
 
     @FunctionalInterface
     public interface TestComponentFactory<C extends Component> {
-        C create(UUID u, @Nullable PlayerEntity p);
+        C create(UUID u, @Nullable Player p);
     }
 
     public interface TestContainerFactory {
-        ComponentContainer create(UUID u, @Nullable PlayerEntity p);
+        ComponentContainer create(UUID u, @Nullable Player p);
     }
 }

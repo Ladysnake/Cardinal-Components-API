@@ -22,7 +22,7 @@
  */
 package org.ladysnake.cca.internal.block;
 
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 
 import java.util.HashMap;

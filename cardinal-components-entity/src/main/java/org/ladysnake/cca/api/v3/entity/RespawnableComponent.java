@@ -22,11 +22,11 @@
  */
 package org.ladysnake.cca.api.v3.entity;
 
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.world.rule.GameRules;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.ladysnake.cca.api.v3.component.Component;
@@ -62,16 +62,16 @@ public interface RespawnableComponent<C extends Component> extends Component, Co
      *                       Can only be {@code false} with other mods installed.
      * @implNote the default implementation delegates to {@link CopyableComponent#copyFrom}
      */
-    default void copyForRespawn(C original, RegistryWrapper.WrapperLookup registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
+    default void copyForRespawn(C original, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
         this.copyFrom(original, registryLookup);
     }
 
     @Override
-    default void copyFrom(C other, RegistryWrapper.WrapperLookup registryLookup) {
-        try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
-            NbtWriteView writeView = NbtWriteView.create(errorReporter, registryLookup);
+    default void copyFrom(C other, HolderLookup.Provider registryLookup) {
+        try (var errorReporter = new ProblemReporter.ScopedCollector(ComponentsInternals.LOGGER)) {
+            TagValueOutput writeView = TagValueOutput.createWithContext(errorReporter, registryLookup);
             other.writeData(writeView);
-            this.readData(NbtReadView.create(errorReporter, registryLookup, writeView.getNbt()));
+            this.readData(TagValueInput.create(errorReporter, registryLookup, writeView.buildResult()));
         }
 
     }

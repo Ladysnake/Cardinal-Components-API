@@ -22,7 +22,7 @@
  */
 package org.ladysnake.cca.api.v3.item;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
 
 /**
@@ -35,7 +35,7 @@ import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
  */
 public interface ItemComponentInitializer extends ComponentRegistrationInitializer {
     /**
-     * Called to register component migrations from CCA to {@link net.minecraft.component.ComponentType}.
+     * Called to register component migrations from CCA to {@link net.minecraft.core.component.DataComponentType}.
      *
      * @param registry an {@link ItemComponentMigrationRegistry} for component migrations
      * @since 7.0.0

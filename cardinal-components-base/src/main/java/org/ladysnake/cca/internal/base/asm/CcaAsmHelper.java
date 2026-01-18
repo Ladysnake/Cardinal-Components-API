@@ -25,7 +25,7 @@ package org.ladysnake.cca.internal.base.asm;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.Component;

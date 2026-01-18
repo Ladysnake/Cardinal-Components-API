@@ -22,12 +22,12 @@
  */
 package org.ladysnake.componenttest.content;
 
-import net.minecraft.block.entity.EndPortalBlockEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.passive.CowEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.TheEndPortalBlockEntity;
 import org.ladysnake.cca.api.v3.block.BlockComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.block.BlockComponentInitializer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -52,23 +52,23 @@ public final class TestComponents implements
     ItemComponentInitializer,
     ScoreboardComponentInitializer {
 
-    public static final Identifier CUSTOM_PROVIDER_1 = Identifier.of("componenttest:custom/1");
-    public static final Identifier CUSTOM_PROVIDER_2 = Identifier.of("componenttest:custom/2");
+    public static final Identifier CUSTOM_PROVIDER_1 = Identifier.parse("componenttest:custom/1");
+    public static final Identifier CUSTOM_PROVIDER_2 = Identifier.parse("componenttest:custom/2");
 
     public static final ComponentKey<Vita> ALT_VITA = ComponentRegistryV3.INSTANCE.getOrCreate(TestStaticComponentInitializer.ALT_VITA_ID, Vita.class);
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.beginRegistration(HostileEntity.class, ALT_VITA).after(Vita.KEY).end(e -> new BaseVita());
-        registry.beginRegistration(PlayerEntity.class, ALT_VITA).after(Vita.KEY).respawnStrategy(RespawnCopyStrategy.ALWAYS_COPY).end(e -> new BaseVita());
+        registry.beginRegistration(Monster.class, ALT_VITA).after(Vita.KEY).end(e -> new BaseVita());
+        registry.beginRegistration(Player.class, ALT_VITA).after(Vita.KEY).respawnStrategy(RespawnCopyStrategy.ALWAYS_COPY).end(e -> new BaseVita());
         registry.registerFor(VitalityZombieEntity.class, Vita.KEY, VitalityZombieEntity::createVitaComponent);
-        registry.beginRegistration(LivingEntity.class, ALT_VITA).filter(CowEntity.class::isAssignableFrom).end(CcaEntityTestMod::createForEntity);
+        registry.beginRegistration(LivingEntity.class, ALT_VITA).filter(Cow.class::isAssignableFrom).end(CcaEntityTestMod::createForEntity);
     }
 
     @Override
     public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
-        registry.beginRegistration(EndPortalBlockEntity.class, ALT_VITA).after(Vita.KEY).impl(SyncedVita.class).end(SyncedVita::new);
-        registry.registerFor(EndPortalBlockEntity.class, Vita.KEY, SyncedVita::new);
+        registry.beginRegistration(TheEndPortalBlockEntity.class, ALT_VITA).after(Vita.KEY).impl(SyncedVita.class).end(SyncedVita::new);
+        registry.registerFor(TheEndPortalBlockEntity.class, Vita.KEY, SyncedVita::new);
     }
 
     @Override

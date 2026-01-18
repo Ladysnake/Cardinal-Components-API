@@ -22,8 +22,8 @@
  */
 package org.ladysnake.cca.api.v3.world;
 
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -33,40 +33,40 @@ import org.ladysnake.cca.api.v3.component.ComponentKey;
  */
 public interface WorldComponentFactoryRegistry {
     /**
-     * Registers a {@link ComponentFactory} for all {@linkplain World worlds}.
+     * Registers a {@link ComponentFactory} for all {@linkplain Level worlds}.
      *
      * <p>If the component's actual implementation has different capabilities to {@code C}
      * (typically if it is ticking and {@code C} is not), one should use the {@linkplain #register(ComponentKey, Class, ComponentFactory) dedicated overload}.
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void register(ComponentKey<C> type, ComponentFactory<World, ? extends C> factory);
+    <C extends Component> void register(ComponentKey<C> type, ComponentFactory<Level, ? extends C> factory);
 
     /**
-     * Registers a {@link ComponentFactory} for all {@link World worlds}, specifying which implementation of the component interface is used.
+     * Registers a {@link ComponentFactory} for all {@link Level worlds}, specifying which implementation of the component interface is used.
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<World, ? extends C> factory);
+    <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<Level, ? extends C> factory);
 
     /**
-     * Registers a {@link ComponentFactory} only for {@linkplain World worlds} with the given {@code dimensionId}.
+     * Registers a {@link ComponentFactory} only for {@linkplain Level worlds} with the given {@code dimensionId}.
      *
      * <p>If the component's actual implementation has different capabilities to {@code C}
-     * (typically if it is ticking and {@code C} is not), one should use the {@linkplain #registerFor(RegistryKey, ComponentKey, Class, ComponentFactory) dedicated overload}.
+     * (typically if it is ticking and {@code C} is not), one should use the {@linkplain #registerFor(ResourceKey, ComponentKey, Class, ComponentFactory) dedicated overload}.
      *
      * @param factory the factory to use to create components of the given type
      * @since 6.0.0
      */
-    <C extends Component> void registerFor(RegistryKey<World> dimensionId, ComponentKey<C> type, ComponentFactory<World, ? extends C> factory);
+    <C extends Component> void registerFor(ResourceKey<Level> dimensionId, ComponentKey<C> type, ComponentFactory<Level, ? extends C> factory);
 
     /**
-     * Registers a {@link ComponentFactory} only for {@linkplain World worlds} with the given {@code dimensionId},
+     * Registers a {@link ComponentFactory} only for {@linkplain Level worlds} with the given {@code dimensionId},
      * specifying which implementation of the component interface is used.
      *
      * @param factory the factory to use to create components of the given type
      * @since 6.0.0
      */
-    <C extends Component> void registerFor(RegistryKey<World> dimensionId, ComponentKey<? super C> type, Class<C> impl, ComponentFactory<World, ? extends C> factory);
+    <C extends Component> void registerFor(ResourceKey<Level> dimensionId, ComponentKey<? super C> type, Class<C> impl, ComponentFactory<Level, ? extends C> factory);
 
 }

@@ -20,36 +20,21 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.chunk.common;
+package org.ladysnake.cca.mixin.world.common;
 
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.HeightLimitView;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.PalettesFactory;
-import net.minecraft.world.chunk.UpgradeData;
-import net.minecraft.world.gen.chunk.BlendingData;
-import org.ladysnake.cca.api.v3.component.ComponentContainer;
-import org.ladysnake.cca.api.v3.component.ComponentProvider;
-import org.ladysnake.cca.internal.chunk.StaticChunkComponentPlugin;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import org.ladysnake.cca.api.v3.world.WorldSyncCallback;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(Chunk.class)
-public abstract class MixinChunk implements ComponentProvider {
-    @Unique
-    private ComponentContainer components;
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void initComponents(ChunkPos pos, UpgradeData upgradeData, HeightLimitView heightLimitView, PalettesFactory palettesFactory, long inhabitedTime, ChunkSection[] sectionArray, BlendingData blendingData, CallbackInfo ci) {
-        this.components = StaticChunkComponentPlugin.createContainer((Chunk) (Object) this);
-    }
-
-    @Override
-    public ComponentContainer getComponentContainer() {
-        return this.components;
+@Mixin(PlayerList.class)
+public abstract class MixinPlayerList {
+    @Inject(method = "sendLevelInfo", at = @At("RETURN"))
+    private void sendWorldInfo(ServerPlayer player, ServerLevel world, CallbackInfo ci) {
+        WorldSyncCallback.EVENT.invoker().onPlayerStartTracking(player, world);
     }
 }

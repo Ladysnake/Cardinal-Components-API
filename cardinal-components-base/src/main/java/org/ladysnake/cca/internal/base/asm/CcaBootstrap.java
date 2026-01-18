@@ -28,8 +28,8 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
+import net.minecraft.IdentifierException;
+import net.minecraft.resources.Identifier;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.StaticComponentInitializer;
@@ -89,9 +89,9 @@ public final class CcaBootstrap extends LazyDispatcher {
                 if (metadata.containsCustomValue("cardinal-components")) {
                     try {
                         for (CustomValue value : metadata.getCustomValue("cardinal-components").getAsArray()) {
-                            staticComponentTypes.add(Identifier.of(value.getAsString()));
+                            staticComponentTypes.add(Identifier.parse(value.getAsString()));
                         }
-                    } catch (ClassCastException | InvalidIdentifierException e) {
+                    } catch (ClassCastException | IdentifierException e) {
                         throw new StaticComponentLoadingException("Failed to load component ids declared by " + metadata.getName() + "(" + metadata.getId() + ")", e);
                     }
                 }

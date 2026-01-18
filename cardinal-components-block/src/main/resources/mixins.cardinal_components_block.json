@@ -2,13 +2,13 @@
   "required": true,
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
-  "package": "org.ladysnake.cca.mixin.block",
+  "package": "org.ladysnake.cca.mixin.block.common",
   "mixins": [
-    "common.MixinBlockEntity",
-    "common.MixinChunkDataSender",
-    "common.MixinChunkHolder",
-    "common.MixinServerPlayerEntity",
-    "common.MixinWorldChunk"
+    "MixinBlockEntity",
+    "MixinChunkDataSender",
+    "MixinChunkHolder",
+    "MixinServerPlayerEntity",
+    "MixinWorldChunk"
   ],
   "client": [
   ],

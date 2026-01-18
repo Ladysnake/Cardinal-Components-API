@@ -35,7 +35,7 @@ public final class CcaEntityClient {
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsEntity.PACKET_ID,
                 (payload, ctx) -> payload.componentKey().flatMap(
-                    key -> key.maybeGet(Objects.requireNonNull(ctx.client().world).getEntityById(payload.targetData()))
+                    key -> key.maybeGet(Objects.requireNonNull(ctx.client().level).getEntity(payload.targetData()))
                 )
             );
         }

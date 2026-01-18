@@ -22,28 +22,28 @@
  */
 package org.ladysnake.cca.test.base;
 
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistry;
 import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 
 public class TickingTestComponent implements ServerTickingComponent, ClientTickingComponent {
-    public static final ComponentKey<TickingTestComponent> KEY = ComponentRegistry.getOrCreate(Identifier.of("cca-base-test", "ticking"), TickingTestComponent.class);
+    public static final ComponentKey<TickingTestComponent> KEY = ComponentRegistry.getOrCreate(Identifier.fromNamespaceAndPath("cca-base-test", "ticking"), TickingTestComponent.class);
 
     private int clientTicks;
     private int serverTicks;
 
     @Override
-    public void readData(ReadView readView) {
-        this.clientTicks = readView.getInt("clientTicks", 0);
-        this.serverTicks = readView.getInt("serverTicks", 0);
+    public void readData(ValueInput readView) {
+        this.clientTicks = readView.getIntOr("clientTicks", 0);
+        this.serverTicks = readView.getIntOr("serverTicks", 0);
     }
 
     @Override
-    public void writeData(WriteView writeView) {
+    public void writeData(ValueOutput writeView) {
         writeView.putInt("clientTicks", this.clientTicks);
         writeView.putInt("serverTicks", this.serverTicks);
     }

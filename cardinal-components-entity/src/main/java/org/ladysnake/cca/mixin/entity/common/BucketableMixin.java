@@ -22,11 +22,11 @@
  */
 package org.ladysnake.cca.mixin.entity.common;
 
-import net.minecraft.entity.Bucketable;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.util.ErrorReporter;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.Bucketable;
+import net.minecraft.world.level.storage.TagValueInput;
 import org.ladysnake.cca.internal.base.AbstractComponentContainer;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,19 +39,19 @@ import java.util.Optional;
 @Mixin(Bucketable.class)
 public interface BucketableMixin {
     @Inject(method = "method_57302", at = @At("RETURN"))
-    private static void writeComponentsToStack(MobEntity mobEntity, NbtCompound nbtCompound, CallbackInfo ci) {
-        NbtCompound nbt = mobEntity.asComponentProvider().getComponentContainer().toOrphanTag(mobEntity.getRegistryManager());
+    private static void writeComponentsToStack(Mob mobEntity, CompoundTag nbtCompound, CallbackInfo ci) {
+        CompoundTag nbt = mobEntity.asComponentProvider().getComponentContainer().toOrphanTag(mobEntity.registryAccess());
         if (nbt != null) {
             nbtCompound.put(AbstractComponentContainer.NBT_KEY, nbt);
         }
     }
 
-    @Inject(method = "copyDataFromNbt(Lnet/minecraft/entity/mob/MobEntity;Lnet/minecraft/nbt/NbtCompound;)V", at = @At("RETURN"))
-    private static void readComponentsFromStack(MobEntity entity, NbtCompound nbt, CallbackInfo ci) {
-        Optional<NbtCompound> componentsNbt = nbt.getCompound(AbstractComponentContainer.NBT_KEY);
+    @Inject(method = "loadDefaultDataFromBucketTag(Lnet/minecraft/world/entity/Mob;Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
+    private static void readComponentsFromStack(Mob entity, CompoundTag nbt, CallbackInfo ci) {
+        Optional<CompoundTag> componentsNbt = nbt.getCompound(AbstractComponentContainer.NBT_KEY);
         if (componentsNbt.isPresent()) {
-            try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
-                entity.asComponentProvider().getComponentContainer().readOrphanData(NbtReadView.create(errorReporter, entity.getRegistryManager(), componentsNbt.get()));
+            try (var errorReporter = new ProblemReporter.ScopedCollector(ComponentsInternals.LOGGER)) {
+                entity.asComponentProvider().getComponentContainer().readOrphanData(TagValueInput.create(errorReporter, entity.registryAccess(), componentsNbt.get()));
             }
         }
     }

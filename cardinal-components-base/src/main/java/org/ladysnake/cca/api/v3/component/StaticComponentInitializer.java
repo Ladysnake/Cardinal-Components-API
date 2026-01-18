@@ -22,7 +22,7 @@
  */
 package org.ladysnake.cca.api.v3.component;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 import java.util.Collection;
 import java.util.Collections;

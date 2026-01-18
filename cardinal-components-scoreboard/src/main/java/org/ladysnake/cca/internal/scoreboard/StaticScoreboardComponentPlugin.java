@@ -23,9 +23,9 @@
 package org.ladysnake.cca.internal.scoreboard;
 
 import com.google.common.base.Suppliers;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -57,7 +57,7 @@ public final class StaticScoreboardComponentPlugin extends LazyDispatcher implem
     private final GenericContainerBuilder<TeamComponentFactoryV2<?>, TeamComponentContainerFactory> teamFactories = new GenericContainerBuilder<>(
         TeamComponentFactoryV2.class,
         TeamComponentContainerFactory.class,
-        List.of(Team.class, Scoreboard.class, MinecraftServer.class),
+        List.of(PlayerTeam.class, Scoreboard.class, MinecraftServer.class),
         (team, scoreboard, server) -> ComponentContainer.EMPTY
     );
 

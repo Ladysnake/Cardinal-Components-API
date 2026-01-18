@@ -20,22 +20,15 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.chunk.common;
+package org.ladysnake.cca.mixin.base;
 
-import net.minecraft.server.network.ChunkDataSender;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.chunk.WorldChunk;
-import org.ladysnake.cca.api.v3.chunk.ChunkSyncCallback;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.TagValueInput;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(ChunkDataSender.class)
-public abstract class MixinChunkDataSender {
-    @Inject(method = "sendChunkData", at = @At("RETURN"))
-    private static void sendChunkComponentsPackets(ServerPlayNetworkHandler handler, ServerWorld world, WorldChunk chunk, CallbackInfo ci) {
-        ChunkSyncCallback.EVENT.invoker().onChunkSync(handler.player, chunk);
-    }
+@Mixin(TagValueInput.class)
+public interface TagValueInputAccessor {
+    @Accessor
+    CompoundTag getInput();
 }

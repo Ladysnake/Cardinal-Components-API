@@ -22,27 +22,27 @@
  */
 package org.ladysnake.cca.internal.world;
 
-import net.minecraft.datafixer.DataFixTypes;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.PersistentStateType;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.internal.base.AbstractComponentContainer;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 
-public class ComponentPersistentState extends PersistentState {
+public class ComponentPersistentState extends SavedData {
     public static final ThreadLocal<Boolean> LOADING = ThreadLocal.withInitial(() -> false);
     private static final String PERSISTENT_STATE_KEY = "cardinal_world_components";
-    public static PersistentStateType<ComponentPersistentState> stateType(ComponentContainer components, RegistryWrapper.WrapperLookup registries) {
-        return new PersistentStateType<>(
+    public static SavedDataType<ComponentPersistentState> stateType(ComponentContainer components, HolderLookup.Provider registries) {
+        return new SavedDataType<>(
             PERSISTENT_STATE_KEY,
             () -> new ComponentPersistentState(components),
-            NbtCompound.CODEC.xmap(
+            CompoundTag.CODEC.xmap(
                 nbt -> fromNbt(components, nbt, registries),
-                state -> state.writeNbt(new NbtCompound(), registries)
+                state -> state.writeNbt(new CompoundTag(), registries)
             ),
             DataFixTypes.LEVEL
         );
@@ -60,7 +60,7 @@ public class ComponentPersistentState extends PersistentState {
         return true;
     }
 
-    public NbtCompound writeNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+    public CompoundTag writeNbt(CompoundTag tag, HolderLookup.Provider registryLookup) {
         var componentsNbt = this.components.toOrphanTag(registryLookup);
         if (componentsNbt != null) {
             tag.put(AbstractComponentContainer.NBT_KEY, componentsNbt);
@@ -68,10 +68,10 @@ public class ComponentPersistentState extends PersistentState {
         return tag;
     }
 
-    public static ComponentPersistentState fromNbt(ComponentContainer components, NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+    public static ComponentPersistentState fromNbt(ComponentContainer components, CompoundTag tag, HolderLookup.Provider registryLookup) {
         ComponentPersistentState state = new ComponentPersistentState(components);
-        try (var errorReporter = new ErrorReporter.Logging(() -> "World", ComponentsInternals.LOGGER)) {
-            state.components.readData(NbtReadView.create(errorReporter, registryLookup, tag));
+        try (var errorReporter = new ProblemReporter.ScopedCollector(() -> "World", ComponentsInternals.LOGGER)) {
+            state.components.readData(TagValueInput.create(errorReporter, registryLookup, tag));
         }
         return state;
     }

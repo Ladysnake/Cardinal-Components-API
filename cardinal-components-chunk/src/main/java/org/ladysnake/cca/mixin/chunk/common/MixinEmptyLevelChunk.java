@@ -20,38 +20,25 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.world.common;
+package org.ladysnake.cca.mixin.chunk.common;
 
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.world.World;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.EmptyLevelChunk;
+import net.minecraft.world.level.chunk.LevelChunk;
+import org.jetbrains.annotations.NotNull;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
-import org.ladysnake.cca.internal.world.CardinalComponentsWorld;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nonnull;
-
-@Mixin(World.class)
-public abstract class MixinWorld implements ComponentProvider {
-
-    @Shadow public abstract DynamicRegistryManager getRegistryManager();
-
-    @Unique
-    protected ComponentContainer components;
-
-    @Inject(method = "<init>*", at = @At("RETURN"))
-    private void initComponents(CallbackInfo ci) {
-        this.components = CardinalComponentsWorld.createComponents((World) (Object) this);
+@Mixin(EmptyLevelChunk.class)
+public abstract class MixinEmptyLevelChunk extends LevelChunk implements ComponentProvider {
+    public MixinEmptyLevelChunk(Level world, ChunkPos pos) {
+        super(world, pos);
     }
 
-    @Nonnull
     @Override
-    public ComponentContainer getComponentContainer() {
-        return this.components;
+    public @NotNull ComponentContainer getComponentContainer() {
+        return ComponentContainer.EMPTY;
     }
 }

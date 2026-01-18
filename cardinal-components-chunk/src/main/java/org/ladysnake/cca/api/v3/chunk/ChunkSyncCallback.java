@@ -24,8 +24,8 @@ package org.ladysnake.cca.api.v3.chunk;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.chunk.LevelChunk;
 
 /**
  * The callback interface for receiving chunk synchronization events.
@@ -41,5 +41,5 @@ public interface ChunkSyncCallback {
     /**
      * Called when a chunk's data is sent to a player
      */
-    void onChunkSync(ServerPlayerEntity player, WorldChunk chunk);
+    void onChunkSync(ServerPlayer player, LevelChunk chunk);
 }

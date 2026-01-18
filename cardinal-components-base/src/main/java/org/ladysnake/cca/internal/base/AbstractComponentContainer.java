@@ -22,16 +22,20 @@
  */
 package org.ladysnake.cca.internal.base;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ErrorReporter;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
-import org.ladysnake.cca.api.v3.component.*;
-import org.ladysnake.cca.mixin.base.NbtReadViewAccessor;
+import org.ladysnake.cca.api.v3.component.Component;
+import org.ladysnake.cca.api.v3.component.ComponentContainer;
+import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.CopyableComponent;
+import org.ladysnake.cca.api.v3.component.TransientComponent;
+import org.ladysnake.cca.mixin.base.TagValueInputAccessor;
 
 import java.util.Iterator;
 
@@ -43,7 +47,7 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
     public static final String NBT_KEY = "cardinal_components";
 
     @Override
-    public void copyFrom(ComponentContainer other, RegistryWrapper.WrapperLookup registryLookup) {
+    public void copyFrom(ComponentContainer other, HolderLookup.Provider registryLookup) {
         for (ComponentKey<?> key : this.keys()) {
             Component theirs = key.getInternal(other);
             Component ours = key.getInternal(this);
@@ -54,10 +58,10 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
                     @SuppressWarnings("unchecked") CopyableComponent<Component> copyable = (CopyableComponent<Component>) ours;
                     copyable.copyFrom(theirs, registryLookup);
                 } else {
-                    try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
-                        NbtWriteView writeView = NbtWriteView.create(errorReporter, registryLookup);
+                    try (var errorReporter = new ProblemReporter.ScopedCollector(ComponentsInternals.LOGGER)) {
+                        TagValueOutput writeView = TagValueOutput.createWithContext(errorReporter, registryLookup);
                         theirs.writeData(writeView);
-                        ours.readData(NbtReadView.create(errorReporter, registryLookup, writeView.getNbt()));
+                        ours.readData(TagValueInput.create(errorReporter, registryLookup, writeView.buildResult()));
                     }
                 }
             }
@@ -75,17 +79,17 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
      * type, the component tag is skipped.
      */
     @Override
-    public void readData(ReadView readView) {
-        readOrphanData(readView.getReadView(NBT_KEY));
+    public void readData(ValueInput readView) {
+        readOrphanData(readView.childOrEmpty(NBT_KEY));
     }
 
     @Override
-    public void readOrphanData(ReadView componentMap) {
-        NbtCompound underlyingNbt = componentMap instanceof NbtReadViewAccessor nbtReadView ? nbtReadView.getNbt() : null;
+    public void readOrphanData(ValueInput componentMap) {
+        CompoundTag underlyingNbt = componentMap instanceof TagValueInputAccessor nbtReadView ? nbtReadView.getInput() : null;
         for (ComponentKey<?> key : this.keys()) {
             String keyId = key.getId().toString();
 
-            ReadView componentData = componentMap.getReadView(keyId);
+            ValueInput componentData = componentMap.childOrEmpty(keyId);
             Component component = key.getInternal(this);
             assert component != null;
             component.readData(componentData);
@@ -95,7 +99,7 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
         }
 
         if (underlyingNbt != null) {
-            ComponentsInternals.logDeserializationWarnings(underlyingNbt.getKeys());
+            ComponentsInternals.logDeserializationWarnings(underlyingNbt.keySet());
         }
     }
 
@@ -105,33 +109,33 @@ public abstract class AbstractComponentContainer implements ComponentContainer {
      * @implSpec This implementation first checks if the container is empty; if so it
      * returns immediately. Then, it iterates over this container's mappings, and creates
      * a compound tag for each component. The tag is then passed to the component's
-     * {@link Component#writeData(WriteView)} method. Every such serialized component is appended
+     * {@link Component#writeData(ValueOutput)} method. Every such serialized component is appended
      * to a {@code NbtCompound}, using the component type's identifier as the key.
      * The serialized map is finally appended to the passed in tag using the "cardinal_components" key.
      */
     @Override
-    public void writeData(WriteView writeView) {
+    public void writeData(ValueOutput writeView) {
         if(this.hasComponents()) {
-            writeOrphanData(writeView.get(NBT_KEY));
+            writeOrphanData(writeView.child(NBT_KEY));
         }
     }
 
     @Override
-    public void writeOrphanData(WriteView writeView) {
+    public void writeOrphanData(ValueOutput writeView) {
         for (ComponentKey<?> type : this.keys()) {
             Component component = type.getFromContainer(this);
             if (!(component instanceof TransientComponent)) {
-                component.writeData(writeView.get(type.getId().toString()));
+                component.writeData(writeView.child(type.getId().toString()));
             }
         }
     }
 
     @Override
-    public @Nullable NbtCompound toOrphanTag(RegistryWrapper.WrapperLookup registryLookup) {
-        try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
-            NbtWriteView writeView = NbtWriteView.create(errorReporter, registryLookup);
+    public @Nullable CompoundTag toOrphanTag(HolderLookup.Provider registryLookup) {
+        try (var errorReporter = new ProblemReporter.ScopedCollector(ComponentsInternals.LOGGER)) {
+            TagValueOutput writeView = TagValueOutput.createWithContext(errorReporter, registryLookup);
             writeOrphanData(writeView);
-            return writeView.isEmpty() ? null : writeView.getNbt();
+            return writeView.isEmpty() ? null : writeView.buildResult();
         }
     }
 

@@ -20,26 +20,15 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.entity.common;
+package org.ladysnake.cca.mixin.scoreboard;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ServerWorld;
-import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(ServerWorld.class)
-public abstract class MixinServerWorld {
-
-    @Inject(method = "tickEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tick()V", shift = At.Shift.AFTER))
-    private void tick(Entity entity, CallbackInfo ci) {
-        ((ComponentProvider) entity).getComponentContainer().tickServerComponents();
-    }
-
-    @Inject(method = "tickPassenger", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tickRiding()V", shift = At.Shift.AFTER))
-    private void tickRiding(Entity vehicle, Entity passenger, CallbackInfo ci) {
-        ((ComponentProvider) passenger).getComponentContainer().tickServerComponents();
-    }
+@Mixin(PlayerTeam.class)
+public interface PlayerTeamAccessor {
+    @Accessor
+    Scoreboard getScoreboard();
 }

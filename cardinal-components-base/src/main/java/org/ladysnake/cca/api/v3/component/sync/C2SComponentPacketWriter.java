@@ -22,7 +22,7 @@
  */
 package org.ladysnake.cca.api.v3.component.sync;
 
-import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
@@ -38,5 +38,5 @@ public interface C2SComponentPacketWriter {
     C2SComponentPacketWriter EMPTY = buf -> {};
 
     @Contract(mutates = "param")
-    void writeC2SPacket(RegistryByteBuf buf);
+    void writeC2SPacket(RegistryFriendlyByteBuf buf);
 }

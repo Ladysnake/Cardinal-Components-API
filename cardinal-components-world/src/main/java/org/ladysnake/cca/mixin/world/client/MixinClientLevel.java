@@ -20,15 +20,21 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.mixin.base;
+package org.ladysnake.cca.mixin.world.client;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.storage.NbtReadView;
+import net.minecraft.client.multiplayer.ClientLevel;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(NbtReadView.class)
-public interface NbtReadViewAccessor {
-    @Accessor
-    NbtCompound getNbt();
+import java.util.function.BooleanSupplier;
+
+@Mixin(ClientLevel.class)
+public abstract class MixinClientLevel {
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+        ((ComponentProvider) this).getComponentContainer().tickClientComponents();
+    }
 }

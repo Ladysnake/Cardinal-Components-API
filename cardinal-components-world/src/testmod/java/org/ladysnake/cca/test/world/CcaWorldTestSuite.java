@@ -23,9 +23,9 @@
 package org.ladysnake.cca.test.world;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.minecraft.test.TestContext;
-import net.minecraft.text.Text;
-import net.minecraft.world.World;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.Vita;
 
@@ -33,24 +33,24 @@ import java.util.Objects;
 
 public class CcaWorldTestSuite {
     @GameTest
-    public void worldLoadWorks(TestContext ctx) {
-        ctx.assertEquals(
+    public void worldLoadWorks(GameTestHelper ctx) {
+        ctx.assertValueEqual(
             1,
-            ctx.getWorld().getComponent(LoadAwareTestComponent.KEY).getLoadCounter(),
-            Text.literal("Load counter should be incremented once when the world gets loaded -")
+            ctx.getLevel().getComponent(LoadAwareTestComponent.KEY).getLoadCounter(),
+            Component.literal("Load counter should be incremented once when the world gets loaded -")
         );
-        ctx.complete();
+        ctx.succeed();
     }
 
     @GameTest
-    public void worldSpecificComponentOverrides(TestContext ctx) {
-        ctx.waitAndRun(1, () -> {
-            ctx.assertEquals(
+    public void worldSpecificComponentOverrides(GameTestHelper ctx) {
+        ctx.runAfterDelay(1, () -> {
+            ctx.assertValueEqual(
                 666,
-                Vita.KEY.getNullable(Objects.requireNonNull(ctx.getWorld().getServer().getWorld(World.NETHER))) instanceof NetherVita v ? v.getVitality() : -1,
-                Text.literal("Nether should have its own Vita implementation -")
+                Vita.KEY.getNullable(Objects.requireNonNull(ctx.getLevel().getServer().getLevel(Level.NETHER))) instanceof NetherVita v ? v.getVitality() : -1,
+                Component.literal("Nether should have its own Vita implementation -")
             );
-            ctx.complete();
+            ctx.succeed();
         });
     }
 }

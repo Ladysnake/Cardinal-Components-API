@@ -23,16 +23,16 @@
 package org.ladysnake.cca.mixin.scoreboard;
 
 import com.mojang.datafixers.util.Unit;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ScoreboardState;
-import net.minecraft.scoreboard.ServerScoreboard;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.util.ErrorReporter;
+import net.minecraft.server.ServerScoreboard;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.ScoreboardSaveData;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.TransientComponent;
@@ -69,28 +69,28 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
     private boolean dirty;
 
     @Override
-    protected Team unpackComponents(Team team, CcaPackedState packedTeam) {
-        NbtCompound nbt = packedTeam.cca$getSerializedComponents();
+    protected PlayerTeam unpackComponents(PlayerTeam team, CcaPackedState packedTeam) {
+        CompoundTag nbt = packedTeam.cca$getSerializedComponents();
         if (nbt != null) {
-            try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
-                ((ComponentProvider) team).getComponentContainer().readOrphanData(NbtReadView.create(errorReporter, server.getRegistryManager(), nbt));
+            try (var errorReporter = new ProblemReporter.ScopedCollector(ComponentsInternals.LOGGER)) {
+                ((ComponentProvider) team).getComponentContainer().readOrphanData(TagValueInput.create(errorReporter, server.registryAccess(), nbt));
             }
         }
         return super.unpackComponents(team, packedTeam);
     }
 
     @Override
-    public Iterable<ServerPlayerEntity> getRecipientsForComponentSync() {
+    public Iterable<ServerPlayer> getRecipientsForComponentSync() {
         MinecraftServer server = this.server;
 
-        if (server.getPlayerManager() != null) {
-            return server.getPlayerManager().getPlayerList();
+        if (server.getPlayerList() != null) {
+            return server.getPlayerList().getPlayers();
         }
         return List.of();
     }
 
     @Override
-    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryByteBuf data) {
+    public <C extends AutoSyncedComponent> ComponentUpdatePayload<?> toComponentPacket(ComponentKey<? super C> key, boolean required, RegistryFriendlyByteBuf data) {
         return new ComponentUpdatePayload<>(
             CardinalComponentsScoreboard.SCOREBOARD_PACKET_ID,
             Unit.INSTANCE,
@@ -105,13 +105,13 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
         this.components = componentsContainerFactory.get().create((Scoreboard) (Object) this, this.server);
     }
 
-    @Inject(method = "updateScoreboardTeamAndPlayers", at = @At("RETURN"))
-    private void syncTeamComponents(Team team, CallbackInfo ci) {
+    @Inject(method = "onTeamAdded", at = @At("RETURN"))
+    private void syncTeamComponents(PlayerTeam team, CallbackInfo ci) {
         TeamAddCallback.EVENT.invoker().onTeamAdded(team);
     }
 
-    @Inject(method = "writeTo", at = @At("HEAD"))
-    private void setDirty(ScoreboardState state, CallbackInfo ci) {
+    @Inject(method = "storeToSaveDataIfDirty", at = @At("HEAD"))
+    private void setDirty(ScoreboardSaveData state, CallbackInfo ci) {
         if (components.hasComponents()) {
             for (var component : components.keys()) {
                 if (!(component instanceof TransientComponent)) {
@@ -122,21 +122,21 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
         }
     }
 
-    @ModifyArg(method = "writeTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/scoreboard/ScoreboardState;set(Lnet/minecraft/scoreboard/ScoreboardState$Packed;)V"))
-    private ScoreboardState.Packed writeComponents(ScoreboardState.Packed packed) {
+    @ModifyArg(method = "storeToSaveDataIfDirty", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/ScoreboardSaveData;setData(Lnet/minecraft/world/scores/ScoreboardSaveData$Packed;)V"))
+    private ScoreboardSaveData.Packed writeComponents(ScoreboardSaveData.Packed packed) {
         ((CcaPackedState) (Object) packed).cca$setSerializedComponents(
-            components.toOrphanTag(server.getRegistryManager())
+            components.toOrphanTag(server.registryAccess())
         );
 
         return packed;
     }
 
-    @Inject(method = "read", at = @At("RETURN"))
-    private void readComponents(ScoreboardState.Packed packed, CallbackInfo ci) {
-        NbtCompound nbt = ((CcaPackedState) (Object) packed).cca$getSerializedComponents();
+    @Inject(method = "load", at = @At("RETURN"))
+    private void readComponents(ScoreboardSaveData.Packed packed, CallbackInfo ci) {
+        CompoundTag nbt = ((CcaPackedState) (Object) packed).cca$getSerializedComponents();
         if (nbt != null) {
-            try (var errorReporter = new ErrorReporter.Logging(ComponentsInternals.LOGGER)) {
-                components.readOrphanData(NbtReadView.create(errorReporter, server.getRegistryManager(), nbt));
+            try (var errorReporter = new ProblemReporter.ScopedCollector(ComponentsInternals.LOGGER)) {
+                components.readOrphanData(TagValueInput.create(errorReporter, server.registryAccess(), nbt));
             }
         }
     }

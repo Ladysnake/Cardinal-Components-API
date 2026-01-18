@@ -22,9 +22,9 @@
  */
 package org.ladysnake.cca.mixin.scoreboard;
 
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ServerScoreboard;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.server.ServerScoreboard;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.internal.scoreboard.CcaPackedState;
@@ -52,8 +52,8 @@ public abstract class MixinScoreboard implements ComponentProvider {
         }
     }
 
-    @ModifyVariable(method = "addTeam(Lnet/minecraft/scoreboard/Team$Packed;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/scoreboard/Team;setCollisionRule(Lnet/minecraft/scoreboard/AbstractTeam$CollisionRule;)V"))
-    protected Team unpackComponents(Team team, @Coerce CcaPackedState packedTeam) {
+    @ModifyVariable(method = "loadPlayerTeam(Lnet/minecraft/world/scores/PlayerTeam$Packed;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/PlayerTeam;setCollisionRule(Lnet/minecraft/world/scores/Team$CollisionRule;)V"))
+    protected PlayerTeam unpackComponents(PlayerTeam team, @Coerce CcaPackedState packedTeam) {
         return team;
     }
 

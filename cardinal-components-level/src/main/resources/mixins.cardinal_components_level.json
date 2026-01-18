@@ -7,11 +7,11 @@
     "client.MixinClientWorldProperties"
   ],
   "mixins": [
-    "common.LevelStorageMixin",
-    "common.MixinLevelProperties",
+    "common.MixinDerivedLevelData",
+    "common.MixinLevelData",
+    "common.MixinLevelStorageSource",
     "common.MixinMinecraftServer",
-    "common.MixinUnmodifiableLevelProperties",
-    "common.MixinWorldProperties"
+    "common.MixinPrimaryLevelData"
   ],
   "injectors": {
     "defaultRequire": 1

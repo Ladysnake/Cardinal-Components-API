@@ -23,17 +23,16 @@
 package org.ladysnake.cca.internal.base;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.network.DisconnectionInfo;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.text.Text;
-import org.ladysnake.cca.api.v3.component.Component;
+import net.minecraft.network.DisconnectionDetails;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
 
 public final class CcaClientInternals {
-    public static <T extends ComponentUpdatePayload<?>> void registerComponentSync(CustomPayload.Id<T> packetId, BiFunction<T, ClientPlayNetworking.Context, Optional<? extends Component>> getter) {
+    public static <T extends ComponentUpdatePayload<?>> void registerComponentSync(CustomPacketPayload.Type<T> packetId, BiFunction<T, ClientPlayNetworking.Context, Optional<? extends Component>> getter) {
         ClientPlayNetworking.registerGlobalReceiver(packetId, (payload, ctx) -> {
             try {
                 getter.apply(payload, ctx).ifPresent(c -> {
@@ -42,7 +41,7 @@ public final class CcaClientInternals {
                     }
                 });
             } catch (UnknownComponentException e) {
-                ctx.player().networkHandler.onDisconnected(new DisconnectionInfo(Text.literal(
+                ctx.player().connection.onDisconnect(new DisconnectionDetails(Component.literal(
                     e.getMessage() + "\n(you are probably missing a mod installed on the server)" + ComponentsInternals.getClientOptionalModAdvice())
                 ));
             } finally {

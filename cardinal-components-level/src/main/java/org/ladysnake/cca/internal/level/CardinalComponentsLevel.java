@@ -24,9 +24,9 @@ package org.ladysnake.cca.internal.level;
 
 import com.mojang.datafixers.util.Unit;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
-import net.minecraft.world.WorldProperties;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.level.storage.LevelData;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.world.WorldSyncCallback;
@@ -36,19 +36,19 @@ import org.ladysnake.cca.internal.base.MorePacketCodecs;
 public final class CardinalComponentsLevel {
 
     /**
-     * {@link CustomPayloadS2CPacket} channel for default level component synchronization.
+     * {@link ClientboundCustomPayloadPacket} channel for default level component synchronization.
      *
-     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryFriendlyByteBuf)}
      * called on the game thread.
      */
-    public static final CustomPayload.Id<ComponentUpdatePayload<Unit>> PACKET_ID = ComponentUpdatePayload.id("level_sync");
+    public static final CustomPacketPayload.Type<ComponentUpdatePayload<Unit>> PACKET_ID = ComponentUpdatePayload.id("level_sync");
 
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             ComponentUpdatePayload.register(PACKET_ID, MorePacketCodecs.EMPTY);
             if (FabricLoader.getInstance().isModLoaded("cardinal-components-world")) {
                 WorldSyncCallback.EVENT.register((player, world) -> {
-                    WorldProperties props = world.getLevelProperties();
+                    LevelData props = world.getLevelData();
 
                     for (ComponentKey<?> key : props.asComponentProvider().getComponentContainer().keys()) {
                         key.syncWith(player, props.asComponentProvider());

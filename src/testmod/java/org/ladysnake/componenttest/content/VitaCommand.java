@@ -24,43 +24,43 @@ package org.ladysnake.componenttest.content;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import net.minecraft.command.argument.BlockPosArgumentType;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import org.ladysnake.cca.test.base.Vita;
 
 public final class VitaCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("ccatest")
-            .then(CommandManager.literal("set")
-                .then(CommandManager.argument("amount", IntegerArgumentType.integer())
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(Commands.literal("ccatest")
+            .then(Commands.literal("set")
+                .then(Commands.argument("amount", IntegerArgumentType.integer())
                     .executes(context -> {
-                        Vita.get(context.getSource().getWorld()).setVitality(IntegerArgumentType.getInteger(context, "amount"));
-                        context.getSource().sendFeedback(() -> Text.of("success!"), false);
+                        Vita.get(context.getSource().getLevel()).setVitality(IntegerArgumentType.getInteger(context, "amount"));
+                        context.getSource().sendSuccess(() -> Component.nullToEmpty("success!"), false);
                         return 1;
                     })
-                    .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
+                    .then(Commands.argument("pos", BlockPosArgument.blockPos())
                         .executes(context -> {
-                            Chunk chunk = context.getSource().getWorld().getChunk(BlockPosArgumentType.getBlockPos(context, "pos"));
+                            ChunkAccess chunk = context.getSource().getLevel().getChunk(BlockPosArgument.getBlockPos(context, "pos"));
                             Vita.get(chunk).setVitality(IntegerArgumentType.getInteger(context, "amount"));
-                            chunk.markNeedsSaving();
-                            context.getSource().sendFeedback(() -> Text.of("success!"), false);
+                            chunk.markUnsaved();
+                            context.getSource().sendSuccess(() -> Component.nullToEmpty("success!"), false);
                             return 1;
                         })
                     )
                 )
             )
-            .then(CommandManager.literal("get")
+            .then(Commands.literal("get")
                 .executes(context -> {
                     // Dedicated servers cannot handle translations
-                    context.getSource().sendFeedback(() -> Text.of("World vitality: " + Vita.get(context.getSource().getWorld()).getVitality()), false);
+                    context.getSource().sendSuccess(() -> Component.nullToEmpty("World vitality: " + Vita.get(context.getSource().getLevel()).getVitality()), false);
                     return 1;
                 })
-                .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
+                .then(Commands.argument("pos", BlockPosArgument.blockPos())
                     .executes(context -> {
-                        context.getSource().sendFeedback(() -> Text.of("Chunk vitality: " + Vita.get(context.getSource().getWorld().getChunk(BlockPosArgumentType.getBlockPos(context, "pos"))).getVitality()), false);
+                        context.getSource().sendSuccess(() -> Component.nullToEmpty("Chunk vitality: " + Vita.get(context.getSource().getLevel().getChunk(BlockPosArgument.getBlockPos(context, "pos"))).getVitality()), false);
                         return 1;
                     }))
             )

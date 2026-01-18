@@ -2,16 +2,16 @@
   "required": true,
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
-  "package": "org.ladysnake.cca.mixin.chunk",
+  "package": "org.ladysnake.cca.mixin.chunk.common",
   "mixins": [
-    "common.MixinChunk",
-    "common.MixinChunkDataSender",
-    "common.MixinChunkHolder",
-    "common.MixinEmptyChunk",
-    "common.MixinSerializedChunk",
-    "common.MixinServerWorld",
-    "common.MixinWorldChunk",
-    "common.MixinWrapperProtoChunk"
+    "MixinChunk",
+    "MixinChunkDataSender",
+    "MixinChunkHolder",
+    "MixinEmptyChunk",
+    "MixinSerializedChunk",
+    "MixinServerWorld",
+    "MixinWorldChunk",
+    "MixinWrapperProtoChunk"
   ],
   "injectors": {
     "defaultRequire": 1

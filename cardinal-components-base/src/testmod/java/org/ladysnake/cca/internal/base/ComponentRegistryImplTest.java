@@ -23,11 +23,11 @@
 package org.ladysnake.cca.internal.base;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.test.TestContext;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.test.base.CardinalGameTest;
@@ -36,7 +36,7 @@ public class ComponentRegistryImplTest implements CardinalGameTest {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @GameTest
-    public void checksRegisteredClasses(TestContext ctx) {
+    public void checksRegisteredClasses(GameTestHelper ctx) {
         ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
         ctx.assertThrows("Component class must extend Component", IllegalArgumentException.class, () -> registry.getOrCreate(CcaTesting.TEST_ID_1, (Class) TestNotComponentItf.class));
         registry.getOrCreate(CcaTesting.TEST_ID_1, TestComponentNotItf.class);
@@ -44,19 +44,19 @@ public class ComponentRegistryImplTest implements CardinalGameTest {
     }
 
     @GameTest
-    public void doesNotDuplicateComponentTypes(TestContext ctx) {
+    public void doesNotDuplicateComponentTypes(GameTestHelper ctx) {
         ComponentRegistryImpl registry = ComponentRegistryImpl.INSTANCE;
         Identifier id = CcaTesting.TEST_ID_1;
         ComponentKey<?> type = registry.getOrCreate(id, TestComponentItf.class);
         ctx.assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf2.class));
         ctx.assertThrows(IllegalStateException.class, () -> registry.getOrCreate(id, TestComponentItf3.class));
-        ctx.assertEquals(type, registry.getOrCreate(id, TestComponentItf.class), Text.literal("component key"));
-        ctx.assertEquals(1L, registry.stream().map(ComponentKey::getId).filter(CcaTesting.ALL_TEST_IDS::contains).count(), Text.literal("number of registrations"));
+        ctx.assertValueEqual(type, registry.getOrCreate(id, TestComponentItf.class), Component.literal("component key"));
+        ctx.assertValueEqual(1L, registry.stream().map(ComponentKey::getId).filter(CcaTesting.ALL_TEST_IDS::contains).count(), Component.literal("number of registrations"));
     }
 
     @Override
-    public void tearDown(TestContext ctx) {
-        ctx.complete();
+    public void tearDown(GameTestHelper ctx) {
+        ctx.succeed();
         for (Identifier id : CcaTesting.ALL_TEST_IDS) {
             ComponentRegistryImpl.INSTANCE.clear(id);
         }
@@ -66,10 +66,10 @@ public class ComponentRegistryImplTest implements CardinalGameTest {
 
     public static class TestComponentNotItf implements Component {
         @Override
-        public void readData(ReadView readView) { }
+        public void readData(ValueInput readView) { }
 
         @Override
-        public void writeData(WriteView writeView) { throw new UnsupportedOperationException(); }
+        public void writeData(ValueOutput writeView) { throw new UnsupportedOperationException(); }
     }
 
     interface TestComponentItf extends Component {}

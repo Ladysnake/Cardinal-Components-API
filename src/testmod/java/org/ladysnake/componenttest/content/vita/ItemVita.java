@@ -25,10 +25,10 @@ package org.ladysnake.componenttest.content.vita;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
-import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
 import org.ladysnake.cca.api.v3.component.TransientComponent;
 import org.ladysnake.cca.test.base.EmptyVita;
 import org.ladysnake.cca.test.base.Vita;
@@ -48,10 +48,10 @@ public class ItemVita implements Vita, TransientComponent {
         return Optional.ofNullable(LOOKUP.find(stack, null));
     }
 
-    private final ComponentType<ItemVita.Data> componentType;
+    private final DataComponentType<ItemVita.Data> componentType;
     private final ItemStack stack;
 
-    public ItemVita(ComponentType<ItemVita.Data> componentType, ItemStack stack) {
+    public ItemVita(DataComponentType<ItemVita.Data> componentType, ItemStack stack) {
         this.componentType = componentType;
         this.stack = stack;
     }
@@ -69,14 +69,14 @@ public class ItemVita implements Vita, TransientComponent {
     public record Data(int vitality) {
         public static final Data EMPTY = new Data(0);
         public static final Codec<Data> CODEC = Codec.INT.xmap(Data::new, Data::vitality);
-        public static final PacketCodec<ByteBuf, Data> PACKET_CODEC = PacketCodecs.INTEGER.xmap(Data::new, Data::vitality);
-        public static final ComponentType<Data> COMPONENT_TYPE = ComponentType.<Data>builder()
-            .codec(CODEC)
-            .packetCodec(PACKET_CODEC)
+        public static final StreamCodec<ByteBuf, Data> PACKET_CODEC = ByteBufCodecs.INT.map(Data::new, Data::vitality);
+        public static final DataComponentType<Data> COMPONENT_TYPE = DataComponentType.<Data>builder()
+            .persistent(CODEC)
+            .networkSynchronized(PACKET_CODEC)
             .build();
-        public static final ComponentType<Data> ALT_COMPONENT_TYPE = ComponentType.<Data>builder()
-            .codec(CODEC)
-            .packetCodec(PACKET_CODEC)
+        public static final DataComponentType<Data> ALT_COMPONENT_TYPE = DataComponentType.<Data>builder()
+            .persistent(CODEC)
+            .networkSynchronized(PACKET_CODEC)
             .build();
     }
 }

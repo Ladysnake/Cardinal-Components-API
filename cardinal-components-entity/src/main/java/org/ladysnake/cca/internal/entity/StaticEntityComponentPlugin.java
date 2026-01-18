@@ -22,16 +22,16 @@
  */
 package org.ladysnake.cca.internal.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
-import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
+import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 import org.ladysnake.cca.internal.base.LazyDispatcher;
 import org.ladysnake.cca.internal.base.QualifiedComponentFactory;
 import org.ladysnake.cca.internal.base.asm.StaticComponentLoadingException;
@@ -125,14 +125,14 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     }
 
     @Override
-    public <C extends RespawnableComponent<? super C>> void registerForPlayers(ComponentKey<? super C> key, ComponentFactory<PlayerEntity, C> factory) {
+    public <C extends RespawnableComponent<? super C>> void registerForPlayers(ComponentKey<? super C> key, ComponentFactory<Player, C> factory) {
         this.registerForPlayers(key, factory, CardinalEntityInternals.DEFAULT_COPY_STRATEGY);
     }
 
     @Override
-    public <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, ComponentFactory<PlayerEntity, P> factory, RespawnCopyStrategy<? super P> respawnStrategy) {
-        this.registerFor(PlayerEntity.class, key, factory);
-        CardinalEntityInternals.registerRespawnCopyStrat(key, PlayerEntity.class, respawnStrategy);
+    public <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, ComponentFactory<Player, P> factory, RespawnCopyStrategy<? super P> respawnStrategy) {
+        this.registerFor(Player.class, key, factory);
+        CardinalEntityInternals.registerRespawnCopyStrat(key, Player.class, respawnStrategy);
     }
 
     private <C extends Component, F extends C, E extends Entity> void register0(Class<? extends E> target, ComponentKey<? super C> key, QualifiedComponentFactory<ComponentFactory<E, F>> factory) {

@@ -23,82 +23,82 @@
 package org.ladysnake.cca.test.entity;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.minecraft.entity.Bucketable;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.conversion.EntityConversionContext;
-import net.minecraft.entity.mob.ShulkerEntity;
-import net.minecraft.entity.passive.CamelEntity;
-import net.minecraft.entity.passive.CatEntity;
-import net.minecraft.entity.passive.CowEntity;
-import net.minecraft.item.EntityBucketItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.test.TestContext;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameMode;
+import net.minecraft.core.BlockPos;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.ConversionParams;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Bucketable;
+import net.minecraft.world.entity.animal.camel.Camel;
+import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.entity.animal.feline.Cat;
+import net.minecraft.world.entity.monster.Shulker;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MobBucketItem;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.Vec3;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.Vita;
 
 public class CcaEntityTestSuite {
     @GameTest
-    public void bucketableWorks(TestContext ctx) {
-        ServerPlayerEntity player = ctx.spawnServerPlayer(1, 0, 1);
-        player.interactionManager.changeGameMode(GameMode.SURVIVAL);
-        player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
+    public void bucketableWorks(GameTestHelper ctx) {
+        ServerPlayer player = ctx.spawnServerPlayer(1, 0, 1);
+        player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
         BlockPos pos = new BlockPos(2, 0, 2);
-        var axolotl = ctx.spawnMob(EntityType.AXOLOTL, pos);
+        var axolotl = ctx.spawnWithNoFreeWill(EntityType.AXOLOTL, pos);
         axolotl.getComponent(Vita.KEY).setVitality(3);
-        Bucketable.tryBucket(player, Hand.MAIN_HAND, axolotl);
-        ((EntityBucketItem) Items.AXOLOTL_BUCKET).onEmptied(player, ctx.getWorld(), player.getStackInHand(Hand.MAIN_HAND), ctx.getAbsolutePos(pos));
-        ctx.expectEntityWithDataEnd(pos, EntityType.AXOLOTL, a -> a.getComponent(Vita.KEY).getVitality(), 3);
+        Bucketable.bucketMobPickup(player, InteractionHand.MAIN_HAND, axolotl);
+        ((MobBucketItem) Items.AXOLOTL_BUCKET).checkExtraContent(player, ctx.getLevel(), player.getItemInHand(InteractionHand.MAIN_HAND), ctx.absolutePos(pos));
+        ctx.succeedWhenEntityData(pos, EntityType.AXOLOTL, a -> a.getComponent(Vita.KEY).getVitality(), 3);
     }
 
     @GameTest
-    public void loadEventsWork(TestContext ctx) {
-        ShulkerEntity shulker = new ShulkerEntity(EntityType.SHULKER, ctx.getWorld());
-        Vec3d vec3d = ctx.getAbsolute(new Vec3d(1, 0, 1));
-        shulker.refreshPositionAndAngles(vec3d.x, vec3d.y, vec3d.z, shulker.getYaw(), shulker.getPitch());
-        ctx.assertEquals(
+    public void loadEventsWork(GameTestHelper ctx) {
+        Shulker shulker = new Shulker(EntityType.SHULKER, ctx.getLevel());
+        Vec3 vec3d = ctx.absoluteVec(new Vec3(1, 0, 1));
+        shulker.snapTo(vec3d.x, vec3d.y, vec3d.z, shulker.getYRot(), shulker.getXRot());
+        ctx.assertValueEqual(
             0, LoadAwareTestComponent.KEY.get(shulker).getLoadCounter(),
-            Text.literal("Load counter should not be incremented until the entity joins the world -")
+            Component.literal("Load counter should not be incremented until the entity joins the world -")
         );
-        ctx.getWorld().spawnEntity(shulker);
-        ctx.assertEquals(
+        ctx.getLevel().addFreshEntity(shulker);
+        ctx.assertValueEqual(
             1, LoadAwareTestComponent.KEY.get(shulker).getLoadCounter(),
-            Text.literal("Load counter should be incremented once when the entity joins the world -")
+            Component.literal("Load counter should be incremented once when the entity joins the world -")
         );
         shulker.remove(Entity.RemovalReason.DISCARDED);
-        ctx.waitAndRun(1, () -> {
-            ctx.assertEquals(
+        ctx.runAfterDelay(1, () -> {
+            ctx.assertValueEqual(
                 0,
                 LoadAwareTestComponent.KEY.get(shulker).getLoadCounter(),
-                Text.literal("Load counter should be decremented when the entity leaves the world -")
+                Component.literal("Load counter should be decremented when the entity leaves the world -")
             );
-            ctx.complete();
+            ctx.succeed();
         });
     }
 
     @GameTest
-    public void moddedEntitiesWork(TestContext ctx) {
-        ctx.spawnEntity(CcaEntityTestMod.TEST_ENTITY, 0, 0, 0);
-        ctx.complete();
+    public void moddedEntitiesWork(GameTestHelper ctx) {
+        ctx.spawn(CcaEntityTestMod.TEST_ENTITY, 0, 0, 0);
+        ctx.succeed();
     }
 
     @GameTest
-    public void respawnHappensOnConversion(TestContext ctx) {
-        CamelEntity camel = ctx.spawnEntity(EntityType.CAMEL, 0, 0, 0);
-        CowEntity cow = camel.convertTo(EntityType.COW, EntityConversionContext.create(camel, true, true), e -> {});
+    public void respawnHappensOnConversion(GameTestHelper ctx) {
+        Camel camel = ctx.spawn(EntityType.CAMEL, 0, 0, 0);
+        Cow cow = camel.convertTo(EntityType.COW, ConversionParams.single(camel, true, true), e -> {});
         assert cow != null;
-        ctx.assertEquals(
+        ctx.assertValueEqual(
             CcaEntityTestMod.CAMEL_BASE_VITA, Vita.get(cow).getVitality(),
-            Text.literal("Component data should transfer according to RespawnCopyStrategy -"));
-        CatEntity cat = cow.convertTo(EntityType.CAT, EntityConversionContext.create(camel, true, true), e -> {});
+            Component.literal("Component data should transfer according to RespawnCopyStrategy -"));
+        Cat cat = cow.convertTo(EntityType.CAT, ConversionParams.single(camel, true, true), e -> {});
         ctx.assertTrue("Component data should not transfer by default", Vita.get(cat).getVitality() < CcaEntityTestMod.NATURAL_VITA_CEILING);
-        ctx.complete();
+        ctx.succeed();
     }
 }

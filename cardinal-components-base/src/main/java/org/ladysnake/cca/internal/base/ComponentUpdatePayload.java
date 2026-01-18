@@ -23,37 +23,38 @@
 package org.ladysnake.cca.internal.base;
 
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type;
+import net.minecraft.resources.Identifier;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistry;
 
 import java.util.Optional;
 
 public record ComponentUpdatePayload<T>(
-    Id<ComponentUpdatePayload<T>> id,
-    T targetData,
-    boolean required,
-    Identifier componentKeyId,
-    RegistryByteBuf buf
-) implements CustomPayload {
-    public static <T> CustomPayload.Id<ComponentUpdatePayload<T>> id(String path) {
-        return new CustomPayload.Id<>(Identifier.of("cardinal-components", path));
+        Type<ComponentUpdatePayload<T>> id,
+        T targetData,
+        boolean required,
+        Identifier componentKeyId,
+        RegistryFriendlyByteBuf buf
+) implements CustomPacketPayload {
+    public static <T> CustomPacketPayload.Type<ComponentUpdatePayload<T>> id(String path) {
+        return new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath("cardinal-components", path));
     }
 
-    public static <T> void register(Id<ComponentUpdatePayload<T>> id, PacketCodec<? super RegistryByteBuf, T> targetDataCodec) {
+    public static <T> void register(Type<ComponentUpdatePayload<T>> id, StreamCodec<? super RegistryFriendlyByteBuf, T> targetDataCodec) {
         PayloadTypeRegistry.playS2C().register(id, codec(id, targetDataCodec));
     }
 
-    public static <T> PacketCodec<RegistryByteBuf, ComponentUpdatePayload<T>> codec(Id<ComponentUpdatePayload<T>> id, PacketCodec<? super RegistryByteBuf, T> targetDataCodec) {
-        return PacketCodec.tuple(
-            PacketCodec.unit(id), ComponentUpdatePayload::id,
+    public static <T> StreamCodec<RegistryFriendlyByteBuf, ComponentUpdatePayload<T>> codec(Type<ComponentUpdatePayload<T>> id, StreamCodec<? super RegistryFriendlyByteBuf, T> targetDataCodec) {
+        return StreamCodec.composite(
+            StreamCodec.unit(id), ComponentUpdatePayload::id,
             targetDataCodec, ComponentUpdatePayload::targetData,
-            PacketCodecs.BOOLEAN, ComponentUpdatePayload::required,
-            Identifier.PACKET_CODEC, ComponentUpdatePayload::componentKeyId,
+            ByteBufCodecs.BOOL, ComponentUpdatePayload::required,
+            Identifier.STREAM_CODEC, ComponentUpdatePayload::componentKeyId,
             MorePacketCodecs.REG_BYTE_BUF, ComponentUpdatePayload::buf,
             ComponentUpdatePayload::new
         );
@@ -68,7 +69,7 @@ public record ComponentUpdatePayload<T>(
     }
 
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public Type<? extends CustomPacketPayload> type() {
         return id;
     }
 }

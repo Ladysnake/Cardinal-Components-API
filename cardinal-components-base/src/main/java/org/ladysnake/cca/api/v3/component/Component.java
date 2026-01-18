@@ -22,9 +22,9 @@
  */
 package org.ladysnake.cca.api.v3.component;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Contract;
 
 /**
@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Contract;
 public interface Component {
 
     /**
-     * Reads this component's properties from a {@link NbtCompound}.
+     * Reads this component's properties from a {@link CompoundTag}.
      *
      * @param readView a {@code NbtCompound} on which this component's serializable data has been written
      * @implNote implementations should not assert that the data written on the tag corresponds to any
@@ -43,13 +43,13 @@ public interface Component {
      * version.
      */
     @Contract(mutates = "this")
-    void readData(ReadView readView);
+    void readData(ValueInput readView);
 
     /**
-     * Writes this component's properties to a {@link NbtCompound}.
+     * Writes this component's properties to a {@link CompoundTag}.
      *
      * @param writeView a {@code NbtCompound} on which to write this component's serializable data
      */
     @Contract(mutates = "param1")
-    void writeData(WriteView writeView);
+    void writeData(ValueOutput writeView);
 }
