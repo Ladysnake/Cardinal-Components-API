@@ -23,8 +23,8 @@
 package org.ladysnake.componenttest.content;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -62,7 +62,7 @@ public class CardinalComponentsTest {
 
     public static final ResourceKey<CreativeModeTab> ITEM_GROUP_KEY = ResourceKey.create(Registries.CREATIVE_MODE_TAB, id("ccagroup"));
 
-    public static final CreativeModeTab ITEM_GROUP = FabricItemGroup.builder()
+    public static final CreativeModeTab ITEM_GROUP = FabricCreativeModeTab.builder()
         .title(Component.translatable("componenttest:item_group"))
         .icon(() -> new ItemStack(Items.COBBLESTONE))
         .build();
@@ -103,7 +103,7 @@ public class CardinalComponentsTest {
         ComponentContainer.Factory.Builder<Integer> factoryBuilder = ComponentContainer.Factory.builder(Integer.class)
             .component(Vita.KEY, BaseVita::new);
         ComponentContainer.Factory<Integer> containerFactory = factoryBuilder.build();
-        ItemGroupEvents.modifyEntriesEvent(CardinalComponentsTest.ITEM_GROUP_KEY).register(entries -> entries.accept(CardinalComponentsTest.VITALITY_STICK));
+        CreativeModeTabEvents.modifyOutputEvent(CardinalComponentsTest.ITEM_GROUP_KEY).register(entries -> entries.accept(CardinalComponentsTest.VITALITY_STICK));
         LOGGER.info(containerFactory.createContainer(3));
         LOGGER.info(containerFactory.createContainer(5));
         try {

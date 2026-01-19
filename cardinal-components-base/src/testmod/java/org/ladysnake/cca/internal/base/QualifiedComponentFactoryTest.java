@@ -24,17 +24,19 @@ package org.ladysnake.cca.internal.base;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistry;
 import org.ladysnake.cca.internal.base.asm.StaticComponentLoadingException;
 import org.ladysnake.cca.test.base.CardinalGameTest;
+import org.ladysnake.elmendorf.ElmendorfTestContext;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static net.minecraft.network.chat.Component.literal;
 
 public class QualifiedComponentFactoryTest implements CardinalGameTest {
     @Override
@@ -55,15 +57,16 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key2.getComponentClass(), Set.of()));
         map.put(key3, new QualifiedComponentFactory<>(new Object(), key3.getComponentClass(), Set.of()));
         Map<ComponentKey<?>, QualifiedComponentFactory<Object>> sorted = QualifiedComponentFactory.sort(map);
-        ctx.assertTrue("Sorted version should be its own instance", map != sorted);
-        ctx.assertValueEqual(List.copyOf(map.keySet()), List.copyOf(sorted.keySet()), Component.literal("Keys should stay the same"));
+        var elmendorfCtx = ((ElmendorfTestContext) ctx);
+        elmendorfCtx.assertTrue("Sorted version should be its own instance", map != sorted);
+        ctx.assertValueEqual(List.copyOf(map.keySet()), List.copyOf(sorted.keySet()), literal("Keys should stay the same"));
         map = new LinkedHashMap<>();
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
         map.put(key3, new QualifiedComponentFactory<>(new Object(), key3.getComponentClass(), Set.of()));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key2.getComponentClass(), Set.of()));
         sorted = QualifiedComponentFactory.sort(map);
-        ctx.assertTrue("Sorted version should be its own instance", map != sorted);
-        ctx.assertValueEqual(List.copyOf(map.keySet()), List.copyOf(sorted.keySet()), Component.literal("Keys should stay the same"));
+        elmendorfCtx.assertTrue("Sorted version should be its own instance", map != sorted);
+        ctx.assertValueEqual(List.copyOf(map.keySet()), List.copyOf(sorted.keySet()), literal("Keys should stay the same"));
     }
 
     @GameTest
@@ -72,7 +75,8 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         var key1 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_1, ComponentRegistryImplTest.TestComponentNotItf.class);
         var key2 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
-        ctx.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.checkDependenciesSatisfied(map));
+        var elmendorfCtx = ((ElmendorfTestContext) ctx);
+        elmendorfCtx.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.checkDependenciesSatisfied(map));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
         QualifiedComponentFactory.checkDependenciesSatisfied(map);
     }
@@ -84,14 +88,15 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         var key2 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_2, ComponentRegistryImplTest.TestComponentNotItf.class);
         var key3 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key1)));
-        ctx.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
+        var elmendorfCtx = ((ElmendorfTestContext) ctx);
+        elmendorfCtx.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key1)));
-        ctx.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
+        elmendorfCtx.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key3)));
         map.put(key3, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key1)));
-        ctx.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
+        elmendorfCtx.assertThrows(StaticComponentLoadingException.class, () -> QualifiedComponentFactory.sort(map));
         map.put(key3, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of()));
         QualifiedComponentFactory.sort(map);
     }
@@ -104,9 +109,9 @@ public class QualifiedComponentFactoryTest implements CardinalGameTest {
         var key3 = ComponentRegistry.getOrCreate(CcaTesting.TEST_ID_3, ComponentRegistryImplTest.TestComponentNotItf.class);
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2)));
         map.put(key2, new QualifiedComponentFactory<>(new Object(), key2.getComponentClass(), Set.of()));
-        ctx.assertValueEqual(List.of(key2, key1), List.copyOf(QualifiedComponentFactory.sort(map).keySet()), Component.literal("Sorted map should have correct key order"));
+        ctx.assertValueEqual(List.of(key2, key1), List.copyOf(QualifiedComponentFactory.sort(map).keySet()), literal("Sorted map should have correct key order"));
         map.put(key1, new QualifiedComponentFactory<>(new Object(), key1.getComponentClass(), Set.of(key2, key3)));
         map.put(key3, new QualifiedComponentFactory<>(new Object(), key3.getComponentClass(), Set.of(key2)));
-        ctx.assertValueEqual(List.of(key2, key3, key1), List.copyOf(QualifiedComponentFactory.sort(map).keySet()), Component.literal("Sorted map should have correct key order"));
+        ctx.assertValueEqual(List.of(key2, key3, key1), List.copyOf(QualifiedComponentFactory.sort(map).keySet()), literal("Sorted map should have correct key order"));
     }
 }

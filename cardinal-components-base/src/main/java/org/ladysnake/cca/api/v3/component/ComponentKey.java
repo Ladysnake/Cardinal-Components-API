@@ -28,9 +28,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +42,8 @@ import org.ladysnake.cca.internal.base.asm.CcaBootstrap;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+
+import static net.minecraft.network.chat.Component.literal;
 
 /**
  * A key for retrieving {@link Component} instances from component providers.
@@ -210,7 +211,7 @@ public abstract class ComponentKey<C extends Component> {
                 } else {
                     if (predicate.isRequiredOnClient()) {
                         String specificMod = FabricLoader.getInstance().getModContainer(this.id.getNamespace()).map(c -> c.getMetadata().getName() + " and ").orElse("");
-                        player.connection.disconnect(Component.literal(
+                        player.connection.disconnect(literal(
                             "This server requires " + specificMod + "Cardinal Components API " +
                                 "(unhandled packet: " + payload.type().id() + ")" +
                                 ComponentsInternals.getClientOptionalModAdvice()));

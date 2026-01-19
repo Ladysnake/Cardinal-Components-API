@@ -1,5 +1,5 @@
 dependencies {
-    api(project(path = ":cardinal-components-base", configuration = "namedElements"))
+    api(project(":cardinal-components-base"))
 }
 
 loom {

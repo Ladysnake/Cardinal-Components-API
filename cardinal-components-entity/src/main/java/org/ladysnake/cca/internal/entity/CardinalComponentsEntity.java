@@ -78,7 +78,7 @@ public final class CardinalComponentsEntity {
     public static void init() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             ComponentUpdatePayload.register(PACKET_ID, ByteBufCodecs.VAR_INT);
-            PayloadTypeRegistry.playC2S().register(C2S_SELF_PACKET_ID, ComponentUpdatePayload.codec(C2S_SELF_PACKET_ID, MorePacketCodecs.EMPTY));
+            PayloadTypeRegistry.serverboundPlay().register(C2S_SELF_PACKET_ID, ComponentUpdatePayload.codec(C2S_SELF_PACKET_ID, MorePacketCodecs.EMPTY));
             PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
             TrackingStartCallback.EVENT.register(CardinalComponentsEntity::syncEntityComponents);
             ServerPlayNetworking.registerGlobalReceiver(CardinalComponentsEntity.C2S_SELF_PACKET_ID, (payload, ctx) -> {

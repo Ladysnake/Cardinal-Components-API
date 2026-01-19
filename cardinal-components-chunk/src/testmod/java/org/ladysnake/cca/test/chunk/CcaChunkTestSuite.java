@@ -35,11 +35,12 @@ import net.minecraft.world.level.chunk.storage.SerializableChunkData;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.TickingTestComponent;
 import org.ladysnake.cca.test.base.Vita;
+import org.ladysnake.elmendorf.ElmendorfTestContext;
 
 public class CcaChunkTestSuite {
     @GameTest
     public void chunksSerialize(GameTestHelper ctx) {
-        ChunkPos pos = new ChunkPos(ctx.absolutePos(new BlockPos(1, 0, 1)));
+        ChunkPos pos = ChunkPos.containing(ctx.absolutePos(new BlockPos(1, 0, 1)));
         ChunkAccess c = new LevelChunk(ctx.getLevel(), pos);
         c.getComponent(Vita.KEY).setVitality(42);
         CompoundTag nbt = SerializableChunkData.copyOf(ctx.getLevel(), c).write();
@@ -51,7 +52,7 @@ public class CcaChunkTestSuite {
 
     @GameTest
     public void chunksTick(GameTestHelper ctx) {
-        ctx.spawnServerPlayer(0, 0, 0);    // Ensure chunk gets ticked
+        ((ElmendorfTestContext) ctx).spawnServerPlayer(0, 0, 0);    // Ensure chunk gets ticked
         int baseTicks = ctx.getLevel().getChunk(ctx.absolutePos(BlockPos.ZERO)).getComponent(TickingTestComponent.KEY).serverTicks();
         ctx.runAfterDelay(5, () -> {
             int ticks = ctx.getLevel().getChunk(ctx.absolutePos(BlockPos.ZERO)).getComponent(TickingTestComponent.KEY).serverTicks();
@@ -62,7 +63,7 @@ public class CcaChunkTestSuite {
 
     @GameTest
     public void chunksLoadUnload(GameTestHelper ctx) {
-        ctx.spawnServerPlayer(0, 0, 0);    // Ensure chunk gets ticked
+        ((ElmendorfTestContext) ctx).spawnServerPlayer(0, 0, 0);    // Ensure chunk gets ticked
         ctx.assertValueEqual(
             1,
             ctx.getLevel().getChunk(ctx.absolutePos(BlockPos.ZERO)).getComponent(LoadAwareTestComponent.KEY).getLoadCounter(),

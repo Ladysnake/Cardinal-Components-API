@@ -33,8 +33,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Item.Properties;
-import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
@@ -63,7 +61,7 @@ public class VitalityStickItem extends Item {
             if (player.isShiftKeyDown()) {
                 Vita src = vita.getVitality() > 0 ? vita : Vita.get(player);
                 AmbientVita worldVita = (AmbientVita) Vita.get(
-                        world.random.nextInt(10) == 0
+                        world.getRandom().nextInt(10) == 0
                                 ? world.getLevelData()
                                 : world
                 );

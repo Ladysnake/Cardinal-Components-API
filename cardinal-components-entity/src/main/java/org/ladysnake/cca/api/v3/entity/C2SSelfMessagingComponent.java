@@ -25,7 +25,7 @@ package org.ladysnake.cca.api.v3.entity;
 import com.mojang.datafixers.util.Unit;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.FriendlyByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketSendListener;
@@ -81,7 +81,7 @@ public interface C2SSelfMessagingComponent extends Component {
     @CheckEnvironment(EnvType.CLIENT)
     static void sendC2SMessage(ComponentKey<?> key, C2SComponentPacketWriter writer) {
         PacketSender sender = ClientPlayNetworking.getSender(); // checks that the player is in game
-        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(PacketByteBufs.create(), Objects.requireNonNull(Minecraft.getInstance().getConnection()).registryAccess());
+        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(FriendlyByteBufs.create(), Objects.requireNonNull(Minecraft.getInstance().getConnection()).registryAccess());
         writer.writeC2SPacket(buf);
         sender.sendPacket(new ComponentUpdatePayload<>(CardinalComponentsEntity.C2S_SELF_PACKET_ID, Unit.INSTANCE, true, key.getId(), buf), PacketSendListener.thenRun(buf::release));
     }

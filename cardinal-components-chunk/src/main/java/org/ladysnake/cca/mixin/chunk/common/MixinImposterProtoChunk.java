@@ -38,6 +38,6 @@ public abstract class MixinImposterProtoChunk implements ComponentProvider {
 
     @Override
     public ComponentContainer getComponentContainer() {
-        return this.wrapped.asComponentProvider().getComponentContainer();
+        return ((ComponentProvider) this.wrapped).getComponentContainer();
     }
 }

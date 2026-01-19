@@ -24,6 +24,7 @@ package org.ladysnake.cca.mixin.level.common;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.WorldData;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,6 +39,6 @@ public abstract class MixinMinecraftServer {
 
     @Inject(at = @At("TAIL"), method = "tickServer")
     private void onEndTick(BooleanSupplier shouldKeepTicking, CallbackInfo info) {
-        this.getWorldData().overworldData().asComponentProvider().getComponentContainer().tickServerComponents();
+        ((ComponentProvider) this.getWorldData().overworldData()).getComponentContainer().tickServerComponents();
     }
 }

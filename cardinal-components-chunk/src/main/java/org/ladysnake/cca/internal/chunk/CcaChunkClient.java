@@ -35,8 +35,8 @@ public class CcaChunkClient {
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsChunk.PACKET_ID,
                 (payload, ctx) -> payload.componentKey().flatMap(key -> key.maybeGet(Objects.requireNonNull(ctx.client().level).getChunk(
-                    payload.targetData().x,
-                    payload.targetData().z
+                    payload.targetData().x(),
+                    payload.targetData().z()
                 ))
             ));
         }

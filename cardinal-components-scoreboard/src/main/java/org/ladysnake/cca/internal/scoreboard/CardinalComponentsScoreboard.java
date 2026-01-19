@@ -25,6 +25,7 @@ package org.ladysnake.cca.internal.scoreboard;
 import com.mojang.datafixers.util.Unit;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -41,14 +42,14 @@ public final class CardinalComponentsScoreboard {
     /**
      * {@link ClientboundCustomPayloadPacket} channel for default scoreboard component synchronization.
      *
-     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryFriendlyByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(RegistryFriendlyByteBuf)}
      * called on the game thread.
      */
     public static final CustomPacketPayload.Type<ComponentUpdatePayload<Unit>> SCOREBOARD_PACKET_ID = ComponentUpdatePayload.id("scoreboard_sync");
     /**
      * {@link ClientboundCustomPayloadPacket} channel for default team component synchronization.
      *
-     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryFriendlyByteBuf)}
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(RegistryFriendlyByteBuf)}
      * called on the game thread.
      */
     public static final CustomPacketPayload.Type<ComponentUpdatePayload<String>> TEAM_PACKET_ID = ComponentUpdatePayload.id("team_sync");
@@ -58,18 +59,18 @@ public final class CardinalComponentsScoreboard {
             ComponentUpdatePayload.register(SCOREBOARD_PACKET_ID, MorePacketCodecs.EMPTY);
             ComponentUpdatePayload.register(TEAM_PACKET_ID, ByteBufCodecs.STRING_UTF8);
             ScoreboardSyncCallback.EVENT.register((player, tracked) -> {
-                for (ComponentKey<?> key : tracked.asComponentProvider().getComponentContainer().keys()) {
-                    key.syncWith(player, tracked.asComponentProvider());
+                for (ComponentKey<?> key : ((ComponentProvider) tracked).getComponentContainer().keys()) {
+                    key.syncWith(player, ((ComponentProvider) tracked));
                 }
 
                 for (PlayerTeam team : tracked.getPlayerTeams()) {
-                    for (ComponentKey<?> key : team.asComponentProvider().getComponentContainer().keys()) {
-                        key.syncWith(player, team.asComponentProvider());
+                    for (ComponentKey<?> key : ((ComponentProvider) team).getComponentContainer().keys()) {
+                        key.syncWith(player, ((ComponentProvider) team));
                     }
                 }
             });
             TeamAddCallback.EVENT.register((tracked) -> {
-                for (ComponentKey<?> key : tracked.asComponentProvider().getComponentContainer().keys()) {
+                for (ComponentKey<?> key : ((ComponentProvider) tracked).getComponentContainer().keys()) {
                     tracked.syncComponent(key);
                 }
             });

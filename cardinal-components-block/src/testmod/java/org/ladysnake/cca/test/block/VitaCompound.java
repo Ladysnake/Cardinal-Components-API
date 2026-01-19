@@ -23,8 +23,12 @@
 package org.ladysnake.cca.test.block;
 
 import net.minecraft.core.Direction;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
@@ -46,19 +50,19 @@ public class VitaCompound implements AutoSyncedComponent {
     }
 
     @Override
-    public void readData(ReadView readView) {
+    public void readData(ValueInput valueInput) {
         for (Map.Entry<Direction, SyncedVita> entry : this.storage.entrySet()) {
-            readView.getOptionalReadView(entry.getKey().name()).ifPresent(t -> entry.getValue().readData(t));
+            valueInput.child(entry.getKey().name()).ifPresent(t -> entry.getValue().readData(t));
         }
     }
 
     @Override
-    public void writeData(WriteView writeView) {
-        storage.forEach((side, vita) -> vita.writeData(writeView.get(side.name())));
+    public void writeData(ValueOutput writeView) {
+        storage.forEach((side, vita) -> vita.writeData(writeView.child(side.name())));
     }
 
     @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player) {
+    public boolean shouldSyncWith(ServerPlayer player) {
         for (SyncedVita value : this.storage.values()) {
             if (value.shouldSyncWith(player)) {
                 return true;
@@ -68,7 +72,7 @@ public class VitaCompound implements AutoSyncedComponent {
     }
 
     @Override
-    public void writeSyncPacket(RegistryByteBuf buf, ServerPlayerEntity recipient) {
+    public void writeSyncPacket(RegistryFriendlyByteBuf buf, ServerPlayer recipient) {
         for (SyncedVita value : this.storage.values()) {
             if (value.shouldSyncWith(recipient)) {
                 value.writeSyncPacket(buf, recipient);
@@ -77,7 +81,7 @@ public class VitaCompound implements AutoSyncedComponent {
     }
 
     @Override
-    public void applySyncPacket(RegistryByteBuf buf) {
+    public void applySyncPacket(RegistryFriendlyByteBuf buf) {
         for (SyncedVita value : this.storage.values()) {
             value.applySyncPacket(buf);
         }

@@ -28,6 +28,7 @@ import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.storage.LevelData;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.world.WorldSyncCallback;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
@@ -50,8 +51,8 @@ public final class CardinalComponentsLevel {
                 WorldSyncCallback.EVENT.register((player, world) -> {
                     LevelData props = world.getLevelData();
 
-                    for (ComponentKey<?> key : props.asComponentProvider().getComponentContainer().keys()) {
-                        key.syncWith(player, props.asComponentProvider());
+                    for (ComponentKey<?> key : ((ComponentProvider) props).getComponentContainer().keys()) {
+                        key.syncWith(player, ((ComponentProvider) props));
                     }
                 });
             }

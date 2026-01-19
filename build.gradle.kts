@@ -4,8 +4,8 @@ import net.fabricmc.loom.task.RemapJarTask
 import java.net.URI
 
 plugins {
-    id("fabric-loom") version "1.13.3"
-    id("io.github.ladysnake.chenille") version "0.16.1"
+    id("net.fabricmc.fabric-loom") version "1.14-SNAPSHOT"
+    id("io.github.ladysnake.chenille") version "0.18.0-SNAPSHOT"
 }
 
 val fabricApiVersion: String = providers.gradleProperty("fabric_api_version").get()
@@ -13,7 +13,7 @@ val fabricApiVersion: String = providers.gradleProperty("fabric_api_version").ge
 allprojects {
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
-    apply(plugin = "fabric-loom")
+    apply(plugin = "net.fabricmc.fabric-loom")
     apply(plugin = "io.github.ladysnake.chenille")
 
     chenille {
@@ -62,20 +62,21 @@ allprojects {
             name = "JitPack"
             url = URI("https://jitpack.io")
         }
+        mavenLocal()
     }
 
     dependencies {
         val props = project.properties
         minecraft("com.mojang:minecraft:${props["minecraft_version"]}")
-        mappings("net.fabricmc:yarn:${props["minecraft_version"]}+build.${props["yarn_mappings"]}:v2")
-        modApi("net.fabricmc:fabric-loader:${props["loader_version"]}")
-        modApi(fabricApi.module("fabric-api-base", fabricApiVersion))
-        modImplementation(fabricApi.module("fabric-entity-events-v1", fabricApiVersion))
-        modImplementation(fabricApi.module("fabric-networking-api-v1", fabricApiVersion))
-        modImplementation(fabricApi.module("fabric-lifecycle-events-v1", fabricApiVersion))
+//        mappings("net.fabricmc:yarn:${props["minecraft_version"]}+build.${props["yarn_mappings"]}:v2")
+        api("net.fabricmc:fabric-loader:${props["loader_version"]}")
+        api(fabricApi.module("fabric-api-base", fabricApiVersion))
+        implementation(fabricApi.module("fabric-entity-events-v1", fabricApiVersion))
+        implementation(fabricApi.module("fabric-networking-api-v1", fabricApiVersion))
+        implementation(fabricApi.module("fabric-lifecycle-events-v1", fabricApiVersion))
 
-        modCompileOnly(fabricApi.module("fabric-gametest-api-v1", fabricApiVersion))
-        modLocalImplementation("org.ladysnake:elmendorf:${props["elmendorf_version"]}")
+        compileOnly(fabricApi.module("fabric-gametest-api-v1", fabricApiVersion))
+        localImplementation("org.ladysnake:elmendorf:${props["elmendorf_version"]}")
 
         compileOnly("com.google.code.findbugs:jsr305:3.0.2")
         compileOnly("org.jetbrains:annotations:24.0.1")
@@ -212,45 +213,43 @@ subprojects {
     }
 }
 
-val remapMavenJar by tasks.registering(RemapJarTask::class) {
-    inputFile.set(tasks.jar.flatMap { it.archiveFile })
-    archiveFileName.set("${project.properties["archivesBaseName"]}-${project.version}-maven.jar")
-    addNestedDependencies = false
-    dependsOn(tasks.jar)
-}
-tasks.assemble.configure {
-    dependsOn(remapMavenJar)
-}
-
-extensions.configure(PublishingExtension::class.java) {
-    publications {
-        val mavenJava by creating(MavenPublication::class) {
-            artifact(remapMavenJar) {
-                builtBy(remapMavenJar)
-            }
-
-            artifact(tasks.named("sourcesJar")) {
-                builtBy(tasks.remapSourcesJar)
-            }
-
-            artifact(tasks.named("javadocJar"))
-
-            pom.withXml {
-                val depsNode = asNode().appendNode("dependencies")
-                subprojects.forEach {
-                    val depNode = depsNode.appendNode("dependency")
-                    depNode.appendNode("groupId", it.group)
-                    depNode.appendNode("artifactId", it.name)
-                    depNode.appendNode("version", it.version)
-                    depNode.appendNode("scope", "compile")
-                }
-            }
-        }
-        // Required until the deprecation is removed. CCA's main jar that is published to maven does not contain sub modules.
-        @Suppress("UnstableApiUsage")
-        loom.disableDeprecatedPomGeneration(mavenJava)
-    }
-}
+//val remapMavenJar by tasks.registering(RemapJarTask::class) {
+//    inputFile.set(tasks.jar.flatMap { it.archiveFile })
+//    archiveFileName.set("${project.properties["archivesBaseName"]}-${project.version}-maven.jar")
+//    addNestedDependencies = false
+//    dependsOn(tasks.jar)
+//}
+//tasks.assemble.configure {
+//    dependsOn(remapMavenJar)
+//}
+//
+//extensions.configure(PublishingExtension::class.java) {
+//    publications {
+//        val mavenJava by creating(MavenPublication::class) {
+//            artifact(remapMavenJar) {
+//                builtBy(remapMavenJar)
+//            }
+//
+//            artifact(tasks.named("sourcesJar"))
+//
+//            artifact(tasks.named("javadocJar"))
+//
+//            pom.withXml {
+//                val depsNode = asNode().appendNode("dependencies")
+//                subprojects.forEach {
+//                    val depNode = depsNode.appendNode("dependency")
+//                    depNode.appendNode("groupId", it.group)
+//                    depNode.appendNode("artifactId", it.name)
+//                    depNode.appendNode("version", it.version)
+//                    depNode.appendNode("scope", "compile")
+//                }
+//            }
+//        }
+//        // Required until the deprecation is removed. CCA's main jar that is published to maven does not contain sub modules.
+//        @Suppress("UnstableApiUsage")
+//        loom.disableDeprecatedPomGeneration(mavenJava)
+//    }
+//}
 
 chenille {
     configureTestmod {
@@ -268,33 +267,29 @@ extensions.configure(GithubReleaseExtension::class.java) {
     owner = providers.gradleProperty("owners")
 }
 
-subprojects.forEach { tasks.remapJar.configure { dependsOn("${it.path}:remapJar") } }
-
 dependencies {
     // used by the test mod
-    modImplementation(fabricApi.module("fabric-api-base", fabricApiVersion))
-    modImplementation(fabricApi.module("fabric-object-builder-api-v1", fabricApiVersion))
-    modImplementation(fabricApi.module("fabric-rendering-v1", fabricApiVersion))
-    modImplementation(fabricApi.module("fabric-lifecycle-events-v1", fabricApiVersion))
-    modImplementation(fabricApi.module("fabric-item-api-v1", fabricApiVersion))
-    modImplementation(fabricApi.module("fabric-item-group-api-v1", fabricApiVersion))
-    modImplementation(fabricApi.module("fabric-events-interaction-v0", fabricApiVersion))
-    modImplementation(fabricApi.module("fabric-api-lookup-api-v1", fabricApiVersion))
-    modImplementation(fabricApi.module("fabric-command-api-v2", fabricApiVersion))
-    modImplementation(fabricApi.module("fabric-gametest-api-v1", fabricApiVersion))
-    modRuntimeOnly(fabricApi.module("fabric-networking-api-v1", fabricApiVersion))
-    modRuntimeOnly(fabricApi.module("fabric-resource-loader-v0", fabricApiVersion))
-    modRuntimeOnly(fabricApi.module("fabric-events-interaction-v0", fabricApiVersion))
-    modRuntimeOnly(fabricApi.module("fabric-registry-sync-v0", fabricApiVersion))
+    implementation(fabricApi.module("fabric-api-base", fabricApiVersion))
+    implementation(fabricApi.module("fabric-object-builder-api-v1", fabricApiVersion))
+    implementation(fabricApi.module("fabric-rendering-v1", fabricApiVersion))
+    implementation(fabricApi.module("fabric-lifecycle-events-v1", fabricApiVersion))
+    implementation(fabricApi.module("fabric-item-api-v1", fabricApiVersion))
+    implementation(fabricApi.module("fabric-creative-tab-api-v1", fabricApiVersion))
+    implementation(fabricApi.module("fabric-events-interaction-v0", fabricApiVersion))
+    implementation(fabricApi.module("fabric-api-lookup-api-v1", fabricApiVersion))
+    implementation(fabricApi.module("fabric-command-api-v2", fabricApiVersion))
+    implementation(fabricApi.module("fabric-gametest-api-v1", fabricApiVersion))
+    runtimeOnly(fabricApi.module("fabric-networking-api-v1", fabricApiVersion))
+    runtimeOnly(fabricApi.module("fabric-resource-loader-v0", fabricApiVersion))
+    runtimeOnly(fabricApi.module("fabric-events-interaction-v0", fabricApiVersion))
+    runtimeOnly(fabricApi.module("fabric-registry-sync-v0", fabricApiVersion))
 
     testCompileOnly("com.google.code.findbugs:jsr305:3.0.2")
 
-    afterEvaluate {
-        subprojects.forEach {
-            api(project(path = ":${it.name}", configuration = "namedElements"))
-            include(project("${it.name}:"))
-            "testmodImplementation"(project("${it.name}:").sourceSets["testmod"].output)
-        }
+    subprojects.forEach {
+        api(project(":${it.name}"))
+        include(project("${it.name}:"))
+        "testmodImplementation"(it.sourceSets["testmod"].output)
     }
 }
 

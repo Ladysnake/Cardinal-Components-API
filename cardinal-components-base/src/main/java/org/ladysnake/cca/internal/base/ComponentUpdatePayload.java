@@ -24,10 +24,9 @@ package org.ladysnake.cca.internal.base;
 
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type;
 import net.minecraft.resources.Identifier;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistry;
@@ -46,7 +45,7 @@ public record ComponentUpdatePayload<T>(
     }
 
     public static <T> void register(Type<ComponentUpdatePayload<T>> id, StreamCodec<? super RegistryFriendlyByteBuf, T> targetDataCodec) {
-        PayloadTypeRegistry.playS2C().register(id, codec(id, targetDataCodec));
+        PayloadTypeRegistry.clientboundPlay().register(id, codec(id, targetDataCodec));
     }
 
     public static <T> StreamCodec<RegistryFriendlyByteBuf, ComponentUpdatePayload<T>> codec(Type<ComponentUpdatePayload<T>> id, StreamCodec<? super RegistryFriendlyByteBuf, T> targetDataCodec) {

@@ -43,11 +43,13 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.Vita;
+import org.ladysnake.elmendorf.ElmendorfTestContext;
 
 public class CcaEntityTestSuite {
     @GameTest
     public void bucketableWorks(GameTestHelper ctx) {
-        ServerPlayer player = ctx.spawnServerPlayer(1, 0, 1);
+        var elmendorfCtx = ((ElmendorfTestContext) ctx);
+        ServerPlayer player = elmendorfCtx.spawnServerPlayer(1, 0, 1);
         player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
         BlockPos pos = new BlockPos(2, 0, 2);
@@ -98,7 +100,7 @@ public class CcaEntityTestSuite {
             CcaEntityTestMod.CAMEL_BASE_VITA, Vita.get(cow).getVitality(),
             Component.literal("Component data should transfer according to RespawnCopyStrategy -"));
         Cat cat = cow.convertTo(EntityType.CAT, ConversionParams.single(camel, true, true), e -> {});
-        ctx.assertTrue("Component data should not transfer by default", Vita.get(cat).getVitality() < CcaEntityTestMod.NATURAL_VITA_CEILING);
+        ((ElmendorfTestContext) ctx).assertTrue("Component data should not transfer by default", Vita.get(cat).getVitality() < CcaEntityTestMod.NATURAL_VITA_CEILING);
         ctx.succeed();
     }
 }

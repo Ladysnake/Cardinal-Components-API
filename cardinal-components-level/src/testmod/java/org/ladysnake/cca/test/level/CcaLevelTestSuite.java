@@ -25,14 +25,15 @@ package org.ladysnake.cca.test.level;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
+import org.ladysnake.cca.api.v3.component.ComponentAccess;
 import org.ladysnake.cca.test.base.TickingTestComponent;
 
 public class CcaLevelTestSuite {
     @GameTest
     public void levelComponentsTick(GameTestHelper ctx) {
-        int baseTicks = ctx.getLevel().getLevelData().getComponent(TickingTestComponent.KEY).serverTicks();
+        int baseTicks = ((ComponentAccess) ctx.getLevel().getLevelData()).getComponent(TickingTestComponent.KEY).serverTicks();
         ctx.runAfterDelay(5, () -> {
-            int ticks = ctx.getLevel().getLevelData().getComponent(TickingTestComponent.KEY).serverTicks();
+            int ticks = ((ComponentAccess) ctx.getLevel().getLevelData()).getComponent(TickingTestComponent.KEY).serverTicks();
             ctx.assertValueEqual(5, ticks - baseTicks, Component.literal("Component should tick 5 times -"));
             ctx.succeed();
         });

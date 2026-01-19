@@ -27,7 +27,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.level.Level;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.internal.base.CcaClientInternals;
-import qouteall.imm_ptl.core.ClientWorldLoader;
 
 import java.util.Optional;
 
@@ -42,7 +41,7 @@ public class CcaBlockClient {
                 (payload, ctx) -> payload.componentKey().flatMap(key -> {
                     Level world;
                     if (hasImmersivePortals) {
-                        world = ClientWorldLoader.getOptionalWorld(payload.targetData().worldKey());
+                        world = null;// ClientWorldLoader.getOptionalWorld(payload.targetData().worldKey());
                         if (world == null) {
                             return Optional.empty();
                         }

@@ -38,7 +38,7 @@ import java.util.Optional;
 
 @Mixin(Bucketable.class)
 public interface BucketableMixin {
-    @Inject(method = "method_57302", at = @At("RETURN"))
+    @Inject(method = "lambda$saveDefaultDataToBucketTag$0", at = @At("RETURN"))
     private static void writeComponentsToStack(Mob mobEntity, CompoundTag nbtCompound, CallbackInfo ci) {
         CompoundTag nbt = mobEntity.asComponentProvider().getComponentContainer().toOrphanTag(mobEntity.registryAccess());
         if (nbt != null) {

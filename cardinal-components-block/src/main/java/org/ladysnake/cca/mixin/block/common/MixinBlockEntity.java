@@ -73,7 +73,7 @@ public abstract class MixinBlockEntity implements ComponentProvider {
         this.components = CardinalBlockInternals.createComponents((BlockEntity) (Object) this);
     }
 
-    @Inject(method = {"saveWithoutMetadata", "saveCustomOnly"}, at = @At("RETURN"))
+    @Inject(method = {"saveWithoutMetadata(Lnet/minecraft/world/level/storage/ValueOutput;)V", "saveCustomOnly(Lnet/minecraft/world/level/storage/ValueOutput;)V"}, at = @At("RETURN"))
     private void writeNbt(ValueOutput data, CallbackInfo ci) {
         this.components.writeData(data);
     }

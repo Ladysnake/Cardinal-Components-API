@@ -23,7 +23,7 @@
 package org.ladysnake.cca.internal.world;
 
 import com.mojang.datafixers.util.Unit;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
@@ -54,8 +54,8 @@ public final class CardinalComponentsWorld {
             });
         }
         if (FabricLoader.getInstance().isModLoaded("fabric-lifecycle-events-v1")) {
-            ServerWorldEvents.LOAD.register((server, world) -> ((ComponentProvider) world).getComponentContainer().onServerLoad());
-            ServerWorldEvents.UNLOAD.register((server, world) -> ((ComponentProvider) world).getComponentContainer().onServerUnload());
+            ServerLevelEvents.LOAD.register((server, world) -> ((ComponentProvider) world).getComponentContainer().onServerLoad());
+            ServerLevelEvents.UNLOAD.register((server, world) -> ((ComponentProvider) world).getComponentContainer().onServerUnload());
         }
         StaticWorldComponentPlugin.INSTANCE.ensureInitialized();
     }

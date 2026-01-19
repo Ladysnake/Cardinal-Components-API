@@ -25,15 +25,15 @@
       }
     },
     "loom:injected_interfaces": {
-      "net/minecraft/class_5217": [
+      "net/minecraft/world/level/Level": [
         "org/ladysnake/cca/api/v3/component/ComponentAccess"
       ]
     }
   },
   "depends": {
-    "minecraft": ">=1.17-",
+    "minecraft": ">=26.1-",
     "fabric-api-base": "*",
-    "cardinal-components-base": ">=6.0.0-beta.2",
+    "cardinal-components-base": ">=8.0.0-alpha.1",
     "fabric-networking-api-v1": "*"
   },
   "recommends": {

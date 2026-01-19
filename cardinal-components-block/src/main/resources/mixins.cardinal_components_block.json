@@ -5,10 +5,10 @@
   "package": "org.ladysnake.cca.mixin.block.common",
   "mixins": [
     "MixinBlockEntity",
-    "MixinChunkDataSender",
     "MixinChunkHolder",
-    "MixinServerPlayerEntity",
-    "MixinWorldChunk"
+    "MixinLevelChunk",
+    "MixinPlayerChunkSender",
+    "MixinServerPlayer"
   ],
   "client": [
   ],

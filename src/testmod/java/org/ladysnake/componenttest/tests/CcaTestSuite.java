@@ -29,6 +29,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.ladysnake.cca.api.v3.component.ComponentAccess;
+import org.ladysnake.elmendorf.ElmendorfTestContext;
 
 public final class CcaTestSuite {
     @GameTest
@@ -50,6 +51,6 @@ public final class CcaTestSuite {
 
     private void checkContainer(GameTestHelper ctx, Object provider) {
         //noinspection ConstantConditions
-        ctx.assertTrue(provider + " should correctly implement ComponentProvider", ((ComponentAccess) provider).asComponentProvider().getComponentContainer() != null);
+        ((ElmendorfTestContext) ctx).assertTrue(provider + " should correctly implement ComponentProvider", ((ComponentAccess) provider).asComponentProvider().getComponentContainer() != null);
     }
 }

@@ -27,6 +27,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.LevelData;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.sync.ComponentPacketWriter;
 import org.ladysnake.cca.api.v3.component.sync.PlayerSyncPredicate;
@@ -48,7 +49,7 @@ public final class LevelComponents {
     public static void sync(ComponentKey<?> key, MinecraftServer server) {
         LevelData props = server.getWorldData().overworldData();
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            key.syncWith(player, props.asComponentProvider());
+            key.syncWith(player, ((ComponentProvider) props));
         }
     }
 
@@ -66,7 +67,7 @@ public final class LevelComponents {
         Component c = key.get(props);
         if (c instanceof AutoSyncedComponent sc) {
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-                key.syncWith(player, props.asComponentProvider(), packetWriter, sc);
+                key.syncWith(player, ((ComponentProvider) props), packetWriter, sc);
             }
         }
     }
@@ -84,7 +85,7 @@ public final class LevelComponents {
     public static void sync(ComponentKey<?> key, MinecraftServer server, ComponentPacketWriter packetWriter, PlayerSyncPredicate predicate) {
         LevelData props = server.getWorldData().overworldData();
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            key.syncWith(player, props.asComponentProvider(), packetWriter, predicate);
+            key.syncWith(player, ((ComponentProvider) props), packetWriter, predicate);
         }
     }
 }
