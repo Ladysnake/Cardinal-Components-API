@@ -1,6 +1,4 @@
 import com.github.breadmoirai.githubreleaseplugin.GithubReleaseExtension
-import net.fabricmc.loom.task.RemapJarTask
-
 import java.net.URI
 
 plugins {
@@ -68,7 +66,6 @@ allprojects {
     dependencies {
         val props = project.properties
         minecraft("com.mojang:minecraft:${props["minecraft_version"]}")
-//        mappings("net.fabricmc:yarn:${props["minecraft_version"]}+build.${props["yarn_mappings"]}:v2")
         api("net.fabricmc:fabric-loader:${props["loader_version"]}")
         api(fabricApi.module("fabric-api-base", fabricApiVersion))
         implementation(fabricApi.module("fabric-entity-events-v1", fabricApiVersion))
@@ -124,7 +121,6 @@ tasks.javadoc {
             "https://docs.oracle.com/en/java/javase/21/docs/api/",
             "https://jenkins.liteloader.com/job/Mixin/javadoc/",
             "https://logging.apache.org/log4j/2.x/javadoc/log4j-api/",
-            "https://maven.fabricmc.net/docs/yarn-${project.property("minecraft_version")}+build.${project.property("yarn_mappings")}/"
         )
         // Disable the crazy super-strict doclint tool in Java 8
         addStringOption("Xdoclint:none", "-quiet")
@@ -295,7 +291,7 @@ dependencies {
 
 val testmodJar by tasks.registering(Jar::class) {
     archiveBaseName.set("CCATest")
-    archiveClassifier.set("dev")
+    archiveClassifier.set("testmod")
     from(sourceSets["testmod"].output) {
         include("fabric.mod.json")
         expand(mapOf("version" to project.version))
@@ -306,14 +302,6 @@ val testmodJar by tasks.registering(Jar::class) {
     dependsOn(tasks.named("testmodClasses"))
 }
 
-val remapTestmodJar by tasks.registering(RemapJarTask::class) {
-    archiveBaseName.set("CCATest")
-    archiveClassifier.set("testmod")
-    inputFile.set(testmodJar.flatMap { it.archiveFile })
-    addNestedDependencies = false
-    dependsOn(testmodJar)
-}
-
 tasks.assemble.configure {
-    dependsOn(remapTestmodJar)
+    dependsOn(testmodJar)
 }
