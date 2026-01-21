@@ -24,7 +24,6 @@ package org.ladysnake.cca.internal.entity;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -32,6 +31,7 @@ import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.LazyDispatcher;
 import org.ladysnake.cca.internal.base.QualifiedComponentFactory;
 import org.ladysnake.cca.internal.base.asm.StaticComponentLoadingException;
@@ -93,7 +93,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         return builder.build();
     }
 
-    private <C extends Component> void addToBuilder(ComponentContainer.Factory.Builder<Entity> builder, Map.Entry<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<? extends Entity, ?>>> entry) {
+    private <C extends CardinalComponent> void addToBuilder(ComponentContainer.Factory.Builder<Entity> builder, Map.Entry<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<? extends Entity, ?>>> entry) {
         @SuppressWarnings("unchecked") var key = (ComponentKey<C>) entry.getKey();
         @SuppressWarnings("unchecked") var factory = (ComponentFactory<Entity, C>) entry.getValue().factory();
         @SuppressWarnings("unchecked") var impl = (Class<C>) entry.getValue().impl();
@@ -109,18 +109,18 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     }
 
     @Override
-    public <C extends Component, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> type, ComponentFactory<E, ? extends C> factory) {
+    public <C extends CardinalComponent, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> type, ComponentFactory<E, ? extends C> factory) {
         this.checkLoading(EntityComponentFactoryRegistry.class, "register");
         this.register0(target, type, new QualifiedComponentFactory<>(factory, type.getComponentClass(), Set.of()));
     }
 
     @Override
-    public <C extends Component> void registerFor(Predicate<Class<? extends Entity>> test, ComponentKey<C> type, ComponentFactory<Entity, C> factory) {
+    public <C extends CardinalComponent> void registerFor(Predicate<Class<? extends Entity>> test, ComponentKey<C> type, ComponentFactory<Entity, C> factory) {
         this.dynamicFactories.add(new PredicatedComponentFactory<>(test, type, new QualifiedComponentFactory<>(factory, type.getComponentClass(), Set.of())));
     }
 
     @Override
-    public <C extends Component, E extends Entity> Registration<C, E> beginRegistration(Class<E> target, ComponentKey<C> key) {
+    public <C extends CardinalComponent, E extends Entity> Registration<C, E> beginRegistration(Class<E> target, ComponentKey<C> key) {
         return new RegistrationImpl<>(target, key);
     }
 
@@ -130,12 +130,12 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
     }
 
     @Override
-    public <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, ComponentFactory<Player, P> factory, RespawnCopyStrategy<? super P> respawnStrategy) {
+    public <C extends CardinalComponent, P extends C> void registerForPlayers(ComponentKey<C> key, ComponentFactory<Player, P> factory, RespawnCopyStrategy<? super P> respawnStrategy) {
         this.registerFor(Player.class, key, factory);
         CardinalEntityInternals.registerRespawnCopyStrat(key, Player.class, respawnStrategy);
     }
 
-    private <C extends Component, F extends C, E extends Entity> void register0(Class<? extends E> target, ComponentKey<? super C> key, QualifiedComponentFactory<ComponentFactory<E, F>> factory) {
+    private <C extends CardinalComponent, F extends C, E extends Entity> void register0(Class<? extends E> target, ComponentKey<? super C> key, QualifiedComponentFactory<ComponentFactory<E, F>> factory) {
         var specializedMap = this.componentFactories.computeIfAbsent(target, t -> new LinkedHashMap<>());
         var previousFactory = specializedMap.get(key);
 
@@ -148,7 +148,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         QualifiedComponentFactory.checkNoDependencyCycles(specializedMap);
     }
 
-    private final class PredicatedComponentFactory<C extends Component> {
+    private final class PredicatedComponentFactory<C extends CardinalComponent> {
         private final Predicate<Class<? extends Entity>> predicate;
         private final ComponentKey<? super C> type;
         private final QualifiedComponentFactory<ComponentFactory<Entity, C>> factory;
@@ -166,7 +166,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         }
     }
 
-    private final class RegistrationImpl<C extends Component, E extends Entity> implements Registration<C, E> {
+    private final class RegistrationImpl<C extends CardinalComponent, E extends Entity> implements Registration<C, E> {
         private final Class<E> target;
         private final ComponentKey<? super C> key;
         private final Set<ComponentKey<?>> dependencies;

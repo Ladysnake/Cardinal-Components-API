@@ -25,9 +25,9 @@ package org.ladysnake.cca.api.v3.entity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.ApiStatus;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 import java.util.function.Predicate;
 
@@ -51,7 +51,7 @@ public interface EntityComponentFactoryRegistry {
      * @param target  a class object representing the type of entities targeted by the factory
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> key, ComponentFactory<E, ? extends C> factory);
+    <C extends CardinalComponent, E extends Entity> void registerFor(Class<E> target, ComponentKey<C> key, ComponentFactory<E, ? extends C> factory);
 
     /**
      * Registers a {@link ComponentFactory} for all instances of classes that pass the {@code test}.
@@ -62,7 +62,7 @@ public interface EntityComponentFactoryRegistry {
      * @throws NullPointerException if any of the arguments is {@code null}
      */
     @Deprecated
-    <C extends Component> void registerFor(Predicate<Class<? extends Entity>> test, ComponentKey<C> key, ComponentFactory<Entity, C> factory);
+    <C extends CardinalComponent> void registerFor(Predicate<Class<? extends Entity>> test, ComponentKey<C> key, ComponentFactory<Entity, C> factory);
 
     /**
      * Begin a factory registration, initially targeting all instances of the {@code target}.
@@ -71,7 +71,7 @@ public interface EntityComponentFactoryRegistry {
      * @param key    the key of components to attach
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends Component, E extends Entity> Registration<C, E> beginRegistration(Class<E> target, ComponentKey<C> key);
+    <C extends CardinalComponent, E extends Entity> Registration<C, E> beginRegistration(Class<E> target, ComponentKey<C> key);
 
     /**
      * Registers a {@link ComponentFactory} for all {@link Player} instances.
@@ -96,9 +96,9 @@ public interface EntityComponentFactoryRegistry {
      * @see Registration#respawnStrategy(RespawnCopyStrategy)
      * @since 2.5.1
      */
-    <C extends Component, P extends C> void registerForPlayers(ComponentKey<C> key, ComponentFactory<Player, P> factory, RespawnCopyStrategy<? super P> respawnStrategy);
+    <C extends CardinalComponent, P extends C> void registerForPlayers(ComponentKey<C> key, ComponentFactory<Player, P> factory, RespawnCopyStrategy<? super P> respawnStrategy);
 
-    interface Registration<C extends Component, E extends Entity> {
+    interface Registration<C extends CardinalComponent, E extends Entity> {
         /**
          * Registers a {@link ComponentFactory} for all instances of classes that pass the {@code test}.
          *

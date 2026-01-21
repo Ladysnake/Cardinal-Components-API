@@ -25,12 +25,12 @@ package org.ladysnake.cca.api.v3.level;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.LevelData;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.sync.ComponentPacketWriter;
 import org.ladysnake.cca.api.v3.component.sync.PlayerSyncPredicate;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 import java.util.NoSuchElementException;
 
@@ -64,7 +64,7 @@ public final class LevelComponents {
      */
     public static void sync(ComponentKey<?> key, MinecraftServer server, ComponentPacketWriter packetWriter) {
         LevelData props = server.getWorldData().overworldData();
-        Component c = key.get(props);
+        CardinalComponent c = key.get(props);
         if (c instanceof AutoSyncedComponent sc) {
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 key.syncWith(player, ((ComponentProvider) props), packetWriter, sc);

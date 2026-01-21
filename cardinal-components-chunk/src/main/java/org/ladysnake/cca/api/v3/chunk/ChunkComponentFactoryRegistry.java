@@ -23,9 +23,9 @@
 package org.ladysnake.cca.api.v3.chunk;
 
 import net.minecraft.world.level.chunk.ChunkAccess;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 /**
  * @since 2.4.0
@@ -36,7 +36,7 @@ public interface ChunkComponentFactoryRegistry {
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void register(ComponentKey<C> key, ComponentFactory<ChunkAccess, ? extends C> factory);
+    <C extends CardinalComponent> void register(ComponentKey<C> key, ComponentFactory<ChunkAccess, ? extends C> factory);
 
     /**
      * Registers a {@link ComponentFactory} for {@link ChunkAccess}s.
@@ -44,5 +44,5 @@ public interface ChunkComponentFactoryRegistry {
      * @param impl    the class object representing the type of component produced by the factory
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, ComponentFactory<ChunkAccess, ? extends C> factory);
+    <C extends CardinalComponent> void register(ComponentKey<? super C> key, Class<C> impl, ComponentFactory<ChunkAccess, ? extends C> factory);
 }

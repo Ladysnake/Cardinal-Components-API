@@ -22,8 +22,8 @@
  */
 package org.ladysnake.cca.api.v3.scoreboard;
 
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 /**
  * @since 2.4.2
@@ -34,26 +34,26 @@ public interface ScoreboardComponentFactoryRegistry {
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void registerTeamComponent(ComponentKey<C> type, TeamComponentFactoryV2<? extends C> factory);
+    <C extends CardinalComponent> void registerTeamComponent(ComponentKey<C> type, TeamComponentFactoryV2<? extends C> factory);
 
     /**
      * Registers a {@link TeamComponentFactory}.
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void registerTeamComponent(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactoryV2<? extends C> factory);
+    <C extends CardinalComponent> void registerTeamComponent(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactoryV2<? extends C> factory);
 
     /**
      * Registers a {@link ScoreboardComponentFactoryV2}.
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void registerScoreboardComponent(ComponentKey<C> type, ScoreboardComponentFactoryV2<? extends C> factory);
+    <C extends CardinalComponent> void registerScoreboardComponent(ComponentKey<C> type, ScoreboardComponentFactoryV2<? extends C> factory);
 
     /**
      * Registers a {@link ScoreboardComponentFactoryV2}.
      *
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component> void registerScoreboardComponent(ComponentKey<? super C> type, Class<C> impl, ScoreboardComponentFactoryV2<? extends C> factory);
+    <C extends CardinalComponent> void registerScoreboardComponent(ComponentKey<? super C> type, Class<C> impl, ScoreboardComponentFactoryV2<? extends C> factory);
 }

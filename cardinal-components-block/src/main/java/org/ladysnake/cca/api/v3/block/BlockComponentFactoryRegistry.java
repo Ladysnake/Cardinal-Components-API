@@ -24,9 +24,9 @@ package org.ladysnake.cca.api.v3.block;
 
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.ApiStatus;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 import java.util.function.Predicate;
 
@@ -49,7 +49,7 @@ public interface BlockComponentFactoryRegistry {
      *  @param target  a class object representing the type of entities targeted by the factory
      * @param factory the factory to use to create components of the given type
      */
-    <C extends Component, BE extends BlockEntity> void registerFor(Class<BE> target, ComponentKey<C> key, ComponentFactory<BE, C> factory);
+    <C extends CardinalComponent, BE extends BlockEntity> void registerFor(Class<BE> target, ComponentKey<C> key, ComponentFactory<BE, C> factory);
 
     /**
      * Begin a factory registration, initially targeting all instances of the {@code target}.
@@ -58,9 +58,9 @@ public interface BlockComponentFactoryRegistry {
      * @param key    the key of components to attach
      * @throws NullPointerException if any of the arguments is {@code null}
      */
-    <C extends Component, B extends BlockEntity> Registration<C, B> beginRegistration(Class<B> target, ComponentKey<C> key);
+    <C extends CardinalComponent, B extends BlockEntity> Registration<C, B> beginRegistration(Class<B> target, ComponentKey<C> key);
 
-    interface Registration<C extends Component, BE extends BlockEntity> {
+    interface Registration<C extends CardinalComponent, BE extends BlockEntity> {
         /**
          * Registers a {@link ComponentFactory} for all instances of classes that pass the {@code test}.
          *

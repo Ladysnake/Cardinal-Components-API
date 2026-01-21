@@ -27,10 +27,10 @@ import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import org.ladysnake.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.chunk.ChunkComponentInitializer;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.asm.StaticComponentPluginBase;
 
 import java.util.Collection;
@@ -60,12 +60,12 @@ public final class StaticChunkComponentPlugin extends StaticComponentPluginBase<
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<C> type, ComponentFactory<ChunkAccess, ? extends C> factory) {
+    public <C extends CardinalComponent> void register(ComponentKey<C> type, ComponentFactory<ChunkAccess, ? extends C> factory) {
         this.register(type, type.getComponentClass(), factory);
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<ChunkAccess, ? extends C> factory) {
+    public <C extends CardinalComponent> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<ChunkAccess, ? extends C> factory) {
         this.checkLoading(ChunkComponentFactoryRegistry.class, "register");
         super.register(type, factory);
     }

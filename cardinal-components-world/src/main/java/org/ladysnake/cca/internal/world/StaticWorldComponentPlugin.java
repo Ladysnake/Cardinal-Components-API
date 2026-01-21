@@ -27,12 +27,12 @@ import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.world.WorldComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.world.WorldComponentInitializer;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.QualifiedComponentFactory;
 import org.ladysnake.cca.internal.base.asm.CcaAsmHelper;
 import org.ladysnake.cca.internal.base.asm.StaticComponentLoadingException;
@@ -78,7 +78,7 @@ public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<
         return builder.build();
     }
 
-    private <C extends Component> void addToBuilder(ComponentContainer.Factory.Builder<Level> builder, Map.Entry<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<Level, ?>>> entry) {
+    private <C extends CardinalComponent> void addToBuilder(ComponentContainer.Factory.Builder<Level> builder, Map.Entry<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<Level, ?>>> entry) {
         @SuppressWarnings("unchecked") var key = (ComponentKey<C>) entry.getKey();
         @SuppressWarnings("unchecked") var factory = (ComponentFactory<Level, C>) entry.getValue().factory();
         @SuppressWarnings("unchecked") var impl = (Class<C>) entry.getValue().impl();
@@ -96,30 +96,30 @@ public final class StaticWorldComponentPlugin extends StaticComponentPluginBase<
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<C> type, ComponentFactory<Level, ? extends C> factory) {
+    public <C extends CardinalComponent> void register(ComponentKey<C> type, ComponentFactory<Level, ? extends C> factory) {
         this.checkLoading(WorldComponentFactoryRegistry.class, "register");
         this.register0(null, type, new QualifiedComponentFactory<>(factory, type.getComponentClass(), Set.of()));
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<Level, ? extends C> factory) {
+    public <C extends CardinalComponent> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<Level, ? extends C> factory) {
         this.checkLoading(WorldComponentFactoryRegistry.class, "register");
         this.register0(null, type, new QualifiedComponentFactory<>(factory, type.getComponentClass(), Set.of()));
     }
 
     @Override
-    public <C extends Component> void registerFor(ResourceKey<Level> dimensionId, ComponentKey<C> type, ComponentFactory<Level, ? extends C> factory) {
+    public <C extends CardinalComponent> void registerFor(ResourceKey<Level> dimensionId, ComponentKey<C> type, ComponentFactory<Level, ? extends C> factory) {
         this.checkLoading(WorldComponentFactoryRegistry.class, "register");
         this.register0(dimensionId, type, new QualifiedComponentFactory<>(factory, type.getComponentClass(), Set.of()));
     }
 
     @Override
-    public <C extends Component> void registerFor(ResourceKey<Level> dimensionId, ComponentKey<? super C> type, Class<C> impl, ComponentFactory<Level, ? extends C> factory) {
+    public <C extends CardinalComponent> void registerFor(ResourceKey<Level> dimensionId, ComponentKey<? super C> type, Class<C> impl, ComponentFactory<Level, ? extends C> factory) {
         this.checkLoading(WorldComponentFactoryRegistry.class, "register");
         this.register0(dimensionId, type, new QualifiedComponentFactory<>(factory, impl, Set.of()));
     }
 
-    private <C extends Component> void register0(@Nullable ResourceKey<Level> dimensionId, ComponentKey<? super C> type, QualifiedComponentFactory<ComponentFactory<Level, ? extends C>> factory) {
+    private <C extends CardinalComponent> void register0(@Nullable ResourceKey<Level> dimensionId, ComponentKey<? super C> type, QualifiedComponentFactory<ComponentFactory<Level, ? extends C>> factory) {
         var specializedMap = this.worldComponentFactories.computeIfAbsent(dimensionId, t -> new LinkedHashMap<>());
         var previousFactory = specializedMap.get(type);
 

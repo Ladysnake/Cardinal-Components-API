@@ -23,8 +23,8 @@
 package org.ladysnake.cca.internal.base;
 
 import com.google.common.collect.Lists;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.asm.StaticComponentLoadingException;
 
 import java.util.ArrayDeque;
@@ -40,11 +40,11 @@ public final class QualifiedComponentFactory<I> {
     private static final boolean DEV = Boolean.getBoolean("fabric.development");
 
     private final I factory;
-    private final Class<? extends Component> impl;
+    private final Class<? extends CardinalComponent> impl;
     private final Set<ComponentKey<?>> dependencies;
     private SortingState sortingState = SortingState.UNSORTED;
 
-    public QualifiedComponentFactory(I factory, Class<? extends Component> impl, Set<ComponentKey<?>> dependencies) {
+    public QualifiedComponentFactory(I factory, Class<? extends CardinalComponent> impl, Set<ComponentKey<?>> dependencies) {
         this.factory = factory;
         this.impl = impl;
         this.dependencies = dependencies;
@@ -119,7 +119,7 @@ public final class QualifiedComponentFactory<I> {
         return factory;
     }
 
-    public Class<? extends Component> impl() {
+    public Class<? extends CardinalComponent> impl() {
         return impl;
     }
 

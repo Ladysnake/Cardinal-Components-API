@@ -25,9 +25,9 @@ package org.ladysnake.cca.internal.base;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import net.minecraft.resources.Identifier;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.asm.CcaBootstrap;
 
 import javax.annotation.Nullable;
@@ -44,8 +44,8 @@ public final class ComponentRegistryImpl implements ComponentRegistryV3 {
     private final Map<Identifier, ComponentKey<?>> keys = new HashMap<>();
 
     @Override
-    public synchronized <T extends Component> ComponentKey<T> getOrCreate(Identifier componentId, Class<T> componentClass) {
-        Preconditions.checkArgument(Component.class.isAssignableFrom(componentClass), "Component interface must extend " + Component.class.getCanonicalName());
+    public synchronized <T extends CardinalComponent> ComponentKey<T> getOrCreate(Identifier componentId, Class<T> componentClass) {
+        Preconditions.checkArgument(CardinalComponent.class.isAssignableFrom(componentClass), "Component interface must extend " + CardinalComponent.class.getCanonicalName());
         // make sure 2+ components cannot get registered at the same time
         @SuppressWarnings("unchecked")
         ComponentKey<T> existing = (ComponentKey<T>) this.get(componentId);
@@ -68,7 +68,7 @@ public final class ComponentRegistryImpl implements ComponentRegistryV3 {
         }
     }
 
-    private <T extends Component> ComponentKey<T> instantiateStaticType(Class<? extends ComponentKey<?>> generated, Identifier componentId, Class<T> componentClass) {
+    private <T extends CardinalComponent> ComponentKey<T> instantiateStaticType(Class<? extends ComponentKey<?>> generated, Identifier componentId, Class<T> componentClass) {
         try {
             @SuppressWarnings("unchecked") ComponentKey<T> ret = (ComponentKey<T>) generated.getConstructor(Identifier.class, Class.class).newInstance(componentId, componentClass);
             return ret;

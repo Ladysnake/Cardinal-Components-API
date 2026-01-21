@@ -30,12 +30,12 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.block.BlockComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.block.BlockComponentInitializer;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.LazyDispatcher;
 import org.ladysnake.cca.internal.base.QualifiedComponentFactory;
 import org.ladysnake.cca.internal.base.asm.StaticComponentLoadingException;
@@ -119,19 +119,19 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         return builder.build();
     }
 
-    private <C extends Component> void addToBuilder(ComponentContainer.Factory.Builder<BlockEntity> builder, Map.Entry<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<? extends BlockEntity, ?>>> entry) {
+    private <C extends CardinalComponent> void addToBuilder(ComponentContainer.Factory.Builder<BlockEntity> builder, Map.Entry<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<? extends BlockEntity, ?>>> entry) {
         @SuppressWarnings("unchecked") var key = (ComponentKey<C>) entry.getKey();
         @SuppressWarnings("unchecked") var factory = (ComponentFactory<BlockEntity, C>) entry.getValue().factory();
         @SuppressWarnings("unchecked") var impl = (Class<C>) entry.getValue().impl();
         builder.component(key, impl, factory, entry.getValue().dependencies());
     }
 
-    public <C extends Component, E extends BlockEntity> void registerFor(Class<E> target, ComponentKey<C> type, ComponentFactory<E, C> factory) {
+    public <C extends CardinalComponent, E extends BlockEntity> void registerFor(Class<E> target, ComponentKey<C> type, ComponentFactory<E, C> factory) {
         this.checkLoading(BlockComponentFactoryRegistry.class, "register");
         this.register0(target, type, new QualifiedComponentFactory<>(factory, type.getComponentClass(), Set.of()));
     }
 
-    private <C extends Component, F extends C, E extends BlockEntity> void register0(Class<? extends E> target, ComponentKey<? super C> type, QualifiedComponentFactory<ComponentFactory<E, F>> factory) {
+    private <C extends CardinalComponent, F extends C, E extends BlockEntity> void register0(Class<? extends E> target, ComponentKey<? super C> type, QualifiedComponentFactory<ComponentFactory<E, F>> factory) {
         var specializedMap = this.beComponentFactories.computeIfAbsent(target, t -> new LinkedHashMap<>());
         var previousFactory = specializedMap.get(type);
 
@@ -144,7 +144,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
     }
 
     @Override
-    public <C extends Component, B extends BlockEntity> Registration<C, B> beginRegistration(Class<B> target, ComponentKey<C> key) {
+    public <C extends CardinalComponent, B extends BlockEntity> Registration<C, B> beginRegistration(Class<B> target, ComponentKey<C> key) {
         return new RegistrationImpl<>(target, key);
     }
 
@@ -156,7 +156,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         );
     }
 
-    private final class PredicatedComponentFactory<C extends Component> {
+    private final class PredicatedComponentFactory<C extends CardinalComponent> {
         private final Predicate<Class<? extends BlockEntity>> predicate;
         private final ComponentKey<? super C> type;
         private final QualifiedComponentFactory<ComponentFactory<BlockEntity, C>> factory;
@@ -174,7 +174,7 @@ public final class StaticBlockComponentPlugin extends LazyDispatcher implements 
         }
     }
 
-    private final class RegistrationImpl<C extends Component, E extends BlockEntity> implements Registration<C, E> {
+    private final class RegistrationImpl<C extends CardinalComponent, E extends BlockEntity> implements Registration<C, E> {
         private final Class<E> target;
         private final ComponentKey<? super C> key;
         private final Set<ComponentKey<?>> dependencies;

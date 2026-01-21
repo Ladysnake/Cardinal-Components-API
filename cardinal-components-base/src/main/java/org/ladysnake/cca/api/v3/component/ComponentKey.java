@@ -36,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.sync.ComponentPacketWriter;
 import org.ladysnake.cca.api.v3.component.sync.PlayerSyncPredicate;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.ladysnake.cca.internal.base.asm.CcaBootstrap;
 
@@ -46,7 +47,7 @@ import java.util.Optional;
 import static net.minecraft.network.chat.Component.literal;
 
 /**
- * A key for retrieving {@link Component} instances from component providers.
+ * A key for retrieving {@link CardinalComponent} instances from component providers.
  *
  * <p> A {@link ComponentKey} must be registered for every component type through
  * {@link ComponentRegistryV3#getOrCreate(Identifier, Class)}.
@@ -54,7 +55,7 @@ import static net.minecraft.network.chat.Component.literal;
  * @see ComponentRegistryV3
  */
 @ApiStatus.NonExtendable
-public abstract class ComponentKey<C extends Component> {
+public abstract class ComponentKey<C extends CardinalComponent> {
 
     public final Identifier getId() {
         return this.id;

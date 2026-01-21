@@ -27,8 +27,8 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.test.base.CardinalGameTest;
 import org.ladysnake.elmendorf.ElmendorfTestContext;
 
@@ -67,7 +67,7 @@ public class ComponentRegistryImplTest implements CardinalGameTest {
 
     interface TestNotComponentItf {}
 
-    public static class TestComponentNotItf implements Component {
+    public static class TestComponentNotItf implements CardinalComponent {
         @Override
         public void readData(ValueInput readView) { }
 
@@ -75,9 +75,9 @@ public class ComponentRegistryImplTest implements CardinalGameTest {
         public void writeData(ValueOutput writeView) { throw new UnsupportedOperationException(); }
     }
 
-    interface TestComponentItf extends Component {}
+    interface TestComponentItf extends CardinalComponent {}
 
-    interface TestComponentItf2 extends Component {}
+    interface TestComponentItf2 extends CardinalComponent {}
 
     interface TestComponentItf3 extends TestComponentItf {}
 }

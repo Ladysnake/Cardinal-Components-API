@@ -25,11 +25,12 @@ package org.ladysnake.cca.api.v3.component;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 /**
  * Utility interface for components that do not hold any data
  */
-public interface TransientComponent extends Component {
+public interface TransientComponent extends CardinalComponent {
     @Override
     default void readData(ValueInput readView) {
         // Nothing to read

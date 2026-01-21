@@ -25,6 +25,7 @@ package org.ladysnake.cca.api.v3.component;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.sync.ComponentPacketWriter;
 import org.ladysnake.cca.api.v3.component.sync.PlayerSyncPredicate;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 import java.util.NoSuchElementException;
 
@@ -45,7 +46,7 @@ public interface ComponentAccess {
      * @throws NullPointerException if {@code key} is null
      * @throws NoSuchElementException if this provider does not provide the desired type of component
      */
-    default <C extends Component> C getComponent(ComponentKey<C> key) {
+    default <C extends CardinalComponent> C getComponent(ComponentKey<C> key) {
         return key.get(this.asComponentProvider());
     }
 

@@ -20,20 +20,36 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ladysnake.cca.api.v3.component;
+package org.ladysnake.cca.api.v8.component;
 
-import net.minecraft.world.item.ItemStack;
-import org.ladysnake.cca.api.v8.component.CardinalComponent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.Contract;
 
 /**
  * The base interface for components.
  *
- * <p>This interface exposes basic methods for serializing components.
- * The {@link Object#equals(Object)} must additionally be overridden when attached to some providers
- * like {@link ItemStack}s.
- *
- * @since 2.5.0
+ * @since 8.0.0
  */
-public interface ComponentV3 extends CardinalComponent {
+public interface CardinalComponent {
 
+    /**
+     * Reads this component's properties from a {@link CompoundTag}.
+     *
+     * @param readView a {@code NbtCompound} on which this component's serializable data has been written
+     * @implNote implementations should not assert that the data written on the tag corresponds to any
+     * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
+     * version.
+     */
+    @Contract(mutates = "this")
+    void readData(ValueInput readView);
+
+    /**
+     * Writes this component's properties to a {@link CompoundTag}.
+     *
+     * @param writeView a {@code NbtCompound} on which to write this component's serializable data
+     */
+    @Contract(mutates = "param1")
+    void writeData(ValueOutput writeView);
 }

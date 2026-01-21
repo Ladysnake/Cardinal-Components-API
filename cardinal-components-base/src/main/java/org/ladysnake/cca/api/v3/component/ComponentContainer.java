@@ -23,8 +23,8 @@
 package org.ladysnake.cca.api.v3.component;
 
 import net.fabricmc.api.EnvType;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.ApiStatus;
@@ -39,6 +39,7 @@ import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
 import org.ladysnake.cca.api.v3.util.CheckEnvironment;
 import org.ladysnake.cca.api.v3.util.NbtSerializable;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.GenericContainerBuilder;
 import org.ladysnake.cca.internal.base.asm.AsmGeneratedCallback;
 import org.ladysnake.cca.internal.base.asm.StaticComponentPluginBase;
@@ -101,7 +102,7 @@ public interface ComponentContainer extends NbtSerializable {
      */
     @Nullable
     @ApiStatus.Experimental
-    default ComponentKey<?> getKey(Component component) {
+    default ComponentKey<?> getKey(CardinalComponent component) {
         for (ComponentKey<?> key : keys()) {
             if (key.getInternal(this) == component) {
                 return key;
@@ -218,18 +219,18 @@ public interface ComponentContainer extends NbtSerializable {
             }
 
             @Contract(mutates = "this")
-            public <C extends Component> Builder<T> component(ComponentKey<C> key, ComponentFactory<T, ? extends C> factory) {
+            public <C extends CardinalComponent> Builder<T> component(ComponentKey<C> key, ComponentFactory<T, ? extends C> factory) {
                 return this.component(key, key.getComponentClass(), factory);
             }
 
             @Contract(mutates = "this")
-            public <C extends Component> Builder<T> component(ComponentKey<? super C> key, Class<C> implClass, ComponentFactory<T, ? extends C> factory) {
+            public <C extends CardinalComponent> Builder<T> component(ComponentKey<? super C> key, Class<C> implClass, ComponentFactory<T, ? extends C> factory) {
                 return this.component(key, implClass, factory, Set.of());
             }
 
             @ApiStatus.Experimental
             @Contract(mutates = "this")
-            public <C extends Component> Builder<T> component(ComponentKey<? super C> key, Class<C> implClass, ComponentFactory<T, ? extends C> factory, Set<ComponentKey<?>> dependencies) {
+            public <C extends CardinalComponent> Builder<T> component(ComponentKey<? super C> key, Class<C> implClass, ComponentFactory<T, ? extends C> factory, Set<ComponentKey<?>> dependencies) {
                 super.component(key, implClass, factory, dependencies);
                 return this;
             }

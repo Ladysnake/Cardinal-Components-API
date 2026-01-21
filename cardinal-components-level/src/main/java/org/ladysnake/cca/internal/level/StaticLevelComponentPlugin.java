@@ -25,12 +25,12 @@ package org.ladysnake.cca.internal.level;
 import com.google.common.base.Suppliers;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.world.level.storage.LevelData;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.level.LevelComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.level.LevelComponentInitializer;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.asm.StaticComponentPluginBase;
 
 import java.util.Collection;
@@ -60,13 +60,13 @@ public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<C> type, ComponentFactory<LevelData, ? extends C> factory) {
+    public <C extends CardinalComponent> void register(ComponentKey<C> type, ComponentFactory<LevelData, ? extends C> factory) {
         this.checkLoading(LevelComponentFactoryRegistry.class, "register");
         super.register(type, factory);
     }
 
     @Override
-    public <C extends Component> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<LevelData, ? extends C> factory) {
+    public <C extends CardinalComponent> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<LevelData, ? extends C> factory) {
         this.checkLoading(LevelComponentFactoryRegistry.class, "register");
         super.register(type, impl, factory);
     }

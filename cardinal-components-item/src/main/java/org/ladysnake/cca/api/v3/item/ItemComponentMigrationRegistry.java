@@ -25,9 +25,10 @@ package org.ladysnake.cca.api.v3.item;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.Identifier;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 /**
- * Allows registering migrations from {@linkplain org.ladysnake.cca.api.v3.component.Component CCA components} to {@linkplain net.minecraft.core.component.TypedDataComponent vanilla components}.
+ * Allows registering migrations from {@linkplain CardinalComponent CCA components} to {@linkplain net.minecraft.core.component.TypedDataComponent vanilla components}.
  */
 public interface ItemComponentMigrationRegistry {
     /**

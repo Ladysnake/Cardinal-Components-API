@@ -25,9 +25,9 @@ package org.ladysnake.cca.internal.base;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.asm.CcaAsmHelper;
 import org.ladysnake.cca.internal.base.asm.StaticComponentLoadingException;
 import org.ladysnake.cca.internal.base.asm.StaticComponentPluginBase;
@@ -73,12 +73,12 @@ public class GenericContainerBuilder<I, R> {
     }
 
     @Contract(mutates = "this")
-    public <C extends Component> GenericContainerBuilder<I, R> component(ComponentKey<? super C> key, Class<C> implClass, I factory, Set<ComponentKey<?>> dependencies) {
+    public <C extends CardinalComponent> GenericContainerBuilder<I, R> component(ComponentKey<? super C> key, Class<C> implClass, I factory, Set<ComponentKey<?>> dependencies) {
         this.addComponent(key, new QualifiedComponentFactory<>(factory, implClass, dependencies));
         return this;
     }
 
-    protected <C extends Component> void addComponent(ComponentKey<? super C> key, QualifiedComponentFactory<I> value) {
+    protected <C extends CardinalComponent> void addComponent(ComponentKey<? super C> key, QualifiedComponentFactory<I> value) {
         this.factories.put(key, value);
     }
 

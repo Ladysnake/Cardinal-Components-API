@@ -40,7 +40,6 @@ import net.minecraft.world.entity.ConversionType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.gamerules.GameRules;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
@@ -48,6 +47,7 @@ import org.ladysnake.cca.api.v3.entity.C2SSelfMessagingComponent;
 import org.ladysnake.cca.api.v3.entity.PlayerSyncCallback;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 import org.ladysnake.cca.api.v3.entity.TrackingStartCallback;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.ladysnake.cca.internal.base.MorePacketCodecs;
@@ -127,7 +127,7 @@ public final class CardinalComponentsEntity {
         }
     }
 
-    private static <C extends Component> void copyData(LivingEntity original, LivingEntity clone, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter, ComponentKey<C> key) {
+    private static <C extends CardinalComponent> void copyData(LivingEntity original, LivingEntity clone, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter, ComponentKey<C> key) {
         C from = key.get(original);
         C to = key.get(clone);
         RespawnCopyStrategy.get(key, original.getClass()).copyForRespawn(from, to, registryLookup, lossless, keepInventory, sameCharacter);

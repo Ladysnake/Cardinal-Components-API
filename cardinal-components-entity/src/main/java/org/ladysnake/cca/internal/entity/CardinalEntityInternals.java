@@ -26,12 +26,12 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 
 import java.util.HashMap;
@@ -40,7 +40,7 @@ import java.util.Objects;
 
 public final class CardinalEntityInternals {
 
-    public static final RespawnCopyStrategy<Component> DEFAULT_COPY_STRATEGY = CardinalEntityInternals::defaultCopyStrategy;
+    public static final RespawnCopyStrategy<CardinalComponent> DEFAULT_COPY_STRATEGY = CardinalEntityInternals::defaultCopyStrategy;
 
     private CardinalEntityInternals() { throw new AssertionError(); }
 
@@ -82,14 +82,14 @@ public final class CardinalEntityInternals {
         return factory;
     }
 
-    public static <C extends Component> void registerRespawnCopyStrat(ComponentKey<? super C> type, Class<? extends Entity> entityClass, RespawnCopyStrategy<? super C> strategy) {
+    public static <C extends CardinalComponent> void registerRespawnCopyStrat(ComponentKey<? super C> type, Class<? extends Entity> entityClass, RespawnCopyStrategy<? super C> strategy) {
         if (respawnCopyStrategies.computeIfAbsent(type, (t) -> new HashMap<>()).put(entityClass, strategy) != null) {
             ComponentsInternals.LOGGER.warn("Multiple respawn copy strategies registered for key {} and entity class {}", type, entityClass);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <C extends Component> RespawnCopyStrategy<? super C> getRespawnCopyStrategy(ComponentKey<C> type, Class<? extends LivingEntity> entityClass) {
+    public static <C extends CardinalComponent> RespawnCopyStrategy<? super C> getRespawnCopyStrategy(ComponentKey<C> type, Class<? extends LivingEntity> entityClass) {
         @Nullable RespawnCopyStrategy<?> strat = null;
         Class<?> c = entityClass;
         while (strat == null && LivingEntity.class.isAssignableFrom(c)) {
@@ -99,7 +99,7 @@ public final class CardinalEntityInternals {
         return strat == null ? DEFAULT_COPY_STRATEGY : (RespawnCopyStrategy<? super C>) strat;
     }
 
-    private static void defaultCopyStrategy(Component from, Component to, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
+    private static void defaultCopyStrategy(CardinalComponent from, CardinalComponent to, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
         if (to instanceof RespawnableComponent) {
             playerComponentCopy(from, (RespawnableComponent<?>) to, registryLookup, lossless, keepInventory, sameCharacter);
         } else {
@@ -108,14 +108,14 @@ public final class CardinalEntityInternals {
     }
 
     @SuppressWarnings("unchecked")
-    private static <C extends Component> void playerComponentCopy(Component from, RespawnableComponent<C> to, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
+    private static <C extends CardinalComponent> void playerComponentCopy(CardinalComponent from, RespawnableComponent<C> to, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean sameCharacter) {
         if (to.shouldCopyForRespawn(lossless, keepInventory, sameCharacter)) {
             to.copyForRespawn((C) from, registryLookup, lossless, keepInventory, sameCharacter);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <C extends Component> void copyAsCopyable(Component from, CopyableComponent<C> to, HolderLookup.Provider registryLookup) {
+    public static <C extends CardinalComponent> void copyAsCopyable(CardinalComponent from, CopyableComponent<C> to, HolderLookup.Provider registryLookup) {
         to.copyFrom((C) from, registryLookup);
     }
 }

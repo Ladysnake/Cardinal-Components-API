@@ -27,17 +27,17 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
-import org.ladysnake.cca.api.v3.component.Component;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 /**
  * A component factory for {@linkplain PlayerTeam teams}.
  *
- * <p>When invoked, the factory must return a {@link Component} of the right type.
+ * <p>When invoked, the factory must return a {@link CardinalComponent} of the right type.
  *
  * @since 2.4.2
  */
 @FunctionalInterface
-public interface TeamComponentFactory<C extends Component> extends TeamComponentFactoryV2<C> {
+public interface TeamComponentFactory<C extends CardinalComponent> extends TeamComponentFactoryV2<C> {
     @Override
     default C createForTeam(PlayerTeam team, Scoreboard scoreboard, @Nullable MinecraftServer server) {
         return this.createForTeam(team);

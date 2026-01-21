@@ -23,8 +23,8 @@
 package org.ladysnake.cca.api.v3.component.tick;
 
 import net.minecraft.resources.Identifier;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.asm.CalledByAsm;
 
 /**
@@ -39,7 +39,7 @@ import org.ladysnake.cca.internal.base.asm.CalledByAsm;
  * @see CommonTickingComponent
  * @see ServerTickingComponent
  */
-public interface ClientTickingComponent extends Component {
+public interface ClientTickingComponent extends CardinalComponent {
     @CalledByAsm
     void clientTick();
 }

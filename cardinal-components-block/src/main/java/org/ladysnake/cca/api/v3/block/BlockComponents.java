@@ -26,15 +26,15 @@ import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 
 /**
- * This class consists exclusively of static methods that return a {@link Component} by querying some block context.
+ * This class consists exclusively of static methods that return a {@link CardinalComponent} by querying some block context.
  */
 public final class BlockComponents {
     /**
@@ -50,7 +50,7 @@ public final class BlockComponents {
      * @see #exposeApi(ComponentKey, BlockApiLookup, BiFunction)
      * @since 2.8.0
      */
-    public static <C extends Component> BlockApiLookup<C, Void> getApiLookup(ComponentKey<C> key) {
+    public static <C extends CardinalComponent> BlockApiLookup<C, Void> getApiLookup(ComponentKey<C> key) {
         return BlockApiLookup.get(key.getId(), key.getComponentClass(), Void.class);
     }
 
@@ -98,7 +98,7 @@ public final class BlockComponents {
      *
      * @since 2.8.0
      */
-    public static <A, T, C extends Component> void exposeApi(ComponentKey<C> key, BlockApiLookup<A, T> apiLookup, BiFunction<? super C, ? super T, ? extends A> mapper) {
+    public static <A, T, C extends CardinalComponent> void exposeApi(ComponentKey<C> key, BlockApiLookup<A, T> apiLookup, BiFunction<? super C, ? super T, ? extends A> mapper) {
         apiLookup.registerFallback((world, pos, state, blockEntity, context) -> {
             if (blockEntity != null) {
                 C ret = key.getNullable(blockEntity);
@@ -119,7 +119,7 @@ public final class BlockComponents {
      * @see #exposeApi(ComponentKey, BlockApiLookup, BiFunction)
      * @since 2.8.0
      */
-    public static <A, T, C extends Component> void exposeApi(ComponentKey<C> key, BlockApiLookup<A, T> apiLookup, BiFunction<? super C, ? super T, ? extends A> mapper, BlockEntityType<?>... types) {
+    public static <A, T, C extends CardinalComponent> void exposeApi(ComponentKey<C> key, BlockApiLookup<A, T> apiLookup, BiFunction<? super C, ? super T, ? extends A> mapper, BlockEntityType<?>... types) {
         apiLookup.registerForBlockEntities((blockEntity, context) -> mapper.apply(key.get(blockEntity), context), types);
     }
 }

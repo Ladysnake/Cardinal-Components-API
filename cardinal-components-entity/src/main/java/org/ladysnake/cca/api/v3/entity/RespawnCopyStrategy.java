@@ -29,9 +29,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.ladysnake.cca.internal.entity.CardinalEntityInternals;
 
@@ -45,7 +45,7 @@ import org.ladysnake.cca.internal.entity.CardinalEntityInternals;
  * @see net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents#MOB_CONVERSION
  */
 @FunctionalInterface
-public interface RespawnCopyStrategy<C extends Component> {
+public interface RespawnCopyStrategy<C extends CardinalComponent> {
 
     /**
      * Always copy a component no matter the cause of respawn.
@@ -53,7 +53,7 @@ public interface RespawnCopyStrategy<C extends Component> {
      * <p>This strategy is relevant for persistent metadata such as statistics, or knowledge the player
      * cannot lose.
      */
-    RespawnCopyStrategy<Component> ALWAYS_COPY = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> copy(from, to, registryLookup);
+    RespawnCopyStrategy<CardinalComponent> ALWAYS_COPY = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> copy(from, to, registryLookup);
 
     /**
      * Always copy a component, unless the player is switching to another character.
@@ -62,7 +62,7 @@ public interface RespawnCopyStrategy<C extends Component> {
      * The difference becomes apparent with mods that let players have multiple bodies, or take
      * over the body of another player.
      */
-    RespawnCopyStrategy<Component> CHARACTER = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> {
+    RespawnCopyStrategy<CardinalComponent> CHARACTER = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> {
         if (sameCharacter) {
             copy(from, to, registryLookup);
         }
@@ -73,7 +73,7 @@ public interface RespawnCopyStrategy<C extends Component> {
      *
      * <p>This strategy is relevant for any data storage tied to items or experience.
      */
-    RespawnCopyStrategy<Component> INVENTORY = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> {
+    RespawnCopyStrategy<CardinalComponent> INVENTORY = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> {
         if (lossless || keepInventory) {
             copy(from, to, registryLookup);
         }
@@ -84,7 +84,7 @@ public interface RespawnCopyStrategy<C extends Component> {
      *
      * <p>This strategy is the default.
      */
-    RespawnCopyStrategy<Component> LOSSLESS_ONLY = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> {
+    RespawnCopyStrategy<CardinalComponent> LOSSLESS_ONLY = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> {
         if (lossless) {
             copy(from, to, registryLookup);
         }
@@ -96,7 +96,7 @@ public interface RespawnCopyStrategy<C extends Component> {
      * <p>This strategy can be used when {@code RespawnCopyStrategy} does not offer enough context,
      * in which case {@link net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents#COPY_FROM} may be used directly.
      */
-    RespawnCopyStrategy<Component> NEVER_COPY = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> { };
+    RespawnCopyStrategy<CardinalComponent> NEVER_COPY = (from, to, registryLookup, lossless, keepInventory, sameCharacter) -> { };
 
     /**
      * The event phase used by CCA to copy components
@@ -109,21 +109,21 @@ public interface RespawnCopyStrategy<C extends Component> {
     /**
      * @param entityClass the class of the source entity being respawned or converted
      */
-    static <C extends Component> RespawnCopyStrategy<? super C> get(ComponentKey<C> key, Class<? extends LivingEntity> entityClass) {
+    static <C extends CardinalComponent> RespawnCopyStrategy<? super C> get(ComponentKey<C> key, Class<? extends LivingEntity> entityClass) {
         return CardinalEntityInternals.getRespawnCopyStrategy(key, entityClass);
     }
 
     /**
      * Copies data from one component to the other.
      *
-     * <p> If {@code to} implements {@link CopyableComponent}, its {@link CopyableComponent#copyFrom(Component, HolderLookup.Provider)}
+     * <p> If {@code to} implements {@link CopyableComponent}, its {@link CopyableComponent#copyFrom(CardinalComponent, HolderLookup.Provider)}
      * method will be called, otherwise data will be copied using NBT serialization.
      *
      * @param from the component to copy data from
      * @param to   the component to copy data to
      * @param <C>  the common component type
      */
-    static <C extends Component> void copy(C from, C to, HolderLookup.Provider registryLookup) {
+    static <C extends CardinalComponent> void copy(C from, C to, HolderLookup.Provider registryLookup) {
         if (to instanceof CopyableComponent<?> copyable) {
             CardinalEntityInternals.copyAsCopyable(from, copyable, registryLookup);
         } else {

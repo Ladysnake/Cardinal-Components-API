@@ -26,10 +26,10 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
 import org.ladysnake.cca.internal.base.LazyDispatcher;
 import org.objectweb.asm.MethodVisitor;
@@ -189,11 +189,11 @@ public abstract class StaticComponentPluginBase<T, I> extends LazyDispatcher {
 
     protected abstract void dispatchRegistration(I entrypoint);
 
-    protected <C extends Component> void register(ComponentKey<C> key, ComponentFactory<T, ? extends C> factory) {
+    protected <C extends CardinalComponent> void register(ComponentKey<C> key, ComponentFactory<T, ? extends C> factory) {
         this.containerFactoryBuilder.component(key, factory);
     }
 
-    protected <C extends Component> void register(ComponentKey<? super C> key, Class<C> impl, ComponentFactory<T, ? extends C> factory) {
+    protected <C extends CardinalComponent> void register(ComponentKey<? super C> key, Class<C> impl, ComponentFactory<T, ? extends C> factory) {
         this.containerFactoryBuilder.component(key, impl, factory);
     }
 }

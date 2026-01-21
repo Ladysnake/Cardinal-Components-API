@@ -25,8 +25,8 @@ package org.ladysnake.cca.internal.base;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.network.DisconnectionDetails;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -34,7 +34,7 @@ import java.util.function.BiFunction;
 import static net.minecraft.network.chat.Component.literal;
 
 public final class CcaClientInternals {
-    public static <T extends ComponentUpdatePayload<?>> void registerComponentSync(CustomPacketPayload.Type<T> packetId, BiFunction<T, ClientPlayNetworking.Context, Optional<? extends Component>> getter) {
+    public static <T extends ComponentUpdatePayload<?>> void registerComponentSync(CustomPacketPayload.Type<T> packetId, BiFunction<T, ClientPlayNetworking.Context, Optional<? extends CardinalComponent>> getter) {
         ClientPlayNetworking.registerGlobalReceiver(packetId, (payload, ctx) -> {
             try {
                 getter.apply(payload, ctx).ifPresent(c -> {

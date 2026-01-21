@@ -25,10 +25,10 @@ package org.ladysnake.cca.test.base;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
-public class BaseVita implements Vita, Component, CopyableComponent<BaseVita> {
+public class BaseVita implements Vita, CardinalComponent, CopyableComponent<BaseVita> {
     protected int vitality;
 
     public BaseVita() {

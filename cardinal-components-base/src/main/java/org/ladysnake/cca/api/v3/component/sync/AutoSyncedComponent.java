@@ -32,18 +32,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import org.jetbrains.annotations.Contract;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.util.CheckEnvironment;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 
 /**
- * A {@link Component} implementing this interface will have its data automatically
+ * A {@link CardinalComponent} implementing this interface will have its data automatically
  * synchronized with players watching its provider.
  *
  * @see ComponentKey#sync(Object)
  */
-public interface AutoSyncedComponent extends Component, ComponentPacketWriter, PlayerSyncPredicate {
+public interface AutoSyncedComponent extends CardinalComponent, ComponentPacketWriter, PlayerSyncPredicate {
 
     /**
      * Returns {@code true} if a synchronization packet for this component
@@ -71,7 +71,7 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      * @param buf       the buffer to write the data to
      * @param recipient the player to which the packet will be sent
      * @implSpec The default implementation writes the whole NBT representation
-     * of this component to the buffer using {@link Component#writeData(net.minecraft.world.level.storage.ValueOutput)}.
+     * of this component to the buffer using {@link CardinalComponent#writeData(net.minecraft.world.level.storage.ValueOutput)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation sends possibly hidden
      * information to clients, uses a wasteful data format, and does not support
@@ -95,7 +95,7 @@ public interface AutoSyncedComponent extends Component, ComponentPacketWriter, P
      * Reads this component's data from {@code buf}.
      *
      * @implSpec The default implementation converts the buffer's content
-     * to a {@link CompoundTag} and calls {@link Component#readData(net.minecraft.world.level.storage.ValueInput)}.
+     * to a {@link CompoundTag} and calls {@link CardinalComponent#readData(net.minecraft.world.level.storage.ValueInput)}.
      * @implNote any implementing class overriding {@link #writeSyncPacket(RegistryFriendlyByteBuf, ServerPlayer)}
      * such that it uses a different data format must override this method.
      * @see #writeSyncPacket(RegistryFriendlyByteBuf, ServerPlayer)

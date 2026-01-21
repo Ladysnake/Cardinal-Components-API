@@ -25,6 +25,7 @@ package org.ladysnake.cca.api.v3.component;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.ComponentRegistryImpl;
 
 import javax.annotation.Nullable;
@@ -37,7 +38,7 @@ import java.util.stream.Stream;
  * {@link ComponentKey} instances serving as keys for those components.
  *
  * @see ComponentKey
- * @see Component
+ * @see CardinalComponent
  * @see ComponentRegistry
  * @since 2.5.0
  */
@@ -72,13 +73,13 @@ public interface ComponentRegistryV3 {
      * @param componentId    a unique identifier for the registered component type
      * @param componentClass the interface or class of which to obtain a {@link ComponentKey}
      * @return a shared instance of {@link ComponentKey}
-     * @throws IllegalArgumentException if {@code componentClass} does not extend {@link Component}
+     * @throws IllegalArgumentException if {@code componentClass} does not extend {@link CardinalComponent}
      * @throws IllegalStateException    if a different component class has been registered with the same {@code componentId},
      *                                  or if {@code componentId} has not been statically declared as a custom data value.
      * @apiNote It is recommended that {@code componentClass} be an interface, so that other
      * mods can interact with a well-defined API rather than directly accessing internals.
      */
-    <C extends Component> ComponentKey<C> getOrCreate(Identifier componentId, Class<C> componentClass);
+    <C extends CardinalComponent> ComponentKey<C> getOrCreate(Identifier componentId, Class<C> componentClass);
 
     /**
      * Directly retrieves a ComponentKey using its id.

@@ -23,24 +23,25 @@
 package org.ladysnake.cca.api.v3.component;
 
 import org.jetbrains.annotations.Contract;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 /**
  * A single-arg component factory.
  *
- * <p>When invoked, the factory must return a {@link Component} of the right type.
+ * <p>When invoked, the factory must return a {@link CardinalComponent} of the right type.
  *
  * @since 3.0.0
  */
 @FunctionalInterface
-public interface ComponentFactory<T, C extends Component> {
+public interface ComponentFactory<T, C extends CardinalComponent> {
     /**
-     * Instantiates a {@link Component} for the given provider.
+     * Instantiates a {@link CardinalComponent} for the given provider.
      *
      * <p>The component returned by this method will be available
      * on the provider as soon as all component factories have been invoked.
      *
      * @param t the factory argument
-     * @return a new {@link Component}
+     * @return a new {@link CardinalComponent}
      */
     @Contract(value = "_ -> new", pure = true)
     C createComponent(T t);

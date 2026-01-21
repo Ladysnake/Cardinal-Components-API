@@ -27,10 +27,10 @@ import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.AbstractComponentContainer;
 import org.ladysnake.cca.internal.base.QualifiedComponentFactory;
 import org.objectweb.asm.ClassReader;
@@ -68,7 +68,7 @@ public final class CcaAsmHelper {
     public static final boolean DEBUG_CLASSES = Boolean.getBoolean("cca.debug.asm");
     public static final int ASM_VERSION = Opcodes.ASM9;
     // existing references
-    public static final String COMPONENT = Type.getInternalName(Component.class);
+    public static final String COMPONENT = Type.getInternalName(CardinalComponent.class);
     public static final String COMPONENT_CONTAINER = Type.getInternalName(ComponentContainer.class);
     public static final String COMPONENT_TYPE = Type.getInternalName(ComponentKey.class);
     public static final String DYNAMIC_COMPONENT_CONTAINER_IMPL = Type.getInternalName(AbstractComponentContainer.class);
@@ -83,7 +83,7 @@ public final class CcaAsmHelper {
 
     private static final List<AsmGeneratedCallbackInfo> asmGeneratedCallbacks = findAsmComponentCallbacks();
 
-    record AsmGeneratedCallbackInfo(String containerCallbackName, Class<? extends Component> componentClass, String componentCallbackName) {}
+    record AsmGeneratedCallbackInfo(String containerCallbackName, Class<? extends CardinalComponent> componentClass, String componentCallbackName) {}
 
     static {
         try {
@@ -98,7 +98,7 @@ public final class CcaAsmHelper {
         for (Method containerMethod : ComponentContainer.class.getMethods()) {
             @Nullable AsmGeneratedCallback annotation = containerMethod.getAnnotation(AsmGeneratedCallback.class);
             if (annotation != null) {
-                Class<? extends Component> componentClass = annotation.value();
+                Class<? extends CardinalComponent> componentClass = annotation.value();
                 boolean found = false;
                 for (Method componentMethod : componentClass.getDeclaredMethods()) {
                     if (componentMethod.isAnnotationPresent(CalledByAsm.class)) {
@@ -212,7 +212,7 @@ public final class CcaAsmHelper {
      * @deprecated cannot remove in 1.17 because internal compatibility
      */
     @Deprecated(forRemoval = true)
-    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, Map<ComponentKey<?>, Class<? extends Component>> componentImpls) throws IOException {
+    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, Map<ComponentKey<?>, Class<? extends CardinalComponent>> componentImpls) throws IOException {
         Map<ComponentKey<?>, QualifiedComponentFactory<I>> merged = new LinkedHashMap<>();
         for (var entry : componentFactories.entrySet()) {
             merged.put(entry.getKey(), new QualifiedComponentFactory<>(entry.getValue(), componentImpls.get(entry.getKey()), Set.of()));
@@ -287,7 +287,7 @@ public final class CcaAsmHelper {
         for (var entry : sorted.entrySet()) {
             Identifier identifier = entry.getKey().getId();
             String componentFieldName = getJavaIdentifierName(identifier);
-            Class<? extends Component> impl = entry.getValue().impl();
+            Class<? extends CardinalComponent> impl = entry.getValue().impl();
             String componentFieldDescriptor = Type.getDescriptor(impl);
             String factoryFieldName = getFactoryFieldName(identifier);
             /* field declaration */
@@ -410,7 +410,7 @@ public final class CcaAsmHelper {
         );
     }
 
-    private static void generateCallbackImpl(String containerImplName, MethodVisitor tick, String componentFieldName, Class<? extends Component> impl, String componentFieldDescriptor, String target) {
+    private static void generateCallbackImpl(String containerImplName, MethodVisitor tick, String componentFieldName, Class<? extends CardinalComponent> impl, String componentFieldDescriptor, String target) {
         tick.visitVarInsn(Opcodes.ALOAD, 0);
         // stack: <this>
         tick.visitFieldInsn(Opcodes.GETFIELD, containerImplName, componentFieldName, componentFieldDescriptor);

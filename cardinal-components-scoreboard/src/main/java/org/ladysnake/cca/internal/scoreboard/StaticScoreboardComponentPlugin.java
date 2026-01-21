@@ -26,13 +26,13 @@ import com.google.common.base.Suppliers;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.scoreboard.ScoreboardComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.scoreboard.ScoreboardComponentFactoryV2;
 import org.ladysnake.cca.api.v3.scoreboard.ScoreboardComponentInitializer;
 import org.ladysnake.cca.api.v3.scoreboard.TeamComponentFactoryV2;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.GenericContainerBuilder;
 import org.ladysnake.cca.internal.base.LazyDispatcher;
 import org.ladysnake.cca.internal.base.asm.StaticComponentPluginBase;
@@ -86,23 +86,23 @@ public final class StaticScoreboardComponentPlugin extends LazyDispatcher implem
     }
 
     @Override
-    public <C extends Component> void registerScoreboardComponent(ComponentKey<C> type, ScoreboardComponentFactoryV2<? extends C> factory) {
+    public <C extends CardinalComponent> void registerScoreboardComponent(ComponentKey<C> type, ScoreboardComponentFactoryV2<? extends C> factory) {
         this.registerScoreboardComponent(type, type.getComponentClass(), factory);
     }
 
     @Override
-    public <C extends Component> void registerScoreboardComponent(ComponentKey<? super C> type, Class<C> impl, ScoreboardComponentFactoryV2<? extends C> factory) {
+    public <C extends CardinalComponent> void registerScoreboardComponent(ComponentKey<? super C> type, Class<C> impl, ScoreboardComponentFactoryV2<? extends C> factory) {
         this.checkLoading(ScoreboardComponentFactoryRegistry.class, "registerForScoreboards");
         this.scoreboardFactories.component(type, impl, factory, Set.of());
     }
 
     @Override
-    public <C extends Component> void registerTeamComponent(ComponentKey<C> type, TeamComponentFactoryV2<? extends C> factory) {
+    public <C extends CardinalComponent> void registerTeamComponent(ComponentKey<C> type, TeamComponentFactoryV2<? extends C> factory) {
         this.registerTeamComponent(type, type.getComponentClass(), factory);
     }
 
     @Override
-    public <C extends Component> void registerTeamComponent(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactoryV2<? extends C> factory) {
+    public <C extends CardinalComponent> void registerTeamComponent(ComponentKey<? super C> type, Class<C> impl, TeamComponentFactoryV2<? extends C> factory) {
         this.checkLoading(ScoreboardComponentFactoryRegistry.class, "register");
         this.teamFactories.component(type, impl, factory, Set.of());
     }

@@ -29,12 +29,12 @@ import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.CopyableComponent;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 
 @ApiStatus.Experimental
-public interface RespawnableComponent<C extends Component> extends Component, CopyableComponent<C> {
+public interface RespawnableComponent<C extends CardinalComponent> extends CardinalComponent, CopyableComponent<C> {
     /**
      * Check whether component data should be copied as part of a respawn situation.
      *

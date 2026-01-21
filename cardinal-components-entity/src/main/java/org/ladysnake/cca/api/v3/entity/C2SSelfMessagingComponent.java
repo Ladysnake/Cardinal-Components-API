@@ -31,11 +31,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.jetbrains.annotations.ApiStatus;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.C2SComponentPacketWriter;
 import org.ladysnake.cca.api.v3.util.CheckEnvironment;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
 import org.ladysnake.cca.internal.entity.CardinalComponentsEntity;
 
@@ -46,7 +46,7 @@ import java.util.Objects;
  * @since 6.0.0
  */
 @ApiStatus.Experimental
-public interface C2SSelfMessagingComponent extends Component {
+public interface C2SSelfMessagingComponent extends CardinalComponent {
     /**
      * Handles a message sent through this component's channel by the player to which this component is attached
      *

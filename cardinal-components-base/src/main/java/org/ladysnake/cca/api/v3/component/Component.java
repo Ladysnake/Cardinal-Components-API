@@ -1,55 +1,10 @@
-/*
- * Cardinal-Components-API
- * Copyright (C) 2019-2025 Ladysnake
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
- * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
- * OR OTHER DEALINGS IN THE SOFTWARE.
- */
 package org.ladysnake.cca.api.v3.component;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.Contract;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 /**
- * The base interface for components.
- *
- * @since 2.7.0
+ * @deprecated replâce with {@link org.ladysnake.cca.api.v8.component.CardinalComponent}
+ * (renamed because of collisions with Minecraft's other components)
  */
-public interface Component {
-
-    /**
-     * Reads this component's properties from a {@link CompoundTag}.
-     *
-     * @param readView a {@code NbtCompound} on which this component's serializable data has been written
-     * @implNote implementations should not assert that the data written on the tag corresponds to any
-     * specific scheme, as saved data is susceptible to external tempering, and may come from an earlier
-     * version.
-     */
-    @Contract(mutates = "this")
-    void readData(ValueInput readView);
-
-    /**
-     * Writes this component's properties to a {@link CompoundTag}.
-     *
-     * @param writeView a {@code NbtCompound} on which to write this component's serializable data
-     */
-    @Contract(mutates = "param1")
-    void writeData(ValueOutput writeView);
-}
+@Deprecated(since = "8.0.0")
+public interface Component extends CardinalComponent { }

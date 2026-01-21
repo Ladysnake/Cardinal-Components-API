@@ -23,8 +23,8 @@
 package org.ladysnake.cca.api.v3.component.load;
 
 import net.minecraft.resources.Identifier;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.asm.CalledByAsm;
 
 /**
@@ -38,7 +38,7 @@ import org.ladysnake.cca.internal.base.asm.CalledByAsm;
  *
  * @see ServerUnloadAwareComponent
  */
-public interface ServerLoadAwareComponent extends Component {
+public interface ServerLoadAwareComponent extends CardinalComponent {
     /**
      * Called after the provider of this component has been loaded.
      *

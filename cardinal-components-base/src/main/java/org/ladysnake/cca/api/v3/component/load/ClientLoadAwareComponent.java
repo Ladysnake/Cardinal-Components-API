@@ -24,9 +24,9 @@ package org.ladysnake.cca.api.v3.component.load;
 
 import net.fabricmc.api.EnvType;
 import net.minecraft.resources.Identifier;
-import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 import org.ladysnake.cca.api.v3.util.CheckEnvironment;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.asm.CalledByAsm;
 
 /**
@@ -40,7 +40,7 @@ import org.ladysnake.cca.internal.base.asm.CalledByAsm;
  *
  * @see ClientUnloadAwareComponent
  */
-public interface ClientLoadAwareComponent extends Component {
+public interface ClientLoadAwareComponent extends CardinalComponent {
     /**
      * Called after the provider of this component has been loaded.
      *

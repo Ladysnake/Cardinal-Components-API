@@ -22,7 +22,7 @@
  */
 package org.ladysnake.cca.internal.base.asm;
 
-import org.ladysnake.cca.api.v3.component.Component;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -39,5 +39,5 @@ public @interface AsmGeneratedCallback {
      *
      * @return the specific type of component targeted by this callback
      */
-    Class<? extends Component> value();
+    Class<? extends CardinalComponent> value();
 }

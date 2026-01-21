@@ -26,18 +26,18 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.Scoreboard;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
-import org.ladysnake.cca.api.v3.component.Component;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.asm.CalledByAsm;
 
 /**
  * A component factory for {@linkplain Scoreboard scoreboards}.
  *
- * <p>When invoked, the factory must return a {@link Component} of the right type.
+ * <p>When invoked, the factory must return a {@link CardinalComponent} of the right type.
  *
  * @since 2.7.10
  */
 @FunctionalInterface
-public interface ScoreboardComponentFactoryV2<C extends Component> {
+public interface ScoreboardComponentFactoryV2<C extends CardinalComponent> {
     /**
      * Initialize components for the given scoreboard.
      *

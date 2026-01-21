@@ -22,8 +22,9 @@
  */
 package org.ladysnake.cca.api.v3.component;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 /**
  * A component that can copy its data from another component of the same type.
@@ -31,12 +32,12 @@ import net.minecraft.core.HolderLookup;
  * @param <C> the type of components that this component may copy
  * @since 2.3.0
  */
-public interface CopyableComponent<C extends Component> extends Component {
+public interface CopyableComponent<C extends CardinalComponent> extends CardinalComponent {
     /**
      * Copies the data from {@code other} into {@code this}.
      *
-     * @implSpec The default implementation {@linkplain Component#writeData(net.minecraft.world.level.storage.ValueOutput) serializes}
-     * the component data to a {@link CompoundTag} and calls {@link Component#readData(net.minecraft.world.level.storage.ValueInput)}.
+     * @implSpec The default implementation {@linkplain CardinalComponent#writeData(net.minecraft.world.level.storage.ValueOutput) serializes}
+     * the component data to a {@link CompoundTag} and calls {@link CardinalComponent#readData(net.minecraft.world.level.storage.ValueInput)}.
      * @implNote The default implementation should generally be overridden.
      * The serialization done by the default implementation assumes NBT consistency
      * between implementations, and is generally slower than a direct copy.
