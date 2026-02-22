@@ -32,7 +32,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.LevelSettings;
-import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.storage.TagValueInput;
@@ -43,10 +42,10 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(LevelStorageSource.class)
 public class MixinLevelStorageSource {
-    @WrapOperation(method = "getLevelDataAndDimensions", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/PrimaryLevelData;parse(Lcom/mojang/serialization/Dynamic;Lnet/minecraft/world/level/LevelSettings;Lnet/minecraft/world/level/storage/PrimaryLevelData$SpecialWorldProperty;Lnet/minecraft/world/level/levelgen/WorldOptions;Lcom/mojang/serialization/Lifecycle;)Lnet/minecraft/world/level/storage/PrimaryLevelData;"))
-    private static PrimaryLevelData readComponents(Dynamic<?> dynamic, LevelSettings info, PrimaryLevelData.SpecialWorldProperty specialProperty, WorldOptions generatorOptions, Lifecycle lifecycle, Operation<PrimaryLevelData> original, @Local(argsOnly = true) HolderLookup.Provider registryManager) {
-        PrimaryLevelData props = original.call(dynamic, info, specialProperty, generatorOptions, lifecycle);
-        CompoundTag nbt = (CompoundTag) dynamic.convert(NbtOps.INSTANCE).getValue();
+    @WrapOperation(method = "getLevelDataAndDimensions", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/PrimaryLevelData;parse(Lcom/mojang/serialization/Dynamic;Lnet/minecraft/world/level/LevelSettings;Lnet/minecraft/world/level/storage/PrimaryLevelData$SpecialWorldProperty;Lcom/mojang/serialization/Lifecycle;)Lnet/minecraft/world/level/storage/PrimaryLevelData;"))
+    private static PrimaryLevelData readComponents(Dynamic<?> input, LevelSettings settings, PrimaryLevelData.SpecialWorldProperty specialWorldProperty, Lifecycle worldGenSettingsLifecycle, Operation<PrimaryLevelData> original, @Local(argsOnly = true) HolderLookup.Provider registryManager) {
+        PrimaryLevelData props = original.call(input, settings, specialWorldProperty, worldGenSettingsLifecycle);
+        CompoundTag nbt = (CompoundTag) input.convert(NbtOps.INSTANCE).getValue();
         try (var errorReporter = new ProblemReporter.ScopedCollector(ComponentsInternals.LOGGER)) {
             ((ComponentProvider) props).getComponentContainer().readData(TagValueInput.create(errorReporter, registryManager, nbt));
         }

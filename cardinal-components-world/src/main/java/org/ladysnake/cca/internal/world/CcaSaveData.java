@@ -24,6 +24,7 @@ package org.ladysnake.cca.internal.world;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -33,13 +34,13 @@ import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.internal.base.AbstractComponentContainer;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 
-public class ComponentPersistentState extends SavedData {
+public class CcaSaveData extends SavedData {
     public static final ThreadLocal<Boolean> LOADING = ThreadLocal.withInitial(() -> false);
-    private static final String PERSISTENT_STATE_KEY = "cardinal_world_components";
-    public static SavedDataType<ComponentPersistentState> stateType(ComponentContainer components, HolderLookup.Provider registries) {
+    private static final Identifier PERSISTENT_STATE_KEY = Identifier.fromNamespaceAndPath("cardinal-components", "world");
+    public static SavedDataType<CcaSaveData> stateType(ComponentContainer components, HolderLookup.Provider registries) {
         return new SavedDataType<>(
             PERSISTENT_STATE_KEY,
-            () -> new ComponentPersistentState(components),
+            () -> new CcaSaveData(components),
             CompoundTag.CODEC.xmap(
                 nbt -> fromNbt(components, nbt, registries),
                 state -> state.writeNbt(new CompoundTag(), registries)
@@ -50,7 +51,7 @@ public class ComponentPersistentState extends SavedData {
 
     private final ComponentContainer components;
 
-    public ComponentPersistentState(ComponentContainer components) {
+    public CcaSaveData(ComponentContainer components) {
         super();
         this.components = components;
     }
@@ -68,8 +69,8 @@ public class ComponentPersistentState extends SavedData {
         return tag;
     }
 
-    public static ComponentPersistentState fromNbt(ComponentContainer components, CompoundTag tag, HolderLookup.Provider registryLookup) {
-        ComponentPersistentState state = new ComponentPersistentState(components);
+    public static CcaSaveData fromNbt(ComponentContainer components, CompoundTag tag, HolderLookup.Provider registryLookup) {
+        CcaSaveData state = new CcaSaveData(components);
         try (var errorReporter = new ProblemReporter.ScopedCollector(() -> "World", ComponentsInternals.LOGGER)) {
             state.components.readData(TagValueInput.create(errorReporter, registryLookup, tag));
         }

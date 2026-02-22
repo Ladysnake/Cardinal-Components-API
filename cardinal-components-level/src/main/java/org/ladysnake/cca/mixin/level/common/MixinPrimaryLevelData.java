@@ -24,19 +24,14 @@ package org.ladysnake.cca.mixin.level.common;
 
 import com.mojang.datafixers.util.Unit;
 import com.mojang.serialization.Lifecycle;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.clock.PackedClockStates;
 import net.minecraft.world.level.LevelSettings;
-import net.minecraft.world.level.dimension.end.EndDragonFight;
-import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.timers.TimerQueue;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
@@ -53,7 +48,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -62,15 +56,15 @@ public abstract class MixinPrimaryLevelData implements ServerLevelData, Componen
     @Unique
     private ComponentContainer components;
 
-    @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;ZLnet/minecraft/world/level/storage/LevelData$RespawnData;JIIIZIZLnet/minecraft/world/clock/PackedClockStates;ZZLjava/util/Optional;IILjava/util/UUID;Ljava/util/Set;Ljava/util/Set;Lnet/minecraft/world/level/timers/TimerQueue;Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/dimension/end/EndDragonFight$Data;Lnet/minecraft/world/level/LevelSettings;Lnet/minecraft/world/level/levelgen/WorldOptions;Lnet/minecraft/world/level/storage/PrimaryLevelData$SpecialWorldProperty;Lcom/mojang/serialization/Lifecycle;)V", at = @At("RETURN"))
-    private void initComponents(CompoundTag loadedPlayerTag, boolean wasModded, RespawnData respawnData, long gameTime, int version, int clearWeatherTime, int rainTime, boolean raining, int thunderTime, boolean thundering, PackedClockStates clockStates, boolean initialized, boolean difficultyLocked, Optional legacyWorldBorderSettings, int wanderingTraderSpawnDelay, int wanderingTraderSpawnChance, UUID wanderingTraderId, Set knownServerBrands, Set removedFeatureFlags, TimerQueue scheduledEvents, CompoundTag customBossEvents, EndDragonFight.Data endDragonFightData, LevelSettings settings, WorldOptions worldOptions, PrimaryLevelData.SpecialWorldProperty specialWorldProperty, Lifecycle worldGenSettingsLifecycle, CallbackInfo ci)  {
+    @Inject(method = "<init>(Ljava/util/UUID;ZLnet/minecraft/world/level/storage/LevelData$RespawnData;JIZLjava/util/Set;Ljava/util/Set;Lnet/minecraft/world/level/LevelSettings;Lnet/minecraft/world/level/storage/PrimaryLevelData$SpecialWorldProperty;Lcom/mojang/serialization/Lifecycle;)V", at = @At("RETURN"))
+    private void initComponents(UUID singlePlayerUUID, boolean wasModded, RespawnData respawnData, long gameTime, int version, boolean initialized, Set<?> knownServerBrands, Set<?> removedFeatureFlags, LevelSettings settings, PrimaryLevelData.SpecialWorldProperty specialWorldProperty, Lifecycle worldGenSettingsLifecycle, CallbackInfo ci)  {
         this.components = StaticLevelComponentPlugin.createContainer(this);
     }
 
     @Inject(method = "setTagData", at = @At("RETURN"))
-    private void writeComponents(RegistryAccess registryManager, CompoundTag data, CompoundTag player, CallbackInfo ci) {
+    private void writeComponents(CompoundTag data, UUID singlePlayerUUID, CallbackInfo ci) {
         try (var errorReporter = new ProblemReporter.ScopedCollector(ComponentsInternals.LOGGER)) {
-            TagValueOutput writeView = TagValueOutput.createWithContext(errorReporter, registryManager);
+            TagValueOutput writeView = TagValueOutput.createWithoutContext(errorReporter);
             this.components.writeOrphanData(writeView);
             if (!writeView.isEmpty()) {
                 data.put(AbstractComponentContainer.NBT_KEY, writeView.buildResult());

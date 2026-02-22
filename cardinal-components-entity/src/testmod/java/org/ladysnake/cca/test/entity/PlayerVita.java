@@ -114,6 +114,6 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
 
     @Override
     public void handleC2SMessage(RegistryFriendlyByteBuf buf) {
-        ((Player) this.owner).displayClientMessage(Component.nullToEmpty("Sync!"), true);
+        ((Player) this.owner).sendOverlayMessage(Component.nullToEmpty("Sync!"));
     }
 }

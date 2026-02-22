@@ -84,8 +84,8 @@ public class VitalityStickItem extends Item {
                 context.getClickedFace()
             );
             if (vita != null) {
-                context.getPlayer().displayClientMessage(Component.translatable("componenttest:action.block_vitality",
-                    vita.getVitality()), true);
+                context.getPlayer().sendOverlayMessage(Component.translatable("componenttest:action.block_vitality",
+                    vita.getVitality()));
             }
         }
         return InteractionResult.SUCCESS;

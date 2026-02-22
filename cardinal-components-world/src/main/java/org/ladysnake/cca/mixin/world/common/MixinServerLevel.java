@@ -26,12 +26,12 @@ import com.mojang.datafixers.util.Unit;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.storage.SavedDataStorage;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
 import org.ladysnake.cca.internal.world.CardinalComponentsWorld;
-import org.ladysnake.cca.internal.world.ComponentPersistentState;
+import org.ladysnake.cca.internal.world.CcaSaveData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -43,7 +43,7 @@ import java.util.function.BooleanSupplier;
 
 @Mixin(ServerLevel.class)
 public abstract class MixinServerLevel extends MixinLevel {
-    @Shadow public abstract DimensionDataStorage getDataStorage();
+    @Shadow public abstract SavedDataStorage getDataStorage();
 
     @Shadow
     public abstract List<ServerPlayer> players();
@@ -51,10 +51,10 @@ public abstract class MixinServerLevel extends MixinLevel {
     @Inject(at = @At("RETURN"), method = "<init>*")
     private void constructor(CallbackInfo ci) {
         try {
-            ComponentPersistentState.LOADING.set(true);
-            this.getDataStorage().computeIfAbsent(ComponentPersistentState.stateType(components, registryAccess()));
+            CcaSaveData.LOADING.set(true);
+            this.getDataStorage().computeIfAbsent(CcaSaveData.stateType(components, registryAccess()));
         } finally {
-            ComponentPersistentState.LOADING.set(false);
+            CcaSaveData.LOADING.set(false);
         }
     }
 

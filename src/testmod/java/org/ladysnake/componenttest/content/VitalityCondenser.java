@@ -53,8 +53,8 @@ public class VitalityCondenser extends Block {
     protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         // only on client side, to confirm that sync works
         if (world.isClientSide()) {
-            player.displayClientMessage(Component.translatable("componenttest:action.chunk_vitality",
-                Objects.requireNonNull(CcaBlockTestMod.VITA_API_LOOKUP.find(world, pos, state, null, hit.getDirection())).getVitality()), true);
+            player.sendOverlayMessage(Component.translatable("componenttest:action.chunk_vitality",
+                Objects.requireNonNull(CcaBlockTestMod.VITA_API_LOOKUP.find(world, pos, state, null, hit.getDirection())).getVitality()));
         }
         return InteractionResult.SUCCESS;
     }
