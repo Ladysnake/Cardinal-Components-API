@@ -10,6 +10,7 @@
     "MixinPersistentState",
     "MixinPlayerManager",
     "MixinScoreboard",
+    "MixinScoreboardState",
     "MixinServerScoreboard",
     "MixinTeam",
     "ServerScoreboardAccessor",
