@@ -50,6 +50,12 @@ public final class VitaCommand {
                             return 1;
                         })
                     )
+                    .then(CommandManager.literal("serverwide")
+                        .executes(commandContext -> {
+                            Vita.get(commandContext.getSource().getServer().getScoreboard()).setVitality(IntegerArgumentType.getInteger(commandContext, "amount"));
+                            commandContext.getSource().sendFeedback(() -> Text.of("success!"), false);
+                            return 1;
+                        }))
                 )
             )
             .then(CommandManager.literal("get")

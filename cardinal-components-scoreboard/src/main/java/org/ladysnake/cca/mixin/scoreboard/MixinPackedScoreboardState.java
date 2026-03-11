@@ -22,6 +22,7 @@
  */
 package org.ladysnake.cca.mixin.scoreboard;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.datafixers.kinds.App;
@@ -37,6 +38,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -68,5 +70,12 @@ public abstract class MixinPackedScoreboardState implements CcaPackedState {
             ((MixinPackedScoreboardState) (Object) packed).cca$serializedComponents = nbtCompound;
             return packed;
         }));
+    }
+
+    @WrapMethod(method = "equals")
+    private boolean patchEquals(Object object, Operation<Boolean> original) {
+        return original.call(object)
+            && object instanceof CcaPackedState otherState
+            && Objects.equals(cca$getSerializedComponents(), otherState.cca$getSerializedComponents());
     }
 }
