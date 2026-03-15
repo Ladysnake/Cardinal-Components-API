@@ -7,6 +7,12 @@ Updated to 26.1-snapshot-9
 - Components attached to a `LevelData` object (using the `cardinal-components-level` module) can no longer use dynamic registries in serialization (vanilla limitation)
 
 ------------------------------------------------------
+Version 7.3.1
+------------------------------------------------------
+**Fixes**
+- Fixed a serialization issue in `cardinal-components-scoreboard` (thanks *farpo* and *AmyMialee* !)
+
+------------------------------------------------------
 Version 7.3.0
 ------------------------------------------------------
 Updated to 1.25.11
