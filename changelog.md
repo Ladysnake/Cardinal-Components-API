@@ -1,7 +1,7 @@
 ------------------------------------------------------
-Version 8.0.0-alpha.2+26.1-snapshot-9
+Version 8.0.0-alpha.3+26.1-pre-2
 ------------------------------------------------------
-Updated to 26.1-snapshot-9
+Updated to 26.1-pre-2
 
 **Removed**
 - Components attached to a `LevelData` object (using the `cardinal-components-level` module) can no longer use dynamic registries in serialization (vanilla limitation)
