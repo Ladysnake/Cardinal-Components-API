@@ -23,7 +23,7 @@
     }
   },
   "depends": {
-    "minecraft": ">=1.17-",
+    "minecraft": ">=26.1-",
     "fabric-api-base": ">=0.1.2"
   },
   "breaks": {
