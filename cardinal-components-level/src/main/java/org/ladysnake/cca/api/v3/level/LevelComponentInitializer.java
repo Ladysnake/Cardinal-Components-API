@@ -22,26 +22,12 @@
  */
 package org.ladysnake.cca.api.v3.level;
 
-import net.fabricmc.api.ModInitializer;
-import net.minecraft.world.level.storage.LevelData;
 import org.ladysnake.cca.internal.base.ComponentRegistrationInitializer;
 
 /**
- * Entrypoint getting invoked to register <em>static</em> item component factories.
- *
- * <p>The entrypoint is exposed as either {@code "cardinal-components"} or {@code "cardinal-components-level"} in the mod json and runs for any environment.
- * It usually executes right during {@linkplain ModInitializer mod init}, or before the first {@linkplain LevelData save properties object} gets loaded, whichever comes first.
- *
- * @since 2.4.0
+ * @deprecated renamed to {@code LevelDataComponentInitializer} in the module {@code cardinal-components-leveldata}
  */
+@Deprecated(since = "8.0.0", forRemoval = true)
 public interface LevelComponentInitializer extends ComponentRegistrationInitializer {
-    /**
-     * Called to register component factories for statically declared component types.
-     *
-     * <p><strong>The passed registry must not be held onto!</strong> Static component factories
-     * must not be registered outside of this method.
-     *
-     * @param registry a {@link LevelComponentFactoryRegistry} for <em>statically declared</em> components
-     */
-    void registerLevelComponentFactories(LevelComponentFactoryRegistry registry);
+    void registerLevelDataComponentFactories(LevelComponentFactoryRegistry registry);
 }

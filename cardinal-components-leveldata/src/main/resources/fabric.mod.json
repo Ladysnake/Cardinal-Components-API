@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "environment": "*",
+  "id": "cardinal-components-leveldata",
+  "name": "Cardinal Components API (level data)",
+  "description": "dynamically exposing components",
+  "version": "${version}",
+  "icon": "assets/cardinal-components-leveldata/icon.png",
+  "entrypoints": {
+    "main": [
+      "org.ladysnake.cca.internal.leveldata.CardinalComponentsLevelData::init"
+    ],
+    "client": [
+      "org.ladysnake.cca.internal.leveldata.CcaLevelDataClient::initClient"
+    ]
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [ "library" ],
+      "parent": {
+        "id": "cardinal-components",
+        "name": "Cardinal Components API",
+        "description": "Attaching more data to various game objects",
+        "badges": [ "library" ]
+      }
+    },
+    "loom:injected_interfaces": {
+      "net/minecraft/world/level/Level": [
+        "org/ladysnake/cca/api/v3/component/ComponentAccess"
+      ]
+    }
+  },
+  "depends": {
+    "minecraft": ">=26.1-",
+    "fabric-api-base": "*",
+    "cardinal-components-base": ">=8.0.0-alpha.1",
+    "fabric-networking-api-v1": "*"
+  },
+  "recommends": {
+    "cardinal-components-level": "*"
+  },
+  "authors": [
+    {
+      "name": "UpcraftLP",
+      "contact": {
+        "homepage": "https://twitter.com/UpcraftLP"
+      }
+    }
+  ],
+  "contact": {
+    "homepage": "https://minecraft.curseforge.com/projects/318449",
+    "issues": "https://github.com/Ladysnake/Cardinal-Components-API/issues",
+    "sources": "https://github.com/Ladysnake/Cardinal-Components-API"
+  },
+  "license": "MIT",
+  "mixins": [
+    {
+      "environment": "*",
+      "config": "mixins.cardinal_components_leveldata.json"
+    }
+  ]
+}

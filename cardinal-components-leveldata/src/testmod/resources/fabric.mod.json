@@ -1,0 +1,23 @@
+{
+    "schemaVersion": 1,
+    "environment": "*",
+    "id": "cca-leveldata-test",
+    "name": "Cardinal Components API Test Mod",
+    "description": "Test mod for Cardinal Components API",
+    "version": "${version}",
+    "entrypoints": {
+        "cardinal-components": [
+          "org.ladysnake.cca.test.leveldata.CcaLevelDataTestMod"
+        ],
+        "fabric-gametest": [
+          "org.ladysnake.cca.test.leveldata.CcaLevelDataTestSuite"
+        ]
+    },
+    "depends": {
+        "fabric-api-base": "*"
+    },
+    "authors": [
+        "Pyrofab"
+    ],
+    "license": "MIT"
+}

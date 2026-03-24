@@ -25,15 +25,13 @@ package org.ladysnake.cca.internal.level;
 import net.fabricmc.loader.api.FabricLoader;
 import org.ladysnake.cca.internal.base.CcaClientInternals;
 
-import java.util.Objects;
-
 public final class CcaLevelClient {
     public static void initClient() {
         if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
             CcaClientInternals.registerComponentSync(
                 CardinalComponentsLevel.PACKET_ID,
                 (payload, ctx) -> payload.componentKey().flatMap(
-                    key -> key.maybeGet(Objects.requireNonNull(ctx.client().level).getLevelData())
+                    key -> key.maybeGet(ctx.client().level)
                 )
             );
         }

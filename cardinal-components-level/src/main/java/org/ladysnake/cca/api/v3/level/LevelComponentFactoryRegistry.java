@@ -28,8 +28,9 @@ import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 /**
- * @since 2.4.0
+ * @deprecated renamed to {@code LevelDataComponentFactoryRegistry} in the module {@code cardinal-components-leveldata}
  */
+@Deprecated(since = "8.0.0", forRemoval = true)
 public interface LevelComponentFactoryRegistry {
     /**
      * Registers a {@link ComponentFactory} for {@link LevelData}.

@@ -3,15 +3,14 @@
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
   "package": "org.ladysnake.cca.mixin.level",
-  "client": [
-    "client.MixinClientWorldProperties"
-  ],
   "mixins": [
-    "common.MixinDerivedLevelData",
-    "common.MixinLevelData",
-    "common.MixinLevelStorageSource",
-    "common.MixinMinecraftServer",
-    "common.MixinPrimaryLevelData"
+    "common.DataFixTypesMixin",
+    "common.MixinLevel",
+    "common.MixinPlayerList",
+    "common.MixinServerLevel"
+  ],
+  "client": [
+    "client.MixinClientLevel"
   ],
   "injectors": {
     "defaultRequire": 1

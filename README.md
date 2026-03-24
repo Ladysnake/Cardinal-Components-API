@@ -152,7 +152,7 @@ class IncrementingIntComponent implements IntComponent, ServerTickingComponent {
 ```
 
 *Serverside ticking is implemented for all providers.
- Clientside ticking is only implemented for entities, block entities, worlds, and scoreboards/teams.*
+ Clientside ticking is only implemented for entities, block entities, levels, and scoreboards/teams.*
 
 If you want your component to **be notified of its provider being loaded and unloaded**, typically for advanced setup or cleanup,
 you can add the [`ServerLoadAwareComponent`](./cardinal-components-base/src/main/java/org/ladysnake/cca/api/v3/component/load/ServerLoadAwareComponent.java)
@@ -169,7 +169,7 @@ class IncrementingIntComponent implements IntComponent, ServerLoadAwareComponent
 }
 ```
 
-*Serverside load and unload is implemented for entities, block entities, chunks, worlds, and scoreboards.
+*Serverside load and unload is implemented for entities, block entities, chunks, levels, and scoreboards.
 Clientside load and unload is only implemented for entities, block entities, and chunks. This is an experimental feature,
 any feedback welcome.*
 
@@ -204,15 +204,15 @@ The next step is to choose an identifier for your component, and to declare it a
 
 Components can be provided by objects of various classes, depending on which modules you installed.
 The most common providers are [entities](https://ladysnake.org/wiki/cardinal-components-api/modules/entity),
-[worlds](https://ladysnake.org/wiki/cardinal-components-api/modules/world)
+[levels](https://ladysnake.org/wiki/cardinal-components-api/modules/world) (previously called `world`)
 and [chunks](https://ladysnake.org/wiki/cardinal-components-api/modules/chunk),
 but more are available.
 To interact with them, you need to **register a component key**, using `ComponentRegistryV3#getOrCreate`;
 the resulting `ComponentKey` instance has the query methods you need. You will also need to **attach your
-component** to some providers (here, to players and worlds):
+component** to some providers (here, to players and levels):
 
 ```java
-public final class MyComponents implements EntityComponentInitializer, WorldComponentInitializer {
+public final class MyComponents implements EntityComponentInitializer, LevelComponentInitializer {
     public static final ComponentKey<IntComponent> MAGIK = 
         ComponentRegistryV3.INSTANCE.getOrCreate(Identifier.of("mymod:magik"), IntComponent.class);
         
@@ -223,9 +223,9 @@ public final class MyComponents implements EntityComponentInitializer, WorldComp
     }
     
     @Override
-    public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
-        // Add the component to every World instance
-        registry.register(MAGIK, world -> new RandomIntComponent());
+    public void registerLevelComponentFactories(LevelComponentFactoryRegistry registry) {
+        // Add the component to every Level instance
+        registry.register(MAGIK, level -> new RandomIntComponent());
     }    
 }
 ```

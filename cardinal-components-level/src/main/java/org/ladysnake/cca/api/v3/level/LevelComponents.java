@@ -35,8 +35,9 @@ import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import java.util.NoSuchElementException;
 
 /**
- * Static helper methods for components attached to {@link LevelData}
+ * @deprecated renamed to {@code LevelDataComponents} in the module {@code cardinal-components-leveldata}
  */
+@Deprecated(since = "8.0.0", forRemoval = true)
 public final class LevelComponents {
     /**
      * Attempts to synchronize the component attached to the main {@link LevelData} of the given {@link MinecraftServer}.

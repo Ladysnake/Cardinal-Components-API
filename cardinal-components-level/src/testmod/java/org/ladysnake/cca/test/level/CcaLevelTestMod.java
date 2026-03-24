@@ -22,15 +22,19 @@
  */
 package org.ladysnake.cca.test.level;
 
-import org.ladysnake.cca.api.v3.level.LevelComponentFactoryRegistry;
-import org.ladysnake.cca.api.v3.level.LevelComponentInitializer;
+import net.minecraft.world.level.Level;
+import org.ladysnake.cca.api.v8.level.LevelComponentFactoryRegistry;
+import org.ladysnake.cca.api.v8.level.LevelComponentInitializer;
+import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.TickingTestComponent;
 import org.ladysnake.cca.test.base.Vita;
 
 public class CcaLevelTestMod implements LevelComponentInitializer {
     @Override
     public void registerLevelComponentFactories(LevelComponentFactoryRegistry registry) {
-        registry.register(TickingTestComponent.KEY, props -> new TickingTestComponent());
-        registry.register(Vita.KEY, props -> new LevelVita());
+        registry.register(Vita.KEY, AmbientVita.WorldVita.class, AmbientVita.WorldVita::new);
+        registry.register(LoadAwareTestComponent.KEY, w -> new LoadAwareTestComponent());
+        registry.registerFor(Level.NETHER, Vita.KEY, NetherVita.class, w -> new NetherVita());
+        registry.registerFor(Level.END, TickingTestComponent.KEY, w -> new TickingTestComponent());
     }
 }

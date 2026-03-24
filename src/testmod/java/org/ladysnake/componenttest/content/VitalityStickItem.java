@@ -42,7 +42,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.scores.Team;
 import org.ladysnake.cca.test.base.Vita;
 import org.ladysnake.cca.test.block.CcaBlockTestMod;
-import org.ladysnake.cca.test.world.AmbientVita;
+import org.ladysnake.cca.test.level.AmbientVita;
 import org.ladysnake.componenttest.content.vita.ItemVita;
 
 import java.util.Optional;

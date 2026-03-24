@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "environment": "*",
   "id": "cardinal-components-level",
-  "name": "Cardinal Components API (world saves)",
+  "name": "Cardinal Components API (levels)",
   "description": "dynamically exposing components",
   "version": "${version}",
   "icon": "assets/cardinal-components-level/icon.png",
@@ -35,9 +35,6 @@
     "fabric-api-base": "*",
     "cardinal-components-base": ">=8.0.0-alpha.1",
     "fabric-networking-api-v1": "*"
-  },
-  "recommends": {
-    "cardinal-components-world": "*"
   },
   "authors": [
     {

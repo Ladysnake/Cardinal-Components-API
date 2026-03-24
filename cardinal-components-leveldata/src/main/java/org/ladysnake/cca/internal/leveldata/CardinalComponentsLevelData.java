@@ -1,0 +1,63 @@
+/*
+ * Cardinal-Components-API
+ * Copyright (C) 2019-2026 Ladysnake
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+ * OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+package org.ladysnake.cca.internal.leveldata;
+
+import com.mojang.datafixers.util.Unit;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.level.storage.LevelData;
+import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.ComponentProvider;
+import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
+import org.ladysnake.cca.api.v8.level.LevelSyncCallback;
+import org.ladysnake.cca.internal.base.ComponentUpdatePayload;
+import org.ladysnake.cca.internal.base.MorePacketCodecs;
+
+public final class CardinalComponentsLevelData {
+
+    /**
+     * {@link ClientboundCustomPayloadPacket} channel for default level component synchronization.
+     *
+     * <p> Components synchronized through this channel will have {@linkplain AutoSyncedComponent#applySyncPacket(net.minecraft.network.RegistryFriendlyByteBuf)}
+     * called on the game thread.
+     */
+    public static final CustomPacketPayload.Type<ComponentUpdatePayload<Unit>> PACKET_ID = ComponentUpdatePayload.id("level_sync");
+
+    public static void init() {
+        if (FabricLoader.getInstance().isModLoaded("fabric-networking-api-v1")) {
+            ComponentUpdatePayload.register(PACKET_ID, MorePacketCodecs.EMPTY);
+            if (FabricLoader.getInstance().isModLoaded("cardinal-components-level")) {
+                LevelSyncCallback.EVENT.register((player, world) -> {
+                    LevelData props = world.getLevelData();
+
+                    for (ComponentKey<?> key : ((ComponentProvider) props).getComponentContainer().keys()) {
+                        key.syncWith(player, ((ComponentProvider) props));
+                    }
+                });
+            }
+        }
+        StaticLevelDataComponentPlugin.INSTANCE.ensureInitialized();
+    }
+
+}

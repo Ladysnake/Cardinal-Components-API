@@ -25,16 +25,31 @@ package org.ladysnake.cca.test.level;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import org.ladysnake.cca.api.v3.component.ComponentAccess;
-import org.ladysnake.cca.test.base.TickingTestComponent;
+import net.minecraft.world.level.Level;
+import org.ladysnake.cca.test.base.LoadAwareTestComponent;
+import org.ladysnake.cca.test.base.Vita;
+
+import java.util.Objects;
 
 public class CcaLevelTestSuite {
     @GameTest
-    public void levelComponentsTick(GameTestHelper ctx) {
-        int baseTicks = ((ComponentAccess) ctx.getLevel().getLevelData()).getComponent(TickingTestComponent.KEY).serverTicks();
-        ctx.runAfterDelay(5, () -> {
-            int ticks = ((ComponentAccess) ctx.getLevel().getLevelData()).getComponent(TickingTestComponent.KEY).serverTicks();
-            ctx.assertValueEqual(5, ticks - baseTicks, Component.literal("Component should tick 5 times -"));
+    public void worldLoadWorks(GameTestHelper ctx) {
+        ctx.assertValueEqual(
+            1,
+            ctx.getLevel().getComponent(LoadAwareTestComponent.KEY).getLoadCounter(),
+            Component.literal("Load counter should be incremented once when the world gets loaded -")
+        );
+        ctx.succeed();
+    }
+
+    @GameTest
+    public void worldSpecificComponentOverrides(GameTestHelper ctx) {
+        ctx.runAfterDelay(1, () -> {
+            ctx.assertValueEqual(
+                666,
+                Vita.KEY.getNullable(Objects.requireNonNull(ctx.getLevel().getServer().getLevel(Level.NETHER))) instanceof NetherVita v ? v.getVitality() : -1,
+                Component.literal("Nether should have its own Vita implementation -")
+            );
             ctx.succeed();
         });
     }

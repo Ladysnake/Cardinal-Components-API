@@ -22,31 +22,67 @@
  */
 package org.ladysnake.cca.internal.level;
 
-import com.google.common.base.Suppliers;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
-import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
-import org.ladysnake.cca.api.v3.level.LevelComponentFactoryRegistry;
-import org.ladysnake.cca.api.v3.level.LevelComponentInitializer;
 import org.ladysnake.cca.api.v8.component.CardinalComponent;
+import org.ladysnake.cca.api.v8.level.LevelComponentFactoryRegistry;
+import org.ladysnake.cca.api.v8.level.LevelComponentInitializer;
+import org.ladysnake.cca.internal.base.QualifiedComponentFactory;
+import org.ladysnake.cca.internal.base.asm.CcaAsmHelper;
+import org.ladysnake.cca.internal.base.asm.StaticComponentLoadingException;
 import org.ladysnake.cca.internal.base.asm.StaticComponentPluginBase;
 
 import java.util.Collection;
-import java.util.function.Supplier;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
-public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<LevelData, LevelComponentInitializer> implements LevelComponentFactoryRegistry {
+public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<Level, LevelComponentInitializer> implements LevelComponentFactoryRegistry {
     public static final StaticLevelComponentPlugin INSTANCE = new StaticLevelComponentPlugin();
-    public static final Supplier<ComponentContainer.Factory<LevelData>> componentContainerFactory
-        = Suppliers.memoize(INSTANCE::buildContainerFactory);
+    private final Map<@Nullable ResourceKey<Level>, Map<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<Level, ?>>>> worldComponentFactories = new Reference2ObjectOpenHashMap<>();
 
-    public static ComponentContainer createContainer(LevelData properties) {
-        return componentContainerFactory.get().createContainer(properties);
+    private static String getSuffix(@Nullable ResourceKey<Level> dimensionId) {
+        return "WorldImpl" + (dimensionId == null ? "" : "_" + CcaAsmHelper.getJavaIdentifierName(dimensionId.identifier()));
     }
 
     private StaticLevelComponentPlugin() {
-        super("loading a world save", LevelData.class);
+        super("loading a world", Level.class);
+    }
+
+    public boolean requiresStaticFactory(ResourceKey<Level> dimensionId) {
+        INSTANCE.ensureInitialized();
+
+        return this.worldComponentFactories.containsKey(dimensionId);
+    }
+
+    public ComponentContainer.Factory<Level> buildDedicatedFactory(@Nullable ResourceKey<Level> dimensionId) {
+        INSTANCE.ensureInitialized();
+
+        var compiled = new LinkedHashMap<>(this.worldComponentFactories.getOrDefault(null, Collections.emptyMap()));
+        compiled.putAll(this.worldComponentFactories.getOrDefault(dimensionId, Collections.emptyMap()));
+
+        ComponentContainer.Factory.Builder<Level> builder = ComponentContainer.Factory.builder(Level.class)
+            .factoryNameSuffix(getSuffix(dimensionId));
+
+        for (var entry : compiled.entrySet()) {
+            addToBuilder(builder, entry);
+        }
+
+        return builder.build();
+    }
+
+    private <C extends CardinalComponent> void addToBuilder(ComponentContainer.Factory.Builder<Level> builder, Map.Entry<ComponentKey<?>, QualifiedComponentFactory<ComponentFactory<Level, ?>>> entry) {
+        @SuppressWarnings("unchecked") var key = (ComponentKey<C>) entry.getKey();
+        @SuppressWarnings("unchecked") var factory = (ComponentFactory<Level, C>) entry.getValue().factory();
+        @SuppressWarnings("unchecked") var impl = (Class<C>) entry.getValue().impl();
+        builder.component(key, impl, factory, entry.getValue().dependencies());
     }
 
     @Override
@@ -60,14 +96,38 @@ public final class StaticLevelComponentPlugin extends StaticComponentPluginBase<
     }
 
     @Override
-    public <C extends CardinalComponent> void register(ComponentKey<C> type, ComponentFactory<LevelData, ? extends C> factory) {
+    public <C extends CardinalComponent> void register(ComponentKey<C> type, ComponentFactory<Level, ? extends C> factory) {
         this.checkLoading(LevelComponentFactoryRegistry.class, "register");
-        super.register(type, factory);
+        this.register0(null, type, new QualifiedComponentFactory<>(factory, type.getComponentClass(), Set.of()));
     }
 
     @Override
-    public <C extends CardinalComponent> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<LevelData, ? extends C> factory) {
+    public <C extends CardinalComponent> void register(ComponentKey<? super C> type, Class<C> impl, ComponentFactory<Level, ? extends C> factory) {
         this.checkLoading(LevelComponentFactoryRegistry.class, "register");
-        super.register(type, impl, factory);
+        this.register0(null, type, new QualifiedComponentFactory<>(factory, type.getComponentClass(), Set.of()));
+    }
+
+    @Override
+    public <C extends CardinalComponent> void registerFor(ResourceKey<Level> dimensionId, ComponentKey<C> type, ComponentFactory<Level, ? extends C> factory) {
+        this.checkLoading(LevelComponentFactoryRegistry.class, "register");
+        this.register0(dimensionId, type, new QualifiedComponentFactory<>(factory, type.getComponentClass(), Set.of()));
+    }
+
+    @Override
+    public <C extends CardinalComponent> void registerFor(ResourceKey<Level> dimensionId, ComponentKey<? super C> type, Class<C> impl, ComponentFactory<Level, ? extends C> factory) {
+        this.checkLoading(LevelComponentFactoryRegistry.class, "register");
+        this.register0(dimensionId, type, new QualifiedComponentFactory<>(factory, impl, Set.of()));
+    }
+
+    private <C extends CardinalComponent> void register0(@Nullable ResourceKey<Level> dimensionId, ComponentKey<? super C> type, QualifiedComponentFactory<ComponentFactory<Level, ? extends C>> factory) {
+        var specializedMap = this.worldComponentFactories.computeIfAbsent(dimensionId, t -> new LinkedHashMap<>());
+        var previousFactory = specializedMap.get(type);
+
+        if (previousFactory != null) {
+            throw new StaticComponentLoadingException("Duplicate factory declarations for %s on %s: %s and %s".formatted(type.getId(), dimensionId, factory, previousFactory));
+        }
+
+        @SuppressWarnings("unchecked") var factory1 = (QualifiedComponentFactory<ComponentFactory<Level, ?>>) (QualifiedComponentFactory<?>) factory;
+        specializedMap.put(type, factory1);
     }
 }
