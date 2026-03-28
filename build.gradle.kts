@@ -3,7 +3,7 @@ import java.net.URI
 
 plugins {
     id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT"
-    id("io.github.ladysnake.chenille") version "0.18.0-SNAPSHOT"
+    id("io.github.ladysnake.chenille") version "0.18.0"
 }
 
 val fabricApiVersion: String = providers.gradleProperty("fabric_api_version").get()

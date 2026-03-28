@@ -5,6 +5,7 @@
   "package": "org.ladysnake.cca.mixin.level",
   "mixins": [
     "common.DataFixTypesMixin",
+    "common.MixinDimensionStorageFileFix",
     "common.MixinLevel",
     "common.MixinPlayerList",
     "common.MixinServerLevel"
