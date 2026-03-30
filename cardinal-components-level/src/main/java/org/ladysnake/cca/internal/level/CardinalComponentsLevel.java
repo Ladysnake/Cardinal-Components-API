@@ -28,7 +28,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;

@@ -23,8 +23,7 @@
 /**
  * Utility classes for API consumers
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
+@NullMarked
 package org.ladysnake.cca.api.v3.util;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;

@@ -26,13 +26,11 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.NotNull;
 import org.ladysnake.cca.api.v3.component.ComponentRegistry;
 import org.ladysnake.cca.internal.base.asm.StaticComponentLoadingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.invoke.MethodHandles;
@@ -85,7 +83,7 @@ public final class ComponentsInternals {
         }
     }
 
-    @SuppressWarnings("unchecked") @Nonnull
+    @SuppressWarnings("unchecked")
     public static <R> R createFactory(Class<R> factoryClass) {
         try {
             return (R) MethodHandles.lookup().findConstructor(factoryClass, MethodType.methodType(void.class)).invoke();
@@ -111,7 +109,7 @@ public final class ComponentsInternals {
         }
     }
 
-    public static @NotNull String getClientOptionalModAdvice() {
+    public static String getClientOptionalModAdvice() {
         return FabricLoader.getInstance().isDevelopmentEnvironment() ? "\n§eDEV ADVICE: If your mod is supposed to be client-optional, try overriding isRequiredOnClient() in your component." : "";
     }
 }

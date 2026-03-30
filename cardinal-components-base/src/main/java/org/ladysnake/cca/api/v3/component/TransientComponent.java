@@ -24,7 +24,7 @@ package org.ladysnake.cca.api.v3.component;
 
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v8.component.CardinalComponent;
 
 /**

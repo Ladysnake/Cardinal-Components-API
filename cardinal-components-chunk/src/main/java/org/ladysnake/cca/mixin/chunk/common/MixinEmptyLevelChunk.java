@@ -26,7 +26,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
 import net.minecraft.world.level.chunk.LevelChunk;
-import org.jetbrains.annotations.NotNull;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,7 +37,7 @@ public abstract class MixinEmptyLevelChunk extends LevelChunk implements Compone
     }
 
     @Override
-    public @NotNull ComponentContainer getComponentContainer() {
+    public ComponentContainer getComponentContainer() {
         return ComponentContainer.EMPTY;
     }
 }

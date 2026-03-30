@@ -23,12 +23,11 @@
 package org.ladysnake.cca.api.v3.component;
 
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.ComponentRegistryImpl;
 
-import javax.annotation.Nullable;
 import java.util.stream.Stream;
 
 /**
@@ -41,7 +40,6 @@ import java.util.stream.Stream;
  * @see ComponentKey
  * @since 2.7.0
  */
-@ApiStatus.NonExtendable
 public final class ComponentRegistry {
     /**
      * Get a component key for the given identifier and class, or create one if it does not exist.

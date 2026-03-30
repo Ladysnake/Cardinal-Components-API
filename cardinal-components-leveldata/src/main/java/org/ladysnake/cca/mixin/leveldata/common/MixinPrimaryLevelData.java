@@ -47,7 +47,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nonnull;
 import java.util.Set;
 import java.util.UUID;
 
@@ -72,7 +71,6 @@ public abstract class MixinPrimaryLevelData implements ServerLevelData, Componen
         }
     }
 
-    @Nonnull
     @Override
     public ComponentContainer getComponentContainer() {
         return this.components;

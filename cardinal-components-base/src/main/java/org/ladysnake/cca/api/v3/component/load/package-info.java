@@ -21,11 +21,8 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 @ApiStatus.Experimental
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
+@NullMarked
 package org.ladysnake.cca.api.v3.component.load;
 
 import org.jetbrains.annotations.ApiStatus;
-import org.ladysnake.cca.api.v3.util.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;

@@ -34,8 +34,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nonnull;
-
 @Mixin(ClientLevel.ClientLevelData.class)
 public abstract class MixinClientWorldProperties implements WritableLevelData, ComponentProvider {
     @Unique
@@ -46,7 +44,6 @@ public abstract class MixinClientWorldProperties implements WritableLevelData, C
         this.components = StaticLevelDataComponentPlugin.createContainer(this);
     }
 
-    @Nonnull
     @Override
     public ComponentContainer getComponentContainer() {
         return this.components;

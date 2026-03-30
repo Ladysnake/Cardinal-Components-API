@@ -30,6 +30,7 @@ import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.IdentifierException;
 import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.StaticComponentInitializer;
@@ -39,7 +40,6 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;

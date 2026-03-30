@@ -75,7 +75,6 @@ allprojects {
         compileOnly(fabricApi.module("fabric-gametest-api-v1", fabricApiVersion))
         localImplementation("org.ladysnake:elmendorf:${props["elmendorf_version"]}")
 
-        compileOnly("com.google.code.findbugs:jsr305:3.0.2")
         compileOnly("org.jetbrains:annotations:24.0.1")
     }
 

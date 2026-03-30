@@ -25,10 +25,10 @@ package org.ladysnake.cca.api.v3.component;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.ComponentRegistryImpl;
 
-import javax.annotation.Nullable;
 import java.util.stream.Stream;
 
 /**

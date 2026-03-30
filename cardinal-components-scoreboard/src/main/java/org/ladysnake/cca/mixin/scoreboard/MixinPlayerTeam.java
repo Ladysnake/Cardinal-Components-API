@@ -43,8 +43,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.annotation.Nonnull;
-
 @Mixin(PlayerTeam.class)
 public abstract class MixinPlayerTeam implements ComponentProvider, PlayerTeamAccessor {
     @Shadow
@@ -74,7 +72,6 @@ public abstract class MixinPlayerTeam implements ComponentProvider, PlayerTeamAc
         }
     }
 
-    @Nonnull
     @Override
     public ComponentContainer getComponentContainer() {
         return this.components;

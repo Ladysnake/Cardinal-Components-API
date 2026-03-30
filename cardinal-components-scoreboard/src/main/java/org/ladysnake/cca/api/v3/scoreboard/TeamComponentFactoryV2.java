@@ -26,7 +26,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.asm.CalledByAsm;
 

@@ -24,10 +24,7 @@
  * Deprecated: level components are a legacy feature that has been superseded by scoreboard components
  */
 @Deprecated(since = "6.0.0")
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
+@NullMarked
 package org.ladysnake.cca.api.v8.leveldata;
 
-import org.ladysnake.cca.api.v3.util.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;

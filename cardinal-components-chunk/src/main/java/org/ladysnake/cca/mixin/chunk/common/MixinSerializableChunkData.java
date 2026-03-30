@@ -35,7 +35,7 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 import net.minecraft.world.level.chunk.storage.SerializableChunkData;
 import net.minecraft.world.level.storage.TagValueInput;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.internal.base.AbstractComponentContainer;
 import org.ladysnake.cca.internal.base.ComponentsInternals;
 import org.spongepowered.asm.mixin.Mixin;

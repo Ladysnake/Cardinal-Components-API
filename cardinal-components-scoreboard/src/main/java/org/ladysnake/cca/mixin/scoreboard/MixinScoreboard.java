@@ -37,8 +37,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nonnull;
-
 @Mixin(Scoreboard.class)
 public abstract class MixinScoreboard implements ComponentProvider {
     @Unique
@@ -57,7 +55,6 @@ public abstract class MixinScoreboard implements ComponentProvider {
         return team;
     }
 
-    @Nonnull
     @Override
     public ComponentContainer getComponentContainer() {
         return this.components;

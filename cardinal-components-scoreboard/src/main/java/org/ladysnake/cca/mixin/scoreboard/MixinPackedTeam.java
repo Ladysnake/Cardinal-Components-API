@@ -30,7 +30,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.scores.PlayerTeam;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.internal.base.AbstractComponentContainer;
 import org.ladysnake.cca.internal.scoreboard.CcaPackedState;
 import org.spongepowered.asm.mixin.Mixin;

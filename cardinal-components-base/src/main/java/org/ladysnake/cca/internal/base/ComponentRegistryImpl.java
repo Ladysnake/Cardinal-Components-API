@@ -25,12 +25,12 @@ package org.ladysnake.cca.internal.base;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 import org.ladysnake.cca.api.v8.component.CardinalComponent;
 import org.ladysnake.cca.internal.base.asm.CcaBootstrap;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;

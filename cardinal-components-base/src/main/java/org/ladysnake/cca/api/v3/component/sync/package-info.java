@@ -20,7 +20,9 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
+@ApiStatus.Experimental
 @NullMarked
-package org.ladysnake.cca.internal.item;
+package org.ladysnake.cca.api.v3.component.sync;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;

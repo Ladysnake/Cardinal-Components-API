@@ -26,7 +26,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;

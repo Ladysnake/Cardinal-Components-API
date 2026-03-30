@@ -30,7 +30,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import org.jetbrains.annotations.NotNull;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 import org.ladysnake.cca.api.v3.component.sync.PlayerSyncPredicate;
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent;
@@ -105,7 +104,7 @@ public class PlayerVita extends EntityVita implements AutoSyncedComponent, Serve
     }
 
     @Override
-    public void copyForRespawn(@NotNull BaseVita original, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean switchingCharacter) {
+    public void copyForRespawn(BaseVita original, HolderLookup.Provider registryLookup, boolean lossless, boolean keepInventory, boolean switchingCharacter) {
         RespawnableComponent.super.copyForRespawn(original, registryLookup, lossless, keepInventory, switchingCharacter);
         if (!lossless && !keepInventory) {
             this.vitality -= 5;

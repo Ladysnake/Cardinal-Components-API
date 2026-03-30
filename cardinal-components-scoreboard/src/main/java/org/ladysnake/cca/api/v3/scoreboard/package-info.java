@@ -20,10 +20,7 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
+@NullMarked
 package org.ladysnake.cca.api.v3.scoreboard;
 
-import org.ladysnake.cca.api.v3.util.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;

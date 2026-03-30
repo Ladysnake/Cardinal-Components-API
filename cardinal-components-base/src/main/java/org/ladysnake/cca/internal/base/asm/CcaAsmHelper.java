@@ -25,8 +25,7 @@ package org.ladysnake.cca.internal.base.asm;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
@@ -396,7 +395,7 @@ public final class CcaAsmHelper {
         return generateClass(classNode, true, classData).asSubclass(ComponentContainer.class);
     }
 
-    @NotNull public static ConstantDynamic constantClassData(Class<?> dataType) {
+    public static ConstantDynamic constantClassData(Class<?> dataType) {
         return new ConstantDynamic(
             "_",
             Type.getDescriptor(dataType),

@@ -27,7 +27,7 @@ import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v3.block.BlockComponentFactoryRegistry;
 import org.ladysnake.cca.api.v3.block.BlockComponentInitializer;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;

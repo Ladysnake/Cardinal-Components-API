@@ -43,7 +43,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -73,7 +72,6 @@ public abstract class MixinEntity implements ComponentProvider {
         this.components.readData(view);
     }
 
-    @Nonnull
     @Override
     public ComponentContainer getComponentContainer() {
         return this.components;

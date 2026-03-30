@@ -29,8 +29,6 @@ import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.level.Level;
 import org.ladysnake.cca.test.entity.EntityVita;
 
-import javax.annotation.Nonnull;
-
 public class VitalityZombieEntity extends Zombie {
     public VitalityZombieEntity(EntityType<? extends Zombie> type, Level world) {
         super(type, world);
@@ -44,7 +42,6 @@ public class VitalityZombieEntity extends Zombie {
         }
     }
 
-    @Nonnull
     public EntityVita createVitaComponent() {
         return new EntityVita(this, 20);
     }

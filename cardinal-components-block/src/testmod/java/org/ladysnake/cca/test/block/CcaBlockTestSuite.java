@@ -35,7 +35,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.CommandBlockEntity;
 import net.minecraft.world.level.block.entity.TheEndPortalBlockEntity;
 import net.minecraft.world.level.storage.TagValueInput;
-import org.jetbrains.annotations.NotNull;
 import org.ladysnake.cca.test.base.LoadAwareTestComponent;
 import org.ladysnake.cca.test.base.TickingTestComponent;
 import org.ladysnake.cca.test.base.Vita;
@@ -95,7 +94,7 @@ public class CcaBlockTestSuite {
         ctx.succeed();
     }
 
-    @NotNull private static Vita getVita(GameTestHelper ctx, BlockPos pos, BlockEntity be) {
+    private static Vita getVita(GameTestHelper ctx, BlockPos pos, BlockEntity be) {
         return Objects.requireNonNull(CcaBlockTestMod.VITA_API_LOOKUP.find(ctx.getLevel(), pos, null, be, Direction.DOWN));
     }
 

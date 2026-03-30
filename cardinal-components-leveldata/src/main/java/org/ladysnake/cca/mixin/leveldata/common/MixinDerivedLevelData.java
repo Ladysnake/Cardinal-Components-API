@@ -30,14 +30,11 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import javax.annotation.Nonnull;
-
 @Mixin(DerivedLevelData.class)
 public abstract class MixinDerivedLevelData implements ComponentProvider {
 
     @Shadow @Final private ServerLevelData wrapped;
 
-    @Nonnull
     @Override
     public ComponentContainer getComponentContainer() {
         return ((ComponentProvider) wrapped).getComponentContainer();

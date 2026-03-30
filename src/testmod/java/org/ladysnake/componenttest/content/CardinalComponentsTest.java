@@ -45,6 +45,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentRegistryV3;
 import org.ladysnake.cca.internal.base.GenericContainerBuilder;
@@ -53,7 +54,6 @@ import org.ladysnake.cca.test.base.Vita;
 import org.ladysnake.cca.test.block.CcaBlockTestMod;
 import org.ladysnake.componenttest.content.vita.ItemVita;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;

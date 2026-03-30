@@ -36,7 +36,7 @@ import net.minecraft.world.level.chunk.PalettedContainerFactory;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
 import org.ladysnake.cca.api.v3.component.ComponentProvider;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
