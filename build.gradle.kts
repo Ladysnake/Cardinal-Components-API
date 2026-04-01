@@ -137,7 +137,7 @@ tasks.javadoc {
 val javadocJar by tasks.registering(Jar::class) {
     dependsOn(tasks.javadoc)
     from(tasks.javadoc.map { it.destinationDir!! })
-    //Set as `fatjavadoc` to prevent an ide form trying to use this javadoc, over using the modules javadoc
+    //Set as `fatjavadoc` to prevent an ide from trying to use this javadoc, over using the modules javadoc
     archiveClassifier.set("fatjavadoc")
 }
 
@@ -208,43 +208,35 @@ subprojects {
     }
 }
 
-//val remapMavenJar by tasks.registering(RemapJarTask::class) {
-//    inputFile.set(tasks.jar.flatMap { it.archiveFile })
-//    archiveFileName.set("${project.properties["archivesBaseName"]}-${project.version}-maven.jar")
-//    addNestedDependencies = false
-//    dependsOn(tasks.jar)
-//}
-//tasks.assemble.configure {
-//    dependsOn(remapMavenJar)
-//}
-//
-//extensions.configure(PublishingExtension::class.java) {
-//    publications {
-//        val mavenJava by creating(MavenPublication::class) {
-//            artifact(remapMavenJar) {
-//                builtBy(remapMavenJar)
-//            }
-//
-//            artifact(tasks.named("sourcesJar"))
-//
-//            artifact(tasks.named("javadocJar"))
-//
-//            pom.withXml {
-//                val depsNode = asNode().appendNode("dependencies")
-//                subprojects.forEach {
-//                    val depNode = depsNode.appendNode("dependency")
-//                    depNode.appendNode("groupId", it.group)
-//                    depNode.appendNode("artifactId", it.name)
-//                    depNode.appendNode("version", it.version)
-//                    depNode.appendNode("scope", "compile")
-//                }
-//            }
-//        }
-//        // Required until the deprecation is removed. CCA's main jar that is published to maven does not contain sub modules.
-//        @Suppress("UnstableApiUsage")
-//        loom.disableDeprecatedPomGeneration(mavenJava)
-//    }
-//}
+val mavenJar by tasks.registering(Jar::class) {
+    archiveFileName.set("cardinal-components-api-${project.version}-maven.jar")
+}
+
+extensions.configure(PublishingExtension::class.java) {
+    publications {
+        val mavenJava by creating(MavenPublication::class) {
+            artifact(mavenJar)
+
+            artifact(tasks.named("sourcesJar"))
+
+            artifact(tasks.named("javadocJar"))
+
+            pom.withXml {
+                val depsNode = asNode().appendNode("dependencies")
+                subprojects.forEach {
+                    val depNode = depsNode.appendNode("dependency")
+                    depNode.appendNode("groupId", it.group)
+                    depNode.appendNode("artifactId", it.name)
+                    depNode.appendNode("version", it.version)
+                    depNode.appendNode("scope", "compile")
+                }
+            }
+        }
+        // Required until the deprecation is removed. CCA's main jar that is published to maven does not contain sub modules.
+        @Suppress("UnstableApiUsage")
+        loom.disableDeprecatedPomGeneration(mavenJava)
+    }
+}
 
 chenille {
     configureTestmod {
