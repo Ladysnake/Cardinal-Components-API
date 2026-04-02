@@ -1,15 +1,18 @@
 ------------------------------------------------------
-Version 8.0.0-alpha.4+26.1-rc-2
+Version 8.0.0-alpha.5+26.1
 ------------------------------------------------------
 Updated to 26.1
 
 See the migration guide available on [the Ladysnake website](https://ladysnake.org/wiki/cardinal-components-api/upgrade-instructions/CCA-8-changes).
+
+Starting with alpha-5, world data from previous minecraft versions should be migrated appropriately (thanks Patbox !).
 
 **Changes**
 - Two modules have been renamed in order to match Mojmap names :
   - `cardinal-components-level` has been renamed to `cardinal-components-leveldata`
   - `cardinal-components-world` has been renamed to `cardinal-components-level`
   - All interfaces inside these modules have been renamed accordingly
+- Nullability annotations now use Jspecify, like the base game
 
 **Removed**
 - Components attached to a `LevelData` object (using the `cardinal-components-leveldata` module) can no longer use dynamic registries in serialization (vanilla limitation)
