@@ -54,13 +54,19 @@ public final class ComponentsInternals {
         try(Reader reader = Files.newBufferedReader(path)) {
             Properties cfg = new Properties();
             cfg.load(reader);
-            if (Integer.parseInt(cfg.getProperty("config-version")) < configVersion) {
+            try {
+                if (Integer.parseInt(cfg.getProperty("config-version")) < configVersion) {
+                    writeConfigFile(path);
+                    cfg.clear();
+                }
+                logDeserializationWarnings = Boolean.parseBoolean(cfg.getProperty("log-deserialization-warnings", String.valueOf(DEFAULT_LOG_DESERIALIZATION_WARNINGS)));
+                maxWarningsPerComponent = Integer.parseInt(cfg.getProperty("max-deserialization-warnings", String.valueOf(DEFAULT_MAX_WARNINGS_PER_COMPONENT)));
+            } catch (NumberFormatException e) {
+                LOGGER.error("Config file at {} contains invalid values, resetting", path, e);
                 writeConfigFile(path);
-                cfg.clear();
             }
-            logDeserializationWarnings = Boolean.parseBoolean(cfg.getProperty("log-deserialization-warnings", String.valueOf(DEFAULT_LOG_DESERIALIZATION_WARNINGS)));
-            maxWarningsPerComponent = Integer.parseInt(cfg.getProperty("max-deserialization-warnings", String.valueOf(DEFAULT_MAX_WARNINGS_PER_COMPONENT)));
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
+            LOGGER.error("Invalid config file at {}, resetting", path, e);
             writeConfigFile(path);
         }
     }

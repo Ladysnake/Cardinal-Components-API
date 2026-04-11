@@ -18,6 +18,9 @@ Starting with alpha-5, world data from previous minecraft versions should be mig
 - Components attached to a `LevelData` object (using the `cardinal-components-leveldata` module) can no longer use dynamic registries in serialization (vanilla limitation)
 - `ComponentContainer.Builder#build(String)` (had been deprecated for removal for a couple years now)
 
+**Fixes**
+- Fixed game crashing when CCA's config file was invalid
+
 ------------------------------------------------------
 Version 7.3.1
 ------------------------------------------------------
