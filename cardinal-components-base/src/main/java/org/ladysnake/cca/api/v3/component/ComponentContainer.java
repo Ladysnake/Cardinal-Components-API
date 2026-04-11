@@ -256,15 +256,6 @@ public interface ComponentContainer extends NbtSerializable {
             public Factory<T> build() {
                 return super.build();
             }
-
-            /**
-             * @deprecated use {@link #factoryNameSuffix(String)}
-             */
-            @Deprecated(forRemoval = true)
-            public Factory<T> build(@Nullable String factoryNameSuffix) {
-                if (factoryNameSuffix != null) this.factoryNameSuffix(factoryNameSuffix);
-                return this.build();
-            }
         }
     }
 }

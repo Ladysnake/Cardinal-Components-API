@@ -205,27 +205,6 @@ public final class CcaAsmHelper {
      * <strong>This method must not be called before the static component container interface has been defined!</strong>
      *
      * @param componentFactoryType the interface implemented by the component factories used to initialize this container
-     * @param componentFactories   a map of {@link ComponentKey}s to factories for components of that type
-     * @param componentImpls       a map of {@link ComponentKey}s to their actual implementation classes for the container
-     * @return the generated container class
-     * @deprecated cannot remove in 1.17 because internal compatibility
-     */
-    @Deprecated(forRemoval = true)
-    public static <I> Class<? extends ComponentContainer> spinComponentContainer(Class<? super I> componentFactoryType, Map<ComponentKey<?>, I> componentFactories, Map<ComponentKey<?>, Class<? extends CardinalComponent>> componentImpls) throws IOException {
-        Map<ComponentKey<?>, QualifiedComponentFactory<I>> merged = new LinkedHashMap<>();
-        for (var entry : componentFactories.entrySet()) {
-            merged.put(entry.getKey(), new QualifiedComponentFactory<>(entry.getValue(), componentImpls.get(entry.getKey()), Set.of()));
-        }
-        return spinComponentContainer(componentFactoryType, merged);
-    }
-
-    /**
-     * Defines an implementation of {@link ComponentContainer} that supports direct component access.
-     *
-     * <p>Instances of the returned class can be returned by {@link ComponentProvider#getComponentContainer()}.
-     * <strong>This method must not be called before the static component container interface has been defined!</strong>
-     *
-     * @param componentFactoryType the interface implemented by the component factories used to initialize this container
      * @param componentFactories   a map of {@link ComponentKey} ids to factories for components of that type
      * @return the generated container class
      */

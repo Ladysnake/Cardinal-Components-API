@@ -1,5 +1,5 @@
 ------------------------------------------------------
-Version 8.0.0-alpha.5+26.1
+Version 8.0.0
 ------------------------------------------------------
 Updated to 26.1
 
@@ -16,6 +16,7 @@ Starting with alpha-5, world data from previous minecraft versions should be mig
 
 **Removed**
 - Components attached to a `LevelData` object (using the `cardinal-components-leveldata` module) can no longer use dynamic registries in serialization (vanilla limitation)
+- `ComponentContainer.Builder#build(String)` (had been deprecated for removal for a couple years now)
 
 ------------------------------------------------------
 Version 7.3.1
