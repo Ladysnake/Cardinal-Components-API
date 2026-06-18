@@ -92,7 +92,7 @@ public abstract class MixinTeam implements ComponentProvider, TeamAccessor {
             this.getName(),
             required,
             key.getId(),
-            data
+            data.array()
         );
     }
 }

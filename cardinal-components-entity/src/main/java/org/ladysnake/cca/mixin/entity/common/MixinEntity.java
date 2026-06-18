@@ -100,7 +100,7 @@ public abstract class MixinEntity implements ComponentProvider {
             this.getId(),
             required,
             key.getId(),
-            data
+            data.array()
         );
     }
 }

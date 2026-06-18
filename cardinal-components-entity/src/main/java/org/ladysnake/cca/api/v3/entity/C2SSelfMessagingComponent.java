@@ -28,7 +28,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.RegistryByteBuf;
 import org.jetbrains.annotations.ApiStatus;
 import org.ladysnake.cca.api.v3.component.Component;
@@ -82,7 +81,14 @@ public interface C2SSelfMessagingComponent extends Component {
     static void sendC2SMessage(ComponentKey<?> key, C2SComponentPacketWriter writer) {
         PacketSender sender = ClientPlayNetworking.getSender(); // checks that the player is in game
         RegistryByteBuf buf = new RegistryByteBuf(PacketByteBufs.create(), Objects.requireNonNull(MinecraftClient.getInstance().getNetworkHandler()).getRegistryManager());
-        writer.writeC2SPacket(buf);
-        sender.sendPacket(new ComponentUpdatePayload<>(CardinalComponentsEntity.C2S_SELF_PACKET_ID, Unit.INSTANCE, true, key.getId(), buf), PacketCallbacks.always(buf::release));
+        byte[] bytes;
+        try {
+            writer.writeC2SPacket(buf);
+            bytes = buf.array();
+        }
+        finally {
+            buf.release();
+        }
+        sender.sendPacket(new ComponentUpdatePayload<>(CardinalComponentsEntity.C2S_SELF_PACKET_ID, Unit.INSTANCE, true, key.getId(), bytes));
     }
 }

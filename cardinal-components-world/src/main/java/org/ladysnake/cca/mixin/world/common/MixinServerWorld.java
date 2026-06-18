@@ -75,7 +75,7 @@ public abstract class MixinServerWorld extends MixinWorld {
             Unit.INSTANCE,
             required,
             key.getId(),
-            data
+            data.array()
         );
     }
 }

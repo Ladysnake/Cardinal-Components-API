@@ -22,8 +22,10 @@
  */
 package org.ladysnake.cca.internal.base;
 
+import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.network.DisconnectionInfo;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.text.Text;
 import org.ladysnake.cca.api.v3.component.Component;
@@ -38,15 +40,19 @@ public final class CcaClientInternals {
             try {
                 getter.apply(payload, ctx).ifPresent(c -> {
                     if (c instanceof AutoSyncedComponent synced) {
-                        synced.applySyncPacket(payload.buf());
+                        var buf = new RegistryByteBuf(Unpooled.wrappedBuffer(payload.rawPayload()), ctx.client().world.getRegistryManager());
+                        try {
+                            synced.applySyncPacket(buf);
+                        }
+                        finally {
+                            buf.release();
+                        }
                     }
                 });
             } catch (UnknownComponentException e) {
                 ctx.player().networkHandler.onDisconnected(new DisconnectionInfo(Text.literal(
                     e.getMessage() + "\n(you are probably missing a mod installed on the server)" + ComponentsInternals.getClientOptionalModAdvice())
                 ));
-            } finally {
-                payload.buf().release();
             }
         });
     }

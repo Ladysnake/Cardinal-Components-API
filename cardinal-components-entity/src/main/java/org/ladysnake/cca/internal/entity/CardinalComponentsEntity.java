@@ -23,6 +23,9 @@
 package org.ladysnake.cca.internal.entity;
 
 import com.mojang.datafixers.util.Unit;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.buffer.UnpooledDirectByteBuf;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -33,6 +36,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.conversion.EntityConversionContext;
 import net.minecraft.entity.conversion.EntityConversionType;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
@@ -82,11 +87,12 @@ public final class CardinalComponentsEntity {
             PlayerSyncCallback.EVENT.register(player -> syncEntityComponents(player, player));
             TrackingStartCallback.EVENT.register(CardinalComponentsEntity::syncEntityComponents);
             ServerPlayNetworking.registerGlobalReceiver(CardinalComponentsEntity.C2S_SELF_PACKET_ID, (payload, ctx) -> {
+                var buf = new RegistryByteBuf(Unpooled.wrappedBuffer(payload.rawPayload()), ctx.player().getRegistryManager());
                 try {
                     Optional<ComponentKey<?>> componentKey = payload.componentKey();
                     if (componentKey.isPresent()) {
                         if (componentKey.get().getNullable(ctx.player()) instanceof C2SSelfMessagingComponent synced) {
-                            synced.handleC2SMessage(payload.buf());
+                            synced.handleC2SMessage(buf);
                         } else if (payload.required() && (unknownC2SPlayerComponents.add(payload.componentKeyId()) || FabricLoader.getInstance().isDevelopmentEnvironment())) {
                             // In prod, only log the first time an unknown component update is received
                             ComponentsInternals.LOGGER.warn("[Cardinal Components API] Received an update for component {} from player {}, but this component is not registered for player entities", payload.componentKeyId(), ctx.player());
@@ -95,7 +101,7 @@ public final class CardinalComponentsEntity {
                         ComponentsInternals.LOGGER.warn("[Cardinal Components API] Received an update for unknown component {} from player {}", payload.componentKeyId(), ctx.player());
                     }
                 } finally {
-                    payload.buf().release();
+                    buf.release();
                 }
             });
         }

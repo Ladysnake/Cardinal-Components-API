@@ -96,7 +96,7 @@ public abstract class MixinServerScoreboard extends MixinScoreboard {
             Unit.INSTANCE,
             required,
             key.getId(),
-            data
+            data.array()
         );
     }
 

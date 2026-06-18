@@ -74,7 +74,7 @@ public abstract class MixinWorldChunk extends Chunk implements ComponentProvider
             this.getPos(),
             required,
             key.getId(),
-            data
+            data.array()
         );
     }
 
