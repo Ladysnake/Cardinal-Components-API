@@ -75,7 +75,7 @@ public abstract class MixinServerLevel extends MixinLevel {
             Unit.INSTANCE,
             required,
             key.getId(),
-            data
+            data.array()
         );
     }
 }

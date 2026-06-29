@@ -203,23 +203,24 @@ public abstract class ComponentKey<C extends CardinalComponent> {
     public void syncWith(ServerPlayer player, ComponentProvider provider, ComponentPacketWriter writer, PlayerSyncPredicate predicate) {
         if (predicate.shouldSyncWith(player)) {
             RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), player.level().registryAccess());
-            writer.writeSyncPacket(buf, player);
-            CustomPacketPayload payload = provider.toComponentPacket(this, predicate.isRequiredOnClient(), buf);
-
-            if (payload != null) {
-                if (ServerPlayNetworking.canSend(player, payload.type())) {
-                    ServerPlayNetworking.getSender(player).sendPacket(payload, PacketSendListener.thenRun(buf::release));
-                } else {
-                    if (predicate.isRequiredOnClient()) {
-                        String specificMod = FabricLoader.getInstance().getModContainer(this.id.getNamespace()).map(c -> c.getMetadata().getName() + " and ").orElse("");
-                        player.connection.disconnect(literal(
-                            "This server requires " + specificMod + "Cardinal Components API " +
-                                "(unhandled packet: " + payload.type().id() + ")" +
-                                ComponentsInternals.getClientOptionalModAdvice()));
+            try {
+                writer.writeSyncPacket(buf, player);
+                CustomPacketPayload payload = provider.toComponentPacket(this, predicate.isRequiredOnClient(), buf);
+                if (payload != null) {
+                    if (ServerPlayNetworking.canSend(player, payload.type())) {
+                        buf.retain(); // only release the buffer after the packet is sent, in case an implementation retains a reference to it
+                        ServerPlayNetworking.getSender(player).sendPacket(payload, PacketSendListener.thenRun(buf::release));
+                    } else {
+                        if (predicate.isRequiredOnClient()) {
+                            String specificMod = FabricLoader.getInstance().getModContainer(this.id.getNamespace()).map(c -> c.getMetadata().getName() + " and ").orElse("");
+                            player.connection.disconnect(literal(
+                                "This server requires " + specificMod + "Cardinal Components API " +
+                                    "(unhandled packet: " + payload.type().id() + ")" +
+                                    ComponentsInternals.getClientOptionalModAdvice()));
+                        }
                     }
-                    buf.release();
                 }
-            } else {
+            } finally {
                 buf.release();
             }
         }

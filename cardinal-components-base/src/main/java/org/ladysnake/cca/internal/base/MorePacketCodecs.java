@@ -24,23 +24,8 @@ package org.ladysnake.cca.internal.base;
 
 import com.mojang.datafixers.util.Unit;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
 public final class MorePacketCodecs {
     public static final StreamCodec<ByteBuf, Unit> EMPTY = StreamCodec.unit(Unit.INSTANCE);
-
-    public static final StreamCodec<RegistryFriendlyByteBuf, RegistryFriendlyByteBuf> REG_BYTE_BUF = StreamCodec.of(
-        (buf, value) -> {
-            buf.writeVarInt(value.readableBytes());
-            buf.writeBytes(value);
-        },
-        (buf) -> {
-            int readableBytes = buf.readVarInt();
-            ByteBuf copy = Unpooled.buffer(readableBytes, readableBytes);
-            buf.readBytes(copy, readableBytes);
-            return new RegistryFriendlyByteBuf(copy, buf.registryAccess());
-        }
-    );
 }
