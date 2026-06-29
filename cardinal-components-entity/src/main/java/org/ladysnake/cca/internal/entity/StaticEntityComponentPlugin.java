@@ -24,6 +24,7 @@ package org.ladysnake.cca.internal.entity;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.ComponentContainer;
 import org.ladysnake.cca.api.v3.component.ComponentFactory;
 import org.ladysnake.cca.api.v3.component.ComponentKey;
@@ -171,6 +172,7 @@ public final class StaticEntityComponentPlugin extends LazyDispatcher implements
         private final ComponentKey<? super C> key;
         private final Set<ComponentKey<?>> dependencies;
         private Class<C> componentClass;
+        @Nullable
         private Predicate<Class<? extends E>> test;
 
         RegistrationImpl(Class<E> target, ComponentKey<C> key) {
