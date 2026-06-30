@@ -15,6 +15,16 @@
     ]
   },
   "custom": {
+    "launchpad:compatible": true,
+    "launchpad:overrides": {
+      "id": "cardinal_components_chunk",
+      "depends": {
+        "minecraft": ">=26.1-",
+        "fabric_api_base": "*",
+        "cardinal_components_base": ">=8.0.0-alpha.1",
+        "fabric_networking_api_v1": "*"
+      }
+    },
     "modmenu": {
       "badges": [ "library" ],
       "parent": {
