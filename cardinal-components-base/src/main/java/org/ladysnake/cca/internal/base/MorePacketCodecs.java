@@ -30,17 +30,4 @@ import net.minecraft.network.codec.PacketCodec;
 
 public final class MorePacketCodecs {
     public static final PacketCodec<ByteBuf, Unit> EMPTY = PacketCodec.unit(Unit.INSTANCE);
-
-    public static final PacketCodec<RegistryByteBuf, RegistryByteBuf> REG_BYTE_BUF = PacketCodec.ofStatic(
-        (buf, value) -> {
-            buf.writeVarInt(value.readableBytes());
-            buf.writeBytes(value);
-        },
-        (buf) -> {
-            int readableBytes = buf.readVarInt();
-            ByteBuf copy = Unpooled.buffer(readableBytes, readableBytes);
-            buf.readBytes(copy, readableBytes);
-            return new RegistryByteBuf(copy, buf.getRegistryManager());
-        }
-    );
 }

@@ -95,7 +95,7 @@ public abstract class MixinLevelProperties implements ServerWorldProperties, Com
             Unit.INSTANCE,
             required,
             key.getId(),
-            data
+            data.array()
         );
     }
 

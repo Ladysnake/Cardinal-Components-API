@@ -111,7 +111,7 @@ public abstract class MixinBlockEntity implements ComponentProvider {
             new BlockEntityAddress(this.getType(), this.getPos(), world.getRegistryKey()),
             required,
             key.getId(),
-            data
+            data.array()
         );
     }
 }

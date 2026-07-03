@@ -23,6 +23,7 @@
 package org.ladysnake.cca.api.v3.component;
 
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketCallbacks;
@@ -200,24 +201,26 @@ public abstract class ComponentKey<C extends Component> {
     @ApiStatus.Experimental
     public void syncWith(ServerPlayerEntity player, ComponentProvider provider, ComponentPacketWriter writer, PlayerSyncPredicate predicate) {
         if (predicate.shouldSyncWith(player)) {
-            RegistryByteBuf buf = new RegistryByteBuf(Unpooled.buffer(), player.getEntityWorld().getRegistryManager());
-            writer.writeSyncPacket(buf, player);
-            CustomPayload payload = provider.toComponentPacket(this, predicate.isRequiredOnClient(), buf);
-
-            if (payload != null) {
-                if (ServerPlayNetworking.canSend(player, payload.getId())) {
-                    ServerPlayNetworking.getSender(player).sendPacket(payload, PacketCallbacks.always(buf::release));
-                } else {
-                    if (predicate.isRequiredOnClient()) {
-                        String specificMod = FabricLoader.getInstance().getModContainer(this.id.getNamespace()).map(c -> c.getMetadata().getName() + " and ").orElse("");
-                        player.networkHandler.disconnect(Text.literal(
-                            "This server requires " + specificMod + "Cardinal Components API " +
-                                "(unhandled packet: " + payload.getId().id() + ")" +
-                                ComponentsInternals.getClientOptionalModAdvice()));
+            RegistryByteBuf buf = new RegistryByteBuf(PacketByteBufs.create(), player.getEntityWorld().getRegistryManager());
+            try {
+                writer.writeSyncPacket(buf, player);
+                CustomPayload payload = provider.toComponentPacket(this, predicate.isRequiredOnClient(), buf);
+                if (payload != null) {
+                    if (ServerPlayNetworking.canSend(player, payload.getId())) {
+                        buf.retain(); // only release the buffer after the packet is sent, in case an implementation retains a reference to it
+                        ServerPlayNetworking.getSender(player).sendPacket(payload, PacketCallbacks.always(buf::release));
+                    } else {
+                        if (predicate.isRequiredOnClient()) {
+                            String specificMod = FabricLoader.getInstance().getModContainer(this.id.getNamespace()).map(c -> c.getMetadata().getName() + " and ").orElse("");
+                            player.networkHandler.disconnect(Text.literal(
+                                "This server requires " + specificMod + "Cardinal Components API " +
+                                    "(unhandled packet: " + payload.getId().id() + ")" +
+                                    ComponentsInternals.getClientOptionalModAdvice()));
+                        }
                     }
-                    buf.release();
                 }
-            } else {
+            }
+            finally {
                 buf.release();
             }
         }
