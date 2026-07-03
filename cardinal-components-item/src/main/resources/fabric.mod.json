@@ -8,14 +8,6 @@
   "version": "${version}",
   "custom": {
     "launchpad:compatible": true,
-    "launchpad:overrides": {
-      "id": "cardinal_components_item",
-      "depends": {
-        "minecraft": ">=1.17-",
-        "fabric_api_base": "*",
-        "cardinal_components_base": "*"
-      }
-    },
     "modmenu": {
       "badges": [ "library" ],
       "parent": {

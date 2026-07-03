@@ -13,13 +13,6 @@
   },
   "custom": {
     "launchpad:compatible": true,
-    "launchpad:overrides": {
-      "id": "cardinal_components_base",
-      "depends": {
-        "minecraft": ">=26.1-",
-        "fabric_api_base": ">=0.1.2"
-      }
-    },
     "modmenu": {
       "badges": [ "library" ],
       "parent": {

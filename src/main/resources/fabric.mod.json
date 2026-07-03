@@ -8,9 +8,6 @@
     "icon": "assets/cardinal-components/icon.png",
     "custom": {
       "launchpad:compatible": true,
-      "launchpad:overrides": {
-        "id": "cardinal_components"
-      },
       "modmenu": {
         "badges": ["library"]
       }
