@@ -38,7 +38,7 @@ public record ComponentUpdatePayload<T>(
         T targetData,
         boolean required,
         Identifier componentKeyId,
-        RegistryFriendlyByteBuf buf
+        byte[] rawPayload
 ) implements CustomPacketPayload {
     public static <T> CustomPacketPayload.Type<ComponentUpdatePayload<T>> id(String path) {
         return new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath("cardinal-components", path));
@@ -54,7 +54,7 @@ public record ComponentUpdatePayload<T>(
             targetDataCodec, ComponentUpdatePayload::targetData,
             ByteBufCodecs.BOOL, ComponentUpdatePayload::required,
             Identifier.STREAM_CODEC, ComponentUpdatePayload::componentKeyId,
-            MorePacketCodecs.REG_BYTE_BUF, ComponentUpdatePayload::buf,
+            ByteBufCodecs.BYTE_ARRAY, ComponentUpdatePayload::rawPayload,
             ComponentUpdatePayload::new
         );
     }

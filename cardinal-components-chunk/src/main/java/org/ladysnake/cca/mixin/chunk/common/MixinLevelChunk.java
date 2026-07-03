@@ -74,7 +74,7 @@ public abstract class MixinLevelChunk extends ChunkAccess implements ComponentPr
             this.getPos(),
             required,
             key.getId(),
-            data
+            data.array()
         );
     }
 

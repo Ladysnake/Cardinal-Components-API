@@ -88,7 +88,7 @@ public abstract class MixinPrimaryLevelData implements ServerLevelData, Componen
             Unit.INSTANCE,
             required,
             key.getId(),
-            data
+            data.array()
         );
     }
 
