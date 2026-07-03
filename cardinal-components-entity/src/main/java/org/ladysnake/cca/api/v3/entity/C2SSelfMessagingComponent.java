@@ -82,7 +82,13 @@ public interface C2SSelfMessagingComponent extends CardinalComponent {
     static void sendC2SMessage(ComponentKey<?> key, C2SComponentPacketWriter writer) {
         PacketSender sender = ClientPlayNetworking.getSender(); // checks that the player is in game
         RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(FriendlyByteBufs.create(), Objects.requireNonNull(Minecraft.getInstance().getConnection()).registryAccess());
-        writer.writeC2SPacket(buf);
-        sender.sendPacket(new ComponentUpdatePayload<>(CardinalComponentsEntity.C2S_SELF_PACKET_ID, Unit.INSTANCE, true, key.getId(), buf), PacketSendListener.thenRun(buf::release));
+        byte[] bytes;
+        try {
+            writer.writeC2SPacket(buf);
+            bytes = buf.array();
+        } finally {
+            buf.release();
+        }
+        sender.sendPacket(new ComponentUpdatePayload<>(CardinalComponentsEntity.C2S_SELF_PACKET_ID, Unit.INSTANCE, true, key.getId(), bytes));
     }
 }

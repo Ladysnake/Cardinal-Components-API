@@ -89,7 +89,7 @@ public abstract class MixinPlayerTeam implements ComponentProvider, PlayerTeamAc
             this.getName(),
             required,
             key.getId(),
-            data
+            data.array()
         );
     }
 }
