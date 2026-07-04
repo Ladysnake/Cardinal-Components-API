@@ -7,6 +7,7 @@
   "icon": "assets/cardinal-components-item/icon.png",
   "version": "${version}",
   "custom": {
+    "launchpad:compatible": true,
     "modmenu": {
       "badges": [ "library" ],
       "parent": {

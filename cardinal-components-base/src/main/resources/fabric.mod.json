@@ -12,6 +12,7 @@
     ]
   },
   "custom": {
+    "launchpad:compatible": true,
     "modmenu": {
       "badges": [ "library" ],
       "parent": {
