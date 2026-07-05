@@ -1,4 +1,11 @@
 ------------------------------------------------------
+Version 8.0.1
+------------------------------------------------------
+**Fixes**
+- Marked as explicitly compatible with Launchpad for Neoforge (thanks Moriya!)
+- Fixed network crashes when using Flashback mod (thanks Up!)
+
+------------------------------------------------------
 Version 8.0.0
 ------------------------------------------------------
 Updated to 26.1
