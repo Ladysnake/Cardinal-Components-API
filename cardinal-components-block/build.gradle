@@ -3,7 +3,7 @@ dependencies {
     // (which we add to various classes through interface injection)
     annotationProcessor api(project(":cardinal-components-base"))
     api fabricApi.module("fabric-api-lookup-api-v1", rootProject.fabric_api_version)
-    testmodImplementation project(":cardinal-components-base").sourceSets.testmod.output
+    testmodImplementation rootProject.project(":cardinal-components-base").sourceSets.testmod.output
     // TODO bring back when IP is updated
 //    compileOnly "com.github.iPortalTeam:ImmersivePortalsMod:${rootProject.immersive_portals_version}"
 }

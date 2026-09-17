@@ -2,7 +2,7 @@ import com.github.breadmoirai.githubreleaseplugin.GithubReleaseExtension
 import java.net.URI
 
 plugins {
-    id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT"
+    id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT"
     id("io.github.ladysnake.chenille") version "0.18.0"
 }
 
@@ -15,7 +15,7 @@ allprojects {
     apply(plugin = "io.github.ladysnake.chenille")
 
     chenille {
-        javaVersion = 21
+        javaVersion = 25
         license = "MIT"
         displayName = providers.gradleProperty("display_name").get()
         owners = providers.gradleProperty("owners").get()

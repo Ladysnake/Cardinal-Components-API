@@ -47,6 +47,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -55,8 +56,8 @@ public abstract class MixinPrimaryLevelData implements ServerLevelData, Componen
     @Unique
     private ComponentContainer components;
 
-    @Inject(method = "<init>(Ljava/util/UUID;ZLnet/minecraft/world/level/storage/LevelData$RespawnData;JIZLjava/util/Set;Ljava/util/Set;Lnet/minecraft/world/level/LevelSettings;Lnet/minecraft/world/level/storage/PrimaryLevelData$SpecialWorldProperty;Lcom/mojang/serialization/Lifecycle;)V", at = @At("RETURN"))
-    private void initComponents(UUID singlePlayerUUID, boolean wasModded, RespawnData respawnData, long gameTime, int version, boolean initialized, Set<?> knownServerBrands, Set<?> removedFeatureFlags, LevelSettings settings, PrimaryLevelData.SpecialWorldProperty specialWorldProperty, Lifecycle worldGenSettingsLifecycle, CallbackInfo ci)  {
+    @Inject(method = "<init>(Ljava/util/UUID;ZLnet/minecraft/world/level/storage/LevelData$RespawnData;JIZLjava/util/Set;Ljava/util/Set;Lnet/minecraft/world/level/LevelSettings;Lnet/minecraft/world/level/storage/PrimaryLevelData$SpecialWorldProperty;Lcom/mojang/serialization/Lifecycle;Ljava/util/List;)V", at = @At("RETURN"))
+    private void initComponents(UUID singlePlayerUUID, boolean wasModded, RespawnData respawnData, long gameTime, int version, boolean initialized, Set knownServerBrands, Set removedFeatureFlags, LevelSettings settings, PrimaryLevelData.SpecialWorldProperty specialWorldProperty, Lifecycle worldGenSettingsLifecycle, List versionHistory, CallbackInfo ci)  {
         this.components = StaticLevelDataComponentPlugin.createContainer(this);
     }
 

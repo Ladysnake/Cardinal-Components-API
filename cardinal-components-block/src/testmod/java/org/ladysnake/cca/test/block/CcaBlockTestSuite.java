@@ -31,7 +31,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.entity.CommandBlockEntity;
 import net.minecraft.world.level.block.entity.TheEndPortalBlockEntity;
 import net.minecraft.world.level.storage.TagValueInput;
@@ -46,7 +46,7 @@ public class CcaBlockTestSuite {
     public void beSerialize(GameTestHelper ctx) {
         BlockPos pos = ctx.absolutePos(BlockPos.ZERO);
         BlockEntity be = Objects.requireNonNull(
-            BlockEntityType.END_GATEWAY.create(
+            BlockEntityTypes.END_GATEWAY.create(
                 pos,
                 Blocks.END_GATEWAY.defaultBlockState()
             )
@@ -54,7 +54,7 @@ public class CcaBlockTestSuite {
         be.getComponent(Vita.KEY).setVitality(42);
         CompoundTag nbt = be.saveWithoutMetadata(ctx.getLevel().registryAccess());
         BlockEntity be1 = Objects.requireNonNull(
-            BlockEntityType.END_GATEWAY.create(
+            BlockEntityTypes.END_GATEWAY.create(
                 pos, Blocks.END_GATEWAY.defaultBlockState()
             )
         );
@@ -76,7 +76,7 @@ public class CcaBlockTestSuite {
     public void canQueryThroughLookup(GameTestHelper ctx) {
         BlockPos pos = ctx.absolutePos(BlockPos.ZERO);
         BlockEntity be = Objects.requireNonNull(
-            BlockEntityType.END_GATEWAY.create(
+            BlockEntityTypes.END_GATEWAY.create(
                 pos,
                 Blocks.END_GATEWAY.defaultBlockState()
             )
@@ -84,7 +84,7 @@ public class CcaBlockTestSuite {
         getVita(ctx, pos, be).setVitality(42);
         CompoundTag nbt = be.saveWithoutMetadata(ctx.getLevel().registryAccess());
         BlockEntity be1 = Objects.requireNonNull(
-            BlockEntityType.END_GATEWAY.create(
+            BlockEntityTypes.END_GATEWAY.create(
                 pos, Blocks.END_GATEWAY.defaultBlockState()
             )
         );

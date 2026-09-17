@@ -33,6 +33,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.entity.player.Player;
@@ -81,7 +82,7 @@ public class CardinalComponentsTest {
     public static final ResourceKey<EntityType<?>> VITALITY_ZOMBIE_ID = ResourceKey.create(Registries.ENTITY_TYPE, id("vita_zombie"));
     public static final EntityType<VitalityZombieEntity> VITALITY_ZOMBIE = Registry.register(BuiltInRegistries.ENTITY_TYPE, VITALITY_ZOMBIE_ID,
             EntityType.Builder.of(VitalityZombieEntity::new, MobCategory.MONSTER)
-                .sized(EntityType.ZOMBIE.getDimensions().width(), EntityType.ZOMBIE.getDimensions().height())
+                .sized(EntityTypes.ZOMBIE.getDimensions().width(), EntityTypes.ZOMBIE.getDimensions().height())
                 .build(VITALITY_ZOMBIE_ID));
 
     public static Identifier id(String path) {

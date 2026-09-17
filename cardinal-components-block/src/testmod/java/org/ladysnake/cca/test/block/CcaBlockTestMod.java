@@ -26,7 +26,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.entity.CommandBlockEntity;
 import net.minecraft.world.level.block.entity.TheEndGatewayBlockEntity;
 import net.minecraft.world.level.block.entity.TheEndPortalBlockEntity;
@@ -50,7 +50,7 @@ public class CcaBlockTestMod implements ModInitializer, BlockComponentInitialize
 
     @Override
     public void onInitialize() {
-        BlockComponents.exposeApi(Vita.KEY, VITA_API_LOOKUP, (vita, side) -> side == Direction.UP ? vita : null, BlockEntityType.END_PORTAL);
-        BlockComponents.exposeApi(VitaCompound.KEY, VITA_API_LOOKUP, VitaCompound::get, BlockEntityType.END_GATEWAY);
+        BlockComponents.exposeApi(Vita.KEY, VITA_API_LOOKUP, (vita, side) -> side == Direction.UP ? vita : null, BlockEntityTypes.END_PORTAL);
+        BlockComponents.exposeApi(VitaCompound.KEY, VITA_API_LOOKUP, VitaCompound::get, BlockEntityTypes.END_GATEWAY);
     }
 }

@@ -25,7 +25,7 @@ package org.ladysnake.componenttest.tests;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.ladysnake.cca.api.v3.component.ComponentAccess;
@@ -40,7 +40,7 @@ public final class CcaTestSuite {
         // CCA Chunk
         checkContainer(context, context.getLevel().getChunk(context.absolutePos(BlockPos.ZERO)));
         // CCA Entity
-        checkContainer(context, context.spawnWithNoFreeWill(EntityType.AXOLOTL, 1, 0, 1));
+        checkContainer(context, context.spawnWithNoFreeWill(EntityTypes.AXOLOTL, 1, 0, 1));
         // CCA Level
         checkContainer(context, context.getLevel().getLevelData());
         // CCA Scoreboard
