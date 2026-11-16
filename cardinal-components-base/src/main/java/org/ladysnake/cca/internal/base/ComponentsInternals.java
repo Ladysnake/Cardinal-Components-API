@@ -36,6 +36,7 @@ import java.io.Reader;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Properties;
@@ -65,6 +66,9 @@ public final class ComponentsInternals {
                 LOGGER.error("Config file at {} contains invalid values, resetting", path, e);
                 writeConfigFile(path);
             }
+        } catch (NoSuchFileException e) {
+            LOGGER.debug("Config file at {} does not exist, creating defaults", path);
+            writeConfigFile(path);
         } catch (IOException | IllegalArgumentException e) {
             LOGGER.error("Invalid config file at {}, resetting", path, e);
             writeConfigFile(path);
