@@ -79,10 +79,11 @@ allprojects {
     }
 
     tasks.processResources {
-        inputs.property("version", project.version)
+        val version = project.version
+        inputs.property("version", version)
 
         filesMatching("fabric.mod.json") {
-            expand(mapOf("version" to project.version))
+            expand(mapOf("version" to version))
         }
     }
 
@@ -104,7 +105,7 @@ allprojects {
 
     tasks.jar {
         from(rootProject.file("LICENSE.md")) {
-            rename { "LICENSE_${project.name.replace("-", "_")}"}
+            rename("LICENSE\\.md", "LICENSE_${project.name.replace("-", "_")}.md")
         }
     }
 }
