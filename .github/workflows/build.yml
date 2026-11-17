@@ -4,33 +4,33 @@
 # against bad commits.
 
 name: build
-on: [pull_request, push]
+on: [ pull_request, push ]
 
 env:
-    JAVA_VERSION: 25
+  JAVA_VERSION: 25
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
-      - name: checkout repository
-        uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-            fetch-depth: 0
-            filter: 'blob:none'
-      - name: setup jdk
-        uses: actions/setup-java@v5
+          fetch-depth: 0
+          filter: 'blob:none'
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'microsoft'
-      - name: setup gradle
-        uses: gradle/actions/setup-gradle@v6
-      - name: make gradle wrapper executable
+      - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        with:
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+      - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
-      - name: build
-        run: ./gradlew build
-      - name: capture build artifacts
-        uses: actions/upload-artifact@v7
+      - name: Build
+        run: ./gradlew assemble
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Artifacts
           path: build/libs/
+      - name: Run Tests
+        run: ./gradlew check
